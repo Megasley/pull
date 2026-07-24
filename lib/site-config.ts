@@ -7,12 +7,23 @@ export const siteConfig = {
   contactEmail: "hello@pullos.dev",
 } as const;
 
-/** Public social profiles. Add entries when accounts are ready. */
-export const socialLinks: readonly {
+/** Public social profiles. */
+export const socialLinks = [
+  {
+    title: "GitHub",
+    href: "https://github.com/Megasley/pull",
+    icon: "github",
+  },
+  {
+    title: "X / @pullosdev",
+    href: "https://x.com/pullosdev",
+    icon: "x",
+  },
+] as const satisfies readonly {
   title: string;
   href: string;
-  icon: "github";
-}[] = [];
+  icon: "github" | "x";
+}[];
 
 export type SocialLink = (typeof socialLinks)[number];
 export type SocialIconName = SocialLink["icon"];
