@@ -1,8 +1,7 @@
 <p align="center">
-  <img src="./public/pull-logo.png" alt="Pull" width="72" height="72" />
+  <img src="./public/pull-logo.png" alt="Pull" width="172" height="172" />
 </p>
 
-<h1 align="center">Pull</h1>
 
 <p align="center">
   <strong>The operating system for open source builders.</strong><br />
