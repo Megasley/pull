@@ -1,3 +1,4 @@
+import { AudienceSection } from "@/components/landing/audience-section";
 import { BuilderLoopSection } from "@/components/landing/builder-loop-section";
 import { FeaturedRoadmapsSection } from "@/components/landing/featured-roadmaps-section";
 import { FinalCtaSection } from "@/components/landing/final-cta-section";
@@ -18,6 +19,7 @@ export default function Home() {
       <HeroSection />
       <BuilderLoopSection />
       <FeaturedRoadmapsSection />
+      <AudienceSection />
       <ProofSection />
       <FinalCtaSection />
     </div>

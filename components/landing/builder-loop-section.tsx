@@ -14,10 +14,10 @@ const STEPS = [
   },
   {
     id: "02",
-    cmd: "./ship",
-    title: "Ship real projects",
+    cmd: "./build",
+    title: "Build real software",
     description:
-      "Build portfolio projects, submit proof of work, and get reviewed as you level up.",
+      "Build portfolio-ready software, submit proof of work, and get reviewed as you level up.",
     href: "/projects",
     linkLabel: "ls ./projects",
   },
@@ -66,7 +66,7 @@ export function BuilderLoopSection() {
             <code className="rounded-none border border-border bg-muted/60 px-1.5 py-0.5 font-mono text-[0.9em] text-foreground">
               while(true)
             </code>{" "}
-            loop of learning, shipping, contributing, and leveling up.
+            loop of learning, building, contributing, and proving what you can do.
           </p>
         </Reveal>
 

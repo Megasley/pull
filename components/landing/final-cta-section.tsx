@@ -30,7 +30,7 @@ export function FinalCtaSection() {
         </Reveal>
         <Reveal variant="fade" delayMs={150}>
           <p className="max-w-xl font-mono text-base leading-snug tracking-[-0.02em] text-ink/80 sm:text-lg">
-            Pick a roadmap, ship a project, contribute upstream, and build a
+            Pick a roadmap, build real software, contribute upstream, and publish a
             portfolio others can verify.
           </p>
         </Reveal>

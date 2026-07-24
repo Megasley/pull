@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 
 const BOOT_LINES = [
   "> boot pull --mode=contribute",
-  "> mount /learn /ship /contribute /prove",
+  "> mount /learn /build /contribute /prove",
   "> sync github credentials … ok",
   "> ready.",
 ] as const;
@@ -55,11 +55,7 @@ export function HeroSection() {
     setStarted(true);
   }, []);
 
-  const title = useTypewriter(
-    siteConfig.name,
-    started && !reduceMotion,
-    70,
-  );
+  const title = useTypewriter(siteConfig.name, started && !reduceMotion, 70);
   const tagline = useTypewriter(
     siteConfig.tagline,
     started && (reduceMotion || title.done),
@@ -88,10 +84,10 @@ export function HeroSection() {
     return () => window.clearInterval(id);
   }, [started, reduceMotion]);
 
-  const displayTitle = reduceMotion ? siteConfig.name : title.value || (started ? "" : siteConfig.name);
-  const displayTagline = reduceMotion
-    ? siteConfig.tagline
-    : tagline.value;
+  const displayTitle = reduceMotion
+    ? siteConfig.name
+    : title.value || (started ? "" : siteConfig.name);
+  const displayTagline = reduceMotion ? siteConfig.tagline : tagline.value;
   const showTitleCaret = started && !reduceMotion && !title.done;
   const showTaglineCaret = started && !reduceMotion && title.done && !tagline.done;
 
@@ -110,10 +106,15 @@ export function HeroSection() {
       </div>
 
       <div className="relative mx-auto flex w-full max-w-6xl flex-col px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
-        <p className="font-mono text-[11px] tracking-[0.14em] text-ink/70 uppercase">
-          sys.boot // open-source
-          <span className="tech-blink ml-2 inline-block h-2.5 w-2 bg-ink align-middle" />
-        </p>
+        <div className="flex flex-wrap items-center gap-3">
+          <p className="font-mono text-[11px] tracking-[0.14em] text-ink/70 uppercase">
+            sys.boot // open-source
+            <span className="tech-blink ml-2 inline-block h-2.5 w-2 bg-ink align-middle" />
+          </p>
+          <span className="border border-ink/35 bg-ink/5 px-2 py-1 font-mono text-[10px] tracking-[0.14em] text-ink uppercase">
+            beta // public
+          </span>
+        </div>
 
         <h1
           id="hero-heading"
@@ -140,6 +141,11 @@ export function HeroSection() {
           {showTaglineCaret ? (
             <span className="tech-caret ml-1 inline-block h-[1em] w-[0.45ch] bg-ink align-[-0.1em]" />
           ) : null}
+        </p>
+
+        <p className="mt-4 max-w-2xl text-sm leading-relaxed text-ink/75 sm:text-base">
+          Learn through structured roadmaps, build real software, contribute to open
+          source, and prove your skills through projects and GitHub activity.
         </p>
 
         <div

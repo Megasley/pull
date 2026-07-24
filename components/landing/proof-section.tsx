@@ -58,8 +58,9 @@ export function ProofSection() {
           </Reveal>
           <Reveal variant="fade" delayMs={150}>
             <p className="mt-4 max-w-2xl font-mono text-sm leading-relaxed text-white/65 sm:text-base">
-              Courses end with a certificate. Pull ends with evidence - a
-              portfolio others can verify.
+              Courses end with a certificate. Pull ends with evidence - a portfolio
+              others can verify. Show employers, maintainers, grant programs, and
+              communities what you&apos;ve actually built.
             </p>
           </Reveal>
 
