@@ -51,8 +51,8 @@ Check [ROADMAP.md](./ROADMAP.md) for planned work and open a discussion before l
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/Megasley/BuilderOS.git
-cd BuilderOS
+git clone https://github.com/Megasley/pull.git
+cd pull
 npm install
 cp .env.example .env.local
 ```
@@ -275,7 +275,7 @@ CI (when configured) should run the same checks. A failing build blocks merge.
 
 ### Bugs
 
-Open a [GitHub Issue](https://github.com/Megasley/BuilderOS/issues) with:
+Open a [GitHub Issue](https://github.com/Megasley/pull/issues) with:
 
 - Steps to reproduce
 - Expected vs actual behavior

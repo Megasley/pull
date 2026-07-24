@@ -107,4 +107,4 @@ Pull is the operating system for open source builders: **learn → ship → cont
 3. **Maintainability** — MDX in Git, validated roadmaps, typed schema
 4. **Community leverage** — features that scale with contributors, not just core team
 
-Questions or proposals? Open a [GitHub Discussion](https://github.com/Megasley/BuilderOS/discussions) or issue with the `roadmap` label.
+Questions or proposals? Open a [GitHub Discussion](https://github.com/Megasley/pull/discussions) or issue with the `roadmap` label.

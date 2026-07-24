@@ -104,8 +104,8 @@ Screenshots belong in [`docs/screenshots/`](./docs/screenshots/). Suggested capt
 ## Quick start
 
 ```bash
-git clone https://github.com/Megasley/BuilderOS.git
-cd BuilderOS
+git clone https://github.com/Megasley/pull.git
+cd pull
 npm install
 cp .env.example .env.local
 # Edit .env.local — see Environment variables below
@@ -131,8 +131,8 @@ Browse lessons without auth. Sign in at `/sign-in` to track progress on the dash
 ### 1. Clone and install dependencies
 
 ```bash
-git clone https://github.com/Megasley/BuilderOS.git
-cd BuilderOS
+git clone https://github.com/Megasley/pull.git
+cd pull
 npm install
 ```
 
