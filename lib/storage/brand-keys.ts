@@ -1,12 +1,12 @@
 /** New brand storage namespace. */
 export const PULL_STORAGE_PREFIX = "pull:";
 
-/** Legacy BuilderOS storage namespace (read once, then migrate). */
+/** Legacy storage namespace from the pre-Pull brand (read once, then migrate). */
 export const LEGACY_STORAGE_PREFIX = "builderos:";
 
 /**
  * Read a localStorage value from the Pull key, falling back to the legacy
- * BuilderOS key and copying it forward when found.
+ * brand key and copying it forward when found.
  */
 export function readMigratedLocalStorage(keySuffix: string): string | null {
   if (typeof window === "undefined") {

@@ -1,4 +1,4 @@
--- BuilderOS project submissions extras + RLS (Phase 2, Step 15)
+-- Pull project submissions extras + RLS (Phase 2, Step 15)
 
 ALTER TABLE public.project_submissions
   ADD COLUMN IF NOT EXISTS live_demo_url text;

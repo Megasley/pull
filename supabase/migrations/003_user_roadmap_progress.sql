@@ -1,4 +1,4 @@
--- BuilderOS slug-based roadmap progress (Phase 1, Step 11)
+-- Pull slug-based roadmap progress (Phase 1, Step 11)
 
 CREATE TABLE IF NOT EXISTS public.user_roadmap_progress (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),

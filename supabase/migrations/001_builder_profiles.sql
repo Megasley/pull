@@ -1,4 +1,4 @@
--- BuilderOS builder profile table (Phase 1, Step 7)
+-- Pull builder profile table (Phase 1, Step 7)
 
 create table if not exists public.builder_profiles (
   id uuid primary key references auth.users (id) on delete cascade,

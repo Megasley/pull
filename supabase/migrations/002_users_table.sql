@@ -1,4 +1,4 @@
--- BuilderOS initial Drizzle schema (Phase 1, Step 8)
+-- Pull initial Drizzle schema (Phase 1, Step 8)
 -- Renames builder_profiles -> users when upgrading from Step 7.
 
 DO $$
