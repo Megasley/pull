@@ -1,0 +1,123 @@
+---
+title: Blocks & Chain
+description: 'Headers, merkle trees, proof-of-work, and chain validation rules.'
+difficulty: beginner
+duration: 5 days
+objectives:
+  - Describe a block header and how blocks link into a chain
+  - Explain merkle trees for transaction inclusion proofs
+  - Reason about proof-of-work and reorgs at a builder level
+resources:
+  - title: Mastering Bitcoin
+    url: >-
+      https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch11_blockchain.adoc
+    kind: book
+    chapter: 'Ch. 11: Bitcoin Blockchain'
+    required: true
+  - title: 'Decoding Bitcoin: Reorg calculator'
+    url: 'https://bitcoindevs.xyz/decoding/reorg-calculator'
+    kind: interactive
+    note: Interactive tool — model reorg depth vs attacker hashrate before the lab.
+    required: true
+  - title: Bitcoin Whitepaper
+    url: 'https://bitcoin.org/bitcoin.pdf'
+    kind: article
+  - title: 'Bitcoin Optech: Chain reorganizations'
+    url: 'https://bitcoinops.org/en/topics/reorgs/'
+    kind: article
+reflectionPrompts:
+  - >-
+    Explain Blocks & Chain to a teammate without jargon — what problem does it
+    solve?
+  - What would break in production if you misunderstood Blocks & Chain?
+  - >-
+    Using the Decoding Bitcoin reorg calculator, what confirmation depth would
+    you defend for a mid-size merchant payment — and why?
+lab:
+  title: Reorg risk + header check
+  description: >-
+    Use the Decoding Bitcoin reorg calculator to pick a confirmation policy,
+    then on regtest inspect a block header (`getblockheader`) and explain how
+    the previous-block hash links the chain.
+  evidence:
+    - Screenshot or notes from the Decoding Bitcoin reorg calculator with your assumed attacker share
+    - 'getblockheader (or explorer) output for one regtest/mainnet tip block'
+    - One-sentence confirmation policy you would ship, tied to the calculator output
+---
+A blockchain is not a magical database, it is a linked list of **blocks**, each committing to a set of transactions and to the previous block’s hash, secured by proof-of-work.
+
+## Why this matters
+
+Explorers, wallets, and payment processors must decide when a payment is “final enough.” That decision is about chain tips, confirmations, and reorg risk.
+
+## Analogy
+
+Think of each block as a sealed evidence bag. The seal includes a fingerprint of the previous bag. To rewrite history, an attacker must reseal every bag after the change, and beat the honest network’s work.
+
+## Block anatomy
+
+A block contains:
+
+- A **header** (version, previous hash, merkle root, time, bits/difficulty, nonce)
+- A list of **transactions** (the coinbase first)
+
+The **merkle root** commits to all transactions so light clients can verify inclusion without downloading everything.
+
+<Mermaid caption="Headers commit to transactions and previous history; PoW makes rewriting expensive." chart="flowchart TD
+    TxA[Tx A] --> M0[Hash]
+    TxB[Tx B] --> M1[Hash]
+    M0 --> Root[Merkle root]
+    M1 --> Root
+    Root --> Hdr[Block header]
+    Prev[Prev block hash] --> Hdr
+    PoW[Nonce / PoW] --> Hdr
+    Hdr --> Next[Next block links here]" />
+
+## Confirmations
+
+When your transaction appears in a block, it has **1 confirmation**. Each block buried on top adds another. Deeper confirmations make reorgs that undo your payment less likely.
+
+```typescript
+const confirmations = tipHeight - txBlockHeight + 1;
+```
+
+<Callout type="info" title="0-conf is a business risk">
+  Accepting unconfirmed transactions can be fine for tiny amounts with controls, but it is not consensus finality. Design product risk limits deliberately.
+</Callout>
+
+## Reorgs
+
+Sometimes two miners find blocks near the same time. Nodes follow the heaviest valid chain. A short **reorganization** can drop a block you briefly saw. Wallets should handle disappearing transactions gracefully.
+
+## Common mistakes
+
+- Treating “seen in mempool” as settled
+- Ignoring that explorers can disagree briefly during races
+- Forgetting coinbase maturity rules when spending mining rewards on regtest
+
+
+## Worked mental model
+
+Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
+
+## Hands-on habit
+
+Every protocol idea should be paired with one local experiment:
+
+1. Reproduce the happy path on regtest (or Polar for Lightning)
+2. Break it on purpose (wrong fee, expired invoice, offline peer)
+3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
+
+That habit turns reading into builder instinct.
+
+## Glossary check
+
+Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
+
+## Resource order
+
+Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
+
+## Next steps
+
+Dive into transaction structure, the bytes wallets actually sign and broadcast.

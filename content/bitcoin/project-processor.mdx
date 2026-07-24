@@ -1,0 +1,71 @@
+---
+title: Payment Processor API
+description: 'Accept invoices, track confirmations, and handle payment webhooks.'
+difficulty: advanced
+duration: 2 weeks
+project: payment-processor
+objectives:
+  - Create BIP-21 payment requests with unique addresses or amounts
+  - Detect payments and confirmation thresholds
+  - Emit signed webhooks to merchants
+resources:
+  - title: BIP-21 URI scheme
+    url: 'https://github.com/bitcoin/bips/blob/master/bip-0021.mediawiki'
+    kind: bip
+    required: true
+  - title: 'Bitcoin Optech: Payment tracking'
+    url: 'https://bitcoinops.org/'
+    kind: article
+  - title: Mastering Bitcoin
+    url: >-
+      https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch06_transactions.adoc
+    kind: book
+    chapter: 'Ch. 6: Transactions'
+reflectionPrompts:
+  - >-
+    Explain Payment Processor API to a teammate without jargon — what problem
+    does it solve?
+  - What would break in production if you misunderstood Payment Processor API?
+  - >-
+    Which BIP, book chapter, or Core doc is authoritative here, and what did you
+    verify?
+lab:
+  title: Project milestone evidence
+  description: >-
+    For Payment Processor API, complete the linked project spec happy path on
+    regtest/Polar and capture demo evidence before marking the lesson complete.
+  evidence:
+    - Link to public repo or branch
+    - Commands or screenshots proving the happy path
+    - Short note of one failure case you tested
+searchQueries:
+  - BIP21
+---
+Merchants need idempotent invoices, confirmation policies, and reliable callbacks. This project is the on-chain cousin of a Lightning POS.
+
+## Build challenge
+
+API endpoints to:
+
+1. Create invoice (amount, expiry, address)
+2. Query invoice status
+3. Register webhook URL
+4. Mark paid after N confirmations
+
+<Mermaid caption="Invoice creation, detection, confirmation, webhook." chart="sequenceDiagram
+    participant M as Merchant
+    participant P as Processor
+    participant N as Node
+    M->>P: Create invoice
+    P->>M: address + BIP21 URI
+    N->>P: Detect payment
+    P->>P: Wait confirmations
+    P->>M: Webhook paid" />
+
+<Callout type="warning" title="Under/over payment">
+  Define policy for wrong amounts and late payments. Document it in the API.
+</Callout>
+
+## Next steps
+
+Enter open source: find a good first issue in a Bitcoin repository.

@@ -1,0 +1,35 @@
+.lesson-content {
+  max-width: 42rem;
+}
+
+.lesson-content > :first-child {
+  margin-top: 0;
+}
+
+.lesson-content h2 {
+  letter-spacing: -0.02em;
+}
+
+.lesson-content h3 {
+  letter-spacing: -0.01em;
+}
+
+.lesson-content p,
+.lesson-content li {
+  font-size: 1.02rem;
+  line-height: 1.8;
+}
+
+.lesson-content pre {
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+
+.lesson-content .anchor {
+  scroll-margin-top: 6rem;
+}
+
+.lesson-content h2,
+.lesson-content h3 {
+  scroll-margin-top: 6rem;
+}

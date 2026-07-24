@@ -1,0 +1,111 @@
+---
+title: Bitcoin Economics
+description: 'Supply schedule, fee markets, mining incentives, and security assumptions.'
+difficulty: beginner
+duration: 4 days
+objectives:
+  - Explain the fixed supply schedule and halvings
+  - Describe how fees bid for limited block space
+  - Connect miner incentives to network security
+resources:
+  - title: Mastering Bitcoin
+    url: 'https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch01_intro.adoc'
+    kind: book
+    chapter: 'Ch. 1: Introduction'
+    required: true
+  - title: Mastering Bitcoin
+    url: 'https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch02_overview.adoc'
+    kind: book
+    chapter: 'Ch. 2: Overview'
+  - title: 'Bitcoin Optech: Transaction fees'
+    url: 'https://bitcoinops.org/en/topics/fee-bumping/'
+    kind: article
+reflectionPrompts:
+  - >-
+    Explain Bitcoin Economics to a teammate without jargon — what problem does
+    it solve?
+  - What would break in production if you misunderstood Bitcoin Economics?
+  - >-
+    Which BIP, book chapter, or Core doc is authoritative here, and what did you
+    verify?
+lab:
+  title: Regtest check
+  description: >-
+    After reading, run one hands-on check related to Bitcoin Economics. Prefer
+    local regtest or Polar over mainnet.
+  evidence:
+    - Command output or screenshot from your local lab
+    - One sentence on what you observed vs expected
+    - Link to the required reading section you used
+---
+Bitcoin is software *and* an incentive system. If you only memorize data structures, you will still be surprised when fees spike, blocks fill, or miners orphan a chain tip. Economics explains the behavior.
+
+## Why this matters
+
+Builders ship wallets, fee estimators, and Lightning nodes. All of them live inside a fee market and a security budget. Ignoring incentives leads to stuck transactions and brittle products.
+
+## Analogy
+
+Block space is like seats on a fixed-size bus that leaves every ~10 minutes. When demand is high, people bid higher fares (fees). Miners are drivers paid by the fare box plus a scheduled subsidy that halves over time.
+
+## Supply schedule
+
+New bitcoin enters circulation through the **block subsidy**. Approximately every 210,000 blocks (~4 years), the subsidy **halves**. Eventually the subsidy trends toward zero and security relies more on fees.
+
+<Mermaid caption="Users bid for inclusion; miners earn subsidy and fees; hashpower secures the ledger." chart="flowchart TD
+    Users[Users broadcast txs] --> Mempool[Mempool bids with fees]
+    Mempool --> Miners[Miners select profitable txs]
+    Miners --> Block[New block + subsidy + fees]
+    Block --> Security[Hashpower secures history]" />
+
+## Fee markets
+
+A transaction pays a fee equal to inputs minus outputs. Wallets express urgency as **sat/vB** (satoshis per virtual byte). Higher fees usually confirm faster when the mempool is congested.
+
+```typescript
+const feeSats = inputSumSats - outputSumSats;
+const satPerVb = feeSats / virtualSize;
+```
+
+<Callout type="info" title="Security assumption">
+  Bitcoin’s security assumes that attacking the chain (for example, rewriting recent history) costs more than it is worth, primarily because honest mining is rewarded and hashpower is expensive. Fees and subsidy fund that hashpower.
+</Callout>
+
+## What builders should design for
+
+- Fee spikes: always support fee bumping (RBF/CPFP) for on-chain sends
+- Dust and uneconomical UTXOs: tiny outputs can cost more to spend than they are worth
+- Confirmation targets: “next block” vs “within a day” are different products
+
+## Common mistakes
+
+- Hard-coding a fee like “10 sat/vB forever”
+- Treating the 21 million cap as a UX detail instead of a consensus rule
+- Assuming Lightning removes the need to understand fees, channels still open/close on-chain
+
+
+## Worked mental model
+
+Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
+
+## Hands-on habit
+
+Every protocol idea should be paired with one local experiment:
+
+1. Reproduce the happy path on regtest (or Polar for Lightning)
+2. Break it on purpose (wrong fee, expired invoice, offline peer)
+3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
+
+That habit turns reading into builder instinct.
+
+## Glossary check
+
+Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
+
+## Resource order
+
+Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
+
+## Next steps
+
+Read Mastering Bitcoin chapters 1, 2, then start the UTXO model, the accounting system every wallet actually uses.

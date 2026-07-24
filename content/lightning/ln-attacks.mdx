@@ -1,0 +1,87 @@
+---
+title: Lightning Attack Surface
+description: >-
+  Congestion, channel probing, watchtower incentives, and lessons from real LN
+  CVEs — adversarial thinking for Lightning builders.
+difficulty: advanced
+duration: 7 days
+objectives:
+  - >-
+    Describe payment-channel congestion / jamming style griefing at a conceptual
+    level
+  - Explain channel balance probing and privacy implications
+  - List defensive practices and why watchtowers / uptime matter
+resources:
+  - title: Payment channel congestion discussion
+    url: 'https://github.com/lightning/bolts/issues/182'
+    kind: docs
+    required: true
+  - title: On the Difficulty of Hiding the Balance of Lightning Network Channels
+    url: 'https://eprint.iacr.org/2019/328.pdf'
+    kind: article
+    required: true
+  - title: 2019 LND/CLN/Eclair CVE disclosure
+    url: >-
+      https://lists.linuxfoundation.org/pipermail/lightning-dev/2019-September/002174.html
+    kind: article
+    required: true
+  - title: Mastering the Lightning Network
+    url: 'https://github.com/lnbook/lnbook'
+    kind: book
+    chapter: Security / attacks overview
+reflectionPrompts:
+  - >-
+    How can an attacker lock liquidity without stealing funds outright, and why
+    is that still damaging?
+  - >-
+    What does successful channel probing reveal, and how should wallet UX talk
+    about LN privacy?
+  - >-
+    After reading a historical multi-implementation CVE disclosure, what process
+    change would you add to your release checklist?
+lab:
+  title: Adversarial tabletop
+  description: >-
+    Run a tabletop exercise for a 3-node Polar graph. Pick congestion, probing,
+    or offline breach. Write attacker steps, defender detections, and product
+    mitigations.
+  evidence:
+    - One-page tabletop writeup with roles and timeline
+    - List of metrics/alerts you would monitor
+    - Two product mitigations ranked by cost vs impact
+searchQueries:
+  - Lightning attack surface
+  - channel jamming
+---
+
+Lightning’s safety depends on **timelocks, honesty assumptions, availability, and implementation correctness**. Attackers may not need to steal immediately — locking liquidity, probing balances, or racing offline victims can still win.
+
+## Why this matters
+
+Builders shipping POS, wallets, or routing services inherit LN’s adversarial reality. Ignoring known classes of griefing and past CVEs is negligence.
+
+## Congestion and jamming
+
+Attackers can open paths or hold HTLCs to **consume channel capacity**, degrading payment success for others. Defenses are an active research and engineering area (limits, reputation, upfront fees, etc.).
+
+## Probing
+
+Because routing reveals whether a payment can proceed, adversaries can **probe channel balances** more than naive privacy marketing suggests. Treat LN privacy as layered and incomplete.
+
+## Watchtowers and uptime
+
+Revocation justice requires someone online to notice a breach. **Watchtowers** outsource detection; they do not remove the need for correct backups and timely justice transactions.
+
+## CVEs are part of the curriculum
+
+Multi-implementation incidents (for example the 2019 disclosures affecting major daemons) show that **interop + shared assumptions** can fail together. Read disclosures for process lessons, not doom.
+
+<Callout type="info" title="Defense in depth">
+  Limits, monitoring, backups, towers, and conservative channel sizes beat clever one-off settings.
+</Callout>
+
+## Common mistakes
+
+- Marketing “Lightning is private” without caveats
+- Running routing nodes with no capacity/HTLC metrics
+- Skipping patch discipline because “it’s just testnet”

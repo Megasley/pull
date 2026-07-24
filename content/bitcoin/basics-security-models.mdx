@@ -1,0 +1,80 @@
+---
+title: Security Models & Light Clients
+description: >-
+  Full validation vs SPV, Neutrino filters, AssumeUTXO, and what “trustless”
+  really means for builders.
+difficulty: advanced
+duration: 6 days
+objectives:
+  - Contrast full-node security with SPV / light-client assumptions
+  - Explain BIP157/158 compact block filters at a builder level
+  - Describe AssumeUTXO’s purpose and remaining trust tradeoffs
+resources:
+  - title: BIP-157 Compact Block Filters
+    url: 'https://github.com/bitcoin/bips/blob/master/bip-0157.mediawiki'
+    kind: bip
+    required: true
+  - title: BIP-158 Compact Block Filter Encoding
+    url: 'https://github.com/bitcoin/bips/blob/master/bip-0158.mediawiki'
+    kind: bip
+    required: true
+  - title: Assume UTXO FAQs
+    url: 'https://github.com/bitcoin/bitcoin/blob/master/doc/assumeutxo.md'
+    kind: docs
+    required: true
+  - title: 'Bitcoin’s Security Model: A Deep Dive'
+    url: >-
+      https://www.coindesk.com/markets/2016/11/13/bitcoins-security-model-a-deep-dive
+    kind: article
+reflectionPrompts:
+  - 'What can an SPV client prove, and what must it assume about miners or peers?'
+  - >-
+    How do compact block filters improve light-client privacy vs BIP37 bloom
+    filters, and what remains leaked?
+  - >-
+    When would you accept AssumeUTXO for a product bootstrap, and what
+    background validation still matters?
+lab:
+  title: Trust boundary map
+  description: >-
+    Draw a trust-boundary diagram for a wallet product choosing (a) full node,
+    (b) Neutrino-style filters, or (c) third-party Electrum/Esplora. Label what
+    each design can detect.
+  evidence:
+    - 'Diagram (SVG, Mermaid, or photo of whiteboard)'
+    - One paragraph per option on fraud/censorship risk
+    - Your recommended default for a beginner builder and why
+searchQueries:
+  - BIP157
+  - BIP158
+---
+
+“Trustless” is relative. Every Bitcoin client chooses a **security model**: what it verifies locally vs what it assumes about peers, miners, or snapshots.
+
+## Why this matters
+
+Product builders who default to third-party APIs without labeling trust boundaries ship wallets that fail silently under eclipse, dishonest servers, or chain forks.
+
+## Full nodes
+
+A validating full node checks proof-of-work, scripts, and economic history rules (with pruning/assumevalid nuances). Highest assurance; highest cost.
+
+## SPV and filters
+
+Classic **SPV** verifies proof-of-work headers and merkle proofs for transactions of interest, trusting that miners will not feed an invalid-but-high-work chain forever without fraud proofs.
+
+**BIP157/158 compact block filters** let light clients request filters and download blocks of interest with better privacy than BIP37 bloom filters — still not full validation.
+
+## AssumeUTXO
+
+**AssumeUTXO** helps nodes sync faster by loading a committed UTXO snapshot, then background-validating. It trades bootstrap time for carefully scoped assumptions until validation completes.
+
+<Callout type="info" title="Label the model in your README">
+  Users deserve to know whether your app verifies scripts, trusts an indexer, or uses filters. Silence is a product bug.
+</Callout>
+
+## Common mistakes
+
+- Calling any API-backed wallet “non-custodial and trustless”
+- Ignoring that light clients can be lied to about *absence* of transactions
+- Skipping background validation after snapshot sync in ops runbooks

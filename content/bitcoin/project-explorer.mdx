@@ -1,0 +1,64 @@
+---
+title: Block Explorer UI
+description: 'Visualize blocks, transactions, and mempool activity in a web dashboard.'
+difficulty: intermediate
+duration: 2 weeks
+project: block-explorer
+objectives:
+  - 'Index or query blocks, txs, and addresses for display'
+  - Present mempool fee histograms or recent transactions
+  - 'Handle loading, empty, and error states cleanly'
+resources:
+  - title: Esplora API
+    url: 'https://github.com/Blockstream/esplora/blob/master/API.md'
+    kind: docs
+  - title: Mempool.space
+    url: 'https://mempool.space/'
+    kind: tool
+  - title: Mastering Bitcoin
+    url: >-
+      https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch11_blockchain.adoc
+    kind: book
+    chapter: 'Ch. 11: Bitcoin Blockchain'
+    required: true
+reflectionPrompts:
+  - >-
+    Explain Block Explorer UI to a teammate without jargon — what problem does
+    it solve?
+  - What would break in production if you misunderstood Block Explorer UI?
+  - >-
+    Which BIP, book chapter, or Core doc is authoritative here, and what did you
+    verify?
+lab:
+  title: Project milestone evidence
+  description: >-
+    For Block Explorer UI, complete the linked project spec happy path on
+    regtest/Polar and capture demo evidence before marking the lesson complete.
+  evidence:
+    - Link to public repo or branch
+    - Commands or screenshots proving the happy path
+    - Short note of one failure case you tested
+---
+Explorers teach users (and you) how the chain looks. Build a focused UI over regtest or an Esplora-compatible API.
+
+## Build challenge
+
+Create pages for:
+
+- Recent blocks
+- Transaction detail (vin/vout, fee, weight)
+- Address summary (funded txouts)
+
+<Mermaid caption="UI reads indexed chain data; keep heavy indexing off the request path when possible." chart="flowchart TD
+    UI[Next.js UI] --> API[Explorer API]
+    API --> Core[Bitcoin Core / Esplora]
+    UI --> TxPage[Tx view]
+    UI --> BlockPage[Block view]" />
+
+<Callout type="info" title="Don't scrape RPC on every click">
+  Cache recent blocks. RPC fan-out per page view will feel slow and fragile.
+</Callout>
+
+## Next steps
+
+Operate a Node Dashboard that monitors peers, sync, and fees in real time.

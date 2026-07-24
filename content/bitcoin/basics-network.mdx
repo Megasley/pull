@@ -1,0 +1,111 @@
+---
+title: P2P Network
+description: 'How nodes discover peers, relay transactions, and gossip blocks.'
+difficulty: intermediate
+duration: 5 days
+objectives:
+  - Describe peer discovery and relay at a high level
+  - Explain compact block relay and why it matters
+  - Know privacy tradeoffs of filters and light clients
+resources:
+  - title: Mastering Bitcoin
+    url: 'https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch10_network.adoc'
+    kind: book
+    chapter: 'Ch. 10: Bitcoin Network'
+    required: true
+  - title: BIP-152 Compact Block Relay
+    url: 'https://github.com/bitcoin/bips/blob/master/bip-0152.mediawiki'
+    kind: bip
+  - title: BIP-157/158 Compact Block Filters
+    url: 'https://github.com/bitcoin/bips/blob/master/bip-0157.mediawiki'
+    kind: bip
+reflectionPrompts:
+  - >-
+    Explain P2P Network to a teammate without jargon — what problem does it
+    solve?
+  - What would break in production if you misunderstood P2P Network?
+  - >-
+    Which BIP, book chapter, or Core doc is authoritative here, and what did you
+    verify?
+lab:
+  title: Regtest check
+  description: >-
+    After reading, run one hands-on check related to P2P Network. Prefer local
+    regtest or Polar over mainnet.
+  evidence:
+    - Command output or screenshot from your local lab
+    - One sentence on what you observed vs expected
+    - Link to the required reading section you used
+searchQueries:
+  - BIP152
+  - BIP157
+---
+Bitcoin is a gossip network of peers. There is no central server that “is Bitcoin.” Your node connects to other nodes, validates rules, and relays data.
+
+## Why this matters
+
+Wallet backends, explorers, and Lightning nodes depend on healthy P2P connectivity. Sync problems, eclipse risks, and privacy leaks start at the network layer.
+
+## Analogy
+
+Think of nodes as neighbors on radios. When someone announces a new transaction or block, others rebroadcast after validation. Compact tricks let them share “what’s new” without repeating everything they already have.
+
+## Relay overview
+
+<Mermaid caption="Peers validate then gossip; compact blocks reduce bandwidth." chart="sequenceDiagram
+    participant A as Node A
+    participant B as Node B
+    participant C as Node C
+    A->>B: inv / tx
+    B->>B: Validate policy + consensus
+    B->>C: Relay onward
+    A->>B: compact block
+    B->>A: getblocktxn for missing txs" />
+
+## Compact blocks and filters
+
+- **Compact block relay (BIP-152)** reconstructs new blocks using mempool txs already known
+- **Compact block filters (BIP-157/158)** help light clients find relevant txs with better privacy than old bloom filters
+
+<Callout type="warning" title="Light client privacy">
+  Querying a random server for “txs to my address” leaks ownership. Prefer filters, client-side scanning, or your own node.
+</Callout>
+
+## Builder checklist
+
+- Run your own node for production backends when possible
+- Monitor peer count and IBD/sync state
+- Rate-limit and authenticate RPC, never expose it publicly
+
+## Common mistakes
+
+- Exposing `bitcoind` RPC to the internet
+- Assuming one explorer API equals full network view
+- Ignoring that different peers may temporarily see different mempools
+
+
+## Worked mental model
+
+Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
+
+## Hands-on habit
+
+Every protocol idea should be paired with one local experiment:
+
+1. Reproduce the happy path on regtest (or Polar for Lightning)
+2. Break it on purpose (wrong fee, expired invoice, offline peer)
+3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
+
+That habit turns reading into builder instinct.
+
+## Glossary check
+
+Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
+
+## Resource order
+
+Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
+
+## Next steps
+
+Learn mining and consensus: why proof-of-work secures the tip you are syncing.

@@ -1,0 +1,115 @@
+---
+title: Lightning Overview
+description: 'Understand how payment channels enable instant, low-fee Bitcoin transfers.'
+difficulty: intermediate
+duration: 4 days
+objectives:
+  - Explain why Lightning exists and what problem it solves
+  - 'Describe channels, HTLCs, and invoices at a high level'
+  - Connect Lightning concepts to prior Bitcoin roadmap knowledge
+resources:
+  - title: Mastering the Lightning Network
+    url: 'https://github.com/lnbook/lnbook/blob/master/01_introduction.asciidoc'
+    kind: book
+    chapter: 'Ch. 1: Introduction to Lightning'
+    required: true
+  - title: Mastering the Lightning Network
+    url: 'https://github.com/lnbook/lnbook/blob/master/03_how_ln_works.asciidoc'
+    kind: book
+    chapter: 'Ch. 3: How the Lightning Network Works'
+  - title: Lightning Network Paper
+    url: 'https://lightning.network/lightning-network-paper.pdf'
+    kind: article
+  - title: Amboss Explorer
+    url: 'https://amboss.space/'
+    kind: tool
+reflectionPrompts:
+  - >-
+    Explain Lightning Overview to a teammate without jargon — what problem does
+    it solve?
+  - What would break in production if you misunderstood Lightning Overview?
+  - >-
+    Which BOLT (or implementation doc) is the source of truth for this topic,
+    and what did you verify there?
+lab:
+  title: Polar check
+  description: >-
+    After reading, run one hands-on check related to Lightning Overview. Prefer
+    local regtest or Polar over mainnet.
+  evidence:
+    - Command output or screenshot from your local lab
+    - One sentence on what you observed vs expected
+    - Link to the required reading section you used
+---
+The Lightning Network scales Bitcoin payments by moving most transfers **off-chain** into bilateral payment channels. Users update balances locally and only settle on-chain when opening or closing channels.
+
+## Why this matters
+
+On-chain block space is scarce. Instant coffee payments should not compete with large settlements for the same limited capacity. Lightning is how builders offer snappy UX without abandoning Bitcoin settlement.
+
+## Analogy
+
+A channel is a bar tab between two friends. You keep a running tally (signed IOUs). When you are done hanging out, you settle the final balance once at the bank (on-chain). Routing is asking mutual friends to help settle tabs across a network of tabs.
+
+## Core concepts
+
+### Payment channels
+
+Two parties lock bitcoin in a 2-of-2 multisig-style funding output. They exchange signed **commitment transactions** off-chain to update balances without publishing every change.
+
+### HTLCs
+
+Hash Time Locked Contracts make multi-hop payments atomic: either the whole route completes, or it fails safely as timelocks unwind.
+
+### Invoices
+
+BOLT11 invoices encode payment requests (amount, expiry, routing hints). Wallets decode before paying.
+
+<LessonImage
+  src="/lessons/lightning/ln-overview/channel-balance.svg"
+  alt="Channel outbound versus inbound capacity"
+  caption="Total capacity is fixed until you splice or close; payments slide the balance boundary."
+/>
+
+<Mermaid caption="Lightning hops across channels; Bitcoin settles channel open/close." chart="flowchart LR
+    Payer[Payer wallet] --> NodeA[Local node]
+    NodeA --> Route[Routed hops]
+    Route --> NodeB[Recipient node]
+    NodeB --> Payee[Payee wallet]
+    NodeA -. on-chain funding .-> Chain[Bitcoin]
+    NodeB -. on-chain funding .-> Chain" />
+
+<Callout type="info" title="Channels are bilateral">
+  A channel exists between two nodes. Routing stitches channels into a network so payments can cross multiple peers.
+</Callout>
+
+## Before you build
+
+Complete the Bitcoin roadmap first. Lightning assumes UTXOs, fees, scripts/timelocks, and regtest comfort.
+
+
+## Worked mental model
+
+Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
+
+## Hands-on habit
+
+Every protocol idea should be paired with one local experiment:
+
+1. Reproduce the happy path on regtest (or Polar for Lightning)
+2. Break it on purpose (wrong fee, expired invoice, offline peer)
+3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
+
+That habit turns reading into builder instinct.
+
+## Glossary check
+
+Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
+
+## Resource order
+
+Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
+
+## Next steps
+
+Learn the BOLT specification landscape: how implementations stay interoperable.

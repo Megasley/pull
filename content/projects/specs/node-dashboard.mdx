@@ -1,0 +1,54 @@
+---
+objectives:
+  - Expose Bitcoin Core health metrics in a live dashboard
+  - Visualize sync progress, peers, and mempool stats
+  - Alert on stalled tip or RPC failures
+architecture: |
+  Browser ──► Dashboard API ──► bitcoind RPC
+                  │
+                  └──► optional metrics store
+requirements:
+  - Live updating tip height and sync progress
+  - Peer and mempool panels with readable units
+  - Clear error banner when RPC is down
+  - RPC credentials stay server-side (never in the browser)
+  - README with Docker-based demo path
+stretchGoals:
+  - Alert when tip has not advanced for N minutes while peers > 0
+  - Wallet balance panel when a wallet is loaded
+  - Historical sparkline for mempool size / fee estimates
+  - Prometheus scrape endpoint for ops teams
+resources:
+  - title: Bitcoin Core RPC Reference
+    url: https://developer.bitcoin.org/reference/rpc/
+  - title: getblockchaininfo
+    url: https://developer.bitcoin.org/reference/rpc/getblockchaininfo.html
+  - title: getpeerinfo
+    url: https://developer.bitcoin.org/reference/rpc/getpeerinfo.html
+exampleRepos:
+  - title: bitcoin-core/gui
+    url: https://github.com/bitcoin-core/gui
+    description: Reference for how Core surfaces node and wallet status.
+  - title: Ride The Lightning
+    url: https://github.com/Ride-The-Lightning/RTL
+    description: Ops dashboard patterns (Lightning-focused, still useful UX).
+submission:
+  - Ship a protected dashboard demo (localhost auth is fine)
+  - Document required RPC permissions and network binding
+  - Include screenshots of healthy and degraded (RPC down) states
+  - Describe your stall-alert rule if implemented
+---
+
+Operators need a single pane of glass for node health. Turn Bitcoin Core RPC into an operational dashboard.
+
+A node dashboard is high privilege. Auth-protect it, bind to localhost by default, and assume leaked cookies equal node access.
+
+### Minimum panels
+
+| Metric | Source ideas |
+| --- | --- |
+| Chain tip / headers | `getblockchaininfo` |
+| Peer count / versions | `getpeerinfo` |
+| Mempool size / fees | `getmempoolinfo`, estimates |
+| Wallet balance | `getbalances` (if enabled) |
+| RPC latency | measured client-side |

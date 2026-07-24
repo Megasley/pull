@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" role="img" aria-labelledby="title desc">
+  <title id="title">Taproot spend paths</title>
+  <desc id="desc">Key path spend versus script path spend with a merkle tree of scripts.</desc>
+  <rect width="720" height="300" fill="#0b0f14"/>
+  <rect x="260" y="30" width="200" height="50" fill="#1a2836" stroke="#5a7a94" stroke-width="2"/>
+  <text x="360" y="60" fill="#e8eef4" font-family="ui-monospace,monospace" font-size="14" text-anchor="middle">Taproot output (P2TR)</text>
+  <path d="M300 80 V120" stroke="#6b8ca8" stroke-width="2"/>
+  <path d="M420 80 V120" stroke="#6b8ca8" stroke-width="2"/>
+  <rect x="80" y="120" width="220" height="120" fill="#15202b" stroke="#4a9e6e" stroke-width="2"/>
+  <text x="190" y="155" fill="#e8eef4" font-family="ui-monospace,monospace" font-size="13" text-anchor="middle">Key-path spend</text>
+  <text x="190" y="180" fill="#8aa0b5" font-family="ui-monospace,monospace" font-size="11" text-anchor="middle">Schnorr signature</text>
+  <text x="190" y="200" fill="#8aa0b5" font-family="ui-monospace,monospace" font-size="11" text-anchor="middle">Looks like single-sig</text>
+  <text x="190" y="220" fill="#8aa0b5" font-family="ui-monospace,monospace" font-size="11" text-anchor="middle">Most private / efficient</text>
+  <rect x="420" y="120" width="220" height="120" fill="#15202b" stroke="#c9a227" stroke-width="2"/>
+  <text x="530" y="155" fill="#e8eef4" font-family="ui-monospace,monospace" font-size="13" text-anchor="middle">Script-path spend</text>
+  <text x="530" y="180" fill="#8aa0b5" font-family="ui-monospace,monospace" font-size="11" text-anchor="middle">Reveal one leaf + proof</text>
+  <text x="530" y="200" fill="#8aa0b5" font-family="ui-monospace,monospace" font-size="11" text-anchor="middle">Unused scripts stay hidden</text>
+  <text x="530" y="220" fill="#8aa0b5" font-family="ui-monospace,monospace" font-size="11" text-anchor="middle">MAST / Tapscript</text>
+</svg>

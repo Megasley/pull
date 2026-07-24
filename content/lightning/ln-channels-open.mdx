@@ -1,0 +1,113 @@
+---
+title: Opening Channels
+description: 'Fund channels, configure policies, and monitor inbound capacity.'
+difficulty: intermediate
+duration: 5 days
+objectives:
+  - Open a channel on a local Lightning lab
+  - Explain funding outputs and confirmation requirements
+  - Configure fees and understand inbound vs outbound capacity
+resources:
+  - title: Mastering the Lightning Network
+    url: 'https://github.com/lnbook/lnbook/blob/master/07_payment_channels.asciidoc'
+    kind: book
+    chapter: 'Ch. 7: Payment Channels'
+    required: true
+  - title: BOLT2 Peer Protocol
+    url: 'https://github.com/lightning/bolts/blob/master/02-peer-protocol.md'
+    kind: bolt
+  - title: LND openchannel
+    url: 'https://docs.lightning.engineering/'
+    kind: docs
+reflectionPrompts:
+  - >-
+    Explain Opening Channels to a teammate without jargon — what problem does it
+    solve?
+  - What would break in production if you misunderstood Opening Channels?
+  - >-
+    Which BOLT (or implementation doc) is the source of truth for this topic,
+    and what did you verify there?
+lab:
+  title: Polar check
+  description: >-
+    After reading, run one hands-on check related to Opening Channels. Prefer
+    local regtest or Polar over mainnet.
+  evidence:
+    - Command output or screenshot from your local lab
+    - One sentence on what you observed vs expected
+    - Link to the required reading section you used
+searchQueries:
+  - BOLT2
+---
+Opening a channel locks on-chain funds into a collaborative contract so you can send many off-chain payments later.
+
+## Why this matters
+
+Without outbound capacity you cannot send. Without inbound capacity you cannot receive. Channel opens are the capital planning step of Lightning ops.
+
+## Analogy
+
+Opening a channel is stocking a cash drawer between two cashiers. The total cash is fixed until you restock (splice/dual-fund) or close.
+
+## Open flow
+
+<Mermaid caption="Fund on-chain, wait for depth, then activate the channel." chart="sequenceDiagram
+    participant A as Node A
+    participant B as Node B
+    participant Chain as Bitcoin
+    A->>B: open_channel
+    A->>Chain: funding tx
+    Chain->>A: confirmations
+    Chain->>B: confirmations
+    A->>B: channel_ready
+    Note over A,B: Off-chain updates begin" />
+
+```bash
+# Illustrative LND-style flow
+lncli connect <pubkey>@host:port
+lncli openchannel <pubkey> <local_amt>
+```
+
+<Callout type="tip" title="Confirmations matter">
+  Do not route large value on a channel that has not reached your configured confirmation depth.
+</Callout>
+
+## Inbound vs outbound
+
+- **Outbound**: your side’s spendable balance for sending
+- **Inbound**: counterparty balance that lets you receive
+
+New single-funded channels often start with outbound only, receiving may require liquidity strategies.
+
+## Common mistakes
+
+- Opening to random public nodes without operational needs
+- Ignoring on-chain fees and reserve requirements
+- Forgetting backups after open
+
+
+## Worked mental model
+
+Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
+
+## Hands-on habit
+
+Every protocol idea should be paired with one local experiment:
+
+1. Reproduce the happy path on regtest (or Polar for Lightning)
+2. Break it on purpose (wrong fee, expired invoice, offline peer)
+3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
+
+That habit turns reading into builder instinct.
+
+## Glossary check
+
+Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
+
+## Resource order
+
+Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
+
+## Next steps
+
+Study commitment transactions, the signed states that make channels safe.

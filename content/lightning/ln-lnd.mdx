@@ -1,0 +1,90 @@
+---
+title: LND
+description: 'Build integrations with LND gRPC, REST, and macaroon authentication.'
+difficulty: advanced
+duration: 2 weeks
+objectives:
+  - Run LND against bitcoind in a lab
+  - Authenticate with macaroons safely
+  - 'Call key RPCs for invoices, payments, and channels'
+resources:
+  - title: LND documentation
+    url: 'https://docs.lightning.engineering/'
+    kind: docs
+  - title: Mastering the Lightning Network
+    url: 'https://github.com/lnbook/lnbook/blob/master/04_node_client.asciidoc'
+    kind: book
+    chapter: 'Ch. 4: Lightning Node Software'
+    required: true
+  - title: Lightning Terminal / Loop
+    url: >-
+      https://docs.lightning.engineering/lightning-network-tools/lightning-terminal
+    kind: docs
+reflectionPrompts:
+  - Explain LND to a teammate without jargon — what problem does it solve?
+  - What would break in production if you misunderstood LND?
+  - >-
+    Which BOLT (or implementation doc) is the source of truth for this topic,
+    and what did you verify there?
+lab:
+  title: Polar check
+  description: >-
+    After reading, run one hands-on check related to LND. Prefer local regtest
+    or Polar over mainnet.
+  evidence:
+    - Command output or screenshot from your local lab
+    - One sentence on what you observed vs expected
+    - Link to the required reading section you used
+---
+**LND** is a widely deployed Lightning implementation with gRPC/REST APIs and macaroon-based auth. Many apps integrate here first.
+
+## Why this matters
+
+Production integrations live or die on auth scoping, idempotent payment calls, and careful macaroon storage.
+
+## Analogy
+
+Macaroons are VIP wristbands with permissions printed on them. Anyone holding an admin wristband is you, guard them like passwords.
+
+<Mermaid caption="Apps authenticate to LND; LND talks to Bitcoin and peers." chart="flowchart LR
+    App[Your app] --> Mac[Macaroon + TLS]
+    Mac --> LND[LND]
+    LND --> Bitcoind[bitcoind]
+    LND --> Peers[LN peers]" />
+
+```bash
+lncli getinfo
+lncli addinvoice --amt 1000
+lncli payinvoice <bolt11>
+```
+
+<Callout type="danger" title="Macaroon hygiene">
+  Do not commit macaroons. Use readonly macaroons for UIs that only display data.
+</Callout>
+
+
+## Worked mental model
+
+Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
+
+## Hands-on habit
+
+Every protocol idea should be paired with one local experiment:
+
+1. Reproduce the happy path on regtest (or Polar for Lightning)
+2. Break it on purpose (wrong fee, expired invoice, offline peer)
+3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
+
+That habit turns reading into builder instinct.
+
+## Glossary check
+
+Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
+
+## Resource order
+
+Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
+
+## Next steps
+
+Compare with Core Lightning’s plugin-centric model.

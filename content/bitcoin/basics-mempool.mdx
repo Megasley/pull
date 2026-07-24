@@ -1,0 +1,111 @@
+---
+title: Mempool & Fees
+description: 'Follow unconfirmed transactions, fee estimation, RBF, and CPFP.'
+difficulty: intermediate
+duration: 4 days
+objectives:
+  - Explain mempool policy versus consensus rules
+  - Estimate fees and choose confirmation targets
+  - Apply RBF and CPFP fee-bumping strategies
+resources:
+  - title: Mastering Bitcoin
+    url: 'https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch09_fees.adoc'
+    kind: book
+    chapter: 'Ch. 9: Transaction Fees'
+    required: true
+  - title: BIP-125 RBF
+    url: 'https://github.com/bitcoin/bips/blob/master/bip-0125.mediawiki'
+    kind: bip
+  - title: 'Bitcoin Optech: Fee bumping'
+    url: 'https://bitcoinops.org/en/topics/fee-bumping/'
+    kind: article
+reflectionPrompts:
+  - >-
+    Explain Mempool & Fees to a teammate without jargon — what problem does it
+    solve?
+  - What would break in production if you misunderstood Mempool & Fees?
+  - >-
+    Which BIP, book chapter, or Core doc is authoritative here, and what did you
+    verify?
+lab:
+  title: Regtest check
+  description: >-
+    After reading, run one hands-on check related to Mempool & Fees. Prefer
+    local regtest or Polar over mainnet.
+  evidence:
+    - Command output or screenshot from your local lab
+    - One sentence on what you observed vs expected
+    - Link to the required reading section you used
+searchQueries:
+  - mempool
+  - BIP125
+---
+The **mempool** is each node’s holding area for valid unconfirmed transactions. Miners (and other nodes) choose what to relay and mine based on **policy** and fees, not every consensus-valid transaction is welcome under default policy.
+
+## Why this matters
+
+Users experience Bitcoin through confirmation delays and fee spikes. Wallets that cannot bump fees create support nightmares.
+
+## Analogy
+
+The mempool is an auction house lobby. Anyone can submit a bid (transaction). Higher fee rates tend to get seated (mined) first when space is scarce. Some items are rejected at the door for policy reasons even if they are “legal.”
+
+## Fee rate basics
+
+```typescript
+const feeRateSatVb = feeSats / vsize;
+```
+
+Estimate using node RPCs (`estimatesmartfee`) or public observers, then add UX affordances for slow/medium/fast targets.
+
+<Mermaid caption="Stuck transactions need fee bumping via RBF or CPFP." chart="flowchart LR
+    Tx[Broadcast tx] --> Mempool[Node mempools]
+    Mempool --> Low{Fee high enough?}
+    Low -->|yes| Mine[Likely next blocks]
+    Low -->|no| Stuck[Sits unconfirmed]
+    Stuck --> RBF[Replace-by-fee]
+    Stuck --> CPFP[Child-pays-for-parent]
+    RBF --> Mine
+    CPFP --> Mine" />
+
+## RBF and CPFP
+
+- **RBF (BIP-125)**: replace an unconfirmed tx with a higher-fee variant (signals required)
+- **CPFP**: spend an unconfirmed output with a high-fee child that incentivizes mining both
+
+<Callout type="info" title="Policy ≠ consensus">
+  A transaction can be consensus-valid yet non-standard under default mempool policy. Builders must test relay behavior, not only block validity on regtest miner shortcuts.
+</Callout>
+
+## Common mistakes
+
+- Broadcasting without RBF signaling when users may need to bump
+- Overpaying dramatically due to stale fee estimates
+- Creating long unconfirmed chains that hit ancestor/descendant limits
+
+
+## Worked mental model
+
+Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
+
+## Hands-on habit
+
+Every protocol idea should be paired with one local experiment:
+
+1. Reproduce the happy path on regtest (or Polar for Lightning)
+2. Break it on purpose (wrong fee, expired invoice, offline peer)
+3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
+
+That habit turns reading into builder instinct.
+
+## Glossary check
+
+Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
+
+## Resource order
+
+Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
+
+## Next steps
+
+Study the P2P network: how transactions and blocks actually propagate, then mining and consensus.

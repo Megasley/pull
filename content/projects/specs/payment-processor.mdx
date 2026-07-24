@@ -1,0 +1,48 @@
+---
+objectives:
+  - Create payment invoices and watch for matching on-chain payments
+  - Track confirmation depth and emit reliable status transitions
+  - Deliver signed webhooks merchants can trust
+architecture: |
+  Merchant ──► Processor API ──► Watcher ──► Node / Indexer
+                   │
+                   └──► signed webhooks
+requirements:
+  - Invoice create + status endpoints with clear state machine
+  - Unique receive address (or BIP-21 URI) per invoice
+  - Explicit under/overpayment and expiry handling
+  - HMAC-signed webhooks with event IDs for safe retries
+  - End-to-end regtest demo: create → pay → confirm → webhook
+stretchGoals:
+  - Hosted invoice page with live status
+  - Watch-only xpub / descriptor custody separation
+  - Rate limits and absurd-dust rejection
+  - CPFP / RBF guidance for stuck merchant payments
+resources:
+  - title: BIP-21 URI Scheme
+    url: https://github.com/bitcoin/bips/blob/master/bip-0021.mediawiki
+  - title: BTCPay Server
+    url: https://github.com/btcpayserver/btcpayserver
+  - title: Webhook security basics
+    url: https://docs.github.com/en/webhooks/using-webhooks/validating-webhook-deliveries
+exampleRepos:
+  - title: BTCPay Server
+    url: https://github.com/btcpayserver/btcpayserver
+    description: Full-featured self-hosted payment processor reference.
+  - title: lnbits
+    url: https://github.com/lnbits/lnbits
+    description: Lightweight invoice and extension patterns (also Lightning).
+submission:
+  - Public repo with OpenAPI or route docs
+  - Regtest script or Docker Compose demo
+  - Sample webhook receiver that verifies signatures
+  - Written confirmation policy (N confirms, amount tolerances)
+---
+
+A payment processor turns "send bitcoin here" into an API merchants can integrate: create invoice → detect payment → confirm → notify.
+
+### Suggested statuses
+
+`unpaid` → `seen` → `confirmed` → `expired` / `underpaid` / `overpaid`
+
+Only fulfill after proven settlement. Deliver webhooks with event IDs and allow merchants to safely retry.

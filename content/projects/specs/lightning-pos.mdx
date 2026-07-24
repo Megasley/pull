@@ -1,0 +1,45 @@
+---
+objectives:
+  - Create BOLT11 (or LNURL-pay) invoices for cart totals
+  - Subscribe to settlement and update order state safely
+  - Deliver a cashier-friendly UX with expiry and failure handling
+architecture: |
+  Cashier UI ──► POS API ──► Lightning node
+                   │
+                   └──► order store + webhooks
+requirements:
+  - Create ticket / cart total in sats
+  - Display QR + copyable BOLT11 (or LNURL-pay flow)
+  - State machine: unpaid → pending → paid / expired
+  - Huge amount + countdown expiry in the UI
+  - Idempotent order fulfillment keyed by payment hash
+stretchGoals:
+  - Tip-adjusted amounts without confusing duplicate tickets
+  - Audio/visual paid confirmation for noisy shop floors
+  - Offline-friendly retry when invoice subscriptions drop
+  - Testnet/mainnet network label always visible
+resources:
+  - title: BOLT11
+    url: https://github.com/lightning/bolts/blob/master/11-payment-encoding.md
+  - title: LNURL Specs
+    url: https://github.com/lnurl/luds
+  - title: LND API
+    url: https://lightning.engineering/api-docs/
+exampleRepos:
+  - title: BTCPay Server Greenfield
+    url: https://docs.btcpayserver.org/API/Greenfield/v1/
+    description: Merchant invoice APIs with Lightning support.
+  - title: Alby
+    url: https://github.com/getAlby
+    description: Wallet UX and LNURL patterns useful for POS flows.
+submission:
+  - Repo + README covering node auth (macaroon/TLS or LNURL)
+  - Demo video of create → scan/pay → paid confirmation
+  - Tests for expiry and duplicate webhook delivery
+  - Screenshots of unpaid, paid, and expired states
+  - Lab evidence pack: Polar/testnode payment hash, expiry failure, and duplicate-webhook test output
+---
+
+A Lightning POS is the canonical merchant integration: show amount → display invoice/QR → detect payment → mark order paid.
+
+Key orders by ID and payment hash. Replaying webhooks must not double-fulfill. Prefer clarity and speed over ornamental UI - cashiers need huge type and an obvious paid state.

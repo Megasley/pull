@@ -1,0 +1,69 @@
+---
+title: Mini Wallet Project
+description: 'Build a CLI wallet that generates addresses, receives, and sends on regtest.'
+difficulty: intermediate
+duration: 2 weeks
+project: mini-wallet
+objectives:
+  - Generate receive addresses from a descriptor or HD wallet
+  - Track UTXOs and build a funded transaction on regtest
+  - Sign and broadcast with tests covering change and fees
+resources:
+  - title: 'Project Spec, Mini Wallet'
+    kind: docs
+    note: Follow the BuilderOS project spec in content/projects/specs.
+  - title: BDK
+    url: 'https://bitcoindevkit.org/'
+    kind: docs
+  - title: Mastering Bitcoin
+    url: 'https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch05_wallets.adoc'
+    kind: book
+    chapter: 'Ch. 5: Wallets'
+    required: true
+reflectionPrompts:
+  - >-
+    Explain Mini Wallet Project to a teammate without jargon — what problem does
+    it solve?
+  - What would break in production if you misunderstood Mini Wallet Project?
+  - >-
+    Which BIP, book chapter, or Core doc is authoritative here, and what did you
+    verify?
+lab:
+  title: Project milestone evidence
+  description: >-
+    For Mini Wallet Project, complete the linked project spec happy path on
+    regtest/Polar and capture demo evidence before marking the lesson complete.
+  evidence:
+    - Link to public repo or branch
+    - Commands or screenshots proving the happy path
+    - Short note of one failure case you tested
+---
+This project turns protocol lessons into a working tool: a command-line wallet on regtest that can receive and send bitcoin.
+
+## Build challenge
+
+Ship a CLI that can:
+
+1. Create or load a wallet (seed/descriptor)
+2. Show a receive address and balance
+3. Send to an address with an explicit fee rate
+4. Mine/confirm via Bitcoin Core RPC in tests
+
+<Mermaid caption="CLI drives wallet logic against a local regtest node." chart="flowchart LR
+    CLI[CLI] --> Wallet[Wallet state]
+    Wallet --> Core[bitcoind regtest]
+    CLI --> Build[Build + sign tx]
+    Build --> Core" />
+
+<Callout type="tip" title="Acceptance tests first">
+  Write a test that mines funds to your wallet, sends half to a second wallet, and asserts balances after one block.
+</Callout>
+
+## Suggested milestones
+
+- Week 1: address generation + sync/balance
+- Week 2: coin selection, change, broadcast, fee unit tests
+
+## Next steps
+
+After the wallet works, visualize the chain with a Block Explorer UI project.

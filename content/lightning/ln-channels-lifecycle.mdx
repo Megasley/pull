@@ -1,0 +1,96 @@
+---
+title: Channel Lifecycle
+description: 'Cooperative close, force close, and penalty transaction scenarios.'
+difficulty: advanced
+duration: 5 days
+objectives:
+  - Contrast cooperative close vs force close
+  - Explain when penalties apply
+  - Practice backup and recovery discipline
+resources:
+  - title: Mastering the Lightning Network
+    url: 'https://github.com/lnbook/lnbook/blob/master/07_payment_channels.asciidoc'
+    kind: book
+    chapter: 'Ch. 7: Payment Channels'
+    required: true
+  - title: BOLT2 closing
+    url: 'https://github.com/lightning/bolts/blob/master/02-peer-protocol.md'
+    kind: bolt
+  - title: Static Channel Backups (LND)
+    url: 'https://docs.lightning.engineering/'
+    kind: docs
+reflectionPrompts:
+  - >-
+    Explain Channel Lifecycle to a teammate without jargon — what problem does
+    it solve?
+  - What would break in production if you misunderstood Channel Lifecycle?
+  - >-
+    Which BOLT (or implementation doc) is the source of truth for this topic,
+    and what did you verify there?
+lab:
+  title: Polar check
+  description: >-
+    After reading, run one hands-on check related to Channel Lifecycle. Prefer
+    local regtest or Polar over mainnet.
+  evidence:
+    - Command output or screenshot from your local lab
+    - One sentence on what you observed vs expected
+    - Link to the required reading section you used
+searchQueries:
+  - BOLT2
+---
+Channels begin with funding and end with a close. How you close determines fees, delay, and risk.
+
+## Why this matters
+
+Force closes are expensive and slow. Lost channel state without backups can lose funds. Lifecycle literacy is operational safety.
+
+## Close types
+
+- **Cooperative close**: both agree, efficient on-chain settlement
+- **Force close**: broadcast latest commitment; timelocks may delay funds
+- **Penalty**: response to revoked state broadcast
+
+<Mermaid caption="Prefer cooperative closes; prepare for force closes and breaches." chart="flowchart TD
+    Open[Channel active] --> Coop[Cooperative close]
+    Open --> Force[Force close]
+    Force --> Wait[CSV delays / anchors]
+    Open --> Cheat[Old state broadcast]
+    Cheat --> Justice[Penalty sweep]" />
+
+<Callout type="danger" title="Backup before you need it">
+  Export static channel backups / recovery data after opens. Test restore on regtest.
+</Callout>
+
+## Common mistakes
+
+- Force closing to “speed up” when fees are high
+- Running nodes without disk redundancy
+- Ignoring unresolved HTLCs during close
+
+
+## Worked mental model
+
+Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
+
+## Hands-on habit
+
+Every protocol idea should be paired with one local experiment:
+
+1. Reproduce the happy path on regtest (or Polar for Lightning)
+2. Break it on purpose (wrong fee, expired invoice, offline peer)
+3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
+
+That habit turns reading into builder instinct.
+
+## Glossary check
+
+Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
+
+## Resource order
+
+Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
+
+## Next steps
+
+Dual funding and splicing change capacity without a full teardown.

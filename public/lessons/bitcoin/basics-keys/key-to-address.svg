@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 280" role="img" aria-labelledby="title desc">
+  <title id="title">Key to address derivation</title>
+  <desc id="desc">Private key derives public key which hashes into an address.</desc>
+  <rect width="720" height="280" fill="#0b0f14"/>
+  <rect x="40" y="100" width="130" height="70" fill="#15202b" stroke="#3d4f5f" stroke-width="2"/>
+  <text x="105" y="140" fill="#e8eef4" font-family="ui-monospace,monospace" font-size="13" text-anchor="middle">Private key</text>
+  <path d="M170 135 H230" stroke="#6b8ca8" stroke-width="2" marker-end="url(#a)"/>
+  <rect x="230" y="100" width="130" height="70" fill="#15202b" stroke="#3d4f5f" stroke-width="2"/>
+  <text x="295" y="140" fill="#e8eef4" font-family="ui-monospace,monospace" font-size="13" text-anchor="middle">Public key</text>
+  <path d="M360 135 H420" stroke="#6b8ca8" stroke-width="2" marker-end="url(#a)"/>
+  <rect x="420" y="100" width="130" height="70" fill="#15202b" stroke="#3d4f5f" stroke-width="2"/>
+  <text x="485" y="132" fill="#e8eef4" font-family="ui-monospace,monospace" font-size="13" text-anchor="middle">Hash160 /</text>
+  <text x="485" y="150" fill="#e8eef4" font-family="ui-monospace,monospace" font-size="13" text-anchor="middle">tweaked key</text>
+  <path d="M550 135 H610" stroke="#6b8ca8" stroke-width="2" marker-end="url(#a)"/>
+  <rect x="610" y="100" width="70" height="70" fill="#1a2836" stroke="#4a9e6e" stroke-width="2"/>
+  <text x="645" y="140" fill="#e8eef4" font-family="ui-monospace,monospace" font-size="12" text-anchor="middle">Addr</text>
+  <text x="360" y="220" fill="#8aa0b5" font-family="ui-monospace,monospace" font-size="12" text-anchor="middle">One-way: you cannot reverse an address to a private key</text>
+  <defs>
+    <marker id="a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#6b8ca8"/>
+    </marker>
+  </defs>
+</svg>

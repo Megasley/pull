@@ -1,0 +1,65 @@
+---
+title: Contribution Rubric
+description: Shared bar for a meaningful first Lightning contribution — scope, tests, and maintainer-ready communication.
+difficulty: intermediate
+duration: 3 days
+objectives:
+  - Score a Lightning contribution attempt against an explicit meaningful-PR rubric
+  - Prefer docs, tests, and tooling issues before consensus-adjacent changes
+  - Write maintainer-ready issue comments and PR descriptions for LND/CLN/LDK
+resources:
+  - title: lightningnetwork/lnd CONTRIBUTING
+    url: https://github.com/lightningnetwork/lnd/blob/master/docs/code_contribution_guidelines.md
+    kind: docs
+    required: true
+  - title: ElementsProject/lightning
+    url: https://github.com/ElementsProject/lightning
+    kind: docs
+    required: true
+  - title: Conventional comments
+    url: https://conventionalcomments.org/
+    kind: article
+    required: true
+reflectionPrompts:
+  - "Which rubric rows would your planned Lightning PR fail today?"
+  - "What Polar/regtest evidence would you attach so reviewers can reproduce?"
+  - "How will you handle a request to shrink scope or add integration tests?"
+lab:
+  title: Rubric self-score
+  description: Pick a real issue on LND, CLN, LDK, or a Lightning tool. Write a plan and self-score 0–2 on each rubric row before coding.
+  evidence:
+    - Issue URL and approach doc
+    - Rubric score table with notes
+    - Draft first comment or PR body
+---
+
+Lightning contributions inherit Bitcoin’s review culture plus **interop risk** across implementations. Use the same meaningful-PR bar, with extra weight on reproduction notes.
+
+## Rubric (score each 0–2)
+
+| Row | 0 | 1 | 2 |
+| --- | --- | --- | --- |
+| Problem fit | Vague / wrong daemon | Plausible issue | Confirmed issue + skill match |
+| Scope | Kitchen-sink | Slightly wide | Minimal diff for one problem |
+| Correctness | Untested | Manual only | Test, Polar repro, or scripted check |
+| Communication | Drive-by | Basic description | Context, risks, and review guide |
+| Citizenship | Ignores project norms | Skims guide | Follows CONTRIBUTING + CI expectations |
+
+**Ship bar:** total ≥ 8/10 before requesting review.
+
+## Evidence pack
+
+1. Issue / PR URLs  
+2. Rubric self-score  
+3. Polar/regtest or unit test notes  
+4. Interop note if behavior could differ across LND/CLN/LDK  
+
+## Anti-patterns
+
+- Untested protocol tweaks
+- Ignoring macaroon / permission surfaces in examples
+- Demanding merge on soft forks of personal preference
+
+<Callout type="info" title="Start smaller than you think">
+  Docs, examples, and tests are excellent first Lightning PRs.
+</Callout>

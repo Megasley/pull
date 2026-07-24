@@ -1,0 +1,42 @@
+---
+objectives:
+  - Aggregate channel, peer, and balance metrics from a Lightning node
+  - Visualize routing revenue and liquidity health
+  - Alert on offline peers, disabled channels, or stalled payments
+architecture: |
+  UI ──► Ops API ──► LND/CLN RPC (+ Prometheus)
+requirements:
+  - Node health panel (alias, pubkey, synced, version)
+  - Per-channel local/remote liquidity view
+  - Peer connected/disconnected status
+  - Forwarding / fee summary
+  - Credentials stay server-side; UI is auth-protected
+stretchGoals:
+  - Liquidity health score per channel (ratio + uptime + failures)
+  - Prometheus metrics + alert rules
+  - High unpaid HTLC warning
+  - Historical forwarding charts
+resources:
+  - title: LND API Docs
+    url: https://lightning.engineering/api-docs/
+  - title: Core Lightning RPC
+    url: https://docs.corelightning.org/docs/rpc
+  - title: Amboss
+    url: https://amboss.space/
+exampleRepos:
+  - title: ThunderHub
+    url: https://github.com/apotdevin/thunderhub
+    description: Polished LND ops dashboard reference.
+  - title: Ride The Lightning
+    url: https://github.com/Ride-The-Lightning/RTL
+    description: Multi-implementation Lightning management UI.
+submission:
+  - Docker-friendly demo README
+  - Screenshots of liquidity and alert panels
+  - Document least-privilege macaroon / ACL choices
+  - Describe any health-score formula you invented
+---
+
+Lightning operators need situational awareness. This dashboard turns node RPCs (and optional Prometheus exporters) into a live ops console.
+
+An ops dashboard can drain funds if compromised. Least-privilege macaroons/RPC ACLs and auth in front of the UI are not optional for production.

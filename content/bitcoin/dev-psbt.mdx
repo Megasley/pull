@@ -1,0 +1,109 @@
+---
+title: PSBT Workflows
+description: Coordinate multi-party signing with Partially Signed Bitcoin Transactions.
+difficulty: intermediate
+duration: 6 days
+objectives:
+  - 'Explain the PSBT roles: creator, updater, signer, finalizer, extractor'
+  - Carry a PSBT across wallet and hardware boundaries
+  - Know when to use PSBTv0 vs later extensions conceptually
+resources:
+  - title: BIP-174 PSBT
+    url: 'https://github.com/bitcoin/bips/blob/master/bip-0174.mediawiki'
+    kind: bip
+    required: true
+  - title: Bitcoin Core PSBT RPCs
+    url: 'https://developer.bitcoin.org/reference/rpc/#blockchain-rpcs'
+    kind: docs
+    note: 'See walletcreatefundedpsbt, walletprocesspsbt, finalizepsbt, send.'
+  - title: 'Bitcoin Optech: PSBT'
+    url: 'https://bitcoinops.org/en/topics/psbt/'
+    kind: article
+reflectionPrompts:
+  - >-
+    Explain PSBT Workflows to a teammate without jargon — what problem does it
+    solve?
+  - What would break in production if you misunderstood PSBT Workflows?
+  - >-
+    Which BIP, book chapter, or Core doc is authoritative here, and what did you
+    verify?
+lab:
+  title: Regtest check
+  description: >-
+    After reading, run one hands-on check related to PSBT Workflows. Prefer
+    local regtest or Polar over mainnet.
+  evidence:
+    - Command output or screenshot from your local lab
+    - One sentence on what you observed vs expected
+    - Link to the required reading section you used
+searchQueries:
+  - BIP174
+  - PSBT
+---
+**PSBT** (Partially Signed Bitcoin Transaction) is a standard container for incomplete transactions plus the metadata signers need (UTXO info, paths, scripts, partial signatures).
+
+## Why this matters
+
+Hardware wallets, multisig cosigners, and watch-only constructors should not invent proprietary blob formats. PSBT is the interoperability layer.
+
+## Analogy
+
+A PSBT is a shared clipboard for a group project: one person drafts the document, others add signatures in the right places, someone finalizes, then you submit.
+
+## Roles
+
+<LessonImage
+  src="/lessons/bitcoin/dev-psbt/psbt-roles.svg"
+  alt="PSBT creator updater signers finalizer broadcast"
+  caption="PSBT moves through roles until signatures are complete and extractable."
+/>
+
+<Mermaid caption="PSBT moves through roles until signatures are complete and extractable." chart="flowchart LR
+    C[Creator] --> U[Updater]
+    U --> S1[Signer A]
+    S1 --> S2[Signer B]
+    S2 --> F[Finalizer]
+    F --> E[Extractor / broadcast]" />
+
+```bash
+bitcoin-cli -regtest walletcreatefundedpsbt '[]' '{"<addr>":1.0}'
+bitcoin-cli -regtest walletprocesspsbt <psbt>
+bitcoin-cli -regtest finalizepsbt <psbt>
+```
+
+<Callout type="info" title="Include witness UTXO data">
+  Signers need previous output information. Incomplete PSBTs fail mysteriously on hardware devices when UTXO data is missing.
+</Callout>
+
+## Common mistakes
+
+- Asking hardware to sign without verifying outputs on the device screen
+- Mixing finalized and unfinalized blobs in your database
+- Forgetting change outputs belong to your descriptor
+
+
+## Worked mental model
+
+Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
+
+## Hands-on habit
+
+Every protocol idea should be paired with one local experiment:
+
+1. Reproduce the happy path on regtest (or Polar for Lightning)
+2. Break it on purpose (wrong fee, expired invoice, offline peer)
+3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
+
+That habit turns reading into builder instinct.
+
+## Glossary check
+
+Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
+
+## Resource order
+
+Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
+
+## Next steps
+
+Build the Mini Wallet project, apply UTXOs, descriptors, regtest, and PSBT in one CLI.

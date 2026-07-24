@@ -1,0 +1,56 @@
+---
+title: First Lightning PR
+description: Submit a tested pull request to a Lightning implementation or tool.
+difficulty: advanced
+duration: 2 weeks
+objectives:
+  - Reproduce a bug or feature need locally
+  - Add or update tests with your change
+  - Navigate CI and review on a Lightning repo
+resources:
+  - title: LND contributing
+    url: >-
+      https://github.com/lightningnetwork/lnd/blob/master/docs/code_contribution_guidelines.md
+    kind: docs
+  - title: CLN contributing
+    url: >-
+      https://github.com/ElementsProject/lightning/blob/master/.github/CONTRIBUTING.md
+    kind: docs
+  - title: Mastering the Lightning Network
+    url: 'https://github.com/lnbook/lnbook'
+    kind: book
+    chapter: Use as protocol companion while debugging
+    required: true
+reflectionPrompts:
+  - >-
+    Explain First Lightning PR to a teammate without jargon — what problem does
+    it solve?
+  - What would break in production if you misunderstood First Lightning PR?
+  - >-
+    Which BOLT (or implementation doc) is the source of truth for this topic,
+    and what did you verify there?
+lab:
+  title: Contribution artifact
+  description: >-
+    Produce a contribution artifact for First Lightning PR: issue shortlist,
+    review notes, or PR draft that a maintainer could act on.
+  evidence:
+    - Issue URL(s) or PR URL
+    - Written approach / review checklist
+    - Self-score against the meaningful-PR rubric
+---
+Landing a Lightning PR requires local labs (bitcoind + peers), patience with CI, and precise reproduction notes.
+
+<Mermaid caption="Reproduce, test, PR, CI, iterate with reviewers." chart="sequenceDiagram
+    participant You
+    participant CI
+    participant Reviewer
+    You->>You: Reproduce + fix + test
+    You->>CI: Open PR
+    CI->>You: Results
+    Reviewer->>You: Feedback
+    You->>CI: Update" />
+
+## Next steps
+
+Practice protocol review, BOLT changes and spec discussions.

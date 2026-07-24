@@ -1,0 +1,61 @@
+---
+title: Custom Router
+description: Implement a pathfinding service with custom fee and reliability heuristics.
+difficulty: advanced
+duration: 2 weeks
+project: custom-router
+objectives:
+  - Ingest a channel graph snapshot
+  - Score edges with custom weights
+  - Benchmark success vs baseline routing
+resources:
+  - title: Mastering the Lightning Network
+    url: 'https://github.com/lnbook/lnbook/blob/master/12_path_finding.asciidoc'
+    kind: book
+    chapter: 'Ch. 12: Pathfinding'
+    required: true
+  - title: Amboss API / graph data
+    url: 'https://amboss.space/'
+    kind: tool
+  - title: BOLT7 Gossip
+    url: 'https://github.com/lightning/bolts/blob/master/07-routing-gossip.md'
+    kind: bolt
+reflectionPrompts:
+  - >-
+    Explain Custom Router to a teammate without jargon — what problem does it
+    solve?
+  - What would break in production if you misunderstood Custom Router?
+  - >-
+    Which BOLT (or implementation doc) is the source of truth for this topic,
+    and what did you verify there?
+lab:
+  title: Project milestone evidence
+  description: >-
+    For Custom Router, complete the linked project spec happy path on
+    regtest/Polar and capture demo evidence before marking the lesson complete.
+  evidence:
+    - Link to public repo or branch
+    - Commands or screenshots proving the happy path
+    - Short note of one failure case you tested
+searchQueries:
+  - BOLT7
+---
+A custom router lets you experiment with weights: fee, uptime, historical fail rates, and liquidity hints.
+
+## Build challenge
+
+Service that:
+
+1. Loads graph data
+2. Returns routes for (source, destination, amount)
+3. Logs hypothetical success metrics against a dataset
+
+<Mermaid caption="Score edges, search paths, measure outcomes." chart="flowchart TD
+    Graph[Graph snapshot] --> Scorer[Edge scorer]
+    Scorer --> Search[Path search]
+    Search --> Routes[Ranked routes]
+    Routes --> Bench[Benchmark harness]" />
+
+## Next steps
+
+Find contribution opportunities across LND, CLN, and LDK.

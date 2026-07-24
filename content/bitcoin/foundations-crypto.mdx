@@ -1,0 +1,152 @@
+---
+title: Cryptography Primer
+description: 'Hashes, key pairs, ECDSA, and Schnorr signatures in a Bitcoin context.'
+difficulty: beginner
+duration: 5 days
+objectives:
+  - Explain hashing and why Bitcoin uses SHA-256 and RIPEMD-160
+  - Describe public-key cryptography and digital signatures
+  - Contrast ECDSA and Schnorr at a builder level
+resources:
+  - title: Mastering Bitcoin
+    url: 'https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch04_keys.adoc'
+    kind: book
+    chapter: 'Ch. 4: Keys and Addresses'
+    note: 'Start with private keys, public keys, and address encodings.'
+    required: true
+  - title: Mastering Bitcoin
+    url: >-
+      https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch08_signatures.adoc
+    kind: book
+    chapter: 'Ch. 8: Signatures'
+    note: Read ECDSA vs Schnorr sections.
+    required: true
+  - title: 'Decoding Bitcoin: Hash functions'
+    url: 'https://bitcoindevs.xyz/decoding/hash-functions'
+    kind: interactive
+    note: Interactive hash playground — pair with the SHA-256 visualizer.
+    required: true
+  - title: 'BDP: SHA-256 hashes visualizer'
+    url: 'https://hashexplained.com'
+    kind: interactive
+    note: Step through SHA-256 rounds visually (Hash Explained).
+  - title: 'Decoding Bitcoin: Schnorr signatures'
+    url: 'https://bitcoindevs.xyz/decoding/schnorr-signature'
+    kind: interactive
+    note: Builder-level Schnorr before BIP-340.
+  - title: 'Decoding Bitcoin: Nonce reuse attack'
+    url: 'https://bitcoindevs.xyz/decoding/nonce-reuse-attack'
+    kind: interactive
+    note: Why ECDSA nonce reuse is catastrophic — matches a reflection prompt.
+  - title: BIP-340 Schnorr
+    url: 'https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki'
+    kind: bip
+    required: true
+reflectionPrompts:
+  - >-
+    Why is a digital signature not the same thing as encryption, and how does
+    that show up in Bitcoin transactions?
+  - >-
+    What goes wrong if an ECDSA nonce is reused, and how does Schnorr change the
+    builder mental model?
+  - >-
+    After reading BIP-340, what one property of Schnorr would you explain to a
+    wallet engineer in two sentences?
+lab:
+  title: Hash demo + interactive crypto
+  description: >-
+    Use Decoding Bitcoin's hash-functions tool (and/or the BDP SHA-256
+    visualizer), then hash a known string locally and inspect a throwaway
+    testnet/regtest address. Never reuse that key.
+  evidence:
+    - Screenshot or notes from Decoding Bitcoin hash functions (or hashes visualizer)
+    - SHA-256 digest of a known string (show input + output)
+    - Address or pubkey you derived for lab-only use
+    - Note confirming the key material was discarded
+searchQueries:
+  - BIP340
+  - Schnorr
+---
+Bitcoin does not “store passwords on the blockchain.” Ownership is proven with **cryptography**: one-way hashes and signatures that anyone can verify, but only the key holder can create.
+
+## Why this matters
+
+Every wallet bug that loses funds usually traces back to misunderstanding keys, hashes, or signatures. You do not need a PhD, you need clear mental models.
+
+## Analogy
+
+A **hash** is like a fingerprint of data: same input → same fingerprint; tiny change → totally different fingerprint; fingerprint does not reveal the original.
+
+A **digital signature** is like a wax seal: anyone can check the seal matches the letter and the author’s public stamp, but only the author has the private seal.
+
+## Hashes in Bitcoin
+
+Bitcoin leans on **SHA-256** and **RIPEMD-160** (often as HASH160 = RIPEMD160(SHA256(x))). Hashes identify transactions, blocks, and scripts. They also commit to data without revealing it early (for example, Lightning payment hashes).
+
+```typescript
+// Conceptual, use audited libraries in production
+type Hash256 = string; // 32-byte digest hex
+
+function commitsTo(data: Uint8Array, digest: Hash256): boolean {
+  // true if sha256(data) === digest
+  return true;
+}
+```
+
+## Keys and signatures
+
+<Mermaid caption="Signing uses the private key; verification uses the public key and message." chart="flowchart LR
+    Priv[Private key] --> Pub[Public key]
+    Msg[Message / tx sighash] --> Sign[Sign with private key]
+    Priv --> Sign
+    Sign --> Sig[Signature]
+    Pub --> Verify[Verify]
+    Msg --> Verify
+    Sig --> Verify
+    Verify --> OK[Valid or invalid]" />
+
+Bitcoin historically used **ECDSA** on the secp256k1 curve. **Taproot** prefers **Schnorr** signatures (BIP-340): smaller, linear (friendly to aggregation), and cleaner security proofs.
+
+<Callout type="warning" title="Never invent crypto">
+  Do not roll your own key derivation, RNG, or signature code. Use battle-tested libraries (`secp256k1`, `bitcoinjs-lib`, `rust-bitcoin`, BDK). A one-line RNG mistake can leak keys.
+</Callout>
+
+## What builders must remember
+
+1. Private keys are secrets, treat them like cash and passwords combined.
+2. Public keys and addresses are safe to share for *receiving*.
+3. Signatures authorize *specific* messages (transaction sighashes), not blank checks.
+4. Hash collisions are astronomically unlikely for SHA-256 in practice; treat digests as unique IDs.
+
+## Common mistakes
+
+- Confusing encryption (hiding data) with signatures (proving authorship)
+- Reusing nonces in ECDSA (catastrophic key leaks historically)
+- Assuming “hashed” means “secret”, hashes of low-entropy secrets can be guessed
+
+
+## Worked mental model
+
+Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
+
+## Hands-on habit
+
+Every protocol idea should be paired with one local experiment:
+
+1. Reproduce the happy path on regtest (or Polar for Lightning)
+2. Break it on purpose (wrong fee, expired invoice, offline peer)
+3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
+
+That habit turns reading into builder instinct.
+
+## Glossary check
+
+Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
+
+## Resource order
+
+Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
+
+## Next steps
+
+With crypto intuition in place, learn Bitcoin’s economic incentives, supply, fees, and why miners secure the chain, then dive into UTXOs.

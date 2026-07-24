@@ -1,0 +1,88 @@
+---
+title: Soft Forks & Activation
+description: >-
+  How Bitcoin upgrades consensus without splitting the network — BIP9, Speedy
+  Trial, and UASF history.
+difficulty: intermediate
+duration: 6 days
+objectives:
+  - >-
+    Distinguish soft forks from hard forks and why soft forks dominate Bitcoin
+    upgrades
+  - >-
+    Explain BIP9 / Speedy Trial style signaling and what miner signaling does
+    not prove
+  - Summarize UASF (BIP148) as a social-technical activation path
+resources:
+  - title: Softfork wiki
+    url: 'https://en.bitcoin.it/wiki/Softfork'
+    kind: docs
+    required: true
+  - title: BIP-9 Version bits
+    url: 'https://github.com/bitcoin/bips/blob/master/bip-0009.mediawiki'
+    kind: bip
+    required: true
+  - title: 'Bitcoin Optech: Soft fork activation'
+    url: 'https://bitcoinops.org/en/topics/soft-fork-activation/'
+    kind: article
+    required: true
+  - title: 'Forks, Signaling, and Activation'
+    url: 'https://medium.com/@elombrozo/forks-signaling-and-activation-d60b6abda49a'
+    kind: article
+reflectionPrompts:
+  - >-
+    In one paragraph, why can a soft fork remain backward-compatible for
+    non-upgraded nodes while still changing what is valid for upgraded nodes?
+  - >-
+    What does miner signaling measure, and what does it fail to measure about
+    economic node preference?
+  - >-
+    When would a flag-day or UASF-style activation be considered, and what
+    failure modes should builders fear?
+lab:
+  title: Activation timeline brief
+  description: >-
+    Pick one historical soft fork (CSV, SegWit, Taproot). Write a one-page brief
+    covering proposal, signaling method, activation height/date, and who had to
+    upgrade.
+  evidence:
+    - One-page markdown brief with sources linked
+    - >-
+      Explicit list of software that had to upgrade (miners, full nodes,
+      wallets)
+    - Note one risk that almost happened or was debated
+searchQueries:
+  - soft fork
+  - BIP9
+---
+
+Bitcoin evolves through **soft forks** more often than hard forks: tightened rules that upgraded nodes enforce, while old nodes still see the chain as valid under older rules.
+
+## Why this matters
+
+Builders who ship Script, Taproot, or Lightning features need to know how consensus changes actually land — and that “miners signaled” is not the whole story.
+
+## Soft vs hard
+
+- **Soft fork:** new rules are a subset of old rules (more restrictive). Non-upgraded nodes may not understand new features but still follow the chain if upgraded miners/economically relevant nodes enforce.
+- **Hard fork:** previously invalid blocks become valid (or incompatible validation). Risk of permanent split without coordinated migration.
+
+## Signaling and activation
+
+Modern activations often use **version bits** (BIP9 family) or variants like **Speedy Trial**: miners set bits to signal readiness during a window; thresholds and timeouts decide lock-in.
+
+<Callout type="warning" title="Signaling ≠ consent of users">
+  Miner hashrate signaling is a coordination signal, not proof that users, exchanges, or economic nodes want the change. History (BIP148 UASF debates) shows social layers matter.
+</Callout>
+
+## Builder checklist
+
+1. Read the BIP activation parameters (start, timeout, threshold).
+2. Know which software must upgrade (policy vs consensus).
+3. Test on signet/regtest forks before assuming mainnet behavior.
+
+## Common mistakes
+
+- Treating soft forks as “just a software update” with no wallet/relay impact
+- Confusing policy (mempool standardness) with consensus validity
+- Ignoring that light clients may see different security assumptions during upgrades

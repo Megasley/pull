@@ -1,0 +1,108 @@
+---
+title: BOLTs & Spec Landscape
+description: Navigate the BOLT specifications and how implementations stay interoperable.
+difficulty: intermediate
+duration: 4 days
+objectives:
+  - Identify what BOLTs are and why they exist
+  - Map major BOLT numbers to features you will implement
+  - Know where to follow spec discussions
+resources:
+  - title: Lightning BOLTs
+    url: 'https://github.com/lightning/bolts'
+    kind: bolt
+    required: true
+  - title: Mastering the Lightning Network
+    url: 'https://github.com/lnbook/lnbook'
+    kind: book
+    chapter: 'Spec references throughout, keep BOLTs open while reading'
+  - title: Lightning RFC discussions
+    url: 'https://github.com/lightning/bolts/pulls'
+    kind: docs
+reflectionPrompts:
+  - >-
+    Explain BOLTs & Spec Landscape to a teammate without jargon — what problem
+    does it solve?
+  - What would break in production if you misunderstood BOLTs & Spec Landscape?
+  - >-
+    Which BOLT (or implementation doc) is the source of truth for this topic,
+    and what did you verify there?
+lab:
+  title: Polar check
+  description: >-
+    After reading, run one hands-on check related to BOLTs & Spec Landscape.
+    Prefer local regtest or Polar over mainnet.
+  evidence:
+    - Command output or screenshot from your local lab
+    - One sentence on what you observed vs expected
+    - Link to the required reading section you used
+searchQueries:
+  - BOLT
+  - Lightning Network
+---
+**BOLTs** (Basis of Lightning Technology) are the interoperability specs for Lightning. LND, Core Lightning, and LDK aim to speak the same protocol so heterogeneous nodes can route.
+
+## Why this matters
+
+Without shared specs, every implementation would be an island. Builders reading BOLTs can debug wire mismatches and evaluate new features (offers, splicing) before they are universal.
+
+## Analogy
+
+BOLTs are the electrical code for Lightning. Different manufacturers (LND/CLN/LDK) can ship distinct products, but plugs must still fit.
+
+## Map of essentials
+
+| BOLT | Focus |
+|------|--------|
+| 1 | Peer protocol foundation |
+| 2 | Channel management / HTLCs |
+| 3 | Transactions |
+| 4 | Onion routing |
+| 7 | Gossip |
+| 11 | Invoices |
+| 12 | Offers (evolving) |
+
+<Mermaid caption="Multiple implementations converge on BOLTs for network compatibility." chart="flowchart TD
+    Bolts[BOLTs specs] --> LND[LND]
+    Bolts --> CLN[Core Lightning]
+    Bolts --> LDK[LDK]
+    LND --> Net[Interoperable network]
+    CLN --> Net
+    LDK --> Net" />
+
+<Callout type="tip" title="Read with a question">
+  Do not read BOLTs cover-to-cover first. Open the BOLT that matches your bug (invoice decode, channel open, onion) and keep Mastering Lightning nearby for narrative.
+</Callout>
+
+## Common mistakes
+
+- Assuming a feature in one implementation is already a ratified BOLT everywhere
+- Treating blog posts as authoritative over the spec text
+- Ignoring feature bits / negotiations between peers
+
+
+## Worked mental model
+
+Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
+
+## Hands-on habit
+
+Every protocol idea should be paired with one local experiment:
+
+1. Reproduce the happy path on regtest (or Polar for Lightning)
+2. Break it on purpose (wrong fee, expired invoice, offline peer)
+3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
+
+That habit turns reading into builder instinct.
+
+## Glossary check
+
+Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
+
+## Resource order
+
+Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
+
+## Next steps
+
+Study BOLT11 invoices, the payment requests wallets actually scan.

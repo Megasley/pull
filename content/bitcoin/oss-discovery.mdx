@@ -1,0 +1,67 @@
+---
+title: Finding Good First Issues
+description: >-
+  Identify beginner-friendly issues in Bitcoin repositories and plan your
+  approach.
+difficulty: intermediate
+duration: 1 week
+objectives:
+  - Map major Bitcoin repositories and contribution surfaces
+  - Select an issue that matches your skills
+  - Write a short implementation plan before coding
+resources:
+  - title: bitcoin/bitcoin
+    url: 'https://github.com/bitcoin/bitcoin'
+    kind: docs
+  - title: Bitcoin Optech
+    url: 'https://bitcoinops.org/'
+    kind: article
+  - title: rust-bitcoin
+    url: 'https://github.com/rust-bitcoin/rust-bitcoin'
+    kind: docs
+reflectionPrompts:
+  - >-
+    Explain Finding Good First Issues to a teammate without jargon — what
+    problem does it solve?
+  - >-
+    What would break in production if you misunderstood Finding Good First
+    Issues?
+  - >-
+    Which BIP, book chapter, or Core doc is authoritative here, and what did you
+    verify?
+lab:
+  title: Contribution artifact
+  description: >-
+    Produce a contribution artifact for Finding Good First Issues: issue
+    shortlist, review notes, or PR draft that a maintainer could act on.
+  evidence:
+    - Issue URL(s) or PR URL
+    - Written approach / review checklist
+    - Self-score against the meaningful-PR rubric
+---
+Contributing starts with choosing the right battlefield. “Good first issue” labels help, but judgment matters more.
+
+## Why this matters
+
+A too-hard first PR burns motivation. A too-vague issue stalls. Builders who scope well ship.
+
+## Where to look
+
+- Bitcoin Core (steep, high bar)
+- rust-bitcoin, BDK, bitcoinjs-lib
+- Indexers, explorers, docs sites, Optech
+
+<Mermaid caption="Match skills → repo → issue → plan → communicate → code." chart="flowchart TD
+    Skills[Your skills] --> Pick[Pick repo]
+    Pick --> Issues[Scan issues]
+    Issues --> Scope[Write approach]
+    Scope --> Ask[Comment on issue]
+    Ask --> Code[Implement]" />
+
+<Callout type="tip" title="Docs and tests count">
+  Clarifying docs or adding a regression test is a legitimate first contribution.
+</Callout>
+
+## Next steps
+
+Practice reviewing others’ PRs with a maintainer mindset.

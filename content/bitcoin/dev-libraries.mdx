@@ -1,0 +1,110 @@
+---
+title: Bitcoin Libraries
+description: 'Use modern libraries for keys, addresses, and transaction construction.'
+difficulty: intermediate
+duration: 6 days
+objectives:
+  - Choose appropriate libraries for JS and Rust stacks
+  - Generate addresses and inspect transactions programmatically
+  - Avoid common footguns when wrapping consensus logic
+resources:
+  - title: bitcoinjs-lib
+    url: 'https://github.com/bitcoinjs/bitcoinjs-lib'
+    kind: docs
+  - title: rust-bitcoin
+    url: 'https://github.com/rust-bitcoin/rust-bitcoin'
+    kind: docs
+  - title: BDK documentation
+    url: 'https://bitcoindevkit.org/'
+    kind: docs
+reflectionPrompts:
+  - >-
+    Explain Bitcoin Libraries to a teammate without jargon — what problem does
+    it solve?
+  - What would break in production if you misunderstood Bitcoin Libraries?
+  - >-
+    Which BIP, book chapter, or Core doc is authoritative here, and what did you
+    verify?
+lab:
+  title: Regtest check
+  description: >-
+    After reading, run one hands-on check related to Bitcoin Libraries. Prefer
+    local regtest or Polar over mainnet.
+  evidence:
+    - Command output or screenshot from your local lab
+    - One sentence on what you observed vs expected
+    - Link to the required reading section you used
+---
+You should not hand-roll Base58, Bech32, or sighash code. Use maintained libraries that track consensus and address standards.
+
+## Why this matters
+
+A one-character encoding bug can burn funds. Libraries encapsulate years of edge cases, version bytes, witness quirks, taproot tweaks.
+
+## Analogy
+
+Libraries are power tools with safety guards. You still need skill, but you should not forge your own circular saw blade from scrap metal.
+
+## Ecosystem map
+
+| Need | JavaScript | Rust |
+|------|------------|------|
+| Primitives | bitcoinjs-lib, @scure/btc-signer | rust-bitcoin |
+| Wallet engine | often custom + indexers | BDK |
+| secp256k1 | noble / bitcoin-secp... | secp256k1 / libsecp |
+
+<Mermaid caption="Apps compose libraries for keys, tx building, and signing workflows." chart="flowchart TD
+    App[Your app] --> Lib[bitcoin library]
+    Lib --> Keys[Keys / addresses]
+    Lib --> Tx[Transaction builder]
+    Lib --> Psbt[PSBT]
+    Tx --> Node[Bitcoin Core / indexer]
+    Psbt --> HW[Hardware signer]" />
+
+```bash
+# Rust example sketch
+cargo add bitcoin
+```
+
+```typescript
+// Prefer well-reviewed packages; pin versions; read changelogs on upgrades
+import * as bitcoin from "bitcoinjs-lib";
+const network = bitcoin.networks.regtest;
+```
+
+<Callout type="warning" title="Pin and audit upgrades">
+  Consensus-adjacent upgrades can change defaults. Pin versions, read release notes, and run vectors/tests before production deploys.
+</Callout>
+
+## Common mistakes
+
+- Copy-pasting random npm snippets that use deprecated address APIs
+- Mixing mainnet and regtest network objects
+- Using non-audited “crypto helper” packages for key material
+
+
+## Worked mental model
+
+Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
+
+## Hands-on habit
+
+Every protocol idea should be paired with one local experiment:
+
+1. Reproduce the happy path on regtest (or Polar for Lightning)
+2. Break it on purpose (wrong fee, expired invoice, offline peer)
+3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
+
+That habit turns reading into builder instinct.
+
+## Glossary check
+
+Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
+
+## Resource order
+
+Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
+
+## Next steps
+
+Design wallet architecture: how HD keys, accounts, and signing fit together.

@@ -1,0 +1,83 @@
+---
+title: Liquidity
+description: 'Balance inbound/outbound liquidity with loops, swaps, and peer management.'
+difficulty: advanced
+duration: 7 days
+objectives:
+  - Diagnose inbound vs outbound shortages
+  - Evaluate Loop/swaps and rebalancing strategies
+  - Understand liquidity ads at a high level
+resources:
+  - title: Lightning Loop
+    url: 'https://docs.lightning.engineering/lightning-network-tools/loop'
+    kind: docs
+  - title: Liquidity advertisements
+    url: 'https://bitcoinops.org/en/topics/liquidity-advertisements/'
+    kind: article
+  - title: Mastering the Lightning Network
+    url: 'https://github.com/lnbook/lnbook/blob/master/08_routing_htlcs.asciidoc'
+    kind: book
+    chapter: 'Ch. 8: Routing (liquidity context)'
+    required: true
+reflectionPrompts:
+  - Explain Liquidity to a teammate without jargon — what problem does it solve?
+  - What would break in production if you misunderstood Liquidity?
+  - >-
+    Which BOLT (or implementation doc) is the source of truth for this topic,
+    and what did you verify there?
+lab:
+  title: Polar check
+  description: >-
+    After reading, run one hands-on check related to Liquidity. Prefer local
+    regtest or Polar over mainnet.
+  evidence:
+    - Command output or screenshot from your local lab
+    - One sentence on what you observed vs expected
+    - Link to the required reading section you used
+---
+Liquidity is the usable balance distribution across your channels. Capital sitting on the wrong side of a channel cannot forward or receive as needed.
+
+## Why this matters
+
+A node with lots of bitcoin locked but zero inbound capacity still cannot get paid. Liquidity ops is the business of Lightning routing and merchant receive capacity.
+
+## Analogy
+
+A highway with all cars stuck on one side of a toll bridge. You need flows (or trucks repositioning cars) to free lanes in both directions.
+
+<Mermaid caption="Different shortages call for rebalancing, loops, or peer liquidity." chart="flowchart LR
+    Out[Outbound heavy] --> Rebalance[Circular rebalance]
+    In[Inbound heavy] --> LoopOut[Loop out / spend]
+    NeedIn[Need inbound] --> Buy[Liquidity ads / peers]
+    NeedIn --> LoopIn[Loop in]" />
+
+<Callout type="info" title="Capital has cost">
+  Every sat locked has opportunity cost. Measure routing revenue vs capital before scaling channels.
+</Callout>
+
+
+## Worked mental model
+
+Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
+
+## Hands-on habit
+
+Every protocol idea should be paired with one local experiment:
+
+1. Reproduce the happy path on regtest (or Polar for Lightning)
+2. Break it on purpose (wrong fee, expired invoice, offline peer)
+3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
+
+That habit turns reading into builder instinct.
+
+## Glossary check
+
+Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
+
+## Resource order
+
+Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
+
+## Next steps
+
+Multipath payments, splitting payments when one path cannot carry the full amount.

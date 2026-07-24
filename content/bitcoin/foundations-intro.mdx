@@ -1,0 +1,146 @@
+---
+title: Developer Environment
+description: >-
+  Set up your toolchain, package manager, and local testing stack for Bitcoin
+  development.
+difficulty: beginner
+duration: 3 days
+objectives:
+  - 'Install and verify Git, Node.js or Rust, and optional Docker'
+  - Understand the recommended BuilderOS project layout
+  - Confirm your local toolchain before moving to protocol lessons
+resources:
+  - title: Git Documentation
+    url: 'https://git-scm.com/doc'
+    kind: docs
+  - title: Rust Toolchain
+    url: 'https://www.rust-lang.org/tools/install'
+    kind: docs
+  - title: Node.js Downloads
+    url: 'https://nodejs.org/'
+    kind: docs
+  - title: Bitcoin Core releases
+    url: 'https://bitcoincore.org/en/download/'
+    kind: tool
+reflectionPrompts:
+  - >-
+    Explain Developer Environment to a teammate without jargon — what problem
+    does it solve?
+  - What would break in production if you misunderstood Developer Environment?
+  - >-
+    Which BIP, book chapter, or Core doc is authoritative here, and what did you
+    verify?
+lab:
+  title: Toolchain verify
+  description: >-
+    Install Git plus Node or Rust (and optional Docker/Bitcoin Core). Record
+    version outputs proving your machine is ready for later regtest labs.
+  evidence:
+    - Paste `git --version` and `node -v` or `rustc --version`
+    - Confirm Docker or bitcoind availability (or note you will use Polar later)
+    - One sentence on your chosen primary language for Bitcoin tooling
+---
+Every Bitcoin builder needs a reliable local environment before touching protocol code. Think of this lesson as preparing a workshop: if your tools are missing or half-configured, every later lesson becomes frustrating noise.
+
+## Why this matters
+
+Bitcoin software is unforgiving. A broken Node install, an old OpenSSL, or no way to run **regtest** (a private local chain) will block wallets, explorers, and Lightning labs. Getting the toolchain right once pays off for months.
+
+## Analogy
+
+Setting up for Bitcoin development is like packing for a multi-day hike. You do not need every gadget in the store, you need the few tools you will actually use daily, verified before you leave the trailhead.
+
+## Choose your stack
+
+Most BuilderOS lessons assume you can run a modern **JavaScript** or **Rust** toolchain. Pick one primary language for app code, but keep both runtimes available for ecosystem tooling.
+
+<Callout type="tip" title="Start on regtest">
+  Use **regtest** for day-to-day development. Mainnet and testnet are useful later, but regtest keeps feedback loops fast and free.
+</Callout>
+
+### Required tools
+
+- Git
+- Node.js 20+ *or* Rust stable (ideally both)
+- Docker (optional, recommended for Bitcoin Core)
+- A code editor with TypeScript and MDX support
+
+## Verify your setup
+
+Run these checks from a clean terminal:
+
+```bash
+git --version
+node --version   # or: rustc --version
+docker --version # optional
+```
+
+If each command prints a version, your base toolchain is ready.
+
+```typescript
+type ToolchainCheck = {
+  name: string;
+  command: string;
+  required: boolean;
+};
+
+const checks: ToolchainCheck[] = [
+  { name: "Git", command: "git --version", required: true },
+  { name: "Node", command: "node --version", required: true },
+  { name: "Rust", command: "rustc --version", required: false },
+  { name: "Docker", command: "docker --version", required: false },
+];
+```
+
+## Project layout
+
+Organize repositories so scripts, docs, and experiments stay easy to navigate:
+
+```
+my-bitcoin-lab/
+  docs/
+  scripts/
+  src/
+  tests/
+```
+
+<Mermaid caption="Local toolchain feeds apps that talk to a private regtest node." chart="flowchart LR
+    Dev[Your machine] --> Git[Git]
+    Dev --> Lang[Node or Rust]
+    Dev --> NodeSoft[Bitcoin Core / Docker]
+    NodeSoft --> Regtest[Regtest chain]
+    Lang --> Apps[Wallets and tools]
+    Apps --> Regtest" />
+
+## Common mistakes
+
+- Installing Node via random package managers and ending up with two conflicting versions, use a version manager (`nvm`, `fnm`, or `asdf`).
+- Skipping Docker and fighting OS-specific Bitcoin Core builds early, start with a container if installs fail.
+- Mixing mainnet credentials into learning projects, keep regtest configs isolated.
+
+
+## Worked mental model
+
+Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
+
+## Hands-on habit
+
+Every protocol idea should be paired with one local experiment:
+
+1. Reproduce the happy path on regtest (or Polar for Lightning)
+2. Break it on purpose (wrong fee, expired invoice, offline peer)
+3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
+
+That habit turns reading into builder instinct.
+
+## Glossary check
+
+Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
+
+## Resource order
+
+Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
+
+## Next steps
+
+Once your environment is verified, move on to Git and open source workflow patterns. Those skills compound quickly when you start contributing to Bitcoin repositories.

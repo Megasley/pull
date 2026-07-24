@@ -1,0 +1,106 @@
+---
+title: Regtest Development
+description: 'Run a private chain, mine blocks, and automate integration tests.'
+difficulty: intermediate
+duration: 5 days
+objectives:
+  - Spin up a disposable regtest environment
+  - Mine blocks and fund test wallets quickly
+  - Encode integration tests around deterministic scenarios
+resources:
+  - title: Bitcoin Core regtest mode
+    url: 'https://developer.bitcoin.org/examples/testing.html'
+    kind: docs
+  - title: 'Bitcoin Optech: Testing'
+    url: 'https://bitcoinops.org/en/topics/testing/'
+    kind: article
+  - title: Polar (Lightning regtest UI)
+    url: 'https://lightningpolar.com/'
+    kind: tool
+    note: Useful once you reach Lightning roadmaps.
+reflectionPrompts:
+  - >-
+    Explain Regtest Development to a teammate without jargon — what problem does
+    it solve?
+  - What would break in production if you misunderstood Regtest Development?
+  - >-
+    Which BIP, book chapter, or Core doc is authoritative here, and what did you
+    verify?
+lab:
+  title: Regtest check
+  description: >-
+    After reading, run one hands-on check related to Regtest Development. Prefer
+    local regtest or Polar over mainnet.
+  evidence:
+    - Command output or screenshot from your local lab
+    - One sentence on what you observed vs expected
+    - Link to the required reading section you used
+---
+**Regtest** is a private Bitcoin network you control. Difficulty is trivial, so you can mine blocks instantly and test multi-step flows without testnet faucets.
+
+## Why this matters
+
+Mainnet is the wrong place to learn. Testnet is shared and flaky. Regtest is your lab bench.
+
+## Analogy
+
+Regtest is a flight simulator. Crashes are free. You can rewind scenarios and practice emergencies before flying real capital.
+
+## Minimal loop
+
+```bash
+bitcoin-cli -regtest createwallet "alice"
+ADDR=$(bitcoin-cli -regtest getnewaddress)
+bitcoin-cli -regtest generatetoaddress 101 "$ADDR"  # mature coinbase
+bitcoin-cli -regtest sendtoaddress <bob> 10
+bitcoin-cli -regtest generatetoaddress 1 "$ADDR"
+```
+
+<Mermaid caption="Deterministic setup → act → confirm → assert → wipe." chart="flowchart TD
+    Start[Start bitcoind regtest] --> Wallet[Create wallets]
+    Wallet --> Mine[Mine maturity blocks]
+    Mine --> Act[Send / contract actions]
+    Act --> Confirm[Mine confirmations]
+    Confirm --> Assert[Assert balances / txs]
+    Assert --> Tear[Reset datadir]" />
+
+<Callout type="tip" title="Automate resets">
+  CI jobs should use fresh datadirs. Leftover wallets and conflicting ports are the top flaky-test sources.
+</Callout>
+
+## Docker tip
+
+Compose `bitcoind` with fixed RPC ports and credentials for app containers. Mount a disposable volume.
+
+## Common mistakes
+
+- Not mining 100+ blocks before spending coinbase
+- Parallel tests sharing one node without isolation
+- Hard-coding txids from a previous run
+
+
+## Worked mental model
+
+Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
+
+## Hands-on habit
+
+Every protocol idea should be paired with one local experiment:
+
+1. Reproduce the happy path on regtest (or Polar for Lightning)
+2. Break it on purpose (wrong fee, expired invoice, offline peer)
+3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
+
+That habit turns reading into builder instinct.
+
+## Glossary check
+
+Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
+
+## Resource order
+
+Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
+
+## Next steps
+
+Learn PSBT workflows: how multi-device and multisig signing is coordinated safely.

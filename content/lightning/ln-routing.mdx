@@ -1,0 +1,90 @@
+---
+title: Routing
+description: 'Select routes using fee budgets, channel hints, and reliability scores.'
+difficulty: advanced
+duration: 6 days
+objectives:
+  - Explain source-based routing at a high level
+  - 'Factor fees, CLTV, and capacity into route choice'
+  - Use explorers to build intuition for public graph structure
+resources:
+  - title: Mastering the Lightning Network
+    url: 'https://github.com/lnbook/lnbook/blob/master/08_routing_htlcs.asciidoc'
+    kind: book
+    chapter: 'Ch. 8: Routing on the Lightning Network'
+    required: true
+  - title: Amboss
+    url: 'https://amboss.space/'
+    kind: tool
+  - title: LND Mission Control
+    url: 'https://docs.lightning.engineering/'
+    kind: docs
+reflectionPrompts:
+  - Explain Routing to a teammate without jargon — what problem does it solve?
+  - What would break in production if you misunderstood Routing?
+  - >-
+    Which BOLT (or implementation doc) is the source of truth for this topic,
+    and what did you verify there?
+lab:
+  title: Polar check
+  description: >-
+    After reading, run one hands-on check related to Routing. Prefer local
+    regtest or Polar over mainnet.
+  evidence:
+    - Command output or screenshot from your local lab
+    - One sentence on what you observed vs expected
+    - Link to the required reading section you used
+---
+Lightning uses **source-based routing**: the payer (usually) constructs a path across the public graph plus hints, then onion-encrypts hop instructions.
+
+## Why this matters
+
+Routing success rates define UX. Fee-aware, reliability-aware pathfinding separates toy demos from production wallets.
+
+## Analogy
+
+You plan a road trip with toll costs and bridge weight limits. If a bridge is “full” (insufficient balance), you detour, often without knowing the exact traffic until you try.
+
+<Mermaid caption="Build a path from gossip + hints, then send an onion." chart="flowchart LR
+    Payer[Payer] --> G[Channel graph]
+    G --> Path[Candidate path]
+    Path --> Onion[Onion packet]
+    Onion --> Hops[Hop1 Hop2 Hop3]
+    Hops --> Payee[Payee]" />
+
+<Callout type="tip" title="Probe carefully">
+  Liquidity is not fully public. Nodes learn from failures (mission control style) without leaking customer details into logs carelessly.
+</Callout>
+
+## Common mistakes
+
+- Optimizing only for lowest fee and ignoring success probability
+- Ignoring max HTLC / capacity constraints
+- Forgetting private channel hints from invoices
+
+
+## Worked mental model
+
+Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
+
+## Hands-on habit
+
+Every protocol idea should be paired with one local experiment:
+
+1. Reproduce the happy path on regtest (or Polar for Lightning)
+2. Break it on purpose (wrong fee, expired invoice, offline peer)
+3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
+
+That habit turns reading into builder instinct.
+
+## Glossary check
+
+Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
+
+## Resource order
+
+Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
+
+## Next steps
+
+Onion routing: how hop payloads stay private.

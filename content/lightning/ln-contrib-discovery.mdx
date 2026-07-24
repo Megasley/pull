@@ -1,0 +1,52 @@
+---
+title: Contribution Discovery
+description: 'Find beginner-friendly issues across LND, CLN, and LDK repositories.'
+difficulty: intermediate
+duration: 5 days
+objectives:
+  - Map Lightning implementation repos and adjacent tools
+  - Select an issue matching your language skills
+  - Engage maintainers with a clear plan
+resources:
+  - title: lightningnetwork/lnd
+    url: 'https://github.com/lightningnetwork/lnd'
+    kind: docs
+  - title: ElementsProject/lightning
+    url: 'https://github.com/ElementsProject/lightning'
+    kind: docs
+  - title: lightningdevkit
+    url: 'https://github.com/lightningdevkit'
+    kind: docs
+reflectionPrompts:
+  - >-
+    Explain Contribution Discovery to a teammate without jargon — what problem
+    does it solve?
+  - What would break in production if you misunderstood Contribution Discovery?
+  - >-
+    Which BOLT (or implementation doc) is the source of truth for this topic,
+    and what did you verify there?
+lab:
+  title: Contribution artifact
+  description: >-
+    Produce a contribution artifact for Contribution Discovery: issue shortlist,
+    review notes, or PR draft that a maintainer could act on.
+  evidence:
+    - Issue URL(s) or PR URL
+    - Written approach / review checklist
+    - Self-score against the meaningful-PR rubric
+---
+Lightning OSS spans Go, C, Rust, and many app repos. Pick a lane that matches your stack.
+
+<Mermaid caption="Match language skills to repos, then scope an issue." chart="flowchart TD
+    Skills[Go / C / Rust / TS] --> Repo[Pick implementation]
+    Repo --> Issues[Label scan]
+    Issues --> Plan[Write approach]
+    Plan --> PR[Contribute]" />
+
+<Callout type="tip" title="Docs & examples">
+  Improving docs or sample apps is a high-leverage first PR.
+</Callout>
+
+## Next steps
+
+Ship your first Lightning PR with tests.

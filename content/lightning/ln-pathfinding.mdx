@@ -1,0 +1,94 @@
+---
+title: Pathfinding
+description: Algorithms and heuristics that turn the channel graph into a route.
+difficulty: advanced
+duration: 5 days
+objectives:
+  - Model the Lightning graph as a weighted search problem
+  - 'Incorporate fees, CLTV, and uncertainty into heuristics'
+  - Know why first attempts fail and retries matter
+resources:
+  - title: Mastering the Lightning Network
+    url: 'https://github.com/lnbook/lnbook/blob/master/12_path_finding.asciidoc'
+    kind: book
+    chapter: 'Ch. 12: Pathfinding'
+    required: true
+  - title: Mastering the Lightning Network
+    url: 'https://github.com/lnbook/lnbook/blob/master/11_channel_graph.asciidoc'
+    kind: book
+    chapter: 'Ch. 11: The Channel Graph'
+  - title: Amboss
+    url: 'https://amboss.space/'
+    kind: tool
+reflectionPrompts:
+  - >-
+    Explain Pathfinding to a teammate without jargon — what problem does it
+    solve?
+  - What would break in production if you misunderstood Pathfinding?
+  - >-
+    Which BOLT (or implementation doc) is the source of truth for this topic,
+    and what did you verify there?
+lab:
+  title: Polar check
+  description: >-
+    After reading, run one hands-on check related to Pathfinding. Prefer local
+    regtest or Polar over mainnet.
+  evidence:
+    - Command output or screenshot from your local lab
+    - One sentence on what you observed vs expected
+    - Link to the required reading section you used
+---
+**Pathfinding** searches the gossip graph (plus hints) for a path that can deliver an amount under fee and timelock constraints, even with incomplete liquidity knowledge.
+
+## Why this matters
+
+Dijkstra-with-fees is only the start. Production routers track historical failures and prefer reliable edges.
+
+## Analogy
+
+GPS with imperfect live traffic. You pick a route, hit a jam (insufficient balance), then reroute using what you learned.
+
+<Mermaid caption="Search, attempt, learn, retry. Liquidity is uncertain." chart="flowchart TD
+    Graph[Gossip graph] --> Weight[Weight edges by fee/risk]
+    Weight --> Search[Shortest path search]
+    Search --> Attempt[Send onion]
+    Attempt --> Ok[Success]
+    Attempt --> Fail[Failure]
+    Fail --> Learn[Update scores]
+    Learn --> Search" />
+
+```typescript
+type Edge = { from: string; to: string; feeBase: number; feeProportional: number };
+// cost ≈ base + amount * proportional / million + riskPenalty
+```
+
+<Callout type="tip" title="Budget user-facing fees">
+  Show a max fee to users. Silent overpaying destroys trust.
+</Callout>
+
+
+## Worked mental model
+
+Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
+
+## Hands-on habit
+
+Every protocol idea should be paired with one local experiment:
+
+1. Reproduce the happy path on regtest (or Polar for Lightning)
+2. Break it on purpose (wrong fee, expired invoice, offline peer)
+3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
+
+That habit turns reading into builder instinct.
+
+## Glossary check
+
+Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
+
+## Resource order
+
+Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
+
+## Next steps
+
+Liquidity management: keeping channels balanced so pathfinding has somewhere to go.

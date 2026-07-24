@@ -1,0 +1,65 @@
+---
+title: Node Dashboard
+description: 'Monitor peers, chain sync, wallet balance, and fee estimates in real time.'
+difficulty: advanced
+duration: 10 days
+project: node-dashboard
+objectives:
+  - Poll or stream Bitcoin Core status metrics
+  - 'Visualize sync progress, peer counts, and mempool size'
+  - Alert on stalled IBD or RPC failures
+resources:
+  - title: Bitcoin Core RPC reference
+    url: 'https://developer.bitcoin.org/reference/rpc/'
+    kind: docs
+  - title: getblockchaininfo
+    url: 'https://developer.bitcoin.org/reference/rpc/getblockchaininfo.html'
+    kind: docs
+  - title: Mastering Bitcoin
+    url: >-
+      https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch03_bitcoin-core.adoc
+    kind: book
+    chapter: 'Ch. 3: Bitcoin Core'
+    required: true
+reflectionPrompts:
+  - >-
+    Explain Node Dashboard to a teammate without jargon — what problem does it
+    solve?
+  - What would break in production if you misunderstood Node Dashboard?
+  - >-
+    Which BIP, book chapter, or Core doc is authoritative here, and what did you
+    verify?
+lab:
+  title: Project milestone evidence
+  description: >-
+    For Node Dashboard, complete the linked project spec happy path on
+    regtest/Polar and capture demo evidence before marking the lesson complete.
+  evidence:
+    - Link to public repo or branch
+    - Commands or screenshots proving the happy path
+    - Short note of one failure case you tested
+---
+Operators need situational awareness. A node dashboard turns RPC into signals: are we synced, connected, and estimating fees sanely?
+
+## Build challenge
+
+Dashboard panels:
+
+- Chain height / headers / verification progress
+- Peer count
+- Mempool size + feerate estimates
+- Optional wallet balances for a monitoring wallet
+
+<Mermaid caption="Poll Core safely and render snapshots; never expose RPC to browsers." chart="flowchart LR
+    Dash[Dashboard] --> Poller[Status poller]
+    Poller --> RPC[bitcoind RPC]
+    Poller --> Store[Snapshot store]
+    Store --> UI[Charts / status]" />
+
+<Callout type="danger" title="Proxy RPC">
+  Browser clients must hit your backend, not `bitcoind` directly.
+</Callout>
+
+## Next steps
+
+Build a Payment Processor API that creates invoices and tracks confirmations.

@@ -1,0 +1,105 @@
+---
+title: Mining & Consensus
+description: 'Proof-of-work, difficulty adjustment, and soft-fork activation for builders.'
+difficulty: intermediate
+duration: 5 days
+objectives:
+  - Explain proof-of-work and difficulty adjustment
+  - Distinguish consensus rules from miner preference
+  - Describe soft-fork activation concepts builders encounter
+resources:
+  - title: Mastering Bitcoin
+    url: 'https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch12_mining.adoc'
+    kind: book
+    chapter: 'Ch. 12: Mining'
+    required: true
+  - title: BIP-9 Version bits
+    url: 'https://github.com/bitcoin/bips/blob/master/bip-0009.mediawiki'
+    kind: bip
+  - title: 'Bitcoin Optech: Soft fork activation'
+    url: 'https://bitcoinops.org/en/topics/soft-fork-activation/'
+    kind: article
+reflectionPrompts:
+  - >-
+    Explain Mining & Consensus to a teammate without jargon — what problem does
+    it solve?
+  - What would break in production if you misunderstood Mining & Consensus?
+  - >-
+    Which BIP, book chapter, or Core doc is authoritative here, and what did you
+    verify?
+lab:
+  title: Regtest check
+  description: >-
+    After reading, run one hands-on check related to Mining & Consensus. Prefer
+    local regtest or Polar over mainnet.
+  evidence:
+    - Command output or screenshot from your local lab
+    - One sentence on what you observed vs expected
+    - Link to the required reading section you used
+searchQueries:
+  - BIP9
+---
+**Mining** is the competitive process of finding a proof-of-work that makes a block header valid under current difficulty. Consensus rules define what blocks and transactions are valid; miners choose among valid templates.
+
+## Why this matters
+
+You may never run an ASIC, but every confirmation UX, reorg assumption, and soft-fork discussion depends on mining incentives and consensus enforcement by **full nodes**.
+
+## Analogy
+
+Difficulty is a treadmill that speeds up or slows down so that bags of work arrive roughly every 10 minutes. If blocks come too fast, the treadmill speeds up; too slow, it eases.
+
+## Proof-of-work loop
+
+<Mermaid caption="Miners search for a header hash below the target; winners earn rewards." chart="flowchart LR
+    Template[Block template] --> Hash[Hash header]
+    Hash --> Check{Below target?}
+    Check -->|no| Nonce[Change nonce / extranonce]
+    Nonce --> Hash
+    Check -->|yes| Win[Propagate block]
+    Win --> Reward[Subsidy + fees]" />
+
+## Difficulty adjustment
+
+Approximately every 2016 blocks, difficulty adjusts based on recent timestamps to keep average block time near 10 minutes.
+
+## Soft forks
+
+A **soft fork** tightens rules in a backward-compatible way. Activation methods (BIP-9 version bits, BIP-8 discussions, Speedy Trial historically) coordinate when new rules lock in. Builders should track whether their libraries and descriptors assume post-fork features (SegWit, Taproot).
+
+<Callout type="info" title="Nodes enforce rules">
+  Miners propose blocks; full nodes verify. Economic users running nodes ultimately decide which rules their software accepts.
+</Callout>
+
+## Common mistakes
+
+- Believing miners can arbitrarily change supply rules without node acceptance
+- Ignoring that empty blocks / fee market dynamics affect confirmation times
+- Testing only `generatetoaddress` on regtest and assuming mainnet propagation behavior matches
+
+
+## Worked mental model
+
+Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
+
+## Hands-on habit
+
+Every protocol idea should be paired with one local experiment:
+
+1. Reproduce the happy path on regtest (or Polar for Lightning)
+2. Break it on purpose (wrong fee, expired invoice, offline peer)
+3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
+
+That habit turns reading into builder instinct.
+
+## Glossary check
+
+Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
+
+## Resource order
+
+Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
+
+## Next steps
+
+Move into development: libraries, wallet architecture, descriptors, and Bitcoin Core RPC.

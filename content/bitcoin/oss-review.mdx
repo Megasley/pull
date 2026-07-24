@@ -1,0 +1,59 @@
+---
+title: Code Review Practice
+description: Review peer pull requests and learn what maintainers expect from contributors.
+difficulty: intermediate
+duration: 5 days
+objectives:
+  - 'Review diffs for correctness, tests, and clarity'
+  - Leave actionable comments without noise
+  - Understand ACK culture and CI expectations
+resources:
+  - title: Bitcoin Core CONTRIBUTING
+    url: 'https://github.com/bitcoin/bitcoin/blob/master/CONTRIBUTING.md'
+    kind: docs
+  - title: Conventional comments
+    url: 'https://conventionalcomments.org/'
+    kind: article
+  - title: Bitcoin Optech Newsletter
+    url: 'https://bitcoinops.org/en/newsletters/'
+    kind: article
+reflectionPrompts:
+  - >-
+    Explain Code Review Practice to a teammate without jargon — what problem
+    does it solve?
+  - What would break in production if you misunderstood Code Review Practice?
+  - >-
+    Which BIP, book chapter, or Core doc is authoritative here, and what did you
+    verify?
+lab:
+  title: Contribution artifact
+  description: >-
+    Produce a contribution artifact for Code Review Practice: issue shortlist,
+    review notes, or PR draft that a maintainer could act on.
+  evidence:
+    - Issue URL(s) or PR URL
+    - Written approach / review checklist
+    - Self-score against the meaningful-PR rubric
+---
+Reviewing is how Bitcoin stays safe. You will learn more from careful review than from rushing another feature PR.
+
+## What to check
+
+1. Does it solve the claimed problem?
+2. Are there tests?
+3. Are edge cases handled?
+4. Is the diff minimal?
+
+<Mermaid caption="Description → diff → tests → informed ACK or change request." chart="flowchart LR
+    PR[Open PR] --> Read[Read description]
+    Read --> Diff[Inspect diff]
+    Diff --> Test[Run tests]
+    Test --> Comment[Comment / ACK]" />
+
+<Callout type="info" title="Be precise">
+  Prefer “This breaks reorg handling because X” over “Hmm not sure.”
+</Callout>
+
+## Next steps
+
+Take a substantive contribution through maintainer feedback cycles.

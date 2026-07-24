@@ -1,0 +1,92 @@
+---
+title: Failure Handling
+description: 'Handle payment failures, retries, and error propagation safely.'
+difficulty: advanced
+duration: 5 days
+objectives:
+  - Categorize permanent vs transient payment failures
+  - Retry with updated pathfinding knowledge
+  - Avoid unsafe refund UX mistakes
+resources:
+  - title: BOLT4 failure messages
+    url: 'https://github.com/lightning/bolts/blob/master/04-onion-routing.md'
+    kind: bolt
+    required: true
+  - title: Mastering the Lightning Network
+    url: 'https://github.com/lnbook/lnbook/blob/master/08_routing_htlcs.asciidoc'
+    kind: book
+    chapter: 'Ch. 8: Routing failures context'
+  - title: 'Bitcoin Optech: Payment reliability'
+    url: 'https://bitcoinops.org/'
+    kind: article
+reflectionPrompts:
+  - >-
+    Explain Failure Handling to a teammate without jargon — what problem does it
+    solve?
+  - What would break in production if you misunderstood Failure Handling?
+  - >-
+    Which BOLT (or implementation doc) is the source of truth for this topic,
+    and what did you verify there?
+lab:
+  title: Polar check
+  description: >-
+    After reading, run one hands-on check related to Failure Handling. Prefer
+    local regtest or Polar over mainnet.
+  evidence:
+    - Command output or screenshot from your local lab
+    - One sentence on what you observed vs expected
+    - Link to the required reading section you used
+searchQueries:
+  - BOLT4
+---
+Most Lightning payments fail at least once before succeeding. Good software treats failure as information, not as a dead end.
+
+## Why this matters
+
+Naive “try once and show error” UX makes Lightning feel broken. Smart retries with fee budgets make it feel instant.
+
+## Failure classes
+
+- Temporary channel imbalance / unknown liquidity
+- Expiry too tight
+- Fee insufficient
+- Permanent: unknown peer, invalid invoice, exhausted expiry
+
+<Mermaid caption="Parse errors, retry when sensible, stop when permanent." chart="flowchart TD
+    Attempt[Pay attempt] --> Fail[Onion error]
+    Fail --> Parse[Interpret failure]
+    Parse --> Transient{Transient?}
+    Transient -->|yes| Update[Update scores / route]
+    Update --> Attempt
+    Transient -->|no| Stop[Surface error to user]" />
+
+<Callout type="warning" title="Idempotency">
+  Never double-charge a merchant because a retry raced a slow success. Key payments by payment hash / idempotency keys.
+</Callout>
+
+
+## Worked mental model
+
+Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
+
+## Hands-on habit
+
+Every protocol idea should be paired with one local experiment:
+
+1. Reproduce the happy path on regtest (or Polar for Lightning)
+2. Break it on purpose (wrong fee, expired invoice, offline peer)
+3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
+
+That habit turns reading into builder instinct.
+
+## Glossary check
+
+Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
+
+## Resource order
+
+Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
+
+## Next steps
+
+Implementation deep dives: start with LND’s APIs and auth model.

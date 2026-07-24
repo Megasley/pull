@@ -1,0 +1,102 @@
+---
+title: BOLT12 Offers
+description: 'Reusable offers, onion messages, and modern Lightning payment UX.'
+difficulty: intermediate
+duration: 5 days
+objectives:
+  - Contrast BOLT11 invoices with BOLT12 offers
+  - Explain reusable static payment points at a high level
+  - Know implementation support is uneven and evolving
+resources:
+  - title: BOLT12 Offers
+    url: 'https://github.com/lightning/bolts/blob/master/12-offer-encoding.md'
+    kind: bolt
+    required: true
+  - title: Core Lightning offers
+    url: 'https://docs.corelightning.org/'
+    kind: docs
+  - title: Mastering the Lightning Network
+    url: 'https://github.com/lnbook/lnbook'
+    kind: book
+    chapter: 'Payment UX chapters, pair with BOLT12 reading'
+reflectionPrompts:
+  - >-
+    Explain BOLT12 Offers to a teammate without jargon — what problem does it
+    solve?
+  - What would break in production if you misunderstood BOLT12 Offers?
+  - >-
+    Which BOLT (or implementation doc) is the source of truth for this topic,
+    and what did you verify there?
+lab:
+  title: Polar check
+  description: >-
+    After reading, run one hands-on check related to BOLT12 Offers. Prefer local
+    regtest or Polar over mainnet.
+  evidence:
+    - Command output or screenshot from your local lab
+    - One sentence on what you observed vs expected
+    - Link to the required reading section you used
+searchQueries:
+  - BOLT12
+  - Lightning offers
+---
+**Offers (BOLT12)** aim to replace many awkward invoice flows with reusable, negotiable payment requests delivered over onion messages.
+
+## Why this matters
+
+Static QR codes, refunds, and recurring flows are painful with single-use BOLT11 strings. Offers are the protocol direction for better UX, but support varies by implementation.
+
+## Analogy
+
+BOLT11 is a single-use concert ticket printed on demand. An offer is a box office that can issue fresh tickets when you ask, without reprinting a giant static poster that goes stale.
+
+## Mental model
+
+1. Payee publishes an **offer**
+2. Payer requests an invoice over Lightning messaging
+3. Payee returns a fresh invoice bound to that request
+4. Payer pays as usual
+
+<Mermaid caption="Offers bootstrap fresh invoices without out-of-band QR churn." chart="sequenceDiagram
+    participant Payer
+    participant Payee
+    Payer->>Payee: Fetch invoice for offer
+    Payee->>Payer: Invoice
+    Payer->>Payee: Pay invoice" />
+
+<Callout type="info" title="Check feature support">
+  Before betting a product on offers, verify your target wallets and node implementations support the flows you need.
+</Callout>
+
+## Common mistakes
+
+- Assuming every wallet can scan offers today
+- Mixing offer UX copy with BOLT11 field names in APIs
+- Ignoring onion message connectivity requirements
+
+
+## Worked mental model
+
+Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
+
+## Hands-on habit
+
+Every protocol idea should be paired with one local experiment:
+
+1. Reproduce the happy path on regtest (or Polar for Lightning)
+2. Break it on purpose (wrong fee, expired invoice, offline peer)
+3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
+
+That habit turns reading into builder instinct.
+
+## Glossary check
+
+Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
+
+## Resource order
+
+Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
+
+## Next steps
+
+LNURL bridges UX today with HTTP-based flows still widely deployed.

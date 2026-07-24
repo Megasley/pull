@@ -1,0 +1,59 @@
+---
+objectives:
+  - Ship a CLI that creates addresses from a descriptor or seed
+  - Receive coins on regtest and display UTXO balance
+  - Send a payment with correct change and fee handling
+architecture: |
+  cli/        argument parsing
+  wallet/     descriptors, addresses, coin selection
+  rpc/        Bitcoin Core client
+  psbt/       build + sign helpers
+requirements:
+  - Works against local regtest without manual RPC pasting
+  - Never uses floating-point for bitcoin amounts
+  - Shows fees before broadcast and confirms user intent
+  - Includes README with setup and demo commands
+  - Has at least one integration test that mines and pays
+  - Creates a change output when leftover exceeds dust threshold
+stretchGoals:
+  - Optional RBF fee bump (`bump`) for a pending send
+  - Taproot (P2TR) receive addresses by default
+  - Coin control flags for selecting specific UTXOs
+  - Watch-only mode from an xpub / descriptor
+resources:
+  - title: BIP-84 Native Segwit
+    url: https://github.com/bitcoin/bips/blob/master/bip-0084.mediawiki
+  - title: BIP-174 PSBT
+    url: https://github.com/bitcoin/bips/blob/master/bip-0174.mediawiki
+  - title: bitcoinjs-lib
+    url: https://github.com/bitcoinjs/bitcoinjs-lib
+  - title: Bitcoin Dev Kit
+    url: https://bitcoindevkit.org/
+exampleRepos:
+  - title: bitcoinjs-lib examples
+    url: https://github.com/bitcoinjs/bitcoinjs-lib
+    description: Reference patterns for payments, addresses, and PSBTs in JavaScript.
+  - title: BDK CLI
+    url: https://github.com/bitcoindevkit/bdk-cli
+    description: A production-minded CLI wallet built on the Bitcoin Dev Kit.
+submission:
+  - Publish a public GitHub repository with a clear README
+  - Include setup steps for Bitcoin Core regtest (or Docker Compose)
+  - Attach a short demo (asciinema, screencast, or GIF) of receive + send
+  - Link the repo from your BuilderOS profile when available
+  - Note your dust policy and fee units in the README
+  - Lab evidence pack: receive+send transcript, fee shown before broadcast, and one failed-send case
+  - Rubric note if this doubles as an OSS portfolio piece
+---
+
+Build a command-line wallet that proves you can combine libraries, regtest, and wallet architecture into working software.
+
+A solid single-sig native segwit (or Taproot) wallet beats a half-finished multisig demo. Nail the happy path first: `init`, `address`, `balance`, and `send`.
+
+### Command surface
+
+1. `init` - create or import a regtest wallet
+2. `address` - print a fresh receive address
+3. `balance` - show confirmed / unconfirmed totals
+4. `send` - pay an address with a chosen fee rate
+5. `bump` - optional RBF fee bump for a pending send

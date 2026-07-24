@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 240" role="img" aria-labelledby="title desc">
+  <title id="title">Lightning channel balances</title>
+  <desc id="desc">A channel with outbound capacity on the left and inbound capacity on the right.</desc>
+  <rect width="720" height="240" fill="#0b0f14"/>
+  <text x="360" y="40" fill="#e8eef4" font-family="ui-monospace,monospace" font-size="14" text-anchor="middle">Channel capacity (fixed until splice/close)</text>
+  <rect x="80" y="80" width="560" height="60" fill="#15202b" stroke="#5a7a94" stroke-width="2"/>
+  <rect x="80" y="80" width="320" height="60" fill="#1a2836" stroke="#4a9e6e" stroke-width="2"/>
+  <text x="240" y="115" fill="#e8eef4" font-family="ui-monospace,monospace" font-size="13" text-anchor="middle">Your outbound</text>
+  <text x="520" y="115" fill="#e8eef4" font-family="ui-monospace,monospace" font-size="13" text-anchor="middle">Inbound (theirs)</text>
+  <text x="360" y="190" fill="#8aa0b5" font-family="ui-monospace,monospace" font-size="12" text-anchor="middle">Payments move the boundary without changing total capacity</text>
+</svg>

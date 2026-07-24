@@ -1,0 +1,125 @@
+---
+title: Invoices
+description: 'Create, decode, and settle BOLT11 invoices on testnet or regtest.'
+difficulty: intermediate
+duration: 5 days
+objectives:
+  - Decode BOLT11 fields that wallets rely on
+  - Create and pay invoices on a local Lightning lab
+  - 'Handle expiry, amounts, and description safely'
+resources:
+  - title: BOLT11 Invoice Protocol
+    url: 'https://github.com/lightning/bolts/blob/master/11-payment-encoding.md'
+    kind: bolt
+    required: true
+  - title: Mastering the Lightning Network
+    url: 'https://github.com/lnbook/lnbook/blob/master/15_payment_requests.asciidoc'
+    kind: book
+    chapter: 'Ch. 15: Payment Requests'
+  - title: Polar
+    url: 'https://lightningpolar.com/'
+    kind: tool
+reflectionPrompts:
+  - Explain Invoices to a teammate without jargon — what problem does it solve?
+  - What would break in production if you misunderstood Invoices?
+  - >-
+    Which BOLT (or implementation doc) is the source of truth for this topic,
+    and what did you verify there?
+lab:
+  title: Polar check
+  description: >-
+    After reading, run one hands-on check related to Invoices. Prefer local
+    regtest or Polar over mainnet.
+  evidence:
+    - Command output or screenshot from your local lab
+    - One sentence on what you observed vs expected
+    - Link to the required reading section you used
+searchQueries:
+  - BOLT11
+  - Lightning invoice
+---
+A **BOLT11 invoice** is a bech32-encoded payment request. It tells a payer what to pay, where hints might help, and when the request expires.
+
+## Why this matters
+
+POS apps, SaaS billing, and wallets all mint invoices. Incorrect expiry or amount handling causes failed payments and angry users.
+
+## Analogy
+
+An invoice is a temporary ticket: amount, destination commitment (payment hash), and a deadline. After expiry, the ticket is useless even if someone pays late.
+
+## Key fields
+
+- Payment hash / payment secret
+- Amount (optional for “any amount”)
+- Expiry / timestamp
+- Description or description hash
+- Routing hints for unannounced channels
+
+<Mermaid caption="Invoice commits to a payment hash; settlement reveals the preimage." chart="sequenceDiagram
+    participant Payee
+    participant Payer
+    Payee->>Payee: Create invoice (hash of preimage)
+    Payee->>Payer: BOLT11 string / QR
+    Payer->>Payee: Route HTLCs
+    Payee->>Payer: Reveal preimage on settle" />
+
+```bash
+# CLN example
+lightning-cli invoice 10000 "coffee" "cup #42"
+lightning-cli decodepay <bolt11>
+```
+
+<Callout type="warning" title="Never reuse preimages carelessly">
+  Payment hashes must be unique per payment intent. Reuse can create serious security/privacy issues.
+</Callout>
+
+## Common mistakes
+
+- Showing expired invoices in UI
+- Ignoring `msat` precision vs display rounding
+- Forgetting routing hints for private channels
+
+
+## Amountless invoices
+
+Invoices can omit amount, letting the payer choose. Receivers must still validate paid amounts against application expectations (donations vs fixed checkout).
+
+## Description hash
+
+Long descriptions can be hashed into the invoice to keep QR codes smaller; the full text is transported out of band. If you use description hashes, ensure the payer UI can fetch and display the preimage text safely.
+
+## Expiry UX
+
+Show countdowns. Disable Pay on expiry. When regenerating invoices, rotate payment hashes, never recycle.
+
+## Test matrix
+
+Decode fixtures from multiple implementations (LND, CLN, LDK wallets) to ensure your parser accepts real-world BOLT11 quirks.
+
+
+## Worked mental model
+
+Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
+
+## Hands-on habit
+
+Every protocol idea should be paired with one local experiment:
+
+1. Reproduce the happy path on regtest (or Polar for Lightning)
+2. Break it on purpose (wrong fee, expired invoice, offline peer)
+3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
+
+That habit turns reading into builder instinct.
+
+## Glossary check
+
+Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
+
+## Resource order
+
+Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
+
+## Next steps
+
+BOLT12 offers improve reusable payment UX beyond one-shot invoices.

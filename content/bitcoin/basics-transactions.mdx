@@ -1,0 +1,169 @@
+---
+title: Transactions
+description: 'Build, decode, sign, and broadcast transactions using regtest.'
+difficulty: beginner
+duration: 5 days
+objectives:
+  - Decode the fields of a Bitcoin transaction
+  - Explain sighashes and what a signature commits to
+  - Create and broadcast a simple regtest payment
+resources:
+  - title: Mastering Bitcoin
+    url: >-
+      https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch06_transactions.adoc
+    kind: book
+    chapter: 'Ch. 6: Transactions'
+    required: true
+  - title: 'Decoding Bitcoin: Transaction lifecycle'
+    url: 'https://bitcoindevs.xyz/decoding/transaction-lifecycle'
+    kind: interactive
+    note: Interactive module — walk creation → confirmation before the lab.
+    required: true
+  - title: 'Decoding Bitcoin: Transaction decoder'
+    url: 'https://bitcoindevs.xyz/decoding/transaction-decoder'
+    kind: interactive
+    note: Paste a raw hex or explorer tx and label vin/vout/fee fields.
+    required: true
+  - title: 'Decoding Bitcoin: Transaction exercises'
+    url: 'https://bitcoindevs.xyz/decoding/transaction_exercises'
+    kind: interactive
+    note: Classroom-style exercises — complete at least one graded path.
+  - title: 'Bitcoin Core RPC, createrawtransaction'
+    url: 'https://developer.bitcoin.org/reference/rpc/createrawtransaction.html'
+    kind: docs
+  - title: 'Bitcoin Optech: Transaction sizes'
+    url: 'https://bitcoinops.org/en/tools/calc-size/'
+    kind: tool
+reflectionPrompts:
+  - >-
+    Explain Transactions to a teammate without jargon — what problem does it
+    solve?
+  - What would break in production if you misunderstood Transactions?
+  - >-
+    Which BIP, book chapter, or Core doc is authoritative here, and what did you
+    verify?
+lab:
+  title: Decode + regtest send
+  description: >-
+    Use Decoding Bitcoin's transaction decoder on a regtest (or known sample)
+    transaction, then create and broadcast a simple payment on local regtest.
+  evidence:
+    - Screenshot or notes from the Decoding Bitcoin transaction decoder with labeled vin/vout/fee
+    - 'getrawtransaction <txid> true JSON (or equivalent) from your regtest send'
+    - One sentence on what you observed vs expected
+    - Link to the Decoding exercise or module section you completed
+---
+A Bitcoin **transaction** moves value by consuming UTXOs and creating new ones. Everything else, wallets, Lightning channels, exchanges, eventually serializes to this structure.
+
+## Why this matters
+
+If you cannot read a raw transaction, debugging stuck payments, wrong fees, or bad scripts becomes guesswork.
+
+## Analogy
+
+A transaction is a signed instruction: “Take these coins (inputs) and lock them under these new conditions (outputs).” Miners include the instruction in a block; nodes verify the signatures and rules.
+
+## Core fields
+
+- **version**
+- **inputs**: previous txid + vout, scriptSig/witness, sequence
+- **outputs**: value + scriptPubKey
+- **locktime**
+
+SegWit moves signatures into the **witness**, changing fee measurement to weight/vbytes.
+
+<Mermaid caption="Build, sign, broadcast, then wait for confirmations." chart="sequenceDiagram
+    participant W as Wallet
+    participant N as Node
+    participant M as Miner
+    W->>W: Select UTXOs and build tx
+    W->>W: Sign inputs
+    W->>N: Broadcast
+    N->>N: Validate and relay
+    N->>M: Relay tx
+    M->>M: Include in block
+    M->>N: New block
+    N->>W: Confirmations increase" />
+
+## Regtest practice
+
+```bash
+bitcoin-cli -regtest getnewaddress
+bitcoin-cli -regtest generatetoaddress 101 "$(bitcoin-cli -regtest getnewaddress)"
+bitcoin-cli -regtest sendtoaddress <addr> 1.5
+bitcoin-cli -regtest getrawtransaction <txid> true
+```
+
+Decode the JSON and identify vin/vout, fees, and scripts.
+
+```typescript
+type TxOut = { valueSats: number; scriptPubKey: string };
+type BuiltTx = { inputs: { txid: string; vout: number }[]; outputs: TxOut[] };
+```
+
+<Callout type="tip" title="Always compute fees explicitly">
+  Fee = sum(inputs) − sum(outputs). If outputs exceed inputs, nodes reject the transaction. If you under-fund fees in a busy mempool, the tx may sit forever.
+</Callout>
+
+## What signatures cover
+
+A signature commits to a **sighash**, a digest of (parts of) the transaction. That is why you must finalize amounts and outputs before signing, and why PSBT workflows exist for multi-party construction.
+
+## Common mistakes
+
+- Changing outputs after signing (invalidates signatures)
+- Mixing mainnet txids into regtest experiments
+- Forgetting change outputs
+
+
+## Virtual size and fees
+
+SegWit transactions are priced by **weight** / **vbytes**, not legacy serialized size alone. When estimating:
+
+```typescript
+const feeSats = Math.ceil(feeRateSatPerVb * vsize);
+```
+
+Underpaying relative to the mempool means waiting; overpaying wastes money. Product UX should expose slow/medium/fast targets.
+
+## Sighash flags (builder intuition)
+
+Most wallets use sighash types that commit to all inputs and outputs so the signed transaction cannot be altered meaningfully. Special flags exist for advanced contracts, avoid them until you can explain why you need them.
+
+## Decode practice
+
+Use the Decoding Bitcoin [transaction decoder](https://bitcoindevs.xyz/decoding/transaction-decoder) on a sample or your own hex, then verify the same fields locally:
+
+```bash
+TXID=$(bitcoin-cli -regtest sendtoaddress "$(bitcoin-cli -regtest getnewaddress)" 0.5)
+bitcoin-cli -regtest getrawtransaction "$TXID" true | jq '.vin,.vout,.fee'
+```
+
+Trace which UTXOs were consumed and which new locks were created. Classroom-style drills live in [transaction exercises](https://bitcoindevs.xyz/decoding/transaction_exercises).
+
+
+## Worked mental model
+
+Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
+
+## Hands-on habit
+
+Every protocol idea should be paired with one local experiment:
+
+1. Reproduce the happy path on regtest (or Polar for Lightning)
+2. Break it on purpose (wrong fee, expired invoice, offline peer)
+3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
+
+That habit turns reading into builder instinct.
+
+## Glossary check
+
+Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
+
+## Resource order
+
+Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
+
+## Next steps
+
+Study Bitcoin Script, the tiny language that defines how outputs can be unlocked.

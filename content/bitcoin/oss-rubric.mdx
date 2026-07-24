@@ -1,0 +1,67 @@
+---
+title: Contribution Rubric
+description: Shared bar for a meaningful first open-source contribution on Pull — scope, quality, and maintainer-ready communication.
+difficulty: intermediate
+duration: 3 days
+objectives:
+  - Score a contribution attempt against an explicit meaningful-PR rubric
+  - Separate docs/tests/good-first issues from drive-by noise
+  - Write maintainer-ready issue comments and PR descriptions
+resources:
+  - title: Bitcoin Core CONTRIBUTING
+    url: https://github.com/bitcoin/bitcoin/blob/master/CONTRIBUTING.md
+    kind: docs
+    required: true
+  - title: Conventional comments
+    url: https://conventionalcomments.org/
+    kind: article
+    required: true
+  - title: "Bitcoin Optech: Contribution culture"
+    url: https://bitcoinops.org/
+    kind: article
+reflectionPrompts:
+  - "Which rubric rows would your last (or planned) PR fail today, and how will you fix them before asking for review?"
+  - "What evidence would convince a maintainer this change is safe to land?"
+  - "How will you respond to a NACK or request for deeper tests without derailing?"
+lab:
+  title: Rubric self-score
+  description: Pick a real issue on a Bitcoin or Lightning repo. Write a one-page plan and self-score it 0–2 on each rubric row below before coding.
+  evidence:
+    - Issue URL and your approach doc
+    - Rubric score table (0–2 per row) with notes
+    - Draft first issue comment or PR body
+---
+
+A **meaningful PR** is not measured by lines changed. It is measured by clarity, testability, and respect for maintainer time — the same bar Btrust/Chaincode-style BOSS programs expect.
+
+## Rubric (score each 0–2)
+
+| Row | 0 | 1 | 2 |
+| --- | --- | --- | --- |
+| Problem fit | Vague / wrong repo | Plausible issue | Confirmed with maintainers or clear GOOD FIRST ISSUE + skill match |
+| Scope | Kitchen-sink | Slightly wide | Minimal diff that solves one stated problem |
+| Correctness | Untested claim | Manual check only | Automated test, scripted repro, or documented verification steps |
+| Communication | Drive-by dump | Basic description | Context, motivation, alternatives, and how to review |
+| Citizenship | Ignores guide | Skims CONTRIBUTING | Follows CONTRIBUTING, style, CI, and review norms |
+
+**Ship bar:** total ≥ 8/10 before you request maintainer review.
+
+## Evidence pack for Pull review
+
+When you submit contribution progress on Pull, include:
+
+1. Issue / PR URLs
+2. Rubric self-score
+3. What you tested (commands, CI link, or Polar/regtest notes)
+4. Open questions for reviewers
+
+## Anti-patterns
+
+- Drive-by refactors unrelated to the issue
+- “LGTM” reviews with no reading
+- Demanding merge timelines
+- Mainnet experiments as proof
+
+<Callout type="info" title="Docs and tests count">
+  Documentation, vectors, and test coverage are first-class contributions — often better first PRs than consensus code.
+</Callout>

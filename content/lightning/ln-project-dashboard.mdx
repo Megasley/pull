@@ -1,0 +1,60 @@
+---
+title: Node Ops Dashboard
+description: 'Monitor channels, peers, balances, and routing revenue in one view.'
+difficulty: advanced
+duration: 10 days
+project: ln-node-dashboard
+objectives:
+  - Aggregate channel and peer metrics from your node
+  - Surface inbound/outbound imbalances
+  - Alert on forced closes and offline peers
+resources:
+  - title: LND prometheus metrics
+    url: 'https://docs.lightning.engineering/'
+    kind: docs
+  - title: Amboss
+    url: 'https://amboss.space/'
+    kind: tool
+  - title: Mastering the Lightning Network
+    url: 'https://github.com/lnbook/lnbook/blob/master/05_node_operations.asciidoc'
+    kind: book
+    chapter: 'Ch. 5: Operating a Lightning Node'
+    required: true
+reflectionPrompts:
+  - >-
+    Explain Node Ops Dashboard to a teammate without jargon — what problem does
+    it solve?
+  - What would break in production if you misunderstood Node Ops Dashboard?
+  - >-
+    Which BOLT (or implementation doc) is the source of truth for this topic,
+    and what did you verify there?
+lab:
+  title: Project milestone evidence
+  description: >-
+    For Node Ops Dashboard, complete the linked project spec happy path on
+    regtest/Polar and capture demo evidence before marking the lesson complete.
+  evidence:
+    - Link to public repo or branch
+    - Commands or screenshots proving the happy path
+    - Short note of one failure case you tested
+---
+Operators need one pane of glass: channels, fees collected, failed HTLCs, and peer health.
+
+## Build challenge
+
+Dashboard widgets:
+
+- Channel list with capacity and balance ratio
+- Recent forwarding events
+- Peer online status
+- On-chain vs channel balance
+
+<Mermaid caption="Collect node metrics, store snapshots, alert on anomalies." chart="flowchart LR
+    Node[LN node APIs] --> ETL[Collector]
+    ETL --> DB[Metrics store]
+    DB --> UI[Ops dashboard]
+    UI --> Alerts[Alerts]" />
+
+## Next steps
+
+Build a Custom Router with your own pathfinding heuristics.

@@ -1,0 +1,163 @@
+---
+title: UTXO Model
+description: 'Understand inputs, outputs, and how wallets track spendable balances.'
+difficulty: beginner
+duration: 4 days
+objectives:
+  - Explain UTXOs versus account balances
+  - Trace how inputs consume outputs and create new ones
+  - Describe coin selection at a high level
+resources:
+  - title: Mastering Bitcoin
+    url: >-
+      https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch06_transactions.adoc
+    kind: book
+    chapter: 'Ch. 6: Transactions'
+    note: 'Focus on inputs, outputs, and how value moves.'
+    required: true
+  - title: 'Decoding Bitcoin: UTXO'
+    url: 'https://bitcoindevs.xyz/decoding/utxo'
+    kind: interactive
+    note: Interactive explainer — contrast UTXO vs account before the lab.
+    required: true
+  - title: 'Decoding Bitcoin: Transaction structure'
+    url: 'https://bitcoindevs.xyz/decoding/transaction-structure'
+    kind: interactive
+    note: See how outputs become the next spendable UTXOs.
+  - title: Mempool.space
+    url: 'https://mempool.space/'
+    kind: tool
+  - title: 'Bitcoin Optech: Coin selection'
+    url: 'https://bitcoinops.org/en/topics/coin-selection/'
+    kind: article
+reflectionPrompts:
+  - >-
+    Explain UTXO Model to a teammate without jargon — what problem does it
+    solve?
+  - What would break in production if you misunderstood UTXO Model?
+  - >-
+    Which BIP, book chapter, or Core doc is authoritative here, and what did you
+    verify?
+lab:
+  title: Trace a UTXO spend
+  description: >-
+    Complete the Decoding Bitcoin UTXO module, then on regtest list unspent
+    outputs, spend one, and show the new change/payment UTXOs created.
+  evidence:
+    - Note or screenshot from the Decoding Bitcoin UTXO interactive section
+    - 'Before/after listunspent (or wallet UTXO view) from regtest'
+    - One sentence explaining which output was consumed and which new locks appeared
+---
+Bitcoin does not keep a global balance per address. Instead, it tracks **unspent transaction outputs (UTXOs)**, discrete chunks of value that can be spent exactly once.
+
+## Why this matters
+
+If you think in “account balance” terms (like a bank), you will mis-build wallets, explorers, and Lightning funding logic. UTXOs are the native accounting unit.
+
+## Analogy
+
+Imagine cash bills in a wallet. You do not “subtract $7 from a $20 balance” in place. You hand over bills and get change back. Each bill is a UTXO. Spending consumes whole bills; change is a new bill returned to you.
+
+## Inputs and outputs
+
+A transaction:
+
+1. **Consumes** one or more UTXOs as inputs
+2. **Creates** one or more new outputs
+3. Pays the difference as a miner fee (no explicit fee output)
+
+<LessonImage
+  src="/lessons/bitcoin/basics-utxo/utxo-spend.svg"
+  alt="Diagram of two inputs creating a payment and change output"
+  caption="Inputs are fully consumed; change is a new UTXO; the remainder is the fee."
+/>
+
+<Mermaid caption="Value conservation: sum(inputs) = sum(outputs) + fee." chart="flowchart LR
+    U1[UTXO 0.05] --> Tx[Transaction]
+    U2[UTXO 0.02] --> Tx
+    Tx --> Pay[Output 0.06]
+    Tx --> Chg[Change 0.009]
+    Tx --> Fee[Fee 0.001]" />
+
+```typescript
+type Utxo = {
+  txid: string;
+  vout: number;
+  valueSats: number;
+  scriptPubKey: string;
+};
+
+const balance = utxos.reduce((sum, u) => sum + u.valueSats, 0);
+```
+
+## Wallet balances
+
+Your wallet balance is the sum of UTXOs it can unlock with its keys, not a single number stored on-chain.
+
+## Coin selection
+
+When sending, wallets choose which UTXOs to spend. Goals often include:
+
+- Minimizing fees (prefer fewer / appropriately sized inputs)
+- Avoiding unnecessary change
+- Preserving privacy when possible
+
+<Callout type="info" title="No partial spends">
+  Each input is fully consumed. There is no “spend half of this UTXO” without creating change.
+</Callout>
+
+## Common mistakes
+
+- Forgetting change and accidentally overpaying the fee
+- Creating dust outputs that cost more to spend later than they are worth
+- Assuming address balance APIs equal UTXO-aware wallet state
+
+
+## Try it: count UTXOs
+
+On regtest, fund an address, then inspect UTXOs:
+
+```bash
+ADDR=$(bitcoin-cli -regtest getnewaddress)
+bitcoin-cli -regtest generatetoaddress 101 "$ADDR"
+bitcoin-cli -regtest listunspent
+```
+
+Each `listunspent` row is a UTXO your wallet can spend. Notice `txid`, `vout`, and `amount`. When you send, some rows disappear and new ones appear (payment + change).
+
+## Dust and consolidation
+
+Very small UTXOs can cost more in fees to spend than they are worth, that is **dust**. Wallets sometimes consolidate many small UTXOs into one when fees are low. Consolidation improves future fee efficiency but links history (privacy tradeoff).
+
+## Builders checklist
+
+- Always compute change explicitly in tests
+- Log fee = inputs − outputs on every send path
+- Never assume an "address balance" API matches your local UTXO set during reorgs
+
+
+## Worked mental model
+
+Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
+
+## Hands-on habit
+
+Every protocol idea should be paired with one local experiment:
+
+1. Reproduce the happy path on regtest (or Polar for Lightning)
+2. Break it on purpose (wrong fee, expired invoice, offline peer)
+3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
+
+That habit turns reading into builder instinct.
+
+## Glossary check
+
+Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
+
+## Resource order
+
+Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
+
+## Next steps
+
+Learn how keys become addresses, then how UTXOs get confirmed inside blocks.

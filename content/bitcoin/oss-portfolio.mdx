@@ -1,0 +1,59 @@
+---
+title: Builder Portfolio
+description: Document your projects and contributions in a public BuilderOS profile.
+difficulty: intermediate
+duration: 5 days
+objectives:
+  - 'Present projects with problem, approach, and results'
+  - Link verifiable commits and PRs
+  - Write a short builder narrative without hype
+resources:
+  - title: GitHub profile README
+    url: 'https://docs.github.com/en/account-and-profile'
+    kind: docs
+  - title: Bitcoin Optech
+    url: 'https://bitcoinops.org/'
+    kind: article
+  - title: Conventional Commits
+    url: 'https://www.conventionalcommits.org/'
+    kind: article
+reflectionPrompts:
+  - >-
+    Explain Builder Portfolio to a teammate without jargon — what problem does
+    it solve?
+  - What would break in production if you misunderstood Builder Portfolio?
+  - >-
+    Which BIP, book chapter, or Core doc is authoritative here, and what did you
+    verify?
+lab:
+  title: Contribution artifact
+  description: >-
+    Produce a contribution artifact for Builder Portfolio: issue shortlist,
+    review notes, or PR draft that a maintainer could act on.
+  evidence:
+    - Issue URL(s) or PR URL
+    - Written approach / review checklist
+    - Self-score against the meaningful-PR rubric
+---
+Your portfolio is evidence: repositories, PRs, writeups, and demos. Hiring managers and OSS maintainers trust artifacts over adjectives.
+
+## What to include
+
+- Mini wallet / explorer / processor links
+- 2, 3 merged (or deeply reviewed) PRs
+- A diagram of architecture for one project
+- Regtest demo script or short recording
+
+<Mermaid caption="Artifacts compose into a credible builder profile." chart="flowchart TD
+    Projects[Projects] --> Portfolio[Portfolio page]
+    PRs[PRs / commits] --> Portfolio
+    Writeups[Short writeups] --> Portfolio
+    Portfolio --> Next[Jobs / collaborators / Lightning roadmap]" />
+
+<Callout type="info" title="Prefer depth over volume">
+  One well-documented wallet beats ten empty repos named `bitcoin-bot`.
+</Callout>
+
+## Next steps
+
+Begin the Lightning roadmap, channels, invoices, and off-chain Bitcoin payments.

@@ -1,0 +1,49 @@
+---
+objectives:
+  - Fetch and display recent blocks and transactions
+  - Render transaction details from raw or API data
+  - Show basic mempool / fee snapshots in a web UI
+architecture: |
+  UI (Next.js) ──► Explorer API / Esplora ──► Bitcoin Core
+requirements:
+  - Navigable home, block, transaction, and search views
+  - Works on desktop and mobile widths
+  - Clear confirmed vs mempool state
+  - Documented how to point at regtest Esplora or equivalent
+  - Loading and error states for missing txids / offline API
+stretchGoals:
+  - Mempool fee histogram or fee-rate bands on the home page
+  - Address page with UTXO and history summaries
+  - Live tip updates via polling or SSE
+  - Dark/light theme toggle that preserves explorer readability
+resources:
+  - title: Esplora API
+    url: https://github.com/Blockstream/esplora/blob/master/API.md
+  - title: Mempool.space
+    url: https://mempool.space/
+  - title: Bitcoin Core REST
+    url: https://github.com/bitcoin/bitcoin/blob/master/doc/REST-interface.md
+exampleRepos:
+  - title: mempool/mempool
+    url: https://github.com/mempool/mempool
+    description: Production Bitcoin explorer UX and mempool visualization patterns.
+  - title: Blockstream Esplora
+    url: https://github.com/Blockstream/esplora
+    description: API + UI reference for electrs-backed explorers.
+submission:
+  - Publish the explorer UI repository with screenshots
+  - Document the backend (Esplora, Core RPC proxy, or mock fixtures)
+  - Demo search for block hash, txid, and a known miss (404)
+  - Include a short loom/GIF walking home → block → transaction
+---
+
+Explorers turn opaque hex into something humans can audit. Ship a focused web UI over regtest or an Esplora-compatible API.
+
+Prefer clarity over novelty - explorers are trust surfaces. Show units clearly (BTC vs sats), distinguish confirmed vs mempool state, and link related entities (block ↔ tx ↔ address).
+
+### Required pages
+
+1. **Home** - latest blocks and fee overview
+2. **Block** - height, hash, tx count, merkle root, tx list
+3. **Transaction** - inputs, outputs, fee, confirmation status
+4. **Search** - lookup by txid, block hash, or address

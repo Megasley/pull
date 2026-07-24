@@ -1,0 +1,412 @@
+{
+  "id": "lightning",
+  "title": "Lightning Roadmap",
+  "description": "Build on the Lightning Network - from payment channels to production node integrations.",
+  "prerequisiteRoadmap": {
+    "slug": "bitcoin",
+    "message": "Complete the Bitcoin roadmap to unlock Lightning."
+  },
+  "sections": [
+    {
+      "id": "lightning-basics",
+      "title": "Lightning Basics",
+      "description": "Network fundamentals, BOLTs, invoices, offers, and LNURL.",
+      "defaultExpanded": true,
+      "position": { "x": 0, "y": 0 },
+      "size": { "width": 340, "height": 510 }
+    },
+    {
+      "id": "channels-htlcs",
+      "title": "Channels & HTLCs",
+      "description": "Open channels, commitments, HTLCs, lifecycle, and splicing.",
+      "defaultExpanded": true,
+      "position": { "x": 380, "y": 0 },
+      "size": { "width": 340, "height": 510 }
+    },
+    {
+      "id": "routing-liquidity",
+      "title": "Routing & Liquidity",
+      "description": "Onion routing, transport, pathfinding, liquidity, multipath, failures, and attacks.",
+      "defaultExpanded": true,
+      "position": { "x": 760, "y": 0 },
+      "size": { "width": 340, "height": 750 }
+    },
+    {
+      "id": "implementation",
+      "title": "Implementation",
+      "description": "LND, Core Lightning, LDK, and watchtowers.",
+      "defaultExpanded": true,
+      "position": { "x": 0, "y": 650 },
+      "size": { "width": 340, "height": 430 }
+    },
+    {
+      "id": "projects",
+      "title": "Projects",
+      "description": "Ship Lightning-native applications and infrastructure tools.",
+      "defaultExpanded": true,
+      "position": { "x": 380, "y": 650 },
+      "size": { "width": 340, "height": 430 }
+    },
+    {
+      "id": "contribution",
+      "title": "Contribution",
+      "description": "Contribute to Lightning implementations and ecosystem repositories.",
+      "defaultExpanded": true,
+      "position": { "x": 760, "y": 650 },
+      "size": { "width": 340, "height": 510 }
+    }
+  ],
+  "nodes": [
+    {
+      "id": "ln-overview",
+      "sectionId": "lightning-basics",
+      "title": "Lightning Overview",
+      "description": "Understand how payment channels enable instant, low-fee Bitcoin transfers.",
+      "duration": "4 days",
+      "difficulty": "intermediate",
+      "resources": ["Mastering Lightning Ch. 1", "Lightning Network Paper", "Amboss"],
+      "position": { "x": 24, "y": 88 }
+    },
+    {
+      "id": "ln-bolts",
+      "sectionId": "lightning-basics",
+      "title": "BOLTs & Spec Landscape",
+      "description": "Navigate the BOLT specifications and how implementations stay interoperable.",
+      "duration": "4 days",
+      "difficulty": "intermediate",
+      "lockedUntil": ["ln-overview"],
+      "resources": ["BOLTs Spec", "Mastering Lightning", "Lightning-RFC"],
+      "position": { "x": 24, "y": 166 }
+    },
+    {
+      "id": "ln-invoices",
+      "sectionId": "lightning-basics",
+      "title": "Invoices",
+      "description": "Create, decode, and settle BOLT11 invoices on testnet or regtest.",
+      "duration": "5 days",
+      "difficulty": "intermediate",
+      "lockedUntil": ["ln-bolts"],
+      "resources": ["BOLT11", "Mastering Lightning Payment Requests", "Polar"],
+      "position": { "x": 24, "y": 244 }
+    },
+    {
+      "id": "ln-offers",
+      "sectionId": "lightning-basics",
+      "title": "BOLT12 Offers",
+      "description": "Reusable offers, onion messages, and modern Lightning payment UX.",
+      "duration": "5 days",
+      "difficulty": "intermediate",
+      "lockedUntil": ["ln-invoices"],
+      "resources": ["BOLT12", "Offers Explainer", "CLN Offers"],
+      "position": { "x": 24, "y": 322 }
+    },
+    {
+      "id": "ln-lnurl",
+      "sectionId": "lightning-basics",
+      "title": "LNURL",
+      "description": "Implement LNURL-withdraw, pay, and auth for better wallet UX.",
+      "duration": "4 days",
+      "difficulty": "intermediate",
+      "lockedUntil": ["ln-offers"],
+      "resources": ["LNURL Specs", "Lightning Address", "Alby Docs"],
+      "position": { "x": 24, "y": 400 }
+    },
+    {
+      "id": "ln-channels-open",
+      "sectionId": "channels-htlcs",
+      "title": "Opening Channels",
+      "description": "Fund channels, configure policies, and monitor inbound capacity.",
+      "duration": "5 days",
+      "difficulty": "intermediate",
+      "lockedUntil": ["ln-lnurl"],
+      "resources": ["Mastering Lightning Channels", "BOLT2", "LND channel CLI"],
+      "position": { "x": 24, "y": 88 }
+    },
+    {
+      "id": "ln-commitments",
+      "sectionId": "channels-htlcs",
+      "title": "Commitment Transactions",
+      "description": "Revocation keys, to_local/to_remote outputs, and penalty security.",
+      "duration": "6 days",
+      "difficulty": "advanced",
+      "lockedUntil": ["ln-channels-open"],
+      "resources": ["Mastering Lightning Channels", "BOLT3", "Anchor Outputs"],
+      "position": { "x": 24, "y": 166 }
+    },
+    {
+      "id": "ln-htlcs",
+      "sectionId": "channels-htlcs",
+      "title": "HTLC Mechanics",
+      "description": "Trace payment hashes and timelocks across multi-hop routes.",
+      "duration": "6 days",
+      "difficulty": "advanced",
+      "lockedUntil": ["ln-commitments"],
+      "resources": ["BOLT2 HTLC", "Mastering Lightning", "HTLC Debug"],
+      "position": { "x": 24, "y": 244 }
+    },
+    {
+      "id": "ln-channels-lifecycle",
+      "sectionId": "channels-htlcs",
+      "title": "Channel Lifecycle",
+      "description": "Cooperative close, force close, and penalty transaction scenarios.",
+      "duration": "5 days",
+      "difficulty": "advanced",
+      "lockedUntil": ["ln-htlcs"],
+      "resources": ["Force Close Playbook", "Channel Backups", "Justice Tx"],
+      "position": { "x": 24, "y": 322 }
+    },
+    {
+      "id": "ln-splicing",
+      "sectionId": "channels-htlcs",
+      "title": "Dual Funding & Splicing",
+      "description": "Add or remove capacity without closing the channel.",
+      "duration": "5 days",
+      "difficulty": "advanced",
+      "lockedUntil": ["ln-channels-lifecycle"],
+      "resources": ["Dual Funding", "Splicing Spec", "CLN Splice"],
+      "position": { "x": 24, "y": 400 }
+    },
+    {
+      "id": "ln-routing",
+      "sectionId": "routing-liquidity",
+      "title": "Routing",
+      "description": "Select routes using fee budgets, channel hints, and reliability scores.",
+      "duration": "6 days",
+      "difficulty": "advanced",
+      "lockedUntil": ["ln-splicing"],
+      "resources": ["Mastering Lightning Routing", "Mission Control", "Amboss"],
+      "position": { "x": 24, "y": 88 }
+    },
+    {
+      "id": "ln-onion",
+      "sectionId": "routing-liquidity",
+      "title": "Onion Routing",
+      "description": "Sphinx packets, hop payloads, and payment privacy on Lightning.",
+      "duration": "5 days",
+      "difficulty": "advanced",
+      "lockedUntil": ["ln-routing"],
+      "resources": ["Mastering Lightning Onion", "BOLT4", "Sphinx"],
+      "position": { "x": 24, "y": 166 }
+    },
+    {
+      "id": "ln-transport",
+      "sectionId": "routing-liquidity",
+      "title": "Transport & Noise",
+      "description": "Encrypted authenticated Lightning peer links using the Noise protocol framework.",
+      "duration": "5 days",
+      "difficulty": "advanced",
+      "lockedUntil": ["ln-onion"],
+      "resources": ["Noise Protocol", "Noise XK", "BOLT8"],
+      "position": { "x": 24, "y": 244 }
+    },
+    {
+      "id": "ln-pathfinding",
+      "sectionId": "routing-liquidity",
+      "title": "Pathfinding",
+      "description": "Algorithms and heuristics that turn the channel graph into a route.",
+      "duration": "5 days",
+      "difficulty": "advanced",
+      "lockedUntil": ["ln-transport"],
+      "resources": ["Mastering Lightning Pathfinding", "Dijkstra LN", "Graph Analysis"],
+      "position": { "x": 24, "y": 322 }
+    },
+    {
+      "id": "ln-liquidity",
+      "sectionId": "routing-liquidity",
+      "title": "Liquidity",
+      "description": "Balance inbound/outbound liquidity with loops, swaps, and peer management.",
+      "duration": "7 days",
+      "difficulty": "advanced",
+      "lockedUntil": ["ln-pathfinding"],
+      "resources": ["Liquidity Ads", "Loop", "Inbound Capacity"],
+      "position": { "x": 24, "y": 400 }
+    },
+    {
+      "id": "ln-mpp",
+      "sectionId": "routing-liquidity",
+      "title": "Multipath Payments",
+      "description": "Split large payments across multiple paths for reliability and size.",
+      "duration": "4 days",
+      "difficulty": "advanced",
+      "lockedUntil": ["ln-liquidity"],
+      "resources": ["MPP / AMP", "BOLT Payments", "LND MPP"],
+      "position": { "x": 24, "y": 478 }
+    },
+    {
+      "id": "ln-routing-failures",
+      "sectionId": "routing-liquidity",
+      "title": "Failure Handling",
+      "description": "Handle payment failures, retries, and error propagation safely.",
+      "duration": "5 days",
+      "difficulty": "advanced",
+      "lockedUntil": ["ln-mpp"],
+      "resources": ["Payment Retries", "Error Codes", "Safe Refunds"],
+      "position": { "x": 24, "y": 556 }
+    },
+    {
+      "id": "ln-attacks",
+      "sectionId": "routing-liquidity",
+      "title": "Lightning Attack Surface",
+      "description": "Congestion, probing, watchtower incentives, and lessons from LN CVEs.",
+      "duration": "7 days",
+      "difficulty": "advanced",
+      "lockedUntil": ["ln-routing-failures"],
+      "resources": ["Congestion discussions", "Channel probing paper", "CVE disclosures"],
+      "position": { "x": 24, "y": 634 }
+    },
+    {
+      "id": "ln-lnd",
+      "sectionId": "implementation",
+      "title": "LND",
+      "description": "Build integrations with LND gRPC, REST, and macaroon authentication.",
+      "duration": "2 weeks",
+      "difficulty": "advanced",
+      "lockedUntil": ["ln-attacks"],
+      "resources": ["LND Docs", "Loop / Pool", "Lightning Terminal"],
+      "position": { "x": 24, "y": 88 }
+    },
+    {
+      "id": "ln-cln",
+      "sectionId": "implementation",
+      "title": "Core Lightning",
+      "description": "Extend CLN with plugins, hooks, and custom RPC commands.",
+      "duration": "2 weeks",
+      "difficulty": "advanced",
+      "lockedUntil": ["ln-lnd"],
+      "resources": ["CLN Docs", "Plugin Guide", "REST Interface"],
+      "position": { "x": 24, "y": 166 }
+    },
+    {
+      "id": "ln-ldk",
+      "sectionId": "implementation",
+      "title": "LDK",
+      "description": "Embed Lightning in applications using the Lightning Development Kit.",
+      "duration": "2 weeks",
+      "difficulty": "advanced",
+      "lockedUntil": ["ln-cln"],
+      "resources": ["LDK Docs", "Sample Node", "Mobile Patterns"],
+      "position": { "x": 24, "y": 244 }
+    },
+    {
+      "id": "ln-watchtowers",
+      "sectionId": "implementation",
+      "title": "Watchtowers",
+      "description": "Outsource breach detection so offline wallets stay protected.",
+      "duration": "5 days",
+      "difficulty": "advanced",
+      "lockedUntil": ["ln-ldk"],
+      "resources": ["Watchtower Protocol", "LND Watchtower", "Mastering Lightning Security"],
+      "position": { "x": 24, "y": 322 }
+    },
+    {
+      "id": "ln-project-pos",
+      "sectionId": "projects",
+      "title": "Lightning POS",
+      "description": "Build a point-of-sale app that creates invoices and tracks settlement.",
+      "duration": "2 weeks",
+      "difficulty": "advanced",
+      "project": "lightning-pos",
+      "lockedUntil": ["ln-watchtowers"],
+      "resources": ["Project Spec: POS", "Webhook Flow", "UX Patterns"],
+      "position": { "x": 24, "y": 88 }
+    },
+    {
+      "id": "ln-project-dashboard",
+      "sectionId": "projects",
+      "title": "Node Ops Dashboard",
+      "description": "Monitor channels, peers, balances, and routing revenue in one view.",
+      "duration": "10 days",
+      "difficulty": "advanced",
+      "project": "ln-node-dashboard",
+      "lockedUntil": ["ln-project-pos"],
+      "resources": ["Project Spec: Dashboard", "Prometheus", "Alerting"],
+      "position": { "x": 24, "y": 166 }
+    },
+    {
+      "id": "ln-project-router",
+      "sectionId": "projects",
+      "title": "Custom Router",
+      "description": "Implement a pathfinding service with custom fee and reliability heuristics.",
+      "duration": "2 weeks",
+      "difficulty": "advanced",
+      "project": "custom-router",
+      "lockedUntil": ["ln-project-dashboard"],
+      "resources": ["Project Spec: Router", "Graph Analysis", "Benchmarks"],
+      "position": { "x": 24, "y": 244 }
+    },
+    {
+      "id": "ln-contrib-discovery",
+      "sectionId": "contribution",
+      "title": "Contribution Discovery",
+      "description": "Find beginner-friendly issues across LND, CLN, and LDK repositories.",
+      "duration": "5 days",
+      "difficulty": "intermediate",
+      "lockedUntil": ["ln-project-router"],
+      "resources": ["Lightning Repo Map", "Good First Issues", "Maintainer Guides"],
+      "position": { "x": 24, "y": 88 }
+    },
+    {
+      "id": "ln-contrib-rubric",
+      "sectionId": "contribution",
+      "title": "Contribution Rubric",
+      "description": "Score Lightning contribution attempts against an explicit meaningful-PR bar.",
+      "duration": "3 days",
+      "difficulty": "intermediate",
+      "lockedUntil": ["ln-contrib-discovery"],
+      "resources": ["LND Guidelines", "CLN Repo", "Conventional Comments"],
+      "position": { "x": 24, "y": 166 }
+    },
+    {
+      "id": "ln-contrib-pr",
+      "sectionId": "contribution",
+      "title": "First Lightning PR",
+      "description": "Submit a tested pull request to a Lightning implementation or tool.",
+      "duration": "2 weeks",
+      "difficulty": "advanced",
+      "lockedUntil": ["ln-contrib-rubric"],
+      "resources": ["PR Checklist", "Integration Tests", "Release Notes"],
+      "position": { "x": 24, "y": 244 }
+    },
+    {
+      "id": "ln-contrib-review",
+      "sectionId": "contribution",
+      "title": "Protocol Review Practice",
+      "description": "Review BOLT-related changes and participate in specification discussions.",
+      "duration": "1 week",
+      "difficulty": "advanced",
+      "lockedUntil": ["ln-contrib-pr"],
+      "resources": ["BOLT Process", "Spec Review", "Mailing List"],
+      "position": { "x": 24, "y": 322 }
+    }
+  ],
+  "edges": [
+    { "id": "le01", "source": "ln-overview", "target": "ln-bolts" },
+    { "id": "le02", "source": "ln-bolts", "target": "ln-invoices" },
+    { "id": "le03", "source": "ln-invoices", "target": "ln-offers" },
+    { "id": "le04", "source": "ln-offers", "target": "ln-lnurl" },
+    { "id": "le05", "source": "ln-lnurl", "target": "ln-channels-open" },
+    { "id": "le06", "source": "ln-channels-open", "target": "ln-commitments" },
+    { "id": "le07", "source": "ln-commitments", "target": "ln-htlcs" },
+    { "id": "le08", "source": "ln-htlcs", "target": "ln-channels-lifecycle" },
+    { "id": "le09", "source": "ln-channels-lifecycle", "target": "ln-splicing" },
+    { "id": "le10", "source": "ln-splicing", "target": "ln-routing" },
+    { "id": "le11", "source": "ln-routing", "target": "ln-onion" },
+    { "id": "le12", "source": "ln-onion", "target": "ln-transport" },
+    { "id": "le13", "source": "ln-transport", "target": "ln-pathfinding" },
+    { "id": "le14", "source": "ln-pathfinding", "target": "ln-liquidity" },
+    { "id": "le15", "source": "ln-liquidity", "target": "ln-mpp" },
+    { "id": "le16", "source": "ln-mpp", "target": "ln-routing-failures" },
+    { "id": "le17", "source": "ln-routing-failures", "target": "ln-attacks" },
+    { "id": "le18", "source": "ln-attacks", "target": "ln-lnd" },
+    { "id": "le19", "source": "ln-lnd", "target": "ln-cln" },
+    { "id": "le20", "source": "ln-cln", "target": "ln-ldk" },
+    { "id": "le21", "source": "ln-ldk", "target": "ln-watchtowers" },
+    { "id": "le22", "source": "ln-watchtowers", "target": "ln-project-pos" },
+    { "id": "le23", "source": "ln-project-pos", "target": "ln-project-dashboard" },
+    { "id": "le24", "source": "ln-project-dashboard", "target": "ln-project-router" },
+    { "id": "le25", "source": "ln-project-router", "target": "ln-contrib-discovery" },
+    { "id": "le26", "source": "ln-contrib-discovery", "target": "ln-contrib-rubric" },
+    { "id": "le27", "source": "ln-contrib-rubric", "target": "ln-contrib-pr" },
+    { "id": "le28", "source": "ln-contrib-pr", "target": "ln-contrib-review" }
+  ]
+}

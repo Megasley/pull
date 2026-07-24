@@ -1,0 +1,106 @@
+---
+title: Descriptors & Miniscript
+description: Express wallet policies as output descriptors and compose safe scripts.
+difficulty: intermediate
+duration: 6 days
+objectives:
+  - Read and write basic output descriptors
+  - Explain why descriptors beat ad-hoc path assumptions
+  - Use Miniscript as a policy language mindset
+resources:
+  - title: BIP-380 Output Script Descriptors
+    url: 'https://github.com/bitcoin/bips/blob/master/bip-0380.mediawiki'
+    kind: bip
+    required: true
+  - title: Miniscript
+    url: 'https://bitcoin.sipa.be/miniscript/'
+    kind: docs
+  - title: Bitcoin Core descriptors
+    url: 'https://github.com/bitcoin/bitcoin/blob/master/doc/descriptors.md'
+    kind: docs
+reflectionPrompts:
+  - >-
+    Explain Descriptors & Miniscript to a teammate without jargon — what problem
+    does it solve?
+  - >-
+    What would break in production if you misunderstood Descriptors &
+    Miniscript?
+  - >-
+    Which BIP, book chapter, or Core doc is authoritative here, and what did you
+    verify?
+lab:
+  title: Regtest check
+  description: >-
+    After reading, run one hands-on check related to Descriptors & Miniscript.
+    Prefer local regtest or Polar over mainnet.
+  evidence:
+    - Command output or screenshot from your local lab
+    - One sentence on what you observed vs expected
+    - Link to the required reading section you used
+searchQueries:
+  - BIP380
+  - output descriptors
+---
+**Output descriptors** are a standard way to describe what scripts/keys a wallet controls. **Miniscript** helps compile human policies into safe Script fragments.
+
+## Why this matters
+
+“m/84'/0'/0'” alone is incomplete if you forget whether you meant wpkh, tr, multisig, or a custom tree. Descriptors make imports, hardware coordination, and recoveries unambiguous.
+
+## Analogy
+
+A descriptor is a precise parts list and assembly diagram for your locks. Miniscript is a grammar that prevents you from building a lock that jams shut forever.
+
+## Descriptor examples
+
+```text
+wpkh([fingerprint/84h/1h/0h]tpub.../0/*)
+tr([fingerprint/86h/1h/0h]tpub.../0/*)
+wsh(multi(2,key1,key2,key3))
+```
+
+Bitcoin Core RPCs like `importdescriptors` and `listdescriptors` operationalize this.
+
+<Mermaid caption="Policies compile to scripts wrapped by portable descriptors." chart="flowchart LR
+    Policy[Spending policy] --> Mini[Miniscript]
+    Mini --> Script[Script]
+    Script --> Desc[Descriptor]
+    Desc --> Core[Bitcoin Core / BDK]
+    Desc --> Backup[Backup &amp; recovery]" />
+
+<Callout type="tip" title="Backup descriptors with seeds">
+  For Taproot script trees and multisig, seed words alone may be insufficient. Store descriptors (and multisig key records) with the same care as seeds.
+</Callout>
+
+## Common mistakes
+
+- Exporting xpubs without origin info / fingerprints
+- Mixing receive and change descriptor chains
+- Assuming Miniscript supports every opcode policy you can imagine
+
+
+## Worked mental model
+
+Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
+
+## Hands-on habit
+
+Every protocol idea should be paired with one local experiment:
+
+1. Reproduce the happy path on regtest (or Polar for Lightning)
+2. Break it on purpose (wrong fee, expired invoice, offline peer)
+3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
+
+That habit turns reading into builder instinct.
+
+## Glossary check
+
+Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
+
+## Resource order
+
+Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
+
+## Next steps
+
+Drive Bitcoin Core via RPC, the reference implementation most builders integrate with.

@@ -1,0 +1,49 @@
+---
+objectives:
+  - Ingest a channel graph and invoice constraints
+  - Rank paths with custom fee and reliability heuristics
+  - Benchmark success rate against a baseline router
+architecture: |
+  Graph snapshot → scorer → path candidates → payment attempt feedback
+requirements:
+  - "`POST /routes` accepts destination, amount, max fee, max CLTV"
+  - Returns ranked candidate paths with expected fees
+  - At least two scoring strategies behind a flag
+  - Deterministic routes for a fixed graph fixture
+  - "Comparison report: success rate, average fees, attempts"
+stretchGoals:
+  - Feedback endpoint for success/failure learning
+  - Multipart / split payment path sets under a fee budget
+  - Cooldown window for recently failed edges
+  - Visualization of chosen vs rejected paths
+resources:
+  - title: BOLT 4 Onion Routing
+    url: https://github.com/lightning/bolts/blob/master/04-onion-routing.md
+  - title: LND Mission Control
+    url: https://github.com/lightningnetwork/lnd/blob/master/routing/missioncontrol.go
+  - title: Pathfinding research notes
+    url: https://lightning.engineering/
+exampleRepos:
+  - title: lnd routing package
+    url: https://github.com/lightningnetwork/lnd/tree/master/routing
+    description: Production pathfinding and mission-control ideas.
+  - title: CLN askrene / plugins
+    url: https://github.com/ElementsProject/lightning
+    description: Plugin-oriented routing experimentation surface.
+submission:
+  - Service repo with fixture graph and benchmark harness
+  - Written report comparing strategies on the same dataset
+  - API examples for route requests/responses
+  - Clear limitations vs full node private-state routers
+---
+
+Pathfinding is a product differentiator. Build a service that proposes routes using your own scoring function.
+
+Without a benchmark harness, "smarter routing" is just storytelling. Log attempt outcomes and measure success rate, fees, and retries.
+
+### Heuristics to try
+
+- Fee cost + risk penalty
+- Channel age / capacity priors
+- Historical failure decay (mission-control style)
+- Avoid recently failed edges for a cooldown window

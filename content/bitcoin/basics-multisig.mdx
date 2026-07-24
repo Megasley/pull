@@ -1,0 +1,114 @@
+---
+title: Multisig & Timelocks
+description: 'Shared custody, CHECKMULTISIG, CSV, CLTV, and MuSig patterns.'
+difficulty: intermediate
+duration: 5 days
+objectives:
+  - Explain m-of-n multisig custody models
+  - Use CLTV and CSV mental models correctly
+  - Contrast on-chain multisig with aggregated MuSig/Taproot approaches
+resources:
+  - title: Mastering Bitcoin
+    url: >-
+      https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch07_authorization-authentication.adoc
+    kind: book
+    chapter: 'Ch. 7: Authorization and Authentication'
+    required: true
+  - title: BIP-65 CLTV
+    url: 'https://github.com/bitcoin/bips/blob/master/bip-0065.mediawiki'
+    kind: bip
+  - title: BIP-68 Relative lock-time
+    url: 'https://github.com/bitcoin/bips/blob/master/bip-0068.mediawiki'
+    kind: bip
+  - title: BIP-112 CSV
+    url: 'https://github.com/bitcoin/bips/blob/master/bip-0112.mediawiki'
+    kind: bip
+reflectionPrompts:
+  - >-
+    Explain Multisig & Timelocks to a teammate without jargon — what problem
+    does it solve?
+  - What would break in production if you misunderstood Multisig & Timelocks?
+  - >-
+    Which BIP, book chapter, or Core doc is authoritative here, and what did you
+    verify?
+lab:
+  title: Regtest check
+  description: >-
+    After reading, run one hands-on check related to Multisig & Timelocks.
+    Prefer local regtest or Polar over mainnet.
+  evidence:
+    - Command output or screenshot from your local lab
+    - One sentence on what you observed vs expected
+    - Link to the required reading section you used
+searchQueries:
+  - multisig
+  - BIP67
+---
+**Multisig** means multiple keys must cooperate to spend. **Timelocks** add “not before” constraints. Together they power vaults, inheritance designs, and Lightning’s security model.
+
+## Why this matters
+
+Shared custody without multisig is usually a single point of failure. Lightning’s justice system depends on relative timelocks. Builders who blur absolute vs relative time create unsafe contracts.
+
+## Analogy
+
+Multisig is a safe deposit box needing two keys. A timelock is a time-delay lock that refuses to open until a date, or until enough time has passed since the box was last sealed.
+
+## Multisig patterns
+
+Classic Script uses `OP_CHECKMULTISIG` for on-chain m-of-n. Modern approaches often prefer Taproot + MuSig2 so cooperative spends look like single-sig.
+
+```text
+Policy example: 2-of-3 keys OR (1 key after 90 days)
+```
+
+<Mermaid caption="Policies combine thresholds and time for safety and recovery." chart="flowchart TD
+    Funds[Funds] --> Coop[2-of-3 cooperative spend]
+    Funds --> Rec[Recovery path after timelock]
+    Coop --> Done[Spend now]
+    Rec --> Wait[Wait for CLTV/CSV]
+    Wait --> Done" />
+
+## Absolute vs relative timelocks
+
+- **CLTV** (BIP-65): absolute, unlock after a block height or timestamp
+- **CSV** (BIP-112 / BIP-68): relative, unlock after the output has confirmed for a relative period
+
+Lightning commitments lean on CSV so old states become punishable after delays.
+
+<Callout type="warning" title="Wall clocks are not consensus">
+  Nodes use block-based rules. Designing “7 days” means encoding that delay in locktime semantics, not trusting a server clock alone.
+</Callout>
+
+## Common mistakes
+
+- Building 2-of-3 without tested recovery paths and key ceremonies
+- Using absolute locks where relative locks were required (and vice versa)
+- Forgetting that mempool policy may delay non-standard scripts
+
+
+## Worked mental model
+
+Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
+
+## Hands-on habit
+
+Every protocol idea should be paired with one local experiment:
+
+1. Reproduce the happy path on regtest (or Polar for Lightning)
+2. Break it on purpose (wrong fee, expired invoice, offline peer)
+3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
+
+That habit turns reading into builder instinct.
+
+## Glossary check
+
+Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
+
+## Resource order
+
+Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
+
+## Next steps
+
+Learn how unconfirmed transactions compete in the mempool and how fee bumping works.

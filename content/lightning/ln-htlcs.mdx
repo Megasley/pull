@@ -1,0 +1,119 @@
+---
+title: HTLC Mechanics
+description: Trace payment hashes and timelocks across multi-hop routes.
+difficulty: advanced
+duration: 6 days
+objectives:
+  - Trace a multi-hop HTLC forward and backward
+  - Explain payment hash vs preimage
+  - Reason about decreasing timelocks along a route
+resources:
+  - title: BOLT2 HTLC handling
+    url: 'https://github.com/lightning/bolts/blob/master/02-peer-protocol.md'
+    kind: bolt
+    required: true
+  - title: Mastering the Lightning Network
+    url: 'https://github.com/lnbook/lnbook/blob/master/08_routing_htlcs.asciidoc'
+    kind: book
+    chapter: 'Ch. 8: Routing on the Lightning Network'
+  - title: Lightning Network Paper
+    url: 'https://lightning.network/lightning-network-paper.pdf'
+    kind: article
+reflectionPrompts:
+  - >-
+    Explain HTLC Mechanics to a teammate without jargon — what problem does it
+    solve?
+  - What would break in production if you misunderstood HTLC Mechanics?
+  - >-
+    Which BOLT (or implementation doc) is the source of truth for this topic,
+    and what did you verify there?
+lab:
+  title: Polar check
+  description: >-
+    After reading, run one hands-on check related to HTLC Mechanics. Prefer
+    local regtest or Polar over mainnet.
+  evidence:
+    - Command output or screenshot from your local lab
+    - One sentence on what you observed vs expected
+    - Link to the required reading section you used
+searchQueries:
+  - BOLT2
+---
+**HTLCs** (Hash Time Locked Contracts) are conditional payments: claim with a preimage before timeout, otherwise refund. Chained HTLCs create atomic multi-hop Lightning payments.
+
+## Why this matters
+
+Every routed payment is an HTLC dance. Debugging failures means reading hashes, CLTV deltas, and onion errors, not guessing.
+
+## Analogy
+
+A locked briefcase opens with a secret word (preimage). Each courier along the path holds a briefcase with the same word requirement but earlier deadlines. When the final person learns the word, it propagates back so everyone can settle.
+
+<LessonImage
+  src="/lessons/lightning/ln-htlcs/htlc-flow.svg"
+  alt="HTLCs across Alice Bob Carol with decreasing timelocks"
+  caption="Same payment hash along the path; timelocks decrease toward the payee."
+/>
+
+<Mermaid caption="Forward HTLCs, then fulfill backward with the preimage." chart="sequenceDiagram
+    participant A as Alice
+    participant B as Bob
+    participant C as Carol
+    A->>B: add_htlc(H, amt, T_high)
+    B->>C: add_htlc(H, amt', T_low)
+    C->>B: fulfill(preimage)
+    B->>A: fulfill(preimage)" />
+
+<Callout type="info" title="Atomicity">
+  Either the preimage settles the chain, or timeouts refund. Intermediaries should not lose funds if they follow protocol and stay online as required.
+</Callout>
+
+## Common mistakes
+
+- Confusing payment hash with payment secret
+- Setting timelock deltas too tight for hops
+- Ignoring that held HTLCs lock liquidity
+
+
+## CLTV deltas
+
+Each hop demands enough timelock margin to settle or fail safely. If deltas are too small, honest nodes risk loss under delay. Implementations enforce minimums; do not invent tighter custom deltas without reading BOLTs and peer requirements.
+
+## Payment secret
+
+Modern invoices include a payment secret so intermediaries cannot settle to the receiver without the payer's onion path completing correctly (anti-probing / security improvement). Decode invoices and confirm secrets are handled by your library.
+
+## Held HTLCs lock capital
+
+While an HTLC is outstanding, that balance slice cannot be used elsewhere. Long-held HTLCs (slow peers, attacks) are an operational risk. Monitor pending HTLCs on production nodes.
+
+## Try it in Polar or regtest
+
+Pay across a 3-node path, then force a failure mid-route and observe how unlocks unwind as timeouts hit, then compare with a successful preimage settle.
+
+
+## Worked mental model
+
+Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
+
+## Hands-on habit
+
+Every protocol idea should be paired with one local experiment:
+
+1. Reproduce the happy path on regtest (or Polar for Lightning)
+2. Break it on purpose (wrong fee, expired invoice, offline peer)
+3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
+
+That habit turns reading into builder instinct.
+
+## Glossary check
+
+Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
+
+## Resource order
+
+Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
+
+## Next steps
+
+Study the full channel lifecycle, cooperative close, force close, and backups.

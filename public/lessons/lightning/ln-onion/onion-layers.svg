@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 260" role="img" aria-labelledby="title desc">
+  <title id="title">Onion routing layers</title>
+  <desc id="desc">Each hop peels one encryption layer and only learns the next hop.</desc>
+  <rect width="720" height="260" fill="#0b0f14"/>
+  <ellipse cx="360" cy="130" rx="280" ry="90" fill="none" stroke="#3d4f5f" stroke-width="2"/>
+  <ellipse cx="360" cy="130" rx="200" ry="65" fill="none" stroke="#5a7a94" stroke-width="2"/>
+  <ellipse cx="360" cy="130" rx="120" ry="40" fill="none" stroke="#4a9e6e" stroke-width="2"/>
+  <circle cx="360" cy="130" r="28" fill="#1a2836" stroke="#c9a227" stroke-width="2"/>
+  <text x="360" y="134" fill="#e8eef4" font-family="ui-monospace,monospace" font-size="11" text-anchor="middle">payee</text>
+  <text x="100" y="50" fill="#8aa0b5" font-family="ui-monospace,monospace" font-size="12">Hop 1 peels outer</text>
+  <text x="280" y="70" fill="#8aa0b5" font-family="ui-monospace,monospace" font-size="12">Hop 2 peels middle</text>
+  <text x="460" y="90" fill="#8aa0b5" font-family="ui-monospace,monospace" font-size="12">Final hop</text>
+  <text x="360" y="240" fill="#8aa0b5" font-family="ui-monospace,monospace" font-size="12" text-anchor="middle">No hop sees the full route</text>
+</svg>

@@ -1,0 +1,181 @@
+"use client";
+
+import Link from "next/link";
+import { useEffect, useState } from "react";
+
+import { Button } from "@/components/ui/button";
+import { siteConfig } from "@/lib/site-config";
+import { cn } from "@/lib/utils";
+
+const BOOT_LINES = [
+  "> boot pull --mode=contribute",
+  "> mount /learn /ship /contribute /prove",
+  "> sync github credentials … ok",
+  "> ready.",
+] as const;
+
+function useTypewriter(text: string, enabled: boolean, speed = 55) {
+  const [value, setValue] = useState("");
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    if (!enabled) {
+      setValue("");
+      setDone(false);
+      return;
+    }
+
+    let i = 0;
+    setValue("");
+    setDone(false);
+
+    const id = window.setInterval(() => {
+      i += 1;
+      setValue(text.slice(0, i));
+      if (i >= text.length) {
+        window.clearInterval(id);
+        setDone(true);
+      }
+    }, speed);
+
+    return () => window.clearInterval(id);
+  }, [text, enabled, speed]);
+
+  return { value, done };
+}
+
+export function HeroSection() {
+  const [bootIndex, setBootIndex] = useState(0);
+  const [started, setStarted] = useState(false);
+  const [reduceMotion, setReduceMotion] = useState(false);
+
+  useEffect(() => {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    setReduceMotion(reduced);
+    setStarted(true);
+  }, []);
+
+  const title = useTypewriter(
+    siteConfig.name,
+    started && !reduceMotion,
+    70,
+  );
+  const tagline = useTypewriter(
+    siteConfig.tagline,
+    started && (reduceMotion || title.done),
+    reduceMotion ? 1 : 28,
+  );
+
+  useEffect(() => {
+    if (!started) return;
+
+    if (reduceMotion) {
+      setBootIndex(BOOT_LINES.length);
+      return;
+    }
+
+    setBootIndex(0);
+    const id = window.setInterval(() => {
+      setBootIndex((current) => {
+        if (current >= BOOT_LINES.length) {
+          window.clearInterval(id);
+          return current;
+        }
+        return current + 1;
+      });
+    }, 420);
+
+    return () => window.clearInterval(id);
+  }, [started, reduceMotion]);
+
+  const displayTitle = reduceMotion ? siteConfig.name : title.value || (started ? "" : siteConfig.name);
+  const displayTagline = reduceMotion
+    ? siteConfig.tagline
+    : tagline.value;
+  const showTitleCaret = started && !reduceMotion && !title.done;
+  const showTaglineCaret = started && !reduceMotion && title.done && !tagline.done;
+
+  return (
+    <section
+      aria-labelledby="hero-heading"
+      className="bg-signal relative flex min-h-[min(88vh,820px)] w-full flex-col justify-center overflow-hidden"
+    >
+      <div aria-hidden className="pointer-events-none absolute inset-0">
+        <div className="tech-scanline absolute inset-x-0 top-0 h-px bg-ink/50" />
+        <div className="tech-grid absolute inset-0 opacity-[0.14]" />
+        <div className="absolute top-6 left-6 size-8 border-t-2 border-l-2 border-ink/45 sm:top-10 sm:left-10" />
+        <div className="absolute top-6 right-6 size-8 border-t-2 border-r-2 border-ink/45 sm:top-10 sm:right-10" />
+        <div className="absolute bottom-6 left-6 size-8 border-b-2 border-l-2 border-ink/45 sm:bottom-10 sm:left-10" />
+        <div className="absolute right-6 bottom-6 size-8 border-r-2 border-b-2 border-ink/45 sm:right-10 sm:bottom-10" />
+      </div>
+
+      <div className="relative mx-auto flex w-full max-w-6xl flex-col px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
+        <p className="font-mono text-[11px] tracking-[0.14em] text-ink/70 uppercase">
+          sys.boot // open-source
+          <span className="tech-blink ml-2 inline-block h-2.5 w-2 bg-ink align-middle" />
+        </p>
+
+        <h1
+          id="hero-heading"
+          className="mt-5 max-w-full text-[clamp(2.5rem,14vw,9.5rem)] leading-[0.88] font-bold tracking-[-0.045em] break-words text-ink"
+        >
+          {displayTitle}
+          {showTitleCaret ? (
+            <span className="tech-caret ml-1 inline-block w-[0.08em] bg-ink align-baseline" />
+          ) : null}
+        </h1>
+
+        <div className="mt-5 h-px w-full max-w-md overflow-hidden bg-ink/15">
+          <div
+            className={cn(
+              "tech-progress h-full w-0 bg-ink",
+              started && "tech-progress-run",
+              (reduceMotion || title.done) && "tech-progress-done",
+            )}
+          />
+        </div>
+
+        <p className="mt-8 min-h-[2.5em] max-w-xl font-mono text-[clamp(1rem,2vw,1.35rem)] leading-snug tracking-[-0.02em] text-ink">
+          {displayTagline}
+          {showTaglineCaret ? (
+            <span className="tech-caret ml-1 inline-block h-[1em] w-[0.45ch] bg-ink align-[-0.1em]" />
+          ) : null}
+        </p>
+
+        <div
+          aria-hidden
+          className="mt-6 max-w-lg space-y-1 overflow-x-auto font-mono text-[11px] leading-relaxed break-all text-ink/65 sm:text-xs"
+        >
+          {BOOT_LINES.slice(0, bootIndex).map((line) => (
+            <p key={line} className="tech-boot-line">
+              {line}
+            </p>
+          ))}
+        </div>
+
+        <div
+          className={cn(
+            "mt-10 flex flex-wrap gap-3 transition-opacity duration-500",
+            reduceMotion || tagline.done || !started ? "opacity-100" : "opacity-0",
+          )}
+        >
+          <Button
+            size="lg"
+            asChild
+            className="h-12 w-full border-ink bg-ink px-6 text-[var(--background)] hover:bg-ink/90 sm:w-auto"
+          >
+            <Link href="/roadmaps">./start-building</Link>
+          </Button>
+          <Button
+            size="lg"
+            variant="outline"
+            asChild
+            className="h-12 w-full border-ink/30 bg-transparent px-6 text-ink hover:bg-ink/5 hover:text-ink sm:w-auto"
+          >
+            <Link href="#loop">man ./loop</Link>
+          </Button>
+        </div>
+      </div>
+    </section>
+  );
+}

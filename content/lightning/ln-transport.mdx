@@ -1,0 +1,76 @@
+---
+title: Transport & Noise
+description: >-
+  How Lightning peers authenticate and encrypt links with the Noise protocol
+  framework (Noise XK).
+difficulty: advanced
+duration: 5 days
+objectives:
+  - Explain why Lightning needs an encrypted authenticated transport under BOLTs
+  - 'Describe Noise XK at a builder level (handshake goals, not crypto invention)'
+  - Relate transport security to node identity and operational OPSEC
+resources:
+  - title: The Noise Protocol Framework
+    url: 'https://noiseprotocol.org/noise.html'
+    kind: docs
+    required: true
+  - title: Noise XK pattern
+    url: 'https://noiseexplorer.com/patterns/XK/'
+    kind: docs
+    required: true
+  - title: BOLT
+    url: 'https://github.com/lightning/bolts/blob/master/08-transport.md'
+    kind: bolt
+    required: true
+  - title: Mastering the Lightning Network
+    url: 'https://github.com/lnbook/lnbook'
+    kind: book
+    chapter: Transport / peer connections
+reflectionPrompts:
+  - >-
+    What properties does Noise XK aim to provide for Lightning peer links that
+    plain TCP lacks?
+  - How does node public key identity interact with the transport handshake?
+  - >-
+    Which operational mistakes would undermine transport security even if Noise
+    is implemented correctly?
+lab:
+  title: Peer identity checklist
+  description: >-
+    On Polar or a testnode, identify your node pubkey, list peers, and document
+    how you would verify you are talking to the intended peer before opening a
+    channel.
+  evidence:
+    - Node pubkey and peer list excerpt (redact secrets)
+    - Short verification procedure you would use in production
+    - One misbinding or phishing scenario and the mitigation
+searchQueries:
+  - Noise protocol
+  - Lightning transport
+---
+
+Lightning peers speak BOLT messages over an **encrypted, authenticated transport**. The ecosystem standardized on the **Noise protocol framework**, commonly the **XK** pattern, rather than inventing a bespoke handshake.
+
+## Why this matters
+
+Channel state machines assume you are talking to the correct peer over a confidential link. Broken transport assumptions become fund-loss or privacy bugs.
+
+## What Noise buys you
+
+Noise patterns compose Diffie–Hellman and symmetric crypto into documented handshakes with clear payload encryption rules. Lightning’s transport BOLT specifies how node static keys participate so peers authenticate identities as they set up sessions.
+
+## Builder rules
+
+1. Never roll your own handshake — use the implementation’s transport.
+2. Treat node pubkeys as identities; verify out-of-band when opening large channels.
+3. Separate clearnet exposure, Tor, and key backup OPSEC.
+
+<Callout type="warning" title="Encryption ≠ economic security">
+  Transport secrecy does not stop channel probing, fee griefing, or offline breach risk. It is one layer in the onion of LN security.
+</Callout>
+
+## Common mistakes
+
+- Pasting node URIs from untrusted chats without verifying the pubkey
+- Logging session secrets or static keys
+- Assuming LAN Lightning needs no auth because “it’s private”

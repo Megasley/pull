@@ -1,0 +1,86 @@
+---
+title: Multipath Payments
+description: Split large payments across multiple paths for reliability and size.
+difficulty: advanced
+duration: 4 days
+objectives:
+  - Explain why single-path payments hit capacity limits
+  - Describe MPP/AMP at a builder level
+  - Know invoice/feature bit requirements for split payments
+resources:
+  - title: 'BOLTs, base payments / MPP notes'
+    url: 'https://github.com/lightning/bolts'
+    kind: bolt
+    required: true
+  - title: LND multipath payments
+    url: 'https://docs.lightning.engineering/'
+    kind: docs
+  - title: 'Bitcoin Optech: Multipath payments'
+    url: 'https://bitcoinops.org/en/topics/multipath-payments/'
+    kind: article
+reflectionPrompts:
+  - >-
+    Explain Multipath Payments to a teammate without jargon — what problem does
+    it solve?
+  - What would break in production if you misunderstood Multipath Payments?
+  - >-
+    Which BOLT (or implementation doc) is the source of truth for this topic,
+    and what did you verify there?
+lab:
+  title: Polar check
+  description: >-
+    After reading, run one hands-on check related to Multipath Payments. Prefer
+    local regtest or Polar over mainnet.
+  evidence:
+    - Command output or screenshot from your local lab
+    - One sentence on what you observed vs expected
+    - Link to the required reading section you used
+---
+**Multipath payments** split one logical payment across several HTLC paths that share a payment secret/hash scheme so the receiver can reassemble atomically.
+
+## Why this matters
+
+Large payments often cannot fit through one channel’s available balance. MPP raises success rates and effective capacity without opening enormous channels.
+
+## Analogy
+
+Moving a couch through a city: sometimes three smaller vans beat one truck that does not fit the alley.
+
+<Mermaid caption="Several HTLCs settle one logical payment." chart="flowchart TD
+    Pay[Payment 1_000_000 msat] --> P1[Path A 400k]
+    Pay --> P2[Path B 350k]
+    Pay --> P3[Path C 250k]
+    P1 --> Rec[Receiver combines]
+    P2 --> Rec
+    P3 --> Rec" />
+
+<Callout type="tip" title="Feature negotiation">
+  Both ends need compatible features. Test across LND/CLN/LDK combinations you support.
+</Callout>
+
+
+## Worked mental model
+
+Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
+
+## Hands-on habit
+
+Every protocol idea should be paired with one local experiment:
+
+1. Reproduce the happy path on regtest (or Polar for Lightning)
+2. Break it on purpose (wrong fee, expired invoice, offline peer)
+3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
+
+That habit turns reading into builder instinct.
+
+## Glossary check
+
+Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
+
+## Resource order
+
+Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
+
+## Next steps
+
+Failure handling: what to do when paths fail and retries are required.

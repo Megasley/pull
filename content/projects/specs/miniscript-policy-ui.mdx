@@ -1,0 +1,57 @@
+---
+objectives:
+  - "Ship a working Miniscript Policy Studio that matches the description"
+  - "Cover the core skills: Miniscript, Descriptors, Taproot trees"
+  - "Document setup, demo steps, and known limitations in the README"
+architecture: |
+  app/          primary interface (CLI, API, or UI)
+  domain/       protocol and business logic
+  adapters/     Bitcoin Core, Lightning node, or indexer clients
+  tests/        smoke and regression coverage
+requirements:
+  - "Implements the stated goal: Compile spending policies to Miniscript and descriptors. Show satisfaction cost and Taproot tree layouts."
+  - "Runs against regtest, signet, or documented testnet endpoints (never assume mainnet funds)"
+  - "Includes a README with install, run, and demo instructions"
+  - "Has at least one automated test or scripted smoke check"
+  - "Fails safely with clear errors when dependencies are offline"
+stretchGoals:
+  - "Add a short architecture diagram to the README"
+  - "Publish a demo recording or asciinema session"
+  - "Compare two implementation approaches and note tradeoffs"
+  - "Add CI that runs the smoke test on every push"
+resources:
+  - title: "Mastering Bitcoin"
+    url: https://github.com/bitcoinbook/bitcoinbook
+  - title: "Bitcoin Optech"
+    url: https://bitcoinops.org/
+  - title: "Bitcoin Core RPC docs"
+    url: https://developer.bitcoin.org/reference/rpc/
+exampleRepos:
+  - title: "bitcoinjs-lib"
+    url: https://github.com/bitcoinjs/bitcoinjs-lib
+    description: "Transaction and address building in JavaScript."
+  - title: "BDK"
+    url: https://bitcoindevkit.org/
+    description: "Wallet toolkit used in production clients."
+submission:
+  - Public GitHub repository with a clear README
+  - Setup steps for local dependencies (regtest, Polar, Docker, etc.)
+  - Demo evidence (commands, screenshots, or short recording)
+  - Lab evidence pack: happy-path transcript + one intentional failure case + what error you saw
+  - Note difficulty assumptions and what you deliberately left out
+---
+
+Compile spending policies to Miniscript and descriptors. Show satisfaction cost and Taproot tree layouts.
+
+This is a **intermediate** BuilderOS project on the **bitcoin** track. Treat it as a portfolio piece: specific acceptance criteria beat vague demos.
+
+### Suggested milestones
+
+1. Reproduce the problem space on a local lab (regtest / testnet / Polar)
+2. Implement the happy path end to end
+3. Add failure cases and README recovery notes
+4. Polish UX or CLI ergonomics for a teammate who has never seen your code
+
+### Related lesson
+
+Open the linked lesson when you need protocol context: `/roadmaps/bitcoin/lessons/dev-descriptors`.

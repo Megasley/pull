@@ -1,0 +1,12 @@
+node_modules
+.next
+.env
+.env.local
+.env*.local
+*.tsbuildinfo
+.DS_Store
+
+# Local-only / internal (not for public repo)
+app/design-system/page.tsx
+AGENTS.md
+CLAUDE.md

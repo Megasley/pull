@@ -1,0 +1,59 @@
+---
+title: Maintainer Collaboration
+description: Work through feedback cycles on a substantive open source contribution.
+difficulty: advanced
+duration: 2 weeks
+objectives:
+  - Respond to review comments professionally and technically
+  - Keep PRs rebase-friendly and focused
+  - Document decisions for future reviewers
+resources:
+  - title: 'GitHub, Addressing review feedback'
+    url: 'https://docs.github.com/en/pull-requests'
+    kind: docs
+  - title: Bitcoin Core contributing
+    url: 'https://github.com/bitcoin/bitcoin/blob/master/CONTRIBUTING.md'
+    kind: docs
+  - title: 'Pro Git, Rewriting history'
+    url: 'https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History'
+    kind: docs
+reflectionPrompts:
+  - >-
+    Explain Maintainer Collaboration to a teammate without jargon — what problem
+    does it solve?
+  - >-
+    What would break in production if you misunderstood Maintainer
+    Collaboration?
+  - >-
+    Which BIP, book chapter, or Core doc is authoritative here, and what did you
+    verify?
+lab:
+  title: Contribution artifact
+  description: >-
+    Produce a contribution artifact for Maintainer Collaboration: issue
+    shortlist, review notes, or PR draft that a maintainer could act on.
+  evidence:
+    - Issue URL(s) or PR URL
+    - Written approach / review checklist
+    - Self-score against the meaningful-PR rubric
+---
+Landing a meaningful PR is a communication skill. Expect iterations. Maintainers juggle scarcity of attention and high cost of mistakes.
+
+## Collaboration loop
+
+<Mermaid caption="Expect multiple rounds; keep commits and responses crisp." chart="sequenceDiagram
+    participant You
+    participant Maintainer
+    You->>Maintainer: Open PR + tests
+    Maintainer->>You: Review comments
+    You->>You: Revise + explain
+    You->>Maintainer: Push updates
+    Maintainer->>You: ACK / request more" />
+
+<Callout type="tip" title="Summarize each push">
+  Reply with what changed and what remains open. Save reviewers time.
+</Callout>
+
+## Next steps
+
+Package your work into a Builder Portfolio, proof of skill for employers and collaborators.

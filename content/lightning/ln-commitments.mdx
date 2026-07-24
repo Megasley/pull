@@ -1,0 +1,111 @@
+---
+title: Commitment Transactions
+description: 'Revocation keys, to_local/to_remote outputs, and penalty security.'
+difficulty: advanced
+duration: 6 days
+objectives:
+  - Explain how commitment transactions represent channel balances
+  - Describe revocation and penalty incentives
+  - Relate anchors and modern fee bumping to force closes
+resources:
+  - title: Mastering the Lightning Network
+    url: 'https://github.com/lnbook/lnbook/blob/master/07_payment_channels.asciidoc'
+    kind: book
+    chapter: 'Ch. 7: Payment Channels'
+    required: true
+  - title: BOLT3 Transactions
+    url: 'https://github.com/lightning/bolts/blob/master/03-transactions.md'
+    kind: bolt
+  - title: 'Bitcoin Optech: Anchor outputs'
+    url: 'https://bitcoinops.org/en/topics/anchor-outputs/'
+    kind: article
+reflectionPrompts:
+  - >-
+    Explain Commitment Transactions to a teammate without jargon — what problem
+    does it solve?
+  - What would break in production if you misunderstood Commitment Transactions?
+  - >-
+    Which BOLT (or implementation doc) is the source of truth for this topic,
+    and what did you verify there?
+lab:
+  title: Polar check
+  description: >-
+    After reading, run one hands-on check related to Commitment Transactions.
+    Prefer local regtest or Polar over mainnet.
+  evidence:
+    - Command output or screenshot from your local lab
+    - One sentence on what you observed vs expected
+    - Link to the required reading section you used
+searchQueries:
+  - BOLT3
+---
+Each Lightning channel state is backed by a pair of **commitment transactions**, pre-signed on-chain settlements that either party can broadcast if cooperation fails.
+
+## Why this matters
+
+If commitments are wrong, someone can steal funds or deadlock value. This is the cryptographic spine of Lightning security.
+
+## Analogy
+
+Every time you update the bar tab, you both sign a new “final bill” and destroy the ability to cash an older bill, because an old bill would be fraud and is punishable.
+
+## Revocation and penalties
+
+When state advances to `n`, state `n-1` is revoked. Publishing a revoked commitment lets the peer sweep funds via a **penalty** (justice) transaction.
+
+<LessonImage
+  src="/lessons/lightning/ln-commitments/revocation.svg"
+  alt="Publishing an old commitment risks a penalty transaction"
+  caption="Old commitments are toxic, broadcasting them can forfeit the channel."
+/>
+
+<Mermaid caption="Advance state, revoke previous, punish cheaters who publish old states." chart="flowchart TD
+    StateN[Commitment n] --> Coop[Cooperative updates]
+    Coop --> StateN1[Commitment n+1]
+    StateN1 --> Revoke[Revoke n secrets exchanged]
+    BroadcastOld[Broadcast old n] --> Penalty[Peer justice tx]
+    Penalty --> Lost[Broadcaster loses funds]" />
+
+<Callout type="danger" title="Always watch the chain">
+  Offline nodes can miss revocation windows. Watchtowers exist for this failure mode.
+</Callout>
+
+
+## to_local and to_remote
+
+Commitment outputs typically pay each side with different conditions. The local party's output often includes a revocation path and a delayed CSV path, enabling punishment if an old state is broadcast, while allowing honest force-close after a delay.
+
+## Anchor outputs
+
+Modern channels use **anchor** outputs so fee bumping a force-close is more reliable under mempool pressure. If you build fee logic around force closes, read your implementation's anchor behavior.
+
+## State machine mindset
+
+Treat channel updates as a state machine: proposed, signed, irrevocably committed, revoked previous. Bugs are often off-by-one state transitions. Log state indices carefully during development.
+
+
+## Worked mental model
+
+Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
+
+## Hands-on habit
+
+Every protocol idea should be paired with one local experiment:
+
+1. Reproduce the happy path on regtest (or Polar for Lightning)
+2. Break it on purpose (wrong fee, expired invoice, offline peer)
+3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
+
+That habit turns reading into builder instinct.
+
+## Glossary check
+
+Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
+
+## Resource order
+
+Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
+
+## Next steps
+
+HTLCs add conditional payments on top of commitments for multi-hop routing.

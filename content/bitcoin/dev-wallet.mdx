@@ -1,0 +1,113 @@
+---
+title: Wallet Architecture
+description: 'Design secure key management, HD wallets, and signing workflows.'
+difficulty: intermediate
+duration: 8 days
+objectives:
+  - Explain BIP-32 HD derivation and account structure
+  - Separate hot watching logic from cold signing
+  - Plan backups for seeds and descriptors
+resources:
+  - title: Mastering Bitcoin
+    url: 'https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch05_wallets.adoc'
+    kind: book
+    chapter: 'Ch. 5: Wallets'
+    required: true
+  - title: BIP-32 HD wallets
+    url: 'https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki'
+    kind: bip
+  - title: BIP-39 Mnemonics
+    url: 'https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki'
+    kind: bip
+reflectionPrompts:
+  - >-
+    Explain Wallet Architecture to a teammate without jargon — what problem does
+    it solve?
+  - What would break in production if you misunderstood Wallet Architecture?
+  - >-
+    Which BIP, book chapter, or Core doc is authoritative here, and what did you
+    verify?
+lab:
+  title: Regtest check
+  description: >-
+    After reading, run one hands-on check related to Wallet Architecture. Prefer
+    local regtest or Polar over mainnet.
+  evidence:
+    - Command output or screenshot from your local lab
+    - One sentence on what you observed vs expected
+    - Link to the required reading section you used
+searchQueries:
+  - BIP32
+  - BIP39
+---
+A wallet is not “an address.” It is software that manages keys, tracks UTXOs, builds transactions, and coordinates signing, often across devices.
+
+## Why this matters
+
+Most catastrophic losses are operational: bad backups, leaked seeds, wrong derivation paths, or watching wallets that cannot spend.
+
+## Analogy
+
+An HD wallet is a tree of keys grown from one seed. The seed is the orchard’s master cutting, lose it and the orchard is gone; leak it and thieves can harvest everything.
+
+## HD derivation
+
+BIP-32 defines hierarchical deterministic keys. BIP-39 encodes seeds as mnemonics. Account standards (BIP-44/84/86 families) organize receiving and change chains.
+
+<Mermaid caption="One backup can regenerate many addresses if derivation is known." chart="flowchart TD
+    Seed[Mnemonic seed] --> Master[Master key]
+    Master --> Acc[Account]
+    Acc --> Rec[Receiving chain]
+    Acc --> Chg[Change chain]
+    Rec --> A0[Address 0..n]
+    Chg --> C0[Change 0..n]" />
+
+```text
+Example (illustrative): m/84'/1'/0'/0/5  # regtest native SegWit receive index 5
+```
+
+## Watch-only vs signing
+
+Production designs often split:
+
+- **Watching** software scans the chain / indexer
+- **Signing** happens in hardware or a secure enclave
+
+PSBTs move unsigned transactions between these roles safely.
+
+<Callout type="danger" title="Seed handling">
+  Never log seeds, never put them in git, never screenshot them into cloud photos. Test restore on regtest before storing real value.
+</Callout>
+
+## Common mistakes
+
+- Backing up addresses instead of seed + descriptor/script info
+- Gap limit surprises (too many unused addresses, balance “missing”)
+- Reusing addresses unnecessarily (privacy) or rotating without backup updates
+
+
+## Worked mental model
+
+Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
+
+## Hands-on habit
+
+Every protocol idea should be paired with one local experiment:
+
+1. Reproduce the happy path on regtest (or Polar for Lightning)
+2. Break it on purpose (wrong fee, expired invoice, offline peer)
+3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
+
+That habit turns reading into builder instinct.
+
+## Glossary check
+
+Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
+
+## Resource order
+
+Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
+
+## Next steps
+
+Output descriptors and Miniscript make wallet policies explicit and portable.

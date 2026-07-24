@@ -1,0 +1,91 @@
+---
+title: Dual Funding & Splicing
+description: Add or remove capacity without closing the channel.
+difficulty: advanced
+duration: 5 days
+objectives:
+  - Explain dual-funded channel opens
+  - Describe splicing as on-chain capacity adjustment
+  - Know that interactive funding flows are implementation-sensitive
+resources:
+  - title: Dual funding discussions
+    url: 'https://github.com/lightning/bolts'
+    kind: bolt
+    note: Follow dual-funding / interactive funding proposals in BOLTs PRs.
+    required: true
+  - title: Core Lightning splicing
+    url: 'https://docs.corelightning.org/'
+    kind: docs
+  - title: 'Bitcoin Optech: Splicing'
+    url: 'https://bitcoinops.org/en/topics/splicing/'
+    kind: article
+reflectionPrompts:
+  - >-
+    Explain Dual Funding & Splicing to a teammate without jargon — what problem
+    does it solve?
+  - What would break in production if you misunderstood Dual Funding & Splicing?
+  - >-
+    Which BOLT (or implementation doc) is the source of truth for this topic,
+    and what did you verify there?
+lab:
+  title: Polar check
+  description: >-
+    After reading, run one hands-on check related to Dual Funding & Splicing.
+    Prefer local regtest or Polar over mainnet.
+  evidence:
+    - Command output or screenshot from your local lab
+    - One sentence on what you observed vs expected
+    - Link to the required reading section you used
+---
+Classic channels are often single-funded. **Dual funding** lets both sides contribute at open. **Splicing** adjusts channel capacity later with an on-chain transaction without losing the channel relationship.
+
+## Why this matters
+
+Liquidity needs change. Closing and reopening wastes fees and downtime. Splicing and dual funding are how the network becomes more capital-efficient.
+
+## Analogy
+
+Dual funding is both roommates paying the security deposit. Splicing is adding money to the joint jar (or withdrawing some) without ending the lease.
+
+<Mermaid caption="Interactive on-chain transactions reshape channel capacity." chart="flowchart LR
+    Chan[Existing channel] --> Splice[Splice tx on-chain]
+    Splice --> More[More capacity]
+    Splice --> Less[Less capacity]
+    Dual[Dual-funded open] --> Chan2[Balanced initial capacity]" />
+
+<Callout type="info" title="Feature availability">
+  Support differs across LND/CLN/LDK versions. Prototype on regtest with the stack you ship.
+</Callout>
+
+## Common mistakes
+
+- Assuming splice always beats open/close without fee math
+- Interrupting interactive funding flows mid-protocol
+- Neglecting backup updates after capacity changes
+
+
+## Worked mental model
+
+Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
+
+## Hands-on habit
+
+Every protocol idea should be paired with one local experiment:
+
+1. Reproduce the happy path on regtest (or Polar for Lightning)
+2. Break it on purpose (wrong fee, expired invoice, offline peer)
+3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
+
+That habit turns reading into builder instinct.
+
+## Glossary check
+
+Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
+
+## Resource order
+
+Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
+
+## Next steps
+
+Routing: how payments choose paths across many channels.
