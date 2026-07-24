@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./public/pull-mark.png" alt="Pull" width="72" height="72" />
+  <img src="./public/pull-logo.png" alt="Pull" width="72" height="72" />
 </p>
 
 <h1 align="center">Pull</h1>
@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://pullos.dev">Live demo</a> ·
+  <a href="https://pullos.dev">Live site</a> ·
   <a href="./ROADMAP.md">Roadmap</a> ·
   <a href="./CONTRIBUTING.md">Contributing</a> ·
   <a href="./LICENSE">License (MIT)</a>
@@ -35,17 +35,17 @@ The curriculum lives in **Git as MDX**. The app handles progress, auth, reviews,
 
 ---
 
-## Demo
+## Try it live
 
 | | |
 | --- | --- |
-| **Production** | [https://pullos.dev](https://pullos.dev) |
+| **Site** | [https://pullos.dev](https://pullos.dev) |
 | **Public roadmaps** | [/roadmaps/bitcoin](https://pullos.dev/roadmaps/bitcoin) · [/roadmaps/lightning](https://pullos.dev/roadmaps/lightning) |
 | **Sample lesson** | [Developer Environment](https://pullos.dev/roadmaps/bitcoin/lessons/foundations-intro) (no sign-in required) |
 
 ### Screenshots
 
-Screenshots belong in [`docs/screenshots/`](./docs/screenshots/). Suggested captures: home, roadmap map, lesson reader, dashboard. Until those are added, explore the [live demo](https://pullos.dev).
+Screenshots belong in [`docs/screenshots/`](./docs/screenshots/). Suggested captures: home, roadmap map, lesson reader, dashboard. Until those are added, explore the [live site](https://pullos.dev).
 
 <p align="center">
   <img src="./public/pull-logo-dark.png" alt="Pull logo" width="320" />
