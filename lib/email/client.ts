@@ -1,5 +1,7 @@
 import { Resend } from "resend";
 
+import { siteConfig } from "@/lib/site-config";
+
 let client: Resend | null | undefined;
 
 export function getResendClient(): Resend | null {
@@ -21,6 +23,11 @@ export function getResendFromAddress(): string {
   return (
     process.env.RESEND_FROM?.trim() || "Pull <onboarding@resend.dev>"
   );
+}
+
+/** Always route replies to the public support inbox. */
+export function getResendReplyToAddress(): string {
+  return `Pull <${siteConfig.contactEmail}>`;
 }
 
 export function isEmailConfigured(): boolean {

@@ -3,6 +3,7 @@ import type { ReactElement } from "react";
 import {
   getResendClient,
   getResendFromAddress,
+  getResendReplyToAddress,
   isEmailConfigured,
 } from "@/lib/email/client";
 
@@ -31,6 +32,7 @@ export async function sendEmail(
   try {
     const { data, error } = await resend.emails.send({
       from: getResendFromAddress(),
+      replyTo: getResendReplyToAddress(),
       to: input.to,
       subject: input.subject,
       react: input.react,
