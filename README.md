@@ -150,6 +150,7 @@ cp .env.example .env.local
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ✓ | Supabase anonymous key |
 | `DATABASE_URL` | ✓ | Postgres URI (Supabase → Settings → Database) |
 | `NEXT_PUBLIC_SITE_URL` | ✓ | Canonical URL (`http://localhost:3000` locally) |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID` | | Google Analytics 4 ID (`G-XXXXXXXX`) |
 | `CRON_SECRET` | prod | Bearer token for `/api/cron/github-sync` |
 | `RESEND_API_KEY` | | Email sending (app no-ops without it) |
 | `RESEND_FROM` | | Verified sender address |

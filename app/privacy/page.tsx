@@ -63,6 +63,7 @@ export default function PrivacyPolicyPage() {
           bullets: [
             "Supabase (authentication and database).",
             "Vercel (application hosting, previews, and related infrastructure).",
+            "Google Analytics (aggregated website usage analytics when enabled).",
             "GitHub (identity provider and source of authorized repository/activity data).",
             "Resend (transactional email delivery for review outcomes, achievements, and account notices when enabled).",
           ],
@@ -71,12 +72,13 @@ export default function PrivacyPolicyPage() {
           title: "6. Provider terms and required disclosures",
           paragraphs: [
             "These providers process data under their own terms and privacy policies. We may also disclose information if required by law, to protect rights and safety, or in connection with a merger, acquisition, or reorganization of the project.",
+            "When Google Analytics is enabled, Google may collect device and usage data (such as pages viewed, approximate location derived from IP, and browser/device signals) according to Google's privacy policy. You can learn more about Google's data practices at https://policies.google.com/privacy.",
           ],
         },
         {
           title: "7. Cookies and local storage",
           paragraphs: [
-            "Pull uses cookies and similar storage for authentication sessions and essential product state. We may also use browser local/session storage for progress caching and UI preferences. Disabling cookies may prevent sign-in from working.",
+            "Pull uses cookies and similar storage for authentication sessions and essential product state. We may also use browser local/session storage for progress caching and UI preferences. When Google Analytics is enabled, Google may set analytics cookies to measure site usage. Disabling cookies may prevent sign-in from working and can limit analytics.",
           ],
         },
         {

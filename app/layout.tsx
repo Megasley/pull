@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { Analytics } from "@vercel/analytics/next";
 
 import { SiteLayout } from "@/components/layout/site-layout";
@@ -50,6 +51,8 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
+const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim();
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -64,6 +67,7 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col overflow-x-hidden font-sans text-foreground">
         <SiteLayout>{children}</SiteLayout>
         <Analytics />
+        {gaId ? <GoogleAnalytics gaId={gaId} /> : null}
       </body>
     </html>
   );
