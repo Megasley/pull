@@ -11,10 +11,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { primaryNav } from "@/lib/site-config";
+import { isExternalHref, primaryNav } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
 
 function isActivePath(pathname: string, href: string) {
+  if (isExternalHref(href)) return false;
   if (href === "/") return pathname === "/";
   return pathname === href || pathname.startsWith(`${href}/`);
 }
@@ -73,15 +74,30 @@ export function MainNav() {
             <DropdownMenuContent align="start" className="min-w-44">
               {item.items.map((child) => {
                 const active = isActivePath(pathname, child.href);
+                const external =
+                  isExternalHref(child.href) ||
+                  ("external" in child && Boolean(child.external));
+
                 return (
                   <DropdownMenuItem key={child.href} asChild>
-                    <Link
-                      href={child.href}
-                      aria-current={active ? "page" : undefined}
-                      className={cn(active && "bg-accent")}
-                    >
-                      {child.title}
-                    </Link>
+                    {external ? (
+                      <a
+                        href={child.href}
+                        target="_blank"
+                        rel="noreferrer"
+                        className={cn(active && "bg-accent")}
+                      >
+                        {child.title}
+                      </a>
+                    ) : (
+                      <Link
+                        href={child.href}
+                        aria-current={active ? "page" : undefined}
+                        className={cn(active && "bg-accent")}
+                      >
+                        {child.title}
+                      </Link>
+                    )}
                   </DropdownMenuItem>
                 );
               })}

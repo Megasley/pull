@@ -31,7 +31,13 @@ export type SocialIconName = SocialLink["icon"];
 export type NavLink = {
   title: string;
   href: string;
+  /** Open in a new tab (for external resources). */
+  external?: boolean;
 };
+
+export function isExternalHref(href: string): boolean {
+  return /^https?:\/\//i.test(href);
+}
 
 export type NavGroup = {
   title: string;
@@ -51,6 +57,11 @@ export const primaryNav = [
     items: [
       { title: "Discover", href: "/discover" },
       { title: "Issues", href: "/issues" },
+      {
+        title: "Open Source Guide",
+        href: "https://opensource.guide/",
+        external: true,
+      },
     ],
   },
 ] as const satisfies readonly PrimaryNavItem[];

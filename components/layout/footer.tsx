@@ -78,8 +78,8 @@ export function Footer({ className }: FooterProps) {
 
         <div className="flex flex-col gap-2 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="font-mono text-[11px] text-muted-foreground">
-            &copy; {new Date().getFullYear()} Pull // code MIT · curriculum all rights
-            reserved
+            &copy; {new Date().getFullYear()} Pull // code MIT · curriculum CC
+            BY-SA 4.0
           </p>
           <div className="flex flex-wrap gap-4 font-mono text-[11px] text-muted-foreground">
             <Link

@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   accountNavSections,
+  isExternalHref,
   primaryNav,
 } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
@@ -41,6 +42,7 @@ const sectionLabelClass: Record<SectionTone, string> = {
 };
 
 function isActivePath(pathname: string, href: string) {
+  if (isExternalHref(href)) return false;
   if (href === "/") return pathname === "/";
   return pathname === href || pathname.startsWith(`${href}/`);
 }
@@ -79,25 +81,42 @@ function MobileLink({
   onClick,
   pathname,
   children,
+  external = false,
 }: {
   href: string;
   onClick: () => void;
   pathname: string;
   children: React.ReactNode;
+  external?: boolean;
 }) {
   const active = isActivePath(pathname, href);
+  const className = cn(
+    "block w-full border-b border-border/50 px-3 py-3.5 font-mono text-xs tracking-[0.1em] uppercase transition-colors last:border-b-0",
+    active
+      ? "bg-ink text-[var(--background)]"
+      : "text-foreground/80 hover:bg-background hover:text-foreground",
+  );
+
+  if (external || isExternalHref(href)) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noreferrer"
+        onClick={onClick}
+        className={className}
+      >
+        {children}
+      </a>
+    );
+  }
 
   return (
     <Link
       href={href}
       onClick={onClick}
       aria-current={active ? "page" : undefined}
-      className={cn(
-        "block w-full border-b border-border/50 px-3 py-3.5 font-mono text-xs tracking-[0.1em] uppercase transition-colors last:border-b-0",
-        active
-          ? "bg-ink text-[var(--background)]"
-          : "text-foreground/80 hover:bg-background hover:text-foreground",
-      )}
+      className={className}
     >
       {children}
     </Link>
@@ -229,6 +248,10 @@ export function MobileNav({
                 href={item.href}
                 pathname={pathname}
                 onClick={close}
+                external={
+                  isExternalHref(item.href) ||
+                  ("external" in item && Boolean(item.external))
+                }
               >
                 {item.title}
               </MobileLink>
