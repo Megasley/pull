@@ -3,7 +3,7 @@ export const siteConfig = {
   description: "The operating system for open source builders.",
   tagline: "Become an open source builder.",
   url: "https://pullos.dev",
-  /** Public contact for privacy / support (create the mailbox before launch). */
+  /** Public contact for privacy / support. */
   contactEmail: "hello@pullos.dev",
 } as const;
 

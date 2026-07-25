@@ -68,14 +68,14 @@ export function LegalPage({
 
       <div className="mt-14 border-t border-border pt-6">
         <p className="font-mono text-xs text-muted-foreground">
-          Questions? Reach out via the contact details on{" "}
-          <Link
-            href="/sign-in"
+          Questions? Email{" "}
+          <a
+            href={`mailto:${siteConfig.contactEmail}`}
             className="text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
           >
-            the product surface
-          </Link>{" "}
-          once support channels are published, or review{" "}
+            {siteConfig.contactEmail}
+          </a>
+          , or review{" "}
           <Link
             href="/privacy"
             className="text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
