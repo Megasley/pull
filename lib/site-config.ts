@@ -39,8 +39,7 @@ export type NavGroup = {
 };
 
 export type PrimaryNavItem =
-  | ({ type: "link" } & NavLink)
-  | ({ type: "group" } & NavGroup);
+  ({ type: "link" } & NavLink) | ({ type: "group" } & NavGroup);
 
 /** Desktop + mobile primary navigation (public product surfaces). */
 export const primaryNav = [
@@ -112,6 +111,7 @@ export const footerNav = [
     links: [
       { title: "Privacy", href: "/privacy" },
       { title: "Terms", href: "/terms" },
+      { title: "Credits", href: "/credits" },
     ],
   },
 ] as const;

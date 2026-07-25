@@ -12,7 +12,8 @@
   <a href="https://pullos.dev">Live site</a> ·
   <a href="./ROADMAP.md">Roadmap</a> ·
   <a href="./CONTRIBUTING.md">Contributing</a> ·
-  <a href="./LICENSE">License (MIT)</a>
+  <a href="./LICENSE">License (MIT)</a> ·
+  <a href="./docs/ATTRIBUTIONS.md">Attributions</a>
 </p>
 
 ---
@@ -342,18 +343,30 @@ Report vulnerabilities privately to **hello@pullos.dev** — do not file public 
 
 ---
 
-## License
+## License & attribution
 
-Pull is open source under the **[MIT License](./LICENSE)**.
+Pull is two things under two sets of terms. The split matters, so it is spelled out:
 
-Copyright (c) 2026 Pull contributors.
+| Layer | Covers | Terms |
+| --- | --- | --- |
+| **Application code** | `app/`, `components/`, `lib/`, `hooks/`, `scripts/`, `drizzle/`, config | **[MIT](./LICENSE)** — fork it, self-host it, build on it |
+| **Pull curriculum** | `content/**` lessons, roadmap JSON, project specs, original diagrams | **[CC BY-SA 4.0](./content/LICENSE)** — reuse with credit, share derivatives alike |
+| **Third-party works** | Books, BIPs, BOLTs, docs, and tools linked from lessons | Each work's own license |
+| **Brand** | Pull name, wordmark, logo files | © 2026 Pull |
+
+The curriculum **links to** third-party material — it does not mirror, fork, or republish it. Linking does not relicense anything: Mastering Bitcoin and Mastering the Lightning Network stay CC BY-SA 4.0 under their authors, the BOLTs stay CC BY 4.0, each BIP keeps its own license, and Decoding Bitcoin labs stay with the Bitcoin Dev Project.
+
+Full source list with licenses: **[docs/ATTRIBUTIONS.md](./docs/ATTRIBUTIONS.md)** (also served at [`/credits`](https://pullos.dev/credits)).
+
+> Describe Pull as *"MIT application code plus a CC BY-SA curriculum that links to third-party resources"* — not as though the linked books, specs, and labs are Pull's to relicense.
 
 ---
 
 ## Acknowledgments
 
-- [Bitcoin Dev Project](https://bitcoindevs.xyz/) — Decoding Bitcoin and curriculum inspiration  
-- [Bitcoin Search](https://bitcoinsearch.xyz/) — research deep links from lessons  
+- [Bitcoin Dev Project](https://bitcoindevs.xyz/) — [Decoding Bitcoin](https://bitcoindevs.xyz/decoding) interactive labs and [Bitcoin Search](https://bitcoinsearch.xyz/), deep-linked from lessons  
+- [Mastering Bitcoin](https://github.com/bitcoinbook/bitcoinbook) and [Mastering the Lightning Network](https://github.com/lnbook/lnbook) — freely licensed books that make the reading paths possible  
+- BIP and BOLT authors, and the Bitcoin Core, LND, Core Lightning, and LDK maintainers  
 - The Bitcoin and Lightning open source communities  
 
 ---

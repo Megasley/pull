@@ -17,6 +17,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/sign-in",
     "/privacy",
     "/terms",
+    "/credits",
   ].map((path) => ({
     url: `${base}${path}`,
     lastModified,
@@ -24,14 +25,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: path === "" ? 1 : 0.7,
   }));
 
-  const roadmapRoutes: MetadataRoute.Sitemap = availableRoadmaps.map(
-    (roadmap) => ({
-      url: `${base}/roadmaps/${roadmap.slug}`,
-      lastModified,
-      changeFrequency: "weekly",
-      priority: 0.85,
-    }),
-  );
+  const roadmapRoutes: MetadataRoute.Sitemap = availableRoadmaps.map((roadmap) => ({
+    url: `${base}/roadmaps/${roadmap.slug}`,
+    lastModified,
+    changeFrequency: "weekly",
+    priority: 0.85,
+  }));
 
   const lessonRoutes: MetadataRoute.Sitemap = getAllLessonSlugs().map(
     ({ roadmap, lesson }) => ({
@@ -42,14 +41,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }),
   );
 
-  const projectRoutes: MetadataRoute.Sitemap = getAllProjects().map(
-    (project) => ({
-      url: `${base}/projects/${project.slug}`,
-      lastModified,
-      changeFrequency: "monthly",
-      priority: 0.6,
-    }),
-  );
+  const projectRoutes: MetadataRoute.Sitemap = getAllProjects().map((project) => ({
+    url: `${base}/projects/${project.slug}`,
+    lastModified,
+    changeFrequency: "monthly",
+    priority: 0.6,
+  }));
 
   return [...staticRoutes, ...roadmapRoutes, ...lessonRoutes, ...projectRoutes];
 }

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: `Terms governing use of ${siteConfig.name}.`,
 };
 
-const EFFECTIVE_DATE = "July 22, 2026";
+const EFFECTIVE_DATE = "July 25, 2026";
 
 export default function TermsOfUsePage() {
   return (
@@ -66,11 +66,12 @@ export default function TermsOfUsePage() {
           ],
         },
         {
-          title: "7. Pull content and IP",
+          title: "7. Licensing, IP, and attribution",
           paragraphs: [
-            "Pull branding, product UI, and original curriculum materials are owned by Pull or its licensors. You may use the service for personal learning and portfolio building as intended.",
-            "You may not copy, resell, or redistribute Pull curriculum or product materials at scale without permission, except for fair use or other rights that cannot be waived under applicable law.",
-            "Open source projects linked from Pull remain under their own licenses.",
+            "Pull's application code is released under the MIT License. Pull's own curriculum — lesson text, roadmap definitions, project specs, and original diagrams — is released under the Creative Commons Attribution-ShareAlike 4.0 International License (CC BY-SA 4.0), so you may reuse and adapt it with credit to Pull provided derivative curriculum carries the same license.",
+            "The Pull name, wordmark, and logo are not covered by those licenses and remain the property of Pull.",
+            "Books, specifications, documentation, repositories, and tools that lessons link to are owned by their respective authors and remain under their own licenses. Pull links to those works rather than redistributing them, and linking does not place them under Pull's licenses.",
+            "A current list of third-party sources and their licenses is published on the Credits page at /credits.",
           ],
         },
         {

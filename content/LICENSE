@@ -1,0 +1,29 @@
+Pull curriculum license
+=======================
+
+Copyright (c) 2026 Pull contributors
+
+The Pull curriculum — the lesson text, roadmap definitions, and project specs
+in this directory, together with the original lesson diagrams in
+public/lessons/ — is licensed under the Creative Commons
+Attribution-ShareAlike 4.0 International License (CC BY-SA 4.0).
+
+    https://creativecommons.org/licenses/by-sa/4.0/
+
+You are free to share and adapt this material for any purpose, including
+commercially, provided that you:
+
+  * give appropriate credit to Pull (https://pullos.dev) and link to this
+    license, and
+  * distribute your contributions under the same license if you remix,
+    transform, or build upon the material.
+
+This license does NOT extend to:
+
+  * Pull's application code, which is licensed under MIT (see /LICENSE);
+  * the Pull name, wordmark, and logo files, which remain the property of Pull;
+  * third-party books, specifications, documentation, and tools that lessons
+    link to, which remain under their own licenses (see /docs/ATTRIBUTIONS.md).
+
+By contributing content to this directory you agree to license your
+contribution under CC BY-SA 4.0.

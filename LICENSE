@@ -1,3 +1,18 @@
+Pull uses two licenses.
+
+  Software (this file)  MIT — application code: app/, components/, lib/,
+                        hooks/, scripts/, drizzle/, types/, styles/, and
+                        configuration.
+
+  Curriculum            CC BY-SA 4.0 — content/** and the original lesson
+                        diagrams in public/lessons/. See content/LICENSE.
+
+Third-party books, specifications, documentation, and tools linked from the
+curriculum are not covered by either license and remain under their own terms.
+See docs/ATTRIBUTIONS.md.
+
+--------------------------------------------------------------------------------
+
 MIT License
 
 Copyright (c) 2026 Pull contributors

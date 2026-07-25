@@ -203,6 +203,28 @@ Fix all errors before submitting. Warnings (e.g. missing diagrams on concept les
 - Keep lesson slugs aligned with roadmap node `id` fields
 - Write for developers new to Bitcoin/Lightning, not for hype
 
+### Content licensing rules
+
+Application code is MIT. Everything under `content/` — plus original lesson
+diagrams in `public/lessons/` — is **CC BY-SA 4.0** (see [`content/LICENSE`](./content/LICENSE)).
+By opening a content PR you agree to license your contribution under CC BY-SA 4.0.
+
+Third-party works are **linked, never copied**:
+
+- **Link out, don't paste.** Required reading is a deep link to the source. Do
+  not paste book chapters, spec text, or documentation into a lesson.
+- **Write it yourself.** Explain concepts in your own words. A short direct
+  quote is fine when it is attributed inline; a paragraph rewritten sentence by
+  sentence from a source is not.
+- **Don't fork third-party curricula** into this repo — that includes Decoding
+  Bitcoin labs, which we deep-link instead.
+- **Diagrams must be original** or carry a license that permits reuse, credited
+  in the lesson.
+- **New source, new entry.** If you introduce a resource that is not already
+  cited, add it to [`lib/attributions.ts`](./lib/attributions.ts) and mirror it
+  in [`docs/ATTRIBUTIONS.md`](./docs/ATTRIBUTIONS.md). Record the license as the
+  upstream project publishes it, not from memory.
+
 ---
 
 ## Contributing code
