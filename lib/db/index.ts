@@ -13,12 +13,14 @@ function createPostgresClient() {
   return postgres(getDatabaseUrl(), {
     prepare: false,
     // Session/transaction poolers drop idle sockets; keep a small pool and recycle.
-    max: 5,
+    max: 3,
     idle_timeout: 20,
-    connect_timeout: 10,
+    connect_timeout: 8,
     max_lifetime: 60 * 10,
     connection: {
       application_name: "pull",
+      // Prevent a single bad admin/dashboard query from hanging the whole function.
+      statement_timeout: 8000,
     },
   });
 }

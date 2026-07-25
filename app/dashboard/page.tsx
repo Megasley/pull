@@ -12,7 +12,6 @@ import {
 } from "@/lib/progress/repository";
 import { listUserAchievements, syncAchievementsForUser } from "@/lib/xp/achievements";
 import { getUserXpTotals } from "@/lib/xp/repository";
-import { getBuilderProfile } from "@/lib/auth/ensure-builder-profile";
 import { loadBuilderScore } from "@/lib/score";
 import { loadOpenSourceReputation } from "@/lib/reputation";
 import { loadGithubDashboardSnapshot } from "@/lib/github";
@@ -28,37 +27,40 @@ export default async function DashboardPage() {
     redirect("/sign-in?next=/dashboard");
   }
 
-  const progressByRoadmap = await getAllCompletedNodeSlugs(profile.id);
-  const recentFromDb = await getRecentCompletedLessons(profile.id, 5);
+  const [progressByRoadmap, recentFromDb] = await Promise.all([
+    getAllCompletedNodeSlugs(profile.id),
+    getRecentCompletedLessons(profile.id, 5),
+  ]);
 
+  // Sync achievements before reading XP/score so badges stay current.
   await syncAchievementsForUser(profile.id);
-  const totals = await getUserXpTotals(profile.id);
-  const refreshedProfile =
-    (await getBuilderProfile(profile.id)) ?? {
-      ...profile,
-      xp: totals.xp,
-      level: totals.level,
-    };
 
-  const dashboardData = buildDashboardData({
-    profile: refreshedProfile,
-    progressByRoadmap,
-    recentFromDb,
-  });
-
-  const [achievements, builderScore, reputation, github, workspace, weeklyGoals] =
+  const [totals, achievements, builderScore, reputation, github, workspace, weeklyGoals] =
     await Promise.all([
+      getUserXpTotals(profile.id),
       listUserAchievements(profile.id, progressByRoadmap),
       loadBuilderScore(profile.id, progressByRoadmap),
       loadOpenSourceReputation(profile.id),
       loadGithubDashboardSnapshot(profile.id),
       loadDashboardWorkspace({
         userId: profile.id,
-        profile: refreshedProfile,
+        profile,
         progressByRoadmap,
       }),
       ensureWeeklyGoals(profile.id),
     ]);
+
+  const refreshedProfile = {
+    ...profile,
+    xp: totals.xp,
+    level: totals.level,
+  };
+
+  const dashboardData = buildDashboardData({
+    profile: refreshedProfile,
+    progressByRoadmap,
+    recentFromDb,
+  });
 
   dashboardData.achievements = achievements;
   dashboardData.builderScore = builderScore;

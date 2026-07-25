@@ -205,22 +205,30 @@ async function countByStatus(status: SubmissionStatus): Promise<number> {
 }
 
 export async function getReviewHealth(): Promise<ReviewHealth> {
+  const empty: ReviewHealth = {
+    submitted: 0,
+    underReview: 0,
+    needsChanges: 0,
+    openTotal: 0,
+    activeClaims: 0,
+    stuckClaims: 0,
+  };
+
   if (!isDatabaseConfigured()) {
-    return {
-      submitted: 0,
-      underReview: 0,
-      needsChanges: 0,
-      openTotal: 0,
-      activeClaims: 0,
-      stuckClaims: 0,
-    };
+    return empty;
   }
 
   const db = getDb();
   const now = new Date().toISOString();
 
-  const [submitted, underReview, needsChanges, activeClaimsRows, stuckClaimsRows] =
-    await Promise.all([
+  try {
+    const [
+      submitted,
+      underReview,
+      needsChanges,
+      activeClaimsRows,
+      stuckClaimsRows,
+    ] = await Promise.all([
       countByStatus("submitted"),
       countByStatus("under_review"),
       countByStatus("needs_changes"),
@@ -248,14 +256,18 @@ export async function getReviewHealth(): Promise<ReviewHealth> {
         ),
     ]);
 
-  return {
-    submitted,
-    underReview,
-    needsChanges,
-    openTotal: submitted + underReview + needsChanges,
-    activeClaims: activeClaimsRows[0]?.value ?? 0,
-    stuckClaims: stuckClaimsRows[0]?.value ?? 0,
-  };
+    return {
+      submitted,
+      underReview,
+      needsChanges,
+      openTotal: submitted + underReview + needsChanges,
+      activeClaims: activeClaimsRows[0]?.value ?? 0,
+      stuckClaims: stuckClaimsRows[0]?.value ?? 0,
+    };
+  } catch (error) {
+    console.warn("[admin] getReviewHealth failed", error);
+    return empty;
+  }
 }
 
 export async function countUsersByRole(): Promise<Record<UserRole, number>> {
@@ -345,14 +357,15 @@ export async function countFirstOssViaPull(): Promise<number> {
 
 export async function getPlatformMetrics(): Promise<PlatformMetrics> {
   const projectsListed = getAllProjects().length;
+  const empty: PlatformMetrics = {
+    registeredUsers: 0,
+    monthlyActiveUsers: 0,
+    projectsListed,
+    firstOssViaPull: 0,
+  };
 
   if (!isDatabaseConfigured()) {
-    return {
-      registeredUsers: 0,
-      monthlyActiveUsers: 0,
-      projectsListed,
-      firstOssViaPull: 0,
-    };
+    return empty;
   }
 
   const db = getDb();
@@ -360,7 +373,8 @@ export async function getPlatformMetrics(): Promise<PlatformMetrics> {
     Date.now() - 30 * 24 * 60 * 60 * 1000,
   ).toISOString();
 
-  const [registeredRows, mauRows, firstOssViaPull] = await Promise.all([
+  // Keep launch metrics resilient — a slow first-OSS join must not hang /admin.
+  const [registeredResult, mauResult, firstOssResult] = await Promise.allSettled([
     db.select({ value: count() }).from(users),
     db
       .select({ value: count() })
@@ -374,10 +388,25 @@ export async function getPlatformMetrics(): Promise<PlatformMetrics> {
     countFirstOssViaPull(),
   ]);
 
+  if (registeredResult.status === "rejected") {
+    console.warn("[admin] registeredUsers query failed", registeredResult.reason);
+  }
+  if (mauResult.status === "rejected") {
+    console.warn("[admin] monthlyActiveUsers query failed", mauResult.reason);
+  }
+  if (firstOssResult.status === "rejected") {
+    console.warn("[admin] firstOssViaPull query failed", firstOssResult.reason);
+  }
+
   return {
-    registeredUsers: registeredRows[0]?.value ?? 0,
-    monthlyActiveUsers: mauRows[0]?.value ?? 0,
+    registeredUsers:
+      registeredResult.status === "fulfilled"
+        ? (registeredResult.value[0]?.value ?? 0)
+        : 0,
+    monthlyActiveUsers:
+      mauResult.status === "fulfilled" ? (mauResult.value[0]?.value ?? 0) : 0,
     projectsListed,
-    firstOssViaPull,
+    firstOssViaPull:
+      firstOssResult.status === "fulfilled" ? firstOssResult.value : 0,
   };
 }

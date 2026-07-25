@@ -51,7 +51,10 @@ export default async function AdminOverviewPage() {
 
   const [health, roleCounts, metrics] = await Promise.all([
     getReviewHealth(),
-    countUsersByRole(),
+    countUsersByRole().catch((error) => {
+      console.warn("[admin] countUsersByRole failed", error);
+      return { builder: 0, reviewer: 0, admin: 0 };
+    }),
     getPlatformMetrics(),
   ]);
 
