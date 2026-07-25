@@ -115,7 +115,6 @@ A signature commits to a **sighash**, a digest of (parts of) the transaction. Th
 - Mixing mainnet txids into regtest experiments
 - Forgetting change outputs
 
-
 ## Virtual size and fees
 
 SegWit transactions are priced by **weight** / **vbytes**, not legacy serialized size alone. When estimating:
@@ -140,29 +139,6 @@ bitcoin-cli -regtest getrawtransaction "$TXID" true | jq '.vin,.vout,.fee'
 ```
 
 Trace which UTXOs were consumed and which new locks were created. Classroom-style drills live in [transaction exercises](https://bitcoindevs.xyz/decoding/transaction_exercises).
-
-
-## Worked mental model
-
-Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
-
-## Hands-on habit
-
-Every protocol idea should be paired with one local experiment:
-
-1. Reproduce the happy path on regtest (or Polar for Lightning)
-2. Break it on purpose (wrong fee, expired invoice, offline peer)
-3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
-
-That habit turns reading into builder instinct.
-
-## Glossary check
-
-Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
-
-## Resource order
-
-Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
 
 ## Next steps
 

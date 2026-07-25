@@ -74,7 +74,6 @@ A locked briefcase opens with a secret word (preimage). Each courier along the p
 - Setting timelock deltas too tight for hops
 - Ignoring that held HTLCs lock liquidity
 
-
 ## CLTV deltas
 
 Each hop demands enough timelock margin to settle or fail safely. If deltas are too small, honest nodes risk loss under delay. Implementations enforce minimums; do not invent tighter custom deltas without reading BOLTs and peer requirements.
@@ -90,29 +89,6 @@ While an HTLC is outstanding, that balance slice cannot be used elsewhere. Long-
 ## Try it in Polar or regtest
 
 Pay across a 3-node path, then force a failure mid-route and observe how unlocks unwind as timeouts hit, then compare with a successful preimage settle.
-
-
-## Worked mental model
-
-Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
-
-## Hands-on habit
-
-Every protocol idea should be paired with one local experiment:
-
-1. Reproduce the happy path on regtest (or Polar for Lightning)
-2. Break it on purpose (wrong fee, expired invoice, offline peer)
-3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
-
-That habit turns reading into builder instinct.
-
-## Glossary check
-
-Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
-
-## Resource order
-
-Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
 
 ## Next steps
 

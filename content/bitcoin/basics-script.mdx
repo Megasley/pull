@@ -122,7 +122,6 @@ Opcodes like `OP_CHECKLOCKTIMEVERIFY` (CLTV) and `OP_CHECKSEQUENCEVERIFY` (CSV) 
 - Confusing policy intent (“2-of-3 after 30 days”) with the exact opcode encoding
 - Assuming non-standard scripts will relay on default mempool policy
 
-
 ## Stack execution intuition
 
 Script pushes and pops values on a stack. `OP_DUP`, `OP_HASH160`, `OP_EQUALVERIFY`, and `OP_CHECKSIG` appear often in P2PKH-style templates. You rarely write these by hand today, descriptors and Miniscript generate them, but reading them debugs explorers and policy bugs.
@@ -139,29 +138,6 @@ Even if a script is consensus-valid, **mempool policy** may refuse to relay non-
 Human policy: "2-of-3 keys, or Alice alone after 90 days."
 
 That becomes a composition of multisig and timelock branches. Miniscript exists so you do not invent unsafe encodings. Taproot can hide unused branches until needed.
-
-
-## Worked mental model
-
-Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
-
-## Hands-on habit
-
-Every protocol idea should be paired with one local experiment:
-
-1. Reproduce the happy path on regtest (or Polar for Lightning)
-2. Break it on purpose (wrong fee, expired invoice, offline peer)
-3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
-
-That habit turns reading into builder instinct.
-
-## Glossary check
-
-Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
-
-## Resource order
-
-Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
 
 ## Next steps
 

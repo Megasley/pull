@@ -10,6 +10,7 @@ import { LessonNavigationBar } from "@/components/content/lesson-navigation";
 import { LessonObjectives } from "@/components/content/lesson-objectives";
 import { LessonReadingProgress } from "@/components/content/lesson-reading-progress";
 import { LessonResourcesPanel } from "@/components/content/lesson-resources-panel";
+import { LessonStudyHabits } from "@/components/content/lesson-study-habits";
 import { LessonStudyPlan } from "@/components/content/lesson-study-plan";
 import { StickyTableOfContents } from "@/components/content/sticky-table-of-contents";
 import { Badge } from "@/components/ui/badge";
@@ -193,6 +194,8 @@ export function LessonExperience({
               lessonTitle={lesson.title}
               lab={lesson.lab}
             />
+
+            <LessonStudyHabits />
 
             <article
               id="lesson-content"

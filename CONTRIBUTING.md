@@ -202,6 +202,7 @@ Fix all errors before submitting. Warnings (e.g. missing diagrams on concept les
 - Quote YAML values that contain `:`, backticks, or `<` characters
 - Keep lesson slugs aligned with roadmap node `id` fields
 - Write for developers new to Bitcoin/Lightning, not for hype
+- Do **not** paste shared study habits (mental model / hands-on / glossary / resource order) into MDX — those live in `LessonStudyHabits` and render for every lesson automatically
 
 ### Content licensing rules
 

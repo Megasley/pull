@@ -58,29 +58,6 @@ lightning-cli invoice 100000 "label" "desc"
   Read maintained plugins before writing your own, patterns around JSON-RPC and notifications save weeks.
 </Callout>
 
-
-## Worked mental model
-
-Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
-
-## Hands-on habit
-
-Every protocol idea should be paired with one local experiment:
-
-1. Reproduce the happy path on regtest (or Polar for Lightning)
-2. Break it on purpose (wrong fee, expired invoice, offline peer)
-3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
-
-That habit turns reading into builder instinct.
-
-## Glossary check
-
-Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
-
-## Resource order
-
-Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
-
 ## Next steps
 
 LDK, embed Lightning directly into applications.

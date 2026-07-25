@@ -105,7 +105,6 @@ Script-path leaves use **Tapscript**, Script with Taproot-specific rules and Sch
 - Losing the internal key / merkle info needed for script-path recovery
 - Mixing Bech32 (v0) and Bech32m (v1) validation
 
-
 ## Internal key and tweak
 
 Taproot output keys commit to an internal key tweaked by a merkle root of scripts (or a nothing-up-my-sleeve tweak when no scripts). Cooperative MuSig-style key aggregation can make complex custody look like a single key on-chain when everyone agrees.
@@ -123,29 +122,6 @@ Unused leaves remain hidden, a privacy and fungibility win versus revealing a fu
 ## Wallet responsibilities
 
 If you support Taproot script trees, backups must include enough data to reconstruct spends for every leaf you might need, not only the key path.
-
-
-## Worked mental model
-
-Re-read the diagrams in this lesson once out loud in plain language. If you cannot explain the flow to a friend without jargon, pause and revisit Mastering Bitcoin / Mastering Lightning chapters linked in Resources. Chapter references are intentional, not decorative.
-
-## Hands-on habit
-
-Every protocol idea should be paired with one local experiment:
-
-1. Reproduce the happy path on regtest (or Polar for Lightning)
-2. Break it on purpose (wrong fee, expired invoice, offline peer)
-3. Write down what error you saw and which layer produced it (wallet, node, mempool, peer)
-
-That habit turns reading into builder instinct.
-
-## Glossary check
-
-Pick three terms from this lesson and define them in one sentence each without opening notes. Weak definitions mean the lesson is not finished yet.
-
-## Resource order
-
-Use Resources in order: narrative book chapter first, then BIP/BOLT for precision, then implementation docs for commands. Jumping straight to RPC flags without the mental model creates brittle knowledge.
 
 ## Next steps
 
