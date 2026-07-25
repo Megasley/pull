@@ -1,26 +1,22 @@
 import {
-  and,
   count,
-  countDistinct,
   desc,
   eq,
-  gt,
-  gte,
   ilike,
-  inArray,
-  isNotNull,
-  lte,
-  min,
   or,
 } from "drizzle-orm";
 
+import { withTimeout } from "@/lib/async/with-timeout";
 import { getAllDiscoveryRepositories } from "@/lib/discovery/catalog";
-import { getDb } from "@/lib/db";
+import { getDb, getPostgresClient, withDbRetry } from "@/lib/db";
 import { isDatabaseConfigured } from "@/lib/db/env";
-import { githubPullRequests, projectSubmissions, users } from "@/lib/db/schema";
+import { users } from "@/lib/db/schema";
 import { getAllProjects } from "@/lib/projects/catalog";
-import type { SubmissionStatus, UserRole } from "@/types/submission";
+import type { UserRole } from "@/types/submission";
 import { REVIEW_QUEUE_STATUSES } from "@/types/submission";
+
+/** Soft budget so /admin never burns a full Vercel function timeout. */
+const ADMIN_QUERY_BUDGET_MS = 4_000;
 
 export type AdminUserRecord = {
   id: string;
@@ -194,16 +190,6 @@ export async function updateUserRole(input: {
   return { ok: true, user: mapAdminUser(updated) };
 }
 
-async function countByStatus(status: SubmissionStatus): Promise<number> {
-  const db = getDb();
-  const rows = await db
-    .select({ value: count() })
-    .from(projectSubmissions)
-    .where(eq(projectSubmissions.status, status));
-
-  return rows[0]?.value ?? 0;
-}
-
 export async function getReviewHealth(): Promise<ReviewHealth> {
   const empty: ReviewHealth = {
     submitted: 0,
@@ -218,52 +204,59 @@ export async function getReviewHealth(): Promise<ReviewHealth> {
     return empty;
   }
 
-  const db = getDb();
   const now = new Date().toISOString();
+  const statuses = [...REVIEW_QUEUE_STATUSES];
 
   try {
-    const [
-      submitted,
-      underReview,
-      needsChanges,
-      activeClaimsRows,
-      stuckClaimsRows,
-    ] = await Promise.all([
-      countByStatus("submitted"),
-      countByStatus("under_review"),
-      countByStatus("needs_changes"),
-      db
-        .select({ value: count() })
-        .from(projectSubmissions)
-        .where(
-          and(
-            inArray(projectSubmissions.status, REVIEW_QUEUE_STATUSES),
-            isNotNull(projectSubmissions.claimedBy),
-            isNotNull(projectSubmissions.claimExpiresAt),
-            gt(projectSubmissions.claimExpiresAt, now),
-          ),
-        ),
-      db
-        .select({ value: count() })
-        .from(projectSubmissions)
-        .where(
-          and(
-            inArray(projectSubmissions.status, REVIEW_QUEUE_STATUSES),
-            isNotNull(projectSubmissions.claimedBy),
-            isNotNull(projectSubmissions.claimExpiresAt),
-            lte(projectSubmissions.claimExpiresAt, now),
-          ),
-        ),
-    ]);
+    return await withTimeout(
+      withDbRetry(async () => {
+        const sql = getPostgresClient();
+        const rows = await sql.begin(async (tx) => {
+          await tx`SELECT set_config('statement_timeout', '3000', true)`;
+          return tx<{
+            submitted: number;
+            under_review: number;
+            needs_changes: number;
+            active_claims: number;
+            stuck_claims: number;
+          }[]>`
+            SELECT
+              COUNT(*) FILTER (WHERE status = 'submitted')::int AS submitted,
+              COUNT(*) FILTER (WHERE status = 'under_review')::int AS under_review,
+              COUNT(*) FILTER (WHERE status = 'needs_changes')::int AS needs_changes,
+              COUNT(*) FILTER (
+                WHERE claimed_by IS NOT NULL
+                  AND claim_expires_at IS NOT NULL
+                  AND claim_expires_at > ${now}
+              )::int AS active_claims,
+              COUNT(*) FILTER (
+                WHERE claimed_by IS NOT NULL
+                  AND claim_expires_at IS NOT NULL
+                  AND claim_expires_at <= ${now}
+              )::int AS stuck_claims
+            FROM project_submissions
+            WHERE status = ANY(${statuses}::text[])
+          `;
+        });
 
-    return {
-      submitted,
-      underReview,
-      needsChanges,
-      openTotal: submitted + underReview + needsChanges,
-      activeClaims: activeClaimsRows[0]?.value ?? 0,
-      stuckClaims: stuckClaimsRows[0]?.value ?? 0,
-    };
+        const row = rows[0];
+        const submitted = row?.submitted ?? 0;
+        const underReview = row?.under_review ?? 0;
+        const needsChanges = row?.needs_changes ?? 0;
+
+        return {
+          submitted,
+          underReview,
+          needsChanges,
+          openTotal: submitted + underReview + needsChanges,
+          activeClaims: row?.active_claims ?? 0,
+          stuckClaims: row?.stuck_claims ?? 0,
+        };
+      }),
+      ADMIN_QUERY_BUDGET_MS,
+      empty,
+      "getReviewHealth",
+    );
   } catch (error) {
     console.warn("[admin] getReviewHealth failed", error);
     return empty;
@@ -271,35 +264,50 @@ export async function getReviewHealth(): Promise<ReviewHealth> {
 }
 
 export async function countUsersByRole(): Promise<Record<UserRole, number>> {
-  if (!isDatabaseConfigured()) {
-    return { builder: 0, reviewer: 0, admin: 0 };
-  }
-
-  const db = getDb();
-  const rows = await db
-    .select({
-      role: users.role,
-      value: count(),
-    })
-    .from(users)
-    .groupBy(users.role);
-
-  const result: Record<UserRole, number> = {
+  const empty: Record<UserRole, number> = {
     builder: 0,
     reviewer: 0,
     admin: 0,
   };
 
-  for (const row of rows) {
-    result[row.role] = row.value;
+  if (!isDatabaseConfigured()) {
+    return empty;
   }
 
-  return result;
+  try {
+    return await withTimeout(
+      withDbRetry(async () => {
+        const db = getDb();
+        const rows = await db
+          .select({
+            role: users.role,
+            value: count(),
+          })
+          .from(users)
+          .groupBy(users.role);
+
+        const result: Record<UserRole, number> = { ...empty };
+        for (const row of rows) {
+          result[row.role] = row.value;
+        }
+        return result;
+      }),
+      ADMIN_QUERY_BUDGET_MS,
+      empty,
+      "countUsersByRole",
+    );
+  } catch (error) {
+    console.warn("[admin] countUsersByRole failed", error);
+    return empty;
+  }
 }
 
 /**
  * First OSS via Pull: builders whose earliest synced merged PR landed after
  * signup, into a repository listed in Discover.
+ *
+ * Not awaited on the critical /admin path — it previously caused
+ * FUNCTION_INVOCATION_TIMEOUT when github_pull_requests grew.
  */
 export async function countFirstOssViaPull(): Promise<number> {
   if (!isDatabaseConfigured()) {
@@ -313,46 +321,39 @@ export async function countFirstOssViaPull(): Promise<number> {
     return 0;
   }
 
-  const db = getDb();
-
-  const earliestMerged = db
-    .select({
-      userId: githubPullRequests.userId,
-      firstMergedAt: min(githubPullRequests.githubMergedAt).as(
-        "first_merged_at",
-      ),
-    })
-    .from(githubPullRequests)
-    .where(
-      and(
-        eq(githubPullRequests.merged, true),
-        isNotNull(githubPullRequests.githubMergedAt),
-      ),
-    )
-    .groupBy(githubPullRequests.userId)
-    .as("earliest_merged");
-
-  const rows = await db
-    .select({ value: countDistinct(users.id) })
-    .from(earliestMerged)
-    .innerJoin(users, eq(users.id, earliestMerged.userId))
-    .innerJoin(
-      githubPullRequests,
-      and(
-        eq(githubPullRequests.userId, earliestMerged.userId),
-        eq(githubPullRequests.merged, true),
-        eq(githubPullRequests.githubMergedAt, earliestMerged.firstMergedAt),
-        inArray(githubPullRequests.repoFullName, catalogRepos),
-      ),
-    )
-    .where(
-      and(
-        isNotNull(earliestMerged.firstMergedAt),
-        gte(earliestMerged.firstMergedAt, users.createdAt),
-      ),
+  try {
+    return await withTimeout(
+      withDbRetry(async () => {
+        const sql = getPostgresClient();
+        const rows = await sql.begin(async (tx) => {
+          await tx`SELECT set_config('statement_timeout', '2500', true)`;
+          return tx<{ value: number }[]>`
+            SELECT COUNT(*)::int AS value
+            FROM (
+              SELECT DISTINCT ON (pr.user_id)
+                pr.user_id,
+                pr.github_merged_at,
+                pr.repo_full_name
+              FROM github_pull_requests pr
+              WHERE pr.merged = true
+                AND pr.github_merged_at IS NOT NULL
+              ORDER BY pr.user_id, pr.github_merged_at ASC
+            ) first_pr
+            INNER JOIN users u ON u.id = first_pr.user_id
+            WHERE first_pr.github_merged_at >= u.created_at
+              AND first_pr.repo_full_name = ANY(${catalogRepos})
+          `;
+        });
+        return rows[0]?.value ?? 0;
+      }),
+      3_000,
+      0,
+      "countFirstOssViaPull",
     );
-
-  return rows[0]?.value ?? 0;
+  } catch (error) {
+    console.warn("[admin] countFirstOssViaPull failed", error);
+    return 0;
+  }
 }
 
 export async function getPlatformMetrics(): Promise<PlatformMetrics> {
@@ -368,45 +369,41 @@ export async function getPlatformMetrics(): Promise<PlatformMetrics> {
     return empty;
   }
 
-  const db = getDb();
   const thirtyDaysAgo = new Date(
     Date.now() - 30 * 24 * 60 * 60 * 1000,
   ).toISOString();
 
-  // Keep launch metrics resilient — a slow first-OSS join must not hang /admin.
-  const [registeredResult, mauResult, firstOssResult] = await Promise.allSettled([
-    db.select({ value: count() }).from(users),
-    db
-      .select({ value: count() })
-      .from(users)
-      .where(
-        and(
-          isNotNull(users.lastActiveAt),
-          gte(users.lastActiveAt, thirtyDaysAgo),
-        ),
-      ),
-    countFirstOssViaPull(),
-  ]);
+  try {
+    const counts = await withTimeout(
+      withDbRetry(async () => {
+        const sql = getPostgresClient();
+        return sql.begin(async (tx) => {
+          await tx`SELECT set_config('statement_timeout', '3000', true)`;
+          return tx<{ registered: number; mau: number }[]>`
+            SELECT
+              COUNT(*)::int AS registered,
+              COUNT(*) FILTER (
+                WHERE last_active_at IS NOT NULL
+                  AND last_active_at >= ${thirtyDaysAgo}
+              )::int AS mau
+            FROM users
+          `;
+        });
+      }),
+      ADMIN_QUERY_BUDGET_MS,
+      null,
+      "getPlatformMetrics.counts",
+    );
 
-  if (registeredResult.status === "rejected") {
-    console.warn("[admin] registeredUsers query failed", registeredResult.reason);
+    return {
+      registeredUsers: counts?.[0]?.registered ?? 0,
+      monthlyActiveUsers: counts?.[0]?.mau ?? 0,
+      projectsListed,
+      // Expensive join — skip on page render; show 0 rather than timing out /admin.
+      firstOssViaPull: 0,
+    };
+  } catch (error) {
+    console.warn("[admin] getPlatformMetrics failed", error);
+    return empty;
   }
-  if (mauResult.status === "rejected") {
-    console.warn("[admin] monthlyActiveUsers query failed", mauResult.reason);
-  }
-  if (firstOssResult.status === "rejected") {
-    console.warn("[admin] firstOssViaPull query failed", firstOssResult.reason);
-  }
-
-  return {
-    registeredUsers:
-      registeredResult.status === "fulfilled"
-        ? (registeredResult.value[0]?.value ?? 0)
-        : 0,
-    monthlyActiveUsers:
-      mauResult.status === "fulfilled" ? (mauResult.value[0]?.value ?? 0) : 0,
-    projectsListed,
-    firstOssViaPull:
-      firstOssResult.status === "fulfilled" ? firstOssResult.value : 0,
-  };
 }

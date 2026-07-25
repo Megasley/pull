@@ -9,6 +9,7 @@ import {
   getPlatformMetrics,
   getReviewHealth,
 } from "@/lib/admin/repository";
+import { withTimeout } from "@/lib/async/with-timeout";
 import { isAdminRole } from "@/lib/auth/roles";
 import { bootstrapCurrentUserProfile } from "@/lib/auth/session";
 import { isDatabaseConfigured } from "@/lib/db/env";
@@ -17,6 +18,9 @@ export const metadata = {
   title: "Admin",
   description: "Platform admin overview for Pull.",
 };
+
+/** Allow longer runs on Pro; Hobby still caps lower. */
+export const maxDuration = 30;
 
 export default async function AdminOverviewPage() {
   const profile = await bootstrapCurrentUserProfile();
@@ -49,14 +53,33 @@ export default async function AdminOverviewPage() {
     );
   }
 
-  const [health, roleCounts, metrics] = await Promise.all([
-    getReviewHealth(),
-    countUsersByRole().catch((error) => {
-      console.warn("[admin] countUsersByRole failed", error);
-      return { builder: 0, reviewer: 0, admin: 0 };
-    }),
-    getPlatformMetrics(),
-  ]);
+  const emptyHealth = {
+    submitted: 0,
+    underReview: 0,
+    needsChanges: 0,
+    openTotal: 0,
+    activeClaims: 0,
+    stuckClaims: 0,
+  };
+  const emptyRoles = { builder: 0, reviewer: 0, admin: 0 };
+  const emptyMetrics = {
+    registeredUsers: 0,
+    monthlyActiveUsers: 0,
+    projectsListed: 0,
+    firstOssViaPull: 0,
+  };
+
+  // Hard ceiling so a stuck DB connection cannot burn the whole invocation.
+  const [health, roleCounts, metrics] = await withTimeout(
+    Promise.all([
+      getReviewHealth(),
+      countUsersByRole(),
+      getPlatformMetrics(),
+    ]),
+    7_000,
+    [emptyHealth, emptyRoles, emptyMetrics],
+    "admin.overview",
+  );
 
   const userTotal =
     roleCounts.builder + roleCounts.reviewer + roleCounts.admin;
@@ -84,14 +107,17 @@ export default async function AdminOverviewPage() {
         <h2 className="text-lg font-semibold tracking-tight">Launch metrics</h2>
         <p className="mt-1 max-w-2xl font-mono text-[11px] text-muted-foreground">
           MAU = signed-in users with activity in the last 30 days. First OSS via
-          Pull = earliest merged PR after signup into a Discover-listed repo.
+          Pull is deferred so this page cannot hang production.
         </p>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
             label="Registered developers"
             value={metrics.registeredUsers}
           />
-          <StatCard label="Monthly active users" value={metrics.monthlyActiveUsers} />
+          <StatCard
+            label="Monthly active users"
+            value={metrics.monthlyActiveUsers}
+          />
           <StatCard label="Projects listed" value={metrics.projectsListed} />
           <StatCard
             label="First OSS via Pull"
