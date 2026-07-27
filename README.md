@@ -13,7 +13,9 @@
   <a href="./ROADMAP.md">Roadmap</a> ·
   <a href="./CONTRIBUTING.md">Contributing</a> ·
   <a href="./LICENSE">License (MIT)</a> ·
-  <a href="./docs/ATTRIBUTIONS.md">Attributions</a>
+  <a href="./docs/ATTRIBUTIONS.md">Attributions</a> ·
+  <a href="./docs/TECHNICAL_OVERVIEW.md">Technical overview</a> ·
+  <a href="./docs/TECHNICAL_OVERVIEW.pdf">PDF</a>
 </p>
 
 ---

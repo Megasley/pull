@@ -15,7 +15,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "db:validate": "npx tsx scripts/validate-schema.ts"
+    "db:validate": "npx tsx scripts/validate-schema.ts",
+    "docs:pdf": "npx tsx scripts/export-technical-overview-pdf.ts"
   },
   "dependencies": {
     "@next/third-parties": "^16.2.11",
@@ -56,6 +57,8 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.11",
     "eslint-config-prettier": "^10.1.8",
+    "marked": "^16.4.2",
+    "marked-gfm-heading-id": "^4.0.0",
     "prettier": "^3.9.6",
     "tailwindcss": "^4",
     "typescript": "^5"

@@ -63,7 +63,7 @@ export function Footer({ className }: FooterProps) {
                 >
                   {group.links.map((item) => (
                     <Link
-                      key={item.href}
+                      key={`${group.title}-${item.title}`}
                       href={item.href}
                       className="font-mono text-xs tracking-wide text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
                     >

@@ -20,16 +20,48 @@ export function projectSpecExists(slug: string) {
   return existsSync(getSpecPath(slug));
 }
 
+/**
+ * YAML turns unquoted `Label: details` list items into objects.
+ * Coerce those back into display strings so React never receives plain objects.
+ */
+export function stringifyYamlListItem(item: unknown): string {
+  if (typeof item === "string") return item;
+  if (item && typeof item === "object" && !Array.isArray(item)) {
+    const entries = Object.entries(item as Record<string, unknown>);
+    if (entries.length === 1) {
+      const [key, value] = entries[0];
+      if (value == null || value === "") return key;
+      return `${key}: ${String(value)}`;
+    }
+  }
+  return String(item ?? "");
+}
+
+function asStringList(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.map(stringifyYamlListItem);
+}
+
 function parseSpecFile(slug: string): {
   overview: string;
   frontmatter: ProjectSpecFrontmatter;
 } {
   const source = readFileSync(getSpecPath(slug), "utf8");
   const { content, data } = matter(source);
+  const raw = data as Partial<ProjectSpecFrontmatter>;
 
   return {
     overview: content.trim(),
-    frontmatter: data as ProjectSpecFrontmatter,
+    frontmatter: {
+      objectives: asStringList(raw.objectives),
+      architecture:
+        typeof raw.architecture === "string" ? raw.architecture : "",
+      requirements: asStringList(raw.requirements),
+      stretchGoals: asStringList(raw.stretchGoals),
+      resources: Array.isArray(raw.resources) ? raw.resources : [],
+      exampleRepos: Array.isArray(raw.exampleRepos) ? raw.exampleRepos : [],
+      submission: asStringList(raw.submission),
+    },
   };
 }
 
