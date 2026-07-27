@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
+import { getMermaid } from "@/lib/mermaid/init";
 import { cn } from "@/lib/utils";
 
 type MermaidDiagramProps = {
@@ -16,12 +17,14 @@ export function MermaidDiagram({
   className,
 }: MermaidDiagramProps) {
   const reactId = useId().replace(/:/g, "");
+  const renderSeq = useRef(0);
   const source = chart.trim();
   const [svg, setSvg] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
+    const renderId = `mermaid-${reactId}-${renderSeq.current++}`;
 
     async function renderChart() {
       if (!source) {
@@ -31,18 +34,8 @@ export function MermaidDiagram({
       }
 
       try {
-        const mermaid = (await import("mermaid")).default;
-        mermaid.initialize({
-          startOnLoad: false,
-          securityLevel: "strict",
-          theme: "dark",
-          fontFamily: "inherit",
-        });
-
-        const { svg: rendered } = await mermaid.render(
-          `mermaid-${reactId}`,
-          source,
-        );
+        const mermaid = await getMermaid();
+        const { svg: rendered } = await mermaid.render(renderId, source);
 
         if (!cancelled) {
           setSvg(rendered);

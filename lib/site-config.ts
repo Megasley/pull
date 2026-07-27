@@ -1,7 +1,7 @@
 export const siteConfig = {
   name: "Pull",
   description: "The operating system for open source builders.",
-  tagline: "Become an open source builder.",
+  tagline: "Become an Open Source Builder.",
   url: "https://pullos.dev",
   /** Public contact for privacy / support. */
   contactEmail: "hello@pullos.dev",
