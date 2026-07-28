@@ -10,6 +10,12 @@ import {
   replaceRoadmapProgress,
   setNodeCompletion,
 } from "@/lib/progress/repository";
+import {
+  getChapterQuizStatus,
+  getChapterQuizStatuses,
+  recordChapterQuizPassed,
+  recordChapterQuizSkipped,
+} from "@/lib/progress/quiz-repository";
 import { buildAllRoadmapProgressSummaries } from "@/lib/progress/summary";
 import type { RoadmapProgressSummary } from "@/types/progress";
 
@@ -102,4 +108,73 @@ export async function getDashboardProgressAction(): Promise<RoadmapProgressSumma
   const progressByRoadmap = await getAllCompletedNodeSlugs(user.id);
 
   return buildAllRoadmapProgressSummaries(progressByRoadmap);
+}
+
+export async function fetchChapterQuizStatusAction(
+  roadmapSlug: string,
+  quizId: string,
+) {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return { authenticated: false as const, status: null };
+  }
+
+  const status = await getChapterQuizStatus(user.id, roadmapSlug, quizId);
+
+  return { authenticated: true as const, status };
+}
+
+export async function fetchChapterQuizStatusesAction(roadmapSlug: string) {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return { authenticated: false as const, statuses: {} as Record<string, string> };
+  }
+
+  const statuses = await getChapterQuizStatuses(user.id, roadmapSlug);
+
+  return { authenticated: true as const, statuses };
+}
+
+export async function submitChapterQuizAction(input: {
+  roadmapSlug: string;
+  quizId: string;
+  score: number;
+}) {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return { ok: false as const, reason: "unauthenticated" as const };
+  }
+
+  await recordChapterQuizPassed({
+    userId: user.id,
+    roadmapSlug: input.roadmapSlug,
+    quizId: input.quizId,
+    score: input.score,
+  });
+
+  revalidatePath("/dashboard");
+
+  return { ok: true as const };
+}
+
+export async function skipChapterQuizAction(input: {
+  roadmapSlug: string;
+  quizId: string;
+}) {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return { ok: false as const, reason: "unauthenticated" as const };
+  }
+
+  await recordChapterQuizSkipped({
+    userId: user.id,
+    roadmapSlug: input.roadmapSlug,
+    quizId: input.quizId,
+  });
+
+  return { ok: true as const };
 }

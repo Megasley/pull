@@ -1,0 +1,67 @@
+---
+title: Code Review Practice
+description: Review peer pull requests on Lightning implementations and learn maintainer expectations.
+difficulty: intermediate
+duration: 5 days
+objectives:
+  - 'Review diffs for correctness, tests, and clarity'
+  - Leave actionable comments without noise
+  - Connect chapter concepts to real implementation changes
+resources:
+  - title: LND CONTRIBUTING
+    url: 'https://github.com/lightningnetwork/lnd/blob/master/docs/code_contribution_guidelines.md'
+    kind: docs
+  - title: Conventional comments
+    url: 'https://conventionalcomments.org/'
+    kind: article
+  - title: Core Lightning CONTRIBUTING
+    url: 'https://github.com/ElementsProject/lightning/blob/master/CONTRIBUTING.md'
+    kind: docs
+reflectionPrompts:
+  - >-
+    Explain Code Review Practice to a teammate without jargon — what problem
+    does it solve?
+  - What would break in production if you misunderstood Code Review Practice?
+  - >-
+    Which implementation doc is authoritative for the repo you reviewed, and
+    what did you verify there?
+lab:
+  title: Contribution artifact
+  description: >-
+    Produce a contribution artifact for Code Review Practice: pick a Review
+    Club PR, leave a constructive comment (or draft review notes), and paste
+    the URL in your evidence.
+  evidence:
+    - GitHub PR or issue URL reviewed
+    - Written review notes using the meaningful-PR checklist
+    - Link to /discover or /issues if you shortlist follow-up work
+recommendedProjects: []
+---
+Reviewing is how Lightning implementations stay safe. You will learn more from careful review than from rushing another feature PR.
+
+Use Pull's [Review Club](/discover) picks on this lesson, or browse [open issues](/issues) filtered for Lightning tracks.
+
+## What to check
+
+1. Does it solve the claimed problem?
+2. Are there tests?
+3. Are edge cases handled?
+4. Is the diff minimal?
+
+<Mermaid caption="Description → diff → tests → informed ACK or change request." chart="flowchart LR
+    PR[Open PR] --> Read[Read description]
+    Read --> Diff[Inspect diff]
+    Diff --> Test[Run tests]
+    Test --> Comment[Comment / ACK]" />
+
+<Callout type="info" title="Be precise">
+  Prefer "This breaks HTLC timeout handling because X" over "Hmm not sure."
+</Callout>
+
+## Tie reviews to what you learned
+
+When reviewing channel, routing, or BOLT changes, name the concept explicitly: inbound capacity, preimage flow, onion privacy, etc. Maintainers reward reviewers who connect behavior to protocol rules.
+
+## Next steps
+
+Score your own future PRs with the contribution rubric before opening them.

@@ -94,7 +94,8 @@
       "difficulty": "beginner",
       "lockedUntil": ["foundations-crypto"],
       "resources": ["Mastering Bitcoin Ch. 1", "Mastering Bitcoin Ch. 2", "Bitcoin Optech Fees"],
-      "position": { "x": 24, "y": 322 }
+      "position": { "x": 24, "y": 322 },
+      "chapterCheckpoint": true
     },
     {
       "id": "basics-utxo",
@@ -193,7 +194,8 @@
       "difficulty": "intermediate",
       "lockedUntil": ["basics-multisig"],
       "resources": ["Mastering Bitcoin Ch. 9", "BIP-125", "Bitcoin Optech Fees"],
-      "position": { "x": 24, "y": 712 }
+      "position": { "x": 24, "y": 712 },
+      "chapterCheckpoint": true
     },
     {
       "id": "basics-network",
@@ -248,7 +250,8 @@
       "difficulty": "intermediate",
       "lockedUntil": ["basics-soft-forks"],
       "resources": ["Mastering Bitcoin Ch. 12", "Mining Economics", "Selfish Mining"],
-      "position": { "x": 24, "y": 400 }
+      "position": { "x": 24, "y": 400 },
+      "chapterCheckpoint": true
     },
     {
       "id": "dev-libraries",
@@ -314,7 +317,8 @@
       "difficulty": "intermediate",
       "lockedUntil": ["dev-regtest"],
       "resources": ["BIP-174", "Hardware Signers", "PSBT Workflows"],
-      "position": { "x": 24, "y": 478 }
+      "position": { "x": 24, "y": 478 },
+      "chapterCheckpoint": true
     },
     {
       "id": "project-wallet",
@@ -362,7 +366,8 @@
       "project": "payment-processor",
       "lockedUntil": ["project-dashboard"],
       "resources": ["Project Spec: Processor", "BIP-21", "Webhook Security"],
-      "position": { "x": 24, "y": 322 }
+      "position": { "x": 24, "y": 322 },
+      "chapterCheckpoint": true
     },
     {
       "id": "oss-discovery",
@@ -417,7 +422,8 @@
       "difficulty": "intermediate",
       "lockedUntil": ["oss-maintainer"],
       "resources": ["Portfolio Checklist", "Contribution Metrics", "Profile Practices"],
-      "position": { "x": 24, "y": 400 }
+      "position": { "x": 24, "y": 400 },
+      "chapterCheckpoint": true
     }
   ],
   "edges": [

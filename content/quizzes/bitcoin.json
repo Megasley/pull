@@ -1,0 +1,786 @@
+[
+  {
+    "id": "bitcoin:foundations",
+    "sectionId": "foundations",
+    "title": "Foundations Check",
+    "passingScore": 4,
+    "questions": [
+      {
+        "id": "found-q1",
+        "prompt": "Why does Pull start with developer environment and Git before protocol lessons?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Bitcoin contributions ship as reviewed code, not solo experiments"
+          },
+          {
+            "id": "b",
+            "label": "Git replaces the need to run a node"
+          },
+          {
+            "id": "c",
+            "label": "Open source projects never use branches"
+          },
+          {
+            "id": "d",
+            "label": "Cryptography is optional for wallet engineers"
+          }
+        ],
+        "correctOptionId": "a",
+        "explanation": "The foundations section builds the toolchain and collaboration habits you need before touching consensus code."
+      },
+      {
+        "id": "found-q2",
+        "prompt": "What property makes a cryptographic hash useful in Bitcoin?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Hashes can be reversed to recover the preimage"
+          },
+          {
+            "id": "b",
+            "label": "Small input changes produce unpredictable output changes"
+          },
+          {
+            "id": "c",
+            "label": "Two different inputs always share the same digest"
+          },
+          {
+            "id": "d",
+            "label": "Hashes encrypt private keys for storage"
+          }
+        ],
+        "correctOptionId": "b",
+        "explanation": "One-way hashes commit to data; tiny changes avalanche into totally different digests."
+      },
+      {
+        "id": "found-q3",
+        "prompt": "What does a digital signature prove in a Bitcoin transaction?",
+        "options": [
+          {
+            "id": "a",
+            "label": "The transaction will confirm in the next block"
+          },
+          {
+            "id": "b",
+            "label": "The recipient's identity was verified off-chain"
+          },
+          {
+            "id": "c",
+            "label": "The spender authorized spending those inputs"
+          },
+          {
+            "id": "d",
+            "label": "The fee rate is optimal for current mempool conditions"
+          }
+        ],
+        "correctOptionId": "c",
+        "explanation": "Signatures prove authorization; anyone can verify them with the public key without seeing the private key."
+      },
+      {
+        "id": "found-q4",
+        "prompt": "Approximately how often does the Bitcoin block subsidy halve?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Every 1,000 blocks"
+          },
+          {
+            "id": "b",
+            "label": "Whenever fees exceed the subsidy"
+          },
+          {
+            "id": "c",
+            "label": "Never; the subsidy is fixed forever"
+          },
+          {
+            "id": "d",
+            "label": "Every ~210,000 blocks (~4 years)"
+          }
+        ],
+        "correctOptionId": "d",
+        "explanation": "Halvings follow the 210,000-block schedule defined in consensus rules."
+      },
+      {
+        "id": "found-q5",
+        "prompt": "When block space is congested, what usually happens to confirmation times for low-fee transactions?",
+        "options": [
+          {
+            "id": "a",
+            "label": "They wait longer because miners prioritize higher fee rates"
+          },
+          {
+            "id": "b",
+            "label": "They confirm faster because the network speeds up"
+          },
+          {
+            "id": "c",
+            "label": "Fees are ignored; transactions confirm in arrival order"
+          },
+          {
+            "id": "d",
+            "label": "The subsidy automatically pays their fees"
+          }
+        ],
+        "correctOptionId": "a",
+        "explanation": "Block space is scarce; users bid with fees and miners select profitable transactions."
+      }
+    ]
+  },
+  {
+    "id": "bitcoin:bitcoin-basics",
+    "sectionId": "bitcoin-basics",
+    "title": "Bitcoin Basics Check",
+    "passingScore": 4,
+    "recommendedProjects": [
+      "utxo-selector",
+      "tx-decoder"
+    ],
+    "questions": [
+      {
+        "id": "bb-q1",
+        "prompt": "How does the UTXO model differ from an account-balance ledger?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Each address has a running balance stored on-chain"
+          },
+          {
+            "id": "b",
+            "label": "Wallets track discrete outputs that are fully consumed when spent"
+          },
+          {
+            "id": "c",
+            "label": "UTXOs can be partially debited like a bank account"
+          },
+          {
+            "id": "d",
+            "label": "Only miners hold UTXOs; users hold accounts"
+          }
+        ],
+        "correctOptionId": "b",
+        "explanation": "Spending consumes whole UTXOs; change is returned as new outputs."
+      },
+      {
+        "id": "bb-q2",
+        "prompt": "What does SegWit move into the witness portion of a transaction?",
+        "options": [
+          {
+            "id": "a",
+            "label": "The block subsidy amount"
+          },
+          {
+            "id": "b",
+            "label": "Private keys for faster signing"
+          },
+          {
+            "id": "c",
+            "label": "Signature and script data, counted with discounted weight"
+          },
+          {
+            "id": "d",
+            "label": "Mempool policy rules"
+          }
+        ],
+        "correctOptionId": "c",
+        "explanation": "SegWit separates witness data and uses weight units (vbytes) for block limits."
+      },
+      {
+        "id": "bb-q3",
+        "prompt": "What is the typical privacy advantage of a Taproot key-path spend?",
+        "options": [
+          {
+            "id": "a",
+            "label": "It hides the transaction from the mempool entirely"
+          },
+          {
+            "id": "b",
+            "label": "It removes the need for signatures"
+          },
+          {
+            "id": "c",
+            "label": "It encrypts the recipient address"
+          },
+          {
+            "id": "d",
+            "label": "On-chain it looks like a simple single-sig spend"
+          }
+        ],
+        "correctOptionId": "d",
+        "explanation": "Alternative script paths stay hidden unless a script-path spend is used."
+      },
+      {
+        "id": "bb-q4",
+        "prompt": "How is a transaction fee calculated at the consensus level?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Sum of input values minus sum of output values"
+          },
+          {
+            "id": "b",
+            "label": "A fixed fee field set by the recipient"
+          },
+          {
+            "id": "c",
+            "label": "10 satoshis per byte regardless of inputs"
+          },
+          {
+            "id": "d",
+            "label": "The miner subsidy plus a protocol tax"
+          }
+        ],
+        "correctOptionId": "a",
+        "explanation": "There is no explicit fee output; the difference between inputs and outputs is the fee."
+      },
+      {
+        "id": "bb-q5",
+        "prompt": "What does Replace-by-Fee (BIP-125) allow a wallet to do?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Refund confirmed transactions after six blocks"
+          },
+          {
+            "id": "b",
+            "label": "Replace an unconfirmed tx with a higher-fee version when signaled"
+          },
+          {
+            "id": "c",
+            "label": "Change the recipient of a confirmed payment"
+          },
+          {
+            "id": "d",
+            "label": "Bypass proof-of-work for urgent sends"
+          }
+        ],
+        "correctOptionId": "b",
+        "explanation": "RBF lets users bump fees on stuck unconfirmed transactions that opted in."
+      }
+    ]
+  },
+  {
+    "id": "bitcoin:protocol-depth",
+    "sectionId": "protocol-depth",
+    "title": "Protocol Depth Check",
+    "passingScore": 4,
+    "recommendedProjects": [
+      "compact-block-lab",
+      "p2p-message-sniffer"
+    ],
+    "questions": [
+      {
+        "id": "pd-q1",
+        "prompt": "What is the main role of Bitcoin's P2P network?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Store user account balances centrally"
+          },
+          {
+            "id": "b",
+            "label": "Issue new bitcoin to wallets on demand"
+          },
+          {
+            "id": "c",
+            "label": "Gossip valid transactions and blocks between peers"
+          },
+          {
+            "id": "d",
+            "label": "Replace the need for local validation"
+          }
+        ],
+        "correctOptionId": "c",
+        "explanation": "Nodes validate first, then relay; there is no central Bitcoin server."
+      },
+      {
+        "id": "pd-q2",
+        "prompt": "Why is eclipse resistance important for a full node?",
+        "options": [
+          {
+            "id": "a",
+            "label": "It only affects mining pools, not wallets"
+          },
+          {
+            "id": "b",
+            "label": "Eclipse attacks steal private keys from disk"
+          },
+          {
+            "id": "c",
+            "label": "More peers always means weaker security"
+          },
+          {
+            "id": "d",
+            "label": "An attacker controlling your peers can feed you a fake chain tip"
+          }
+        ],
+        "correctOptionId": "d",
+        "explanation": "If you only talk to adversarial peers, you may accept invalid or minority-chain data."
+      },
+      {
+        "id": "pd-q3",
+        "prompt": "How does an SPV light client differ from a fully validating node?",
+        "options": [
+          {
+            "id": "a",
+            "label": "It trusts block headers and Merkle proofs instead of verifying every script"
+          },
+          {
+            "id": "b",
+            "label": "It mines blocks without a full chain download"
+          },
+          {
+            "id": "c",
+            "label": "It stores the entire UTXO set in browser localStorage"
+          },
+          {
+            "id": "d",
+            "label": "It cannot detect payments at all"
+          }
+        ],
+        "correctOptionId": "a",
+        "explanation": "SPV clients trade bandwidth for trust assumptions about miners and peers."
+      },
+      {
+        "id": "pd-q4",
+        "prompt": "What defines a soft fork compared to a hard fork?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Soft forks delete all historical transactions"
+          },
+          {
+            "id": "b",
+            "label": "Soft forks tighten rules; old nodes still see valid blocks"
+          },
+          {
+            "id": "c",
+            "label": "Hard forks never require coordination"
+          },
+          {
+            "id": "d",
+            "label": "Only soft forks change proof-of-work"
+          }
+        ],
+        "correctOptionId": "b",
+        "explanation": "Soft forks make previously valid blocks/transactions invalid under new rules while remaining backward compatible at the block level."
+      },
+      {
+        "id": "pd-q5",
+        "prompt": "What does proof-of-work primarily secure in Bitcoin?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Encryption of wallet seeds"
+          },
+          {
+            "id": "b",
+            "label": "Instant finality of unconfirmed payments"
+          },
+          {
+            "id": "c",
+            "label": "Ordering and immutability of the heaviest valid chain"
+          },
+          {
+            "id": "d",
+            "label": "Privacy of sender IP addresses"
+          }
+        ],
+        "correctOptionId": "c",
+        "explanation": "Work makes rewriting recent history expensive; difficulty adjusts to target block intervals."
+      }
+    ]
+  },
+  {
+    "id": "bitcoin:development",
+    "sectionId": "development",
+    "title": "Development Check",
+    "passingScore": 4,
+    "recommendedProjects": [
+      "psbt-multisig-desk",
+      "hd-wallet-backup"
+    ],
+    "questions": [
+      {
+        "id": "dev-q1",
+        "prompt": "What problem do output descriptors (BIP-380 family) solve for wallet engineers?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Replace the need for private keys"
+          },
+          {
+            "id": "b",
+            "label": "Store mempool transactions in SQL"
+          },
+          {
+            "id": "c",
+            "label": "Mine blocks from a browser tab"
+          },
+          {
+            "id": "d",
+            "label": "Express spending policies in a portable, machine-readable form"
+          }
+        ],
+        "correctOptionId": "d",
+        "explanation": "Descriptors document how keys and scripts map to addresses for backup and signing workflows."
+      },
+      {
+        "id": "dev-q2",
+        "prompt": "What does BIP-32 enable in an HD wallet?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Deriving many keys from one seed with a structured path"
+          },
+          {
+            "id": "b",
+            "label": "Storing bitcoin without any keys"
+          },
+          {
+            "id": "c",
+            "label": "Automatic fee negotiation with miners"
+          },
+          {
+            "id": "d",
+            "label": "On-chain encrypted messaging"
+          }
+        ],
+        "correctOptionId": "a",
+        "explanation": "Hierarchical deterministic derivation lets one backup regenerate many addresses."
+      },
+      {
+        "id": "dev-q3",
+        "prompt": "Why is regtest preferred for integration tests over mainnet?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Regtest uses real money for realistic UX"
+          },
+          {
+            "id": "b",
+            "label": "You control block production and coin supply locally"
+          },
+          {
+            "id": "c",
+            "label": "Mainnet cannot broadcast transactions"
+          },
+          {
+            "id": "d",
+            "label": "Regtest skips script validation"
+          }
+        ],
+        "correctOptionId": "b",
+        "explanation": "Regtest lets you mine instantly and reset state without financial risk."
+      },
+      {
+        "id": "dev-q4",
+        "prompt": "What is the main purpose of PSBT (BIP-174)?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Publish blocks to the P2P network"
+          },
+          {
+            "id": "b",
+            "label": "Encode Lightning invoices"
+          },
+          {
+            "id": "c",
+            "label": "Pass partially built transactions between signers and devices"
+          },
+          {
+            "id": "d",
+            "label": "Replace the UTXO set with accounts"
+          }
+        ],
+        "correctOptionId": "c",
+        "explanation": "PSBT standardizes multi-party signing across software, hardware, and coordinators."
+      },
+      {
+        "id": "dev-q5",
+        "prompt": "What is a critical security rule when exposing Bitcoin Core RPC?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Bind RPC to 0.0.0.0 without a password for convenience"
+          },
+          {
+            "id": "b",
+            "label": "Share cookie auth in public GitHub issues"
+          },
+          {
+            "id": "c",
+            "label": "Disable TLS because localhost is always safe"
+          },
+          {
+            "id": "d",
+            "label": "Never expose it publicly; authenticate and firewall it"
+          }
+        ],
+        "correctOptionId": "d",
+        "explanation": "RPC can move funds and control the node; treat it like root access."
+      }
+    ]
+  },
+  {
+    "id": "bitcoin:projects",
+    "sectionId": "projects",
+    "title": "Projects Check",
+    "passingScore": 4,
+    "recommendedProjects": [
+      "mini-wallet",
+      "payment-processor"
+    ],
+    "questions": [
+      {
+        "id": "proj-q1",
+        "prompt": "What should a mini-wallet project demonstrate on regtest?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Generate addresses, receive funds, and send with correct change"
+          },
+          {
+            "id": "b",
+            "label": "Rewrite Bitcoin Core consensus rules"
+          },
+          {
+            "id": "c",
+            "label": "Store seeds in the README for reproducibility"
+          },
+          {
+            "id": "d",
+            "label": "Skip transaction broadcasting entirely"
+          }
+        ],
+        "correctOptionId": "a",
+        "explanation": "The mini-wallet ties together keys, UTXOs, fees, and broadcasting on a private chain."
+      },
+      {
+        "id": "proj-q2",
+        "prompt": "What does BIP-21 standardize for merchants?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Lightning routing hints in invoices"
+          },
+          {
+            "id": "b",
+            "label": "A URI scheme for payment requests (bitcoin:...)"
+          },
+          {
+            "id": "c",
+            "label": "Hardware wallet firmware updates"
+          },
+          {
+            "id": "d",
+            "label": "Mempool eviction policy"
+          }
+        ],
+        "correctOptionId": "b",
+        "explanation": "BIP-21 links amount, address, and labels into scannable payment URIs."
+      },
+      {
+        "id": "proj-q3",
+        "prompt": "When building a block explorer UI, what is a common data source pattern?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Scrape social media for balances"
+          },
+          {
+            "id": "b",
+            "label": "Ask users to email their xpub"
+          },
+          {
+            "id": "c",
+            "label": "Index chain data from your own node or Esplora-style API"
+          },
+          {
+            "id": "d",
+            "label": "Hard-code mainnet balances for demo speed"
+          }
+        ],
+        "correctOptionId": "c",
+        "explanation": "Explorers visualize data your backend indexes from validated chain sources."
+      },
+      {
+        "id": "proj-q4",
+        "prompt": "What should payment-processor webhooks include for merchant trust?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Private keys for automatic sweeping"
+          },
+          {
+            "id": "b",
+            "label": "Unauthenticated GET callbacks only"
+          },
+          {
+            "id": "c",
+            "label": "Marketing copy instead of txids"
+          },
+          {
+            "id": "d",
+            "label": "Signed payloads and clear confirmation thresholds"
+          }
+        ],
+        "correctOptionId": "d",
+        "explanation": "Merchants need verifiable events tied to on-chain confirmation depth."
+      },
+      {
+        "id": "proj-q5",
+        "prompt": "Which environment is preferred for Bitcoin project demos on Pull?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Regtest or Polar over mainnet for learning"
+          },
+          {
+            "id": "b",
+            "label": "Mainnet with real funds for every exercise"
+          },
+          {
+            "id": "c",
+            "label": "Mocked JSON with no node"
+          },
+          {
+            "id": "d",
+            "label": "Production merchant traffic only"
+          }
+        ],
+        "correctOptionId": "a",
+        "explanation": "Local labs are safer and faster for iteration; document how to reproduce."
+      }
+    ]
+  },
+  {
+    "id": "bitcoin:open-source",
+    "sectionId": "open-source",
+    "title": "Open Source Check",
+    "passingScore": 4,
+    "questions": [
+      {
+        "id": "oss-q1",
+        "prompt": "Before opening a Bitcoin OSS pull request, you should:",
+        "options": [
+          {
+            "id": "a",
+            "label": "Open a large refactor without maintainer discussion"
+          },
+          {
+            "id": "b",
+            "label": "Read CONTRIBUTING, find agreed scope, and run relevant tests"
+          },
+          {
+            "id": "c",
+            "label": "Skip CI because Bitcoin is decentralized"
+          },
+          {
+            "id": "d",
+            "label": "Copy code without attribution"
+          }
+        ],
+        "correctOptionId": "b",
+        "explanation": "Maintainers expect scoped changes, tests, and alignment with project norms."
+      },
+      {
+        "id": "oss-q2",
+        "prompt": "What is the purpose of the meaningful-PR rubric?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Replace all code review"
+          },
+          {
+            "id": "b",
+            "label": "Score quiz answers only"
+          },
+          {
+            "id": "c",
+            "label": "Self-check problem fit, scope, correctness, and communication before shipping"
+          },
+          {
+            "id": "d",
+            "label": "Guarantee automatic merge"
+          }
+        ],
+        "correctOptionId": "c",
+        "explanation": "The rubric helps you judge whether a PR is worth a maintainer's time."
+      },
+      {
+        "id": "oss-q3",
+        "prompt": "What makes a builder portfolio credible to maintainers?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Buzzwords without links to code"
+          },
+          {
+            "id": "b",
+            "label": "Private gists only"
+          },
+          {
+            "id": "c",
+            "label": "Screenshots of other people's work"
+          },
+          {
+            "id": "d",
+            "label": "Verifiable repos, commits, PRs, and concise writeups"
+          }
+        ],
+        "correctOptionId": "d",
+        "explanation": "Evidence beats adjectives; link what you built and what was merged."
+      },
+      {
+        "id": "oss-q4",
+        "prompt": "During maintainer feedback cycles, you should:",
+        "options": [
+          {
+            "id": "a",
+            "label": "Address review comments, keep scope tight, and re-run tests"
+          },
+          {
+            "id": "b",
+            "label": "Force-push without reading feedback"
+          },
+          {
+            "id": "c",
+            "label": "Open a new PR for every typo fix"
+          },
+          {
+            "id": "d",
+            "label": "Argue that tests are optional for docs changes"
+          }
+        ],
+        "correctOptionId": "a",
+        "explanation": "Iteration is normal; responsive, tested updates build trust."
+      },
+      {
+        "id": "oss-q5",
+        "prompt": "When triaging good first issues, prioritize:",
+        "options": [
+          {
+            "id": "a",
+            "label": "Issues labeled 'rewrite everything'"
+          },
+          {
+            "id": "b",
+            "label": "Clear reproduction, maintainer interest, and a bounded fix"
+          },
+          {
+            "id": "c",
+            "label": "Closed issues from five years ago"
+          },
+          {
+            "id": "d",
+            "label": "Features no maintainer asked for"
+          }
+        ],
+        "correctOptionId": "b",
+        "explanation": "Scoped issues with maintainer buy-in are the fastest path to a merged PR."
+      }
+    ]
+  }
+]

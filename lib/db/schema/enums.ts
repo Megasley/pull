@@ -53,6 +53,7 @@ export const reviewDecisionEnum = pgEnum("review_decision", [
 
 export const xpSourceTypeEnum = pgEnum("xp_source_type", [
   "lesson_complete",
+  "chapter_quiz_passed",
   "project_submitted",
   "project_approved",
   "merged_pr",
@@ -81,4 +82,9 @@ export const weeklyGoalTargetTypeEnum = pgEnum("weekly_goal_target_type", [
   "merge_pr",
   "complete_lesson",
   "custom",
+]);
+
+export const chapterQuizStatusEnum = pgEnum("chapter_quiz_status", [
+  "passed",
+  "skipped",
 ]);

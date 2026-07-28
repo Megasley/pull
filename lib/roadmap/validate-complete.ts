@@ -71,30 +71,32 @@ export function validateLightningRoadmap(data: RoadmapJson): void {
     }
   }
 
-  const requiredTopics = [
-    "Lightning Overview",
-    "Invoices",
-    "LNURL",
-    "Opening Channels",
-    "HTLC Mechanics",
-    "Routing",
-    "Liquidity",
-    "LND",
-    "Core Lightning",
-    "LDK",
+  const requiredNodeIds = [
+    "ln-overview",
+    "ln-invoices",
+    "ln-lnurl",
+    "ln-channels-open",
+    "ln-channel-liquidity",
+    "ln-htlcs",
+    "ln-routing",
+    "ln-liquidity",
+    "ln-lnd",
+    "ln-cln",
+    "ln-ldk",
+    "ln-contrib-code-review",
   ];
-  const nodeTitles = new Set(data.nodes.map((node) => node.title));
+  const nodeIds = new Set(data.nodes.map((node) => node.id));
 
-  for (const topic of requiredTopics) {
-    if (!nodeTitles.has(topic)) {
-      throw new Error(`Lightning roadmap is missing required topic "${topic}".`);
+  for (const nodeId of requiredNodeIds) {
+    if (!nodeIds.has(nodeId)) {
+      throw new Error(`Lightning roadmap is missing required node "${nodeId}".`);
     }
   }
 
   validateRoadmapNodeFields(data, ["projects"]);
 
-  if (data.nodes.length < 17) {
-    throw new Error("Lightning roadmap requires at least 17 nodes.");
+  if (data.nodes.length < 31) {
+    throw new Error("Lightning roadmap requires at least 31 nodes.");
   }
 }
 

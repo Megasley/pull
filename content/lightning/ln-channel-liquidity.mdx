@@ -1,0 +1,96 @@
+---
+title: Channel Liquidity
+description: 'Understand inbound vs outbound balance and why funded channels can still fail to pay or receive.'
+difficulty: intermediate
+duration: 4 days
+objectives:
+  - Explain inbound vs outbound capacity without ops jargon
+  - Predict when a payment will fail due to balance direction
+  - Relate channel balance to forwarding constraints
+resources:
+  - title: Mastering the Lightning Network
+    url: 'https://github.com/lnbook/lnbook/blob/master/07_payment_channels.asciidoc'
+    kind: book
+    chapter: 'Ch. 7: Payment Channels'
+    required: true
+  - title: Mastering the Lightning Network
+    url: 'https://github.com/lnbook/lnbook/blob/master/08_routing_htlcs.asciidoc'
+    kind: book
+    chapter: 'Ch. 8: Routing (balance context)'
+  - title: Amboss
+    url: 'https://amboss.space/'
+    kind: tool
+reflectionPrompts:
+  - >-
+    Explain inbound vs outbound to a teammate who only knows on-chain Bitcoin —
+    what is different?
+  - >-
+    Your node shows 1 BTC total channel capacity but cannot receive a 50k sat
+    invoice. What is the most likely cause?
+  - >-
+    Which side of a single-funded channel holds inbound capacity for the funder?
+lab:
+  title: Balance direction check
+  description: >-
+    In Polar or regtest, open a channel and inspect balances. Attempt a small
+    payment in each direction and note which direction fails first when
+    imbalanced.
+  evidence:
+    - Screenshot or CLI output showing local/remote balance split
+    - One sentence on send vs receive failure when outbound-heavy
+    - Link to the Ch. 7 section you used
+searchQueries:
+  - inbound capacity
+---
+Channel **liquidity** is not how much bitcoin you locked — it is **which side of each channel holds that balance**. Lightning is directional: the same channel can send easily in one direction and fail in the other.
+
+## Why this matters
+
+This is the Lightning-specific idea that confuses people the first time. On-chain, a UTXO is yours to spend. In a channel, only your **outbound** balance is spendable by you; **inbound** is the counterparty's share that lets you receive. Routing later is just finding a path where every hop has enough outbound on the forward edge.
+
+## Fixed capacity
+
+Total channel capacity is fixed until you splice, dual-fund, or close. Payments move balance between the two sides — they do not create new capacity.
+
+<LessonImage
+  src="/lessons/lightning/ln-overview/channel-balance.svg"
+  alt="Channel outbound versus inbound capacity"
+  caption="Outbound is your spendable side; inbound is what lets you receive."
+/>
+
+## Inbound vs outbound
+
+| Term | Meaning |
+|------|---------|
+| **Outbound** | Your side's balance — what you can send or forward |
+| **Inbound** | Counterparty's balance on your channel — what you can receive |
+
+After a typical single-funded open, the funder starts **outbound-heavy** (can send, cannot receive much). The peer starts **inbound-heavy** relative to the funder.
+
+## Payment failure from wrong-side balance
+
+<Mermaid caption="A route fails when any hop lacks outbound on the forward edge." chart="flowchart LR
+    A[Alice outbound OK] --> B[Bob outbound low]
+    B -->|fail| C[Carol]
+    Note1[Alice can pay Bob]
+    Note2[Bob cannot forward to Carol]" />
+
+<Callout type="warning" title="Funded does not mean receive-ready">
+  A merchant with 10 BTC locked across channels but zero inbound on the invoice route still cannot get paid. Capacity and direction are different questions.
+</Callout>
+
+## Forwarding locks liquidity
+
+When your node forwards an HTLC, that slice of outbound is reserved until the payment settles or fails. Heavy routing without balanced channels drains outbound on busy edges — another reason direction matters before you study pathfinding.
+
+## Try it in Polar or regtest
+
+1. Open a channel between two nodes.
+2. Check `local_balance` vs `remote_balance` (or equivalent).
+3. Pay from the funder toward the peer — should succeed.
+4. Pay back the full amount — may fail if inbound is insufficient.
+5. Write one sentence explaining the failure in inbound/outbound terms.
+
+## Next steps
+
+Commitment transactions — the signed states that make channel updates safe.

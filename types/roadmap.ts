@@ -20,6 +20,7 @@ export type RoadmapJsonNode = {
   lockedUntil?: string[];
   resources?: string[];
   project?: string;
+  chapterCheckpoint?: boolean;
   position: { x: number; y: number };
 };
 

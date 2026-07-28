@@ -1,6 +1,6 @@
 ---
 title: Routing
-description: 'Select routes using fee budgets, channel hints, and reliability scores.'
+description: 'Liquidity-aware path selection using fee budgets, channel hints, and reliability scores.'
 difficulty: advanced
 duration: 6 days
 objectives:
@@ -35,11 +35,11 @@ lab:
     - One sentence on what you observed vs expected
     - Link to the required reading section you used
 ---
-Lightning uses **source-based routing**: the payer (usually) constructs a path across the public graph plus hints, then onion-encrypts hop instructions.
+**Routing is liquidity-aware path selection.** The payer (usually) constructs a path across the public graph plus hints, then onion-encrypts hop instructions. Every hop must have enough **outbound** on the forward edge — you already know from channel liquidity why that is not guaranteed.
 
 ## Why this matters
 
-Routing success rates define UX. Fee-aware, reliability-aware pathfinding separates toy demos from production wallets.
+Routing success rates define UX. A path that looks cheap on fees still fails if any hop lacks outbound. Fee-aware, reliability-aware pathfinding separates toy demos from production wallets.
 
 ## Analogy
 

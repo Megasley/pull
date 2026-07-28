@@ -11,6 +11,8 @@
     "format:check": "prettier --check .",
     "validate:roadmaps": "npx tsx scripts/validate-roadmaps.ts",
     "validate:content": "npx tsx scripts/validate-content.ts",
+    "verify:quizzes": "npx tsx scripts/verify-chapter-quizzes.ts",
+    "verify:review-club": "npx tsx scripts/verify-review-club.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",

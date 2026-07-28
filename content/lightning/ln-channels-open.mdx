@@ -43,7 +43,7 @@ Opening a channel locks on-chain funds into a collaborative contract so you can 
 
 ## Why this matters
 
-Without outbound capacity you cannot send. Without inbound capacity you cannot receive. Channel opens are the capital planning step of Lightning ops.
+Channel opens lock capital on-chain. Whether you can send or receive depends on how balance is split — covered in depth in the next lesson on **channel liquidity**.
 
 ## Analogy
 
@@ -72,12 +72,9 @@ lncli openchannel <pubkey> <local_amt>
   Do not route large value on a channel that has not reached your configured confirmation depth.
 </Callout>
 
-## Inbound vs outbound
+## Balance direction (preview)
 
-- **Outbound**: your side’s spendable balance for sending
-- **Inbound**: counterparty balance that lets you receive
-
-New single-funded channels often start with outbound only, receiving may require liquidity strategies.
+Single-funded opens usually leave the funder **outbound-heavy**. You will study inbound vs outbound, forwarding constraints, and failure modes in **Channel Liquidity** before routing.
 
 ## Common mistakes
 
@@ -87,4 +84,4 @@ New single-funded channels often start with outbound only, receiving may require
 
 ## Next steps
 
-Study commitment transactions, the signed states that make channels safe.
+**Channel Liquidity** — why balance direction matters before you route a single payment.

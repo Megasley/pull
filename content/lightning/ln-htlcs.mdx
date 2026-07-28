@@ -82,9 +82,9 @@ Each hop demands enough timelock margin to settle or fail safely. If deltas are 
 
 Modern invoices include a payment secret so intermediaries cannot settle to the receiver without the payer's onion path completing correctly (anti-probing / security improvement). Decode invoices and confirm secrets are handled by your library.
 
-## Held HTLCs lock capital
+## Held HTLCs lock liquidity
 
-While an HTLC is outstanding, that balance slice cannot be used elsewhere. Long-held HTLCs (slow peers, attacks) are an operational risk. Monitor pending HTLCs on production nodes.
+While an HTLC is outstanding, that slice of **outbound** balance cannot be used elsewhere on that channel. This ties directly to channel liquidity: a node can look healthy on total capacity but fail to forward because outbound is tied up in pending HTLCs. Long-held HTLCs (slow peers, attacks) are an operational risk. Monitor pending HTLCs on production nodes.
 
 ## Try it in Polar or regtest
 

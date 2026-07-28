@@ -12,6 +12,8 @@ type LessonCompletionButtonProps = {
   onToggle: () => void;
   isAuthenticated?: boolean;
   signInHref?: string;
+  disabled?: boolean;
+  disabledReason?: string;
   className?: string;
 };
 
@@ -31,6 +33,8 @@ export function LessonCompletionButton({
   onToggle,
   isAuthenticated = true,
   signInHref = "/sign-in",
+  disabled = false,
+  disabledReason,
   className,
 }: LessonCompletionButtonProps) {
   const [celebrating, setCelebrating] = useState(false);
@@ -48,6 +52,10 @@ export function LessonCompletionButton({
   }, [isComplete]);
 
   function handleToggle() {
+    if (disabled) {
+      return;
+    }
+
     if (!isComplete) {
       setCelebrating(true);
     }
@@ -96,9 +104,11 @@ export function LessonCompletionButton({
             {isComplete ? "status // complete" : "status // in-progress"}
           </p>
           <p className="mt-1 font-mono text-xs text-muted-foreground">
-            {isComplete
-              ? "Progress saved to your roadmap."
-              : "Finish reading, then mark complete to unlock the next node."}
+            {disabled && disabledReason
+              ? disabledReason
+              : isComplete
+                ? "Progress saved to your roadmap."
+                : "Finish reading, then mark complete to unlock the next node."}
           </p>
         </div>
 
@@ -131,6 +141,7 @@ export function LessonCompletionButton({
             type="button"
             variant={isComplete ? "outline" : "default"}
             onClick={handleToggle}
+            disabled={disabled}
             className="relative shrink-0"
           >
             {isComplete ? (

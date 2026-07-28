@@ -11,6 +11,7 @@ import {
 } from "drizzle-orm/pg-core";
 
 import {
+  chapterQuizStatusEnum,
   difficultyEnum,
   nodeStatusEnum,
   progressStatusEnum,
@@ -327,6 +328,41 @@ export const submissionReviewEvents = pgTable(
     index("submission_review_events_submission_id_idx").on(table.submissionId),
     index("submission_review_events_actor_user_id_idx").on(table.actorUserId),
     index("submission_review_events_created_at_idx").on(table.createdAt),
+  ],
+);
+
+export const userChapterQuizzes = pgTable(
+  "user_chapter_quizzes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    roadmapSlug: text("roadmap_slug").notNull(),
+    quizId: text("quiz_id").notNull(),
+    status: chapterQuizStatusEnum("status").notNull(),
+    score: integer("score"),
+    completedAt: timestamp("completed_at", {
+      withTimezone: true,
+      mode: "string",
+    })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("user_chapter_quizzes_user_roadmap_quiz_idx").on(
+      table.userId,
+      table.roadmapSlug,
+      table.quizId,
+    ),
+    index("user_chapter_quizzes_user_id_idx").on(table.userId),
+    index("user_chapter_quizzes_roadmap_slug_idx").on(table.roadmapSlug),
   ],
 );
 

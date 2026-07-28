@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useState } from "react";
 
 import { LessonBuildChallenge } from "@/components/content/lesson-build-challenge";
+import { ChapterProjectCallout } from "@/components/content/chapter-project-callout";
+import { ChapterQuizGate } from "@/components/content/chapter-quiz-gate";
 import { LessonCompletionButton } from "@/components/content/lesson-completion-button";
 import { LessonKeyboardHelp } from "@/components/content/lesson-keyboard-help";
 import { LessonNavigationBar } from "@/components/content/lesson-navigation";
@@ -12,11 +14,13 @@ import { LessonReadingProgress } from "@/components/content/lesson-reading-progr
 import { LessonResourcesPanel } from "@/components/content/lesson-resources-panel";
 import { LessonStudyHabits } from "@/components/content/lesson-study-habits";
 import { LessonStudyPlan } from "@/components/content/lesson-study-plan";
+import { LessonReviewClub } from "@/components/content/lesson-review-club";
 import { StickyTableOfContents } from "@/components/content/sticky-table-of-contents";
 import { SiteContainer } from "@/components/layout/site-container";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAuthSession } from "@/hooks/use-auth-session";
+import { useChapterQuizGate } from "@/hooks/use-chapter-quiz-gate";
 import { useLessonCompletion } from "@/hooks/use-lesson-completion";
 import { useLessonShortcuts } from "@/hooks/use-lesson-shortcuts";
 import { useActiveHeading, useReadingProgress } from "@/hooks/use-lesson-reading";
@@ -24,6 +28,13 @@ import {
   buildBitcoinSearchUrl,
   resolveLessonSearchQuery,
 } from "@/lib/content/bitcoin-search";
+import { getChapterQuizzesForRoadmap } from "@/lib/quizzes/load";
+import {
+  getChapterQuizForLesson,
+  getProjectSlugForLesson,
+  getSectionForLesson,
+  isChapterCheckpointLesson,
+} from "@/lib/roadmap/checkpoints";
 import { cn } from "@/lib/utils";
 import type { CompiledLesson, LessonNavigation } from "@/types/content";
 import {
@@ -55,12 +66,27 @@ export function LessonExperience({
     "lesson-content",
     headingIds,
   );
-  const { isAuthenticated } = useAuthSession();
+  const { isAuthenticated, userId } = useAuthSession();
   const { isComplete, toggleComplete, roadmapProgress } = useLessonCompletion(
     lesson.roadmap,
     lesson.slug,
     roadmap,
   );
+  const sectionId = getSectionForLesson(roadmap, lesson.slug);
+  const isCheckpoint = isChapterCheckpointLesson(roadmap, lesson.slug);
+  const chapterQuiz = getChapterQuizForLesson(
+    roadmap,
+    lesson.slug,
+    getChapterQuizzesForRoadmap(lesson.roadmap),
+  );
+  const roadmapProjectSlug = getProjectSlugForLesson(roadmap, lesson.slug);
+  const projectSlug = lesson.project ?? roadmapProjectSlug;
+  const recommendedProjects = [
+    ...(lesson.recommendedProjects ?? []),
+    ...(chapterQuiz?.recommendedProjects ?? []),
+  ];
+  const { canMarkComplete, status, hydrated, handlePassed, handleSkip } =
+    useChapterQuizGate(lesson.roadmap, chapterQuiz, userId, isAuthenticated);
   const signInHref = `/sign-in?next=${encodeURIComponent(
     `/roadmaps/${lesson.roadmap}/lessons/${lesson.slug}`,
   )}`;
@@ -98,7 +124,7 @@ export function LessonExperience({
     previousSlug: navigation.previous?.slug,
     nextSlug: navigation.next?.slug,
     researchUrl,
-    canToggleComplete: isAuthenticated,
+    canToggleComplete: isAuthenticated && canMarkComplete,
     onToggleComplete: toggleComplete,
     onToggleHelp: () => setHelpOpen((current) => !current),
   });
@@ -209,16 +235,46 @@ export function LessonExperience({
               resources={furtherReading}
               heading="further reading"
             />
+            <LessonReviewClub
+              lessonSlug={lesson.slug}
+              sectionId={sectionId}
+              track={lesson.roadmap}
+              showSectionBundle={isCheckpoint}
+            />
+
             <LessonBuildChallenge
-              project={lesson.project}
+              project={projectSlug}
               challenge={lesson.challenge}
+              recommendedProjects={recommendedProjects}
             />
-            <LessonCompletionButton
-              isComplete={isComplete}
-              onToggle={toggleComplete}
-              isAuthenticated={isAuthenticated}
-              signInHref={signInHref}
-            />
+
+            {isCheckpoint && chapterQuiz?.recommendedProjects?.length ? (
+              <ChapterProjectCallout
+                projectSlugs={chapterQuiz.recommendedProjects}
+              />
+            ) : null}
+
+            {isCheckpoint && chapterQuiz ? (
+              <ChapterQuizGate
+                quiz={chapterQuiz}
+                status={status}
+                hydrated={hydrated}
+                canMarkComplete={canMarkComplete}
+                isComplete={isComplete}
+                onToggleComplete={toggleComplete}
+                isAuthenticated={isAuthenticated}
+                signInHref={signInHref}
+                onPassed={(score) => void handlePassed(score)}
+                onSkip={() => void handleSkip()}
+              />
+            ) : (
+              <LessonCompletionButton
+                isComplete={isComplete}
+                onToggle={toggleComplete}
+                isAuthenticated={isAuthenticated}
+                signInHref={signInHref}
+              />
+            )}
             <LessonNavigationBar
               roadmapSlug={lesson.roadmap}
               navigation={navigation}

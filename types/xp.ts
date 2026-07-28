@@ -1,5 +1,6 @@
 export type XpSourceType =
   | "lesson_complete"
+  | "chapter_quiz_passed"
   | "project_submitted"
   | "project_approved"
   | "merged_pr"

@@ -192,9 +192,33 @@ Link out to trusted external interactives (e.g. [Decoding Bitcoin](https://bitco
 ```bash
 npm run validate:roadmaps
 npm run validate:content
+npm run verify:quizzes
+npm run verify:review-club
 ```
 
 Fix all errors before submitting. Warnings (e.g. missing diagrams on concept lessons) should be addressed or explained in the PR.
+
+### Chapter quizzes
+
+Section checkpoint lessons are marked with `"chapterCheckpoint": true` on the last node in each roadmap section (`content/roadmaps/bitcoin.json`, `content/roadmaps/lightning.json`). Quiz content lives in `content/quizzes/`:
+
+- One quiz per section (`sectionId` matches roadmap section `id`)
+- Bitcoin quizzes: 5 questions each (`content/quizzes/bitcoin.json`)
+- Lightning quizzes: 3–4 questions each (`content/quizzes/lightning.json`)
+- 3–4 multiple-choice questions with `correctOptionId` matching an option `id`
+- `passingScore` is the minimum correct answers to unlock mark-complete (soft gate: learners can skip with a warning)
+
+Run `npm run verify:quizzes` after editing quizzes or checkpoint nodes.
+
+### Review Club catalog
+
+Curated external PRs, GFIs, and spec reviews live in `content/discovery/review-club.json` for both **bitcoin** and **lightning** tracks. Each item must include:
+
+- `repoId` referencing `content/discovery/repositories.json`
+- `lessonSlugs` and/or `sectionIds` for lesson embeds
+- `reviewFocus` tags and a short `summary`
+
+Run `npm run verify:review-club` after adding or editing items.
 
 ### Content guidelines
 

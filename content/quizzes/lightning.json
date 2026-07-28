@@ -1,0 +1,617 @@
+[
+  {
+    "id": "lightning:lightning-basics",
+    "sectionId": "lightning-basics",
+    "title": "Lightning Basics Check",
+    "passingScore": 3,
+    "questions": [
+      {
+        "id": "lb-q1",
+        "prompt": "What is the main reason Lightning moves most payments off-chain?",
+        "options": [
+          {
+            "id": "a",
+            "label": "To avoid Bitcoin block space for routine transfers"
+          },
+          {
+            "id": "b",
+            "label": "To replace Bitcoin's proof-of-work"
+          },
+          {
+            "id": "c",
+            "label": "To store invoices on-chain"
+          },
+          {
+            "id": "d",
+            "label": "To eliminate the need for full nodes"
+          }
+        ],
+        "correctOptionId": "a",
+        "explanation": "Lightning channels batch many updates; on-chain settlement is for open/close and disputes."
+      },
+      {
+        "id": "lb-q2",
+        "prompt": "What role do BOLTs play in the Lightning ecosystem?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Optional style guides with no interop impact"
+          },
+          {
+            "id": "b",
+            "label": "Interoperability specs that implementations follow"
+          },
+          {
+            "id": "c",
+            "label": "On-chain smart contract bytecode"
+          },
+          {
+            "id": "d",
+            "label": "Wallet seed derivation standards only"
+          }
+        ],
+        "correctOptionId": "b",
+        "explanation": "BOLTs define peer protocol, onion format, invoices, and more so LND, CLN, and LDK can interoperate."
+      },
+      {
+        "id": "lb-q3",
+        "prompt": "What does a BOLT11 invoice primarily encode?",
+        "options": [
+          {
+            "id": "a",
+            "label": "A reusable merchant catalog"
+          },
+          {
+            "id": "b",
+            "label": "A channel funding transaction"
+          },
+          {
+            "id": "c",
+            "label": "A one-time payment request with amount and routing hints"
+          },
+          {
+            "id": "d",
+            "label": "A watchtower subscription"
+          }
+        ],
+        "correctOptionId": "c",
+        "explanation": "BOLT11 invoices are payment requests wallets decode before attempting a route."
+      },
+      {
+        "id": "lb-q4",
+        "prompt": "How do BOLT12 offers differ from BOLT11 invoices?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Offers only work on mainnet"
+          },
+          {
+            "id": "b",
+            "label": "Invoices require on-chain confirmation"
+          },
+          {
+            "id": "c",
+            "label": "Offers replace HTLCs entirely"
+          },
+          {
+            "id": "d",
+            "label": "Offers are reusable; invoices are typically one-shot"
+          }
+        ],
+        "correctOptionId": "d",
+        "explanation": "Offers support reusable payment flows and modern UX patterns like static QR codes."
+      }
+    ]
+  },
+  {
+    "id": "lightning:channels-htlcs",
+    "sectionId": "channels-htlcs",
+    "title": "Channels & HTLCs Check",
+    "passingScore": 3,
+    "recommendedProjects": [
+      "ln-node-dashboard"
+    ],
+    "questions": [
+      {
+        "id": "ch-q1",
+        "prompt": "After a typical single-funded channel open, the funder usually starts with:",
+        "options": [
+          {
+            "id": "a",
+            "label": "Mostly outbound capacity"
+          },
+          {
+            "id": "b",
+            "label": "Mostly inbound capacity"
+          },
+          {
+            "id": "c",
+            "label": "Equal inbound and outbound automatically"
+          },
+          {
+            "id": "d",
+            "label": "No spendable balance until a payment arrives"
+          }
+        ],
+        "correctOptionId": "a",
+        "explanation": "The funder's coins sit on their side (outbound). Receiving requires inbound, which often needs a separate strategy."
+      },
+      {
+        "id": "ch-q2",
+        "prompt": "What does a revocation key protect against in commitment transactions?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Invoice expiry on the public graph"
+          },
+          {
+            "id": "b",
+            "label": "Publishing an old channel state after a newer one was agreed"
+          },
+          {
+            "id": "c",
+            "label": "Onion packet decryption by intermediaries"
+          },
+          {
+            "id": "d",
+            "label": "LNURL authentication replay"
+          }
+        ],
+        "correctOptionId": "b",
+        "explanation": "Revocation lets the honest party penalize a peer who broadcasts a stale commitment."
+      },
+      {
+        "id": "ch-q3",
+        "prompt": "What must a hop reveal to settle an HTLC forward?",
+        "options": [
+          {
+            "id": "a",
+            "label": "The payer's full route"
+          },
+          {
+            "id": "b",
+            "label": "The channel funding private key"
+          },
+          {
+            "id": "c",
+            "label": "The payment preimage matching the payment hash"
+          },
+          {
+            "id": "d",
+            "label": "The merchant's tax ID"
+          }
+        ],
+        "correctOptionId": "c",
+        "explanation": "HTLCs are hash-locked; the preimage unlocks the conditional payment atomically along the path."
+      },
+      {
+        "id": "ch-q4",
+        "prompt": "What is splicing used for?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Encrypting onion payloads"
+          },
+          {
+            "id": "b",
+            "label": "Replacing BOLT11 with offers"
+          },
+          {
+            "id": "c",
+            "label": "Bypassing timelocks on mainnet"
+          },
+          {
+            "id": "d",
+            "label": "Adding or removing capacity without closing the channel"
+          }
+        ],
+        "correctOptionId": "d",
+        "explanation": "Splicing adjusts on-chain funding while keeping the channel relationship active."
+      }
+    ]
+  },
+  {
+    "id": "lightning:routing-liquidity",
+    "sectionId": "routing-liquidity",
+    "title": "Routing & Liquidity Check",
+    "passingScore": 3,
+    "recommendedProjects": [
+      "custom-router"
+    ],
+    "questions": [
+      {
+        "id": "rl-q1",
+        "prompt": "In Lightning source-based routing, who typically constructs the payment path?",
+        "options": [
+          {
+            "id": "a",
+            "label": "The payer (or payer's wallet)"
+          },
+          {
+            "id": "b",
+            "label": "The payee before issuing an invoice"
+          },
+          {
+            "id": "c",
+            "label": "Each hop independently without coordination"
+          },
+          {
+            "id": "d",
+            "label": "Bitcoin miners at block template time"
+          }
+        ],
+        "correctOptionId": "a",
+        "explanation": "The sender chooses a path using graph data and hints, then onion-encrypts hop instructions."
+      },
+      {
+        "id": "rl-q2",
+        "prompt": "Why can a path fail even when total channel capacity looks sufficient?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Invoices always require on-chain confirmation"
+          },
+          {
+            "id": "b",
+            "label": "Liquidity may be on the wrong side of one or more hops"
+          },
+          {
+            "id": "c",
+            "label": "Onion routing exposes balances publicly"
+          },
+          {
+            "id": "d",
+            "label": "HTLCs do not use timelocks"
+          }
+        ],
+        "correctOptionId": "b",
+        "explanation": "Each forward edge needs outbound on that hop. Wrong-side balance is the common failure mode."
+      },
+      {
+        "id": "rl-q3",
+        "prompt": "What does onion routing primarily hide from intermediaries?",
+        "options": [
+          {
+            "id": "a",
+            "label": "The existence of fees"
+          },
+          {
+            "id": "b",
+            "label": "The fact that an HTLC is in flight"
+          },
+          {
+            "id": "c",
+            "label": "The full path and final payee identity beyond their hop"
+          },
+          {
+            "id": "d",
+            "label": "Channel capacity from the payer"
+          }
+        ],
+        "correctOptionId": "c",
+        "explanation": "Sphinx-style onions reveal only the next hop's instructions to each intermediary."
+      },
+      {
+        "id": "rl-q4",
+        "prompt": "What is a common production response to uncertain liquidity on the graph?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Publish exact balances in gossip for every channel"
+          },
+          {
+            "id": "b",
+            "label": "Disable multipath entirely"
+          },
+          {
+            "id": "c",
+            "label": "Force close all channels after each failure"
+          },
+          {
+            "id": "d",
+            "label": "Attempt, learn from failures, and retry with updated scores"
+          }
+        ],
+        "correctOptionId": "d",
+        "explanation": "Liquidity is not fully public; routers probe and update heuristics (e.g. mission control style)."
+      }
+    ]
+  },
+  {
+    "id": "lightning:implementation",
+    "sectionId": "implementation",
+    "title": "Implementation Check",
+    "passingScore": 3,
+    "recommendedProjects": [
+      "lightning-pos",
+      "ln-node-dashboard"
+    ],
+    "questions": [
+      {
+        "id": "impl-q1",
+        "prompt": "Which best describes LND vs LDK?",
+        "options": [
+          {
+            "id": "a",
+            "label": "LND is a full node daemon; LDK is an embeddable library"
+          },
+          {
+            "id": "b",
+            "label": "LDK only runs on mobile; LND only on servers"
+          },
+          {
+            "id": "c",
+            "label": "They are the same codebase with different names"
+          },
+          {
+            "id": "d",
+            "label": "LND cannot route payments"
+          }
+        ],
+        "correctOptionId": "a",
+        "explanation": "LND is commonly operated as a node service; LDK targets app-embedded Lightning."
+      },
+      {
+        "id": "impl-q2",
+        "prompt": "What is a typical way to extend Core Lightning (CLN)?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Editing the Bitcoin consensus rules"
+          },
+          {
+            "id": "b",
+            "label": "Plugins and hooks"
+          },
+          {
+            "id": "c",
+            "label": "Replacing BOLT3 with custom scripts"
+          },
+          {
+            "id": "d",
+            "label": "Disabling peer encryption"
+          }
+        ],
+        "correctOptionId": "b",
+        "explanation": "CLN's plugin architecture is a primary integration path for custom behavior."
+      },
+      {
+        "id": "impl-q3",
+        "prompt": "What problem do watchtowers address?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Finding the cheapest on-chain fee rate"
+          },
+          {
+            "id": "b",
+            "label": "Generating BOLT11 invoices"
+          },
+          {
+            "id": "c",
+            "label": "Detecting and responding to breach attempts while a wallet is offline"
+          },
+          {
+            "id": "d",
+            "label": "Scoring pathfinding edges"
+          }
+        ],
+        "correctOptionId": "c",
+        "explanation": "Watchtowers help offline users by monitoring for stale state broadcasts."
+      },
+      {
+        "id": "impl-q4",
+        "prompt": "Why do LND integrations often use macaroons?",
+        "options": [
+          {
+            "id": "a",
+            "label": "On-chain channel backups only"
+          },
+          {
+            "id": "b",
+            "label": "Invoice preimage generation"
+          },
+          {
+            "id": "c",
+            "label": "Replacing Noise transport"
+          },
+          {
+            "id": "d",
+            "label": "Scoped API credentials with delegated permissions"
+          }
+        ],
+        "correctOptionId": "d",
+        "explanation": "Macaroons let operators grant limited gRPC/REST access without sharing the admin key."
+      }
+    ]
+  },
+  {
+    "id": "lightning:projects",
+    "sectionId": "projects",
+    "title": "Projects Check",
+    "passingScore": 3,
+    "recommendedProjects": [
+      "lightning-pos",
+      "ln-node-dashboard",
+      "custom-router"
+    ],
+    "questions": [
+      {
+        "id": "proj-q1",
+        "prompt": "What makes a Pull project submission meaningful?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Public repo, working demo path, and evidence a reviewer can verify"
+          },
+          {
+            "id": "b",
+            "label": "A README only with no runnable code"
+          },
+          {
+            "id": "c",
+            "label": "Screenshots without linking a repository"
+          },
+          {
+            "id": "d",
+            "label": "Marking the lesson complete without building"
+          }
+        ],
+        "correctOptionId": "a",
+        "explanation": "Projects prove you can ship; reviewers need a repo and evidence on regtest or testnet."
+      },
+      {
+        "id": "proj-q2",
+        "prompt": "When should you build a personal tool vs contribute upstream?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Always contribute before writing any local code"
+          },
+          {
+            "id": "b",
+            "label": "Build to learn deeply; contribute when you have a scoped fix the maintainers want"
+          },
+          {
+            "id": "c",
+            "label": "Never contribute until all roadmaps are complete"
+          },
+          {
+            "id": "d",
+            "label": "Only build closed-source tools"
+          }
+        ],
+        "correctOptionId": "b",
+        "explanation": "Personal projects deepen understanding; OSS PRs need maintainer-aligned scope."
+      },
+      {
+        "id": "proj-q3",
+        "prompt": "Which environment is preferred for Lightning project demos on Pull?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Mainnet with real funds for every exercise"
+          },
+          {
+            "id": "b",
+            "label": "Mocked JSON with no node"
+          },
+          {
+            "id": "c",
+            "label": "Regtest or Polar over mainnet for learning"
+          },
+          {
+            "id": "d",
+            "label": "Production merchant traffic only"
+          }
+        ],
+        "correctOptionId": "c",
+        "explanation": "Local labs are safer and faster for iteration; document how to reproduce."
+      }
+    ]
+  },
+  {
+    "id": "lightning:contribution",
+    "sectionId": "contribution",
+    "title": "Contribution Check",
+    "passingScore": 3,
+    "questions": [
+      {
+        "id": "contrib-q1",
+        "prompt": "Before opening a Lightning PR, you should:",
+        "options": [
+          {
+            "id": "a",
+            "label": "Open a large refactor without discussion"
+          },
+          {
+            "id": "b",
+            "label": "Skip CI because Lightning is off-chain"
+          },
+          {
+            "id": "c",
+            "label": "Copy code without attribution"
+          },
+          {
+            "id": "d",
+            "label": "Read CONTRIBUTING, find an agreed issue, and run relevant tests"
+          }
+        ],
+        "correctOptionId": "d",
+        "explanation": "Maintainers expect scoped changes, tests, and alignment with project norms."
+      },
+      {
+        "id": "contrib-q2",
+        "prompt": "What is the purpose of the meaningful-PR rubric?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Self-check problem fit, scope, correctness, and communication before shipping"
+          },
+          {
+            "id": "b",
+            "label": "Replace all code review"
+          },
+          {
+            "id": "c",
+            "label": "Score quiz answers only"
+          },
+          {
+            "id": "d",
+            "label": "Guarantee automatic merge"
+          }
+        ],
+        "correctOptionId": "a",
+        "explanation": "The rubric helps you judge whether a PR is worth a maintainer's time."
+      },
+      {
+        "id": "contrib-q3",
+        "prompt": "Review Club PRs on Pull are meant to:",
+        "options": [
+          {
+            "id": "a",
+            "label": "Replace your own first PR"
+          },
+          {
+            "id": "b",
+            "label": "Practice reading real OSS changes tied to what you just learned"
+          },
+          {
+            "id": "c",
+            "label": "Auto-merge into lightning/bolts"
+          },
+          {
+            "id": "d",
+            "label": "Skip reading the diff"
+          }
+        ],
+        "correctOptionId": "b",
+        "explanation": "Reviewing curated PRs builds the same skills you need for your own contributions."
+      },
+      {
+        "id": "contrib-q4",
+        "prompt": "BOLT specification reviews should prioritize:",
+        "options": [
+          {
+            "id": "a",
+            "label": "Marketing copy only"
+          },
+          {
+            "id": "b",
+            "label": "Personal wallet branding"
+          },
+          {
+            "id": "c",
+            "label": "Interop, edge cases, rollout behavior, and test vectors"
+          },
+          {
+            "id": "d",
+            "label": "Deleting backward compatibility without notice"
+          }
+        ],
+        "correctOptionId": "c",
+        "explanation": "Spec review keeps the network coherent across implementations."
+      }
+    ]
+  }
+]

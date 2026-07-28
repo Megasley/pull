@@ -26,6 +26,28 @@ export type LessonLab = {
   evidence: string[];
 };
 
+export type LessonQuizOption = {
+  id: string;
+  label: string;
+};
+
+export type LessonQuizQuestion = {
+  id: string;
+  prompt: string;
+  options: LessonQuizOption[];
+  correctOptionId: string;
+  explanation: string;
+};
+
+export type LessonChapterQuiz = {
+  id: string;
+  sectionId: string;
+  title: string;
+  passingScore: number;
+  recommendedProjects?: string[];
+  questions: LessonQuizQuestion[];
+};
+
 export type LessonFrontmatter = {
   title: string;
   description: string;
@@ -41,6 +63,7 @@ export type LessonFrontmatter = {
   searchQueries?: string[];
   project?: string | null;
   challenge?: string;
+  recommendedProjects?: string[];
 };
 
 export type TocItem = {

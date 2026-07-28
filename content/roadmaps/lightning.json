@@ -18,15 +18,15 @@
     {
       "id": "channels-htlcs",
       "title": "Channels & HTLCs",
-      "description": "Open channels, commitments, HTLCs, lifecycle, and splicing.",
+      "description": "Open channels, inbound/outbound liquidity, commitments, HTLCs, lifecycle, and splicing.",
       "defaultExpanded": true,
       "position": { "x": 380, "y": 0 },
-      "size": { "width": 340, "height": 510 }
+      "size": { "width": 340, "height": 590 }
     },
     {
       "id": "routing-liquidity",
       "title": "Routing & Liquidity",
-      "description": "Onion routing, transport, pathfinding, liquidity, multipath, failures, and attacks.",
+      "description": "Liquidity ops, routing, onion, transport, pathfinding, multipath, failures, and attacks.",
       "defaultExpanded": true,
       "position": { "x": 760, "y": 0 },
       "size": { "width": 340, "height": 750 }
@@ -109,6 +109,7 @@
       "difficulty": "intermediate",
       "lockedUntil": ["ln-offers"],
       "resources": ["LNURL Specs", "Lightning Address", "Alby Docs"],
+      "chapterCheckpoint": true,
       "position": { "x": 24, "y": 400 }
     },
     {
@@ -123,15 +124,26 @@
       "position": { "x": 24, "y": 88 }
     },
     {
+      "id": "ln-channel-liquidity",
+      "sectionId": "channels-htlcs",
+      "title": "Channel Liquidity",
+      "description": "Inbound vs outbound balance and why funded channels can still fail to pay or receive.",
+      "duration": "4 days",
+      "difficulty": "intermediate",
+      "lockedUntil": ["ln-channels-open"],
+      "resources": ["Mastering Lightning Ch. 7", "Mastering Lightning Ch. 8", "Amboss"],
+      "position": { "x": 24, "y": 140 }
+    },
+    {
       "id": "ln-commitments",
       "sectionId": "channels-htlcs",
       "title": "Commitment Transactions",
       "description": "Revocation keys, to_local/to_remote outputs, and penalty security.",
       "duration": "6 days",
       "difficulty": "advanced",
-      "lockedUntil": ["ln-channels-open"],
+      "lockedUntil": ["ln-channel-liquidity"],
       "resources": ["Mastering Lightning Channels", "BOLT3", "Anchor Outputs"],
-      "position": { "x": 24, "y": 166 }
+      "position": { "x": 24, "y": 192 }
     },
     {
       "id": "ln-htlcs",
@@ -142,7 +154,7 @@
       "difficulty": "advanced",
       "lockedUntil": ["ln-commitments"],
       "resources": ["BOLT2 HTLC", "Mastering Lightning", "HTLC Debug"],
-      "position": { "x": 24, "y": 244 }
+      "position": { "x": 24, "y": 270 }
     },
     {
       "id": "ln-channels-lifecycle",
@@ -153,7 +165,7 @@
       "difficulty": "advanced",
       "lockedUntil": ["ln-htlcs"],
       "resources": ["Force Close Playbook", "Channel Backups", "Justice Tx"],
-      "position": { "x": 24, "y": 322 }
+      "position": { "x": 24, "y": 348 }
     },
     {
       "id": "ln-splicing",
@@ -164,18 +176,30 @@
       "difficulty": "advanced",
       "lockedUntil": ["ln-channels-lifecycle"],
       "resources": ["Dual Funding", "Splicing Spec", "CLN Splice"],
-      "position": { "x": 24, "y": 400 }
+      "chapterCheckpoint": true,
+      "position": { "x": 24, "y": 426 }
+    },
+    {
+      "id": "ln-liquidity",
+      "sectionId": "routing-liquidity",
+      "title": "Liquidity Operations",
+      "description": "Manage inbound/outbound balance with loops, swaps, rebalancing, and peer liquidity.",
+      "duration": "7 days",
+      "difficulty": "advanced",
+      "lockedUntil": ["ln-splicing"],
+      "resources": ["Liquidity Ads", "Loop", "Inbound Capacity"],
+      "position": { "x": 24, "y": 88 }
     },
     {
       "id": "ln-routing",
       "sectionId": "routing-liquidity",
       "title": "Routing",
-      "description": "Select routes using fee budgets, channel hints, and reliability scores.",
+      "description": "Liquidity-aware path selection using fee budgets, channel hints, and reliability scores.",
       "duration": "6 days",
       "difficulty": "advanced",
-      "lockedUntil": ["ln-splicing"],
+      "lockedUntil": ["ln-liquidity"],
       "resources": ["Mastering Lightning Routing", "Mission Control", "Amboss"],
-      "position": { "x": 24, "y": 88 }
+      "position": { "x": 24, "y": 166 }
     },
     {
       "id": "ln-onion",
@@ -186,7 +210,7 @@
       "difficulty": "advanced",
       "lockedUntil": ["ln-routing"],
       "resources": ["Mastering Lightning Onion", "BOLT4", "Sphinx"],
-      "position": { "x": 24, "y": 166 }
+      "position": { "x": 24, "y": 244 }
     },
     {
       "id": "ln-transport",
@@ -197,7 +221,7 @@
       "difficulty": "advanced",
       "lockedUntil": ["ln-onion"],
       "resources": ["Noise Protocol", "Noise XK", "BOLT8"],
-      "position": { "x": 24, "y": 244 }
+      "position": { "x": 24, "y": 322 }
     },
     {
       "id": "ln-pathfinding",
@@ -208,17 +232,6 @@
       "difficulty": "advanced",
       "lockedUntil": ["ln-transport"],
       "resources": ["Mastering Lightning Pathfinding", "Dijkstra LN", "Graph Analysis"],
-      "position": { "x": 24, "y": 322 }
-    },
-    {
-      "id": "ln-liquidity",
-      "sectionId": "routing-liquidity",
-      "title": "Liquidity",
-      "description": "Balance inbound/outbound liquidity with loops, swaps, and peer management.",
-      "duration": "7 days",
-      "difficulty": "advanced",
-      "lockedUntil": ["ln-pathfinding"],
-      "resources": ["Liquidity Ads", "Loop", "Inbound Capacity"],
       "position": { "x": 24, "y": 400 }
     },
     {
@@ -228,7 +241,7 @@
       "description": "Split large payments across multiple paths for reliability and size.",
       "duration": "4 days",
       "difficulty": "advanced",
-      "lockedUntil": ["ln-liquidity"],
+      "lockedUntil": ["ln-pathfinding"],
       "resources": ["MPP / AMP", "BOLT Payments", "LND MPP"],
       "position": { "x": 24, "y": 478 }
     },
@@ -252,6 +265,7 @@
       "difficulty": "advanced",
       "lockedUntil": ["ln-routing-failures"],
       "resources": ["Congestion discussions", "Channel probing paper", "CVE disclosures"],
+      "chapterCheckpoint": true,
       "position": { "x": 24, "y": 634 }
     },
     {
@@ -296,6 +310,7 @@
       "difficulty": "advanced",
       "lockedUntil": ["ln-ldk"],
       "resources": ["Watchtower Protocol", "LND Watchtower", "Mastering Lightning Security"],
+      "chapterCheckpoint": true,
       "position": { "x": 24, "y": 322 }
     },
     {
@@ -332,6 +347,7 @@
       "project": "custom-router",
       "lockedUntil": ["ln-project-dashboard"],
       "resources": ["Project Spec: Router", "Graph Analysis", "Benchmarks"],
+      "chapterCheckpoint": true,
       "position": { "x": 24, "y": 244 }
     },
     {
@@ -346,15 +362,26 @@
       "position": { "x": 24, "y": 88 }
     },
     {
+      "id": "ln-contrib-code-review",
+      "sectionId": "contribution",
+      "title": "Code Review Practice",
+      "description": "Review peer pull requests on Lightning implementations and learn maintainer expectations.",
+      "duration": "5 days",
+      "difficulty": "intermediate",
+      "lockedUntil": ["ln-contrib-discovery"],
+      "resources": ["LND CONTRIBUTING", "Conventional Comments", "Bitcoin Optech"],
+      "position": { "x": 24, "y": 140 }
+    },
+    {
       "id": "ln-contrib-rubric",
       "sectionId": "contribution",
       "title": "Contribution Rubric",
       "description": "Score Lightning contribution attempts against an explicit meaningful-PR bar.",
       "duration": "3 days",
       "difficulty": "intermediate",
-      "lockedUntil": ["ln-contrib-discovery"],
+      "lockedUntil": ["ln-contrib-code-review"],
       "resources": ["LND Guidelines", "CLN Repo", "Conventional Comments"],
-      "position": { "x": 24, "y": 166 }
+      "position": { "x": 24, "y": 208 }
     },
     {
       "id": "ln-contrib-pr",
@@ -365,7 +392,7 @@
       "difficulty": "advanced",
       "lockedUntil": ["ln-contrib-rubric"],
       "resources": ["PR Checklist", "Integration Tests", "Release Notes"],
-      "position": { "x": 24, "y": 244 }
+      "position": { "x": 24, "y": 286 }
     },
     {
       "id": "ln-contrib-review",
@@ -376,7 +403,8 @@
       "difficulty": "advanced",
       "lockedUntil": ["ln-contrib-pr"],
       "resources": ["BOLT Process", "Spec Review", "Mailing List"],
-      "position": { "x": 24, "y": 322 }
+      "chapterCheckpoint": true,
+      "position": { "x": 24, "y": 364 }
     }
   ],
   "edges": [
@@ -385,28 +413,30 @@
     { "id": "le03", "source": "ln-invoices", "target": "ln-offers" },
     { "id": "le04", "source": "ln-offers", "target": "ln-lnurl" },
     { "id": "le05", "source": "ln-lnurl", "target": "ln-channels-open" },
-    { "id": "le06", "source": "ln-channels-open", "target": "ln-commitments" },
-    { "id": "le07", "source": "ln-commitments", "target": "ln-htlcs" },
-    { "id": "le08", "source": "ln-htlcs", "target": "ln-channels-lifecycle" },
-    { "id": "le09", "source": "ln-channels-lifecycle", "target": "ln-splicing" },
-    { "id": "le10", "source": "ln-splicing", "target": "ln-routing" },
-    { "id": "le11", "source": "ln-routing", "target": "ln-onion" },
-    { "id": "le12", "source": "ln-onion", "target": "ln-transport" },
-    { "id": "le13", "source": "ln-transport", "target": "ln-pathfinding" },
-    { "id": "le14", "source": "ln-pathfinding", "target": "ln-liquidity" },
-    { "id": "le15", "source": "ln-liquidity", "target": "ln-mpp" },
-    { "id": "le16", "source": "ln-mpp", "target": "ln-routing-failures" },
-    { "id": "le17", "source": "ln-routing-failures", "target": "ln-attacks" },
-    { "id": "le18", "source": "ln-attacks", "target": "ln-lnd" },
-    { "id": "le19", "source": "ln-lnd", "target": "ln-cln" },
-    { "id": "le20", "source": "ln-cln", "target": "ln-ldk" },
-    { "id": "le21", "source": "ln-ldk", "target": "ln-watchtowers" },
-    { "id": "le22", "source": "ln-watchtowers", "target": "ln-project-pos" },
-    { "id": "le23", "source": "ln-project-pos", "target": "ln-project-dashboard" },
-    { "id": "le24", "source": "ln-project-dashboard", "target": "ln-project-router" },
-    { "id": "le25", "source": "ln-project-router", "target": "ln-contrib-discovery" },
-    { "id": "le26", "source": "ln-contrib-discovery", "target": "ln-contrib-rubric" },
-    { "id": "le27", "source": "ln-contrib-rubric", "target": "ln-contrib-pr" },
-    { "id": "le28", "source": "ln-contrib-pr", "target": "ln-contrib-review" }
+    { "id": "le06", "source": "ln-channels-open", "target": "ln-channel-liquidity" },
+    { "id": "le07", "source": "ln-channel-liquidity", "target": "ln-commitments" },
+    { "id": "le08", "source": "ln-commitments", "target": "ln-htlcs" },
+    { "id": "le09", "source": "ln-htlcs", "target": "ln-channels-lifecycle" },
+    { "id": "le10", "source": "ln-channels-lifecycle", "target": "ln-splicing" },
+    { "id": "le11", "source": "ln-splicing", "target": "ln-liquidity" },
+    { "id": "le12", "source": "ln-liquidity", "target": "ln-routing" },
+    { "id": "le13", "source": "ln-routing", "target": "ln-onion" },
+    { "id": "le14", "source": "ln-onion", "target": "ln-transport" },
+    { "id": "le15", "source": "ln-transport", "target": "ln-pathfinding" },
+    { "id": "le16", "source": "ln-pathfinding", "target": "ln-mpp" },
+    { "id": "le17", "source": "ln-mpp", "target": "ln-routing-failures" },
+    { "id": "le18", "source": "ln-routing-failures", "target": "ln-attacks" },
+    { "id": "le19", "source": "ln-attacks", "target": "ln-lnd" },
+    { "id": "le20", "source": "ln-lnd", "target": "ln-cln" },
+    { "id": "le21", "source": "ln-cln", "target": "ln-ldk" },
+    { "id": "le22", "source": "ln-ldk", "target": "ln-watchtowers" },
+    { "id": "le23", "source": "ln-watchtowers", "target": "ln-project-pos" },
+    { "id": "le24", "source": "ln-project-pos", "target": "ln-project-dashboard" },
+    { "id": "le25", "source": "ln-project-dashboard", "target": "ln-project-router" },
+    { "id": "le26", "source": "ln-project-router", "target": "ln-contrib-discovery" },
+    { "id": "le27", "source": "ln-contrib-discovery", "target": "ln-contrib-code-review" },
+    { "id": "le28", "source": "ln-contrib-code-review", "target": "ln-contrib-rubric" },
+    { "id": "le29", "source": "ln-contrib-rubric", "target": "ln-contrib-pr" },
+    { "id": "le30", "source": "ln-contrib-pr", "target": "ln-contrib-review" }
   ]
 }
