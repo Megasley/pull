@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Logo } from "@/components/brand/logo";
+import { SiteContainer } from "@/components/layout/site-container";
 import { footerNav, socialLinks, type SocialIconName } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
 
@@ -27,7 +28,7 @@ function SocialIcon({ name }: { name: SocialIconName }) {
 export function Footer({ className }: FooterProps) {
   return (
     <footer className={cn("relative border-t border-border bg-background", className)}>
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 py-12 sm:px-6 lg:px-8">
+      <SiteContainer className="flex flex-col gap-10 py-12">
         <div className="grid gap-10 md:grid-cols-[1.4fr_2fr]">
           <div className="space-y-4">
             <Logo />
@@ -102,7 +103,7 @@ export function Footer({ className }: FooterProps) {
             </Link>
           </div>
         </div>
-      </div>
+      </SiteContainer>
     </footer>
   );
 }

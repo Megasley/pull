@@ -319,3 +319,33 @@ export async function listRecentUserSubmissions(
     }),
   );
 }
+
+/** Latest submission status per project slug for a user (for project library cards). */
+export async function listUserSubmissionStatusByProjectSlug(
+  userId: string,
+): Promise<Record<string, SubmissionStatus>> {
+  if (!isDatabaseConfigured()) {
+    return {};
+  }
+
+  const db = getDb();
+  const rows = await db
+    .select({
+      slug: projects.slug,
+      status: projectSubmissions.status,
+      updatedAt: projectSubmissions.updatedAt,
+    })
+    .from(projectSubmissions)
+    .innerJoin(projects, eq(projectSubmissions.projectId, projects.id))
+    .where(eq(projectSubmissions.userId, userId))
+    .orderBy(desc(projectSubmissions.updatedAt));
+
+  const result: Record<string, SubmissionStatus> = {};
+  for (const row of rows) {
+    if (!result[row.slug]) {
+      result[row.slug] = row.status;
+    }
+  }
+
+  return result;
+}

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { PageHeader } from "@/components/design-system";
+import { SiteContainer } from "@/components/layout/site-container";
 import { ContributionDiscovery } from "@/components/discovery/contribution-discovery";
 import { Button } from "@/components/ui/button";
 import { bootstrapCurrentUserProfile } from "@/lib/auth/session";
@@ -35,7 +36,7 @@ export default async function DiscoverPage() {
   ].filter(Boolean);
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 pt-12 pb-16 sm:px-6 lg:px-8">
+    <SiteContainer className="pt-12 pb-16">
       <PageHeader
         eyebrow="contribute // discover"
         title="Contribution discovery"
@@ -62,6 +63,6 @@ export default async function DiscoverPage() {
           recommendations={recommendations}
         />
       </div>
-    </div>
+    </SiteContainer>
   );
 }

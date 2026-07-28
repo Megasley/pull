@@ -75,6 +75,8 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
             >
               ./retry
             </button>
+            {/* Root layout may be broken; plain <a> is required for a hard navigation. */}
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
             <a
               href="/"
               style={{

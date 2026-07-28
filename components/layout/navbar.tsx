@@ -2,6 +2,7 @@ import { Logo } from "@/components/brand/logo";
 import { AuthControls } from "@/components/layout/auth-controls";
 import { MainNav } from "@/components/layout/main-nav";
 import { MobileNav } from "@/components/layout/mobile-nav";
+import { SiteContainer } from "@/components/layout/site-container";
 import { getCurrentSessionContext } from "@/lib/auth/session";
 import { cn } from "@/lib/utils";
 
@@ -28,7 +29,7 @@ export async function Navbar({ className }: NavbarProps) {
         className,
       )}
     >
-      <div className="relative mx-auto flex h-14 w-full max-w-6xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+      <SiteContainer className="relative flex h-14 items-center justify-between gap-4">
         <Logo />
 
         <MainNav />
@@ -42,7 +43,7 @@ export async function Navbar({ className }: NavbarProps) {
             profile={profile}
           />
         </div>
-      </div>
+      </SiteContainer>
     </header>
   );
 }

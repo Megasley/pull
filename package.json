@@ -16,6 +16,8 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:validate": "npx tsx scripts/validate-schema.ts",
+    "db:seed:demo": "npx tsx scripts/seed-demo-profile.ts",
+    "marketing:capture-profile": "bash scripts/capture-demo-profile-screenshot.sh",
     "docs:pdf": "npx tsx scripts/export-technical-overview-pdf.ts"
   },
   "dependencies": {

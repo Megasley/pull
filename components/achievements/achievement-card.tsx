@@ -1,24 +1,55 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
 import { ACHIEVEMENT_CATEGORY_LABELS } from "@/lib/achievements/definitions";
 import { cn } from "@/lib/utils";
 import type { AchievementItem } from "@/types/dashboard";
 import type { AchievementCategory } from "@/types/achievement";
+import { Badge } from "@/components/ui/badge";
 
 type AchievementCardProps = {
   achievement: AchievementItem;
   index?: number;
   className?: string;
+  variant?: "default" | "profile";
 };
 
 export function AchievementCard({
   achievement,
   index = 0,
   className,
+  variant = "default",
 }: AchievementCardProps) {
   const category = achievement.category as AchievementCategory | undefined;
   const celebrate = achievement.earned && achievement.recentlyUnlocked;
+  const isProfile = variant === "profile";
+
+  if (isProfile && achievement.earned) {
+    return (
+      <li className={cn("profile-ach-card", className)}>
+        <div className="profile-ach-icon" aria-hidden>
+          {achievement.icon}
+        </div>
+        <div className="min-w-0">
+          <p className="text-sm font-bold text-ink">
+            {achievement.title}
+            <span className="profile-ach-unlock">Unlocked</span>
+          </p>
+          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+            {achievement.description}
+          </p>
+          <p className="mt-1.5 font-mono text-[10.5px] text-ink/80">
+            {category ? `${ACHIEVEMENT_CATEGORY_LABELS[category]} ` : ""}
+            {typeof achievement.xpReward === "number" && achievement.xpReward > 0
+              ? `+${achievement.xpReward} XP`
+              : ""}
+            {achievement.earnedAt
+              ? ` · ${new Intl.DateTimeFormat("en", { dateStyle: "medium" }).format(new Date(achievement.earnedAt))}`
+              : ""}
+          </p>
+        </div>
+      </li>
+    );
+  }
 
   return (
     <li

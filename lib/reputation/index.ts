@@ -11,3 +11,7 @@ export {
   REPUTATION_TARGETS,
   REPUTATION_MONTHS,
 } from "./weights";
+export {
+  buildPublicReputationSummary,
+  withPublicReputationCopy,
+} from "./public-summary";

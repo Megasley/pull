@@ -1,6 +1,10 @@
 import { PageHeader } from "@/components/design-system";
+import { SiteContainer } from "@/components/layout/site-container";
 import { ProjectLibrary } from "@/components/projects/project-library";
+import { bootstrapCurrentUserProfile } from "@/lib/auth/session";
+import { isDatabaseConfigured } from "@/lib/db/env";
 import { getAllProjects } from "@/lib/projects/catalog";
+import { listUserSubmissionStatusByProjectSlug } from "@/lib/submissions/repository";
 
 export const metadata = {
   title: "Projects",
@@ -8,14 +12,20 @@ export const metadata = {
     "Hands-on Bitcoin and Lightning builds from beginner labs to advanced protocol tooling.",
 };
 
-export default function ProjectsPage() {
+export default async function ProjectsPage() {
   const projects = getAllProjects();
   const beginner = projects.filter((p) => p.difficulty === "beginner").length;
   const intermediate = projects.filter((p) => p.difficulty === "intermediate").length;
   const advanced = projects.filter((p) => p.difficulty === "advanced").length;
 
+  const profile = await bootstrapCurrentUserProfile();
+  const submissionStatusBySlug =
+    profile && isDatabaseConfigured()
+      ? await listUserSubmissionStatusByProjectSlug(profile.id)
+      : {};
+
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 pt-12 pb-16 sm:px-6 lg:px-8">
+    <SiteContainer className="pt-12 pb-16">
       <PageHeader
         eyebrow="catalog // projects"
         title="Project library"
@@ -24,8 +34,11 @@ export default function ProjectsPage() {
       />
 
       <div className="mt-10">
-        <ProjectLibrary projects={projects} />
+        <ProjectLibrary
+          projects={projects}
+          submissionStatusBySlug={submissionStatusBySlug}
+        />
       </div>
-    </div>
+    </SiteContainer>
   );
 }

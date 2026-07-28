@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { X } from "lucide-react";
 
 import {
@@ -40,16 +40,22 @@ export function AchievementUnlockToast({
     [achievements],
   );
 
+  const [seen, setSeen] = useState<string[]>(() => readSeen());
   const [queue, setQueue] = useState<AchievementItem[]>([]);
+  const [queuedKey, setQueuedKey] = useState("");
 
-  useEffect(() => {
-    const seen = new Set(readSeen());
-    const fresh = recent.filter((item) => !seen.has(item.id));
-    if (fresh.length === 0) return;
+  const seenSet = useMemo(() => new Set(seen), [seen]);
+  const fresh = recent.filter((item) => !seenSet.has(item.id));
+  const freshKey = fresh.map((item) => item.id).join("\0");
 
-    writeSeen([...seen, ...fresh.map((item) => item.id)]);
+  // Enqueue newly unlocked achievements during render (React-approved pattern).
+  if (fresh.length > 0 && freshKey !== queuedKey) {
+    const nextSeen = [...seen, ...fresh.map((item) => item.id)];
+    writeSeen(nextSeen);
+    setSeen(nextSeen);
+    setQueuedKey(freshKey);
     setQueue(fresh);
-  }, [recent]);
+  }
 
   const current = queue[0];
 

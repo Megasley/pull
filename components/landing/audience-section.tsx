@@ -1,4 +1,5 @@
 import { Reveal, RevealStagger } from "@/components/landing/reveal";
+import { SiteContainer } from "@/components/layout/site-container";
 
 const AUDIENCES = [
   {
@@ -33,7 +34,7 @@ export function AudienceSection() {
       aria-labelledby="audience-heading"
       className="border-b border-border bg-muted/20"
     >
-      <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+      <SiteContainer className="py-16 sm:py-20">
         <Reveal variant="clip">
           <p className="tech-eyebrow">users // who pull is for</p>
         </Reveal>
@@ -69,7 +70,7 @@ export function AudienceSection() {
             </div>
           ))}
         </RevealStagger>
-      </div>
+      </SiteContainer>
     </section>
   );
 }

@@ -108,12 +108,23 @@ async function listRoadmapCompletions(userId: string): Promise<TimelineEvent[]> 
 
 export async function loadContributionTimeline(
   userId: string,
+  preload?: {
+    pullRequests?: Awaited<ReturnType<typeof listGithubPullRequests>>;
+    commits?: Awaited<ReturnType<typeof listGithubCommits>>;
+    issues?: Awaited<ReturnType<typeof listGithubIssues>>;
+  },
 ): Promise<ContributionTimelineData> {
   const [commits, pullRequests, issues, reviews, submissions, roadmaps] =
     await Promise.all([
-      listGithubCommits(userId, 100),
-      listGithubPullRequests(userId, 100),
-      listGithubIssues(userId, 100),
+      preload?.commits
+        ? Promise.resolve(preload.commits)
+        : listGithubCommits(userId, 100),
+      preload?.pullRequests
+        ? Promise.resolve(preload.pullRequests)
+        : listGithubPullRequests(userId, 100),
+      preload?.issues
+        ? Promise.resolve(preload.issues)
+        : listGithubIssues(userId, 100),
       listReviewEventsForUser(userId),
       listRecentUserSubmissions(userId, 50),
       listRoadmapCompletions(userId),

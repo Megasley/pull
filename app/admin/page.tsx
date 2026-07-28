@@ -13,6 +13,8 @@ import { withTimeout } from "@/lib/async/with-timeout";
 import { isAdminRole } from "@/lib/auth/roles";
 import { bootstrapCurrentUserProfile } from "@/lib/auth/session";
 import { isDatabaseConfigured } from "@/lib/db/env";
+import { listReviewQueue } from "@/lib/reviews/repository";
+import { SUBMISSION_STATUS_LABELS } from "@/types/submission";
 
 export const metadata = {
   title: "Admin",
@@ -81,6 +83,8 @@ export default async function AdminOverviewPage() {
     "admin.overview",
   );
 
+  const openQueue = await listReviewQueue(profile.id);
+
   const userTotal =
     roleCounts.builder + roleCounts.reviewer + roleCounts.admin;
 
@@ -144,10 +148,40 @@ export default async function AdminOverviewPage() {
           <div className="mt-4">
             <EmptyState
               title="Queue is clear"
-              description="No open submissions need attention."
+              description="No open submissions (submitted, in review, or needs changes). Drafts are not counted — builders must click Submit for review."
             />
           </div>
-        ) : null}
+        ) : (
+          <div className="mt-6 space-y-3">
+            <h3 className="text-sm font-semibold tracking-tight">
+              Open submissions
+            </h3>
+            {openQueue.map((item) => (
+              <div
+                key={item.id}
+                className="flex flex-col gap-3 rounded-none border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div className="space-y-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="font-medium">{item.projectTitle}</p>
+                    <Badge variant="secondary">
+                      {SUBMISSION_STATUS_LABELS[item.status]}
+                    </Badge>
+                  </div>
+                  <p className="font-mono text-[11px] text-muted-foreground">
+                    {item.builderDisplayName ?? item.builderUsername ?? "Builder"}
+                    {item.submittedAt
+                      ? ` · submitted ${new Date(item.submittedAt).toLocaleString()}`
+                      : ""}
+                  </p>
+                </div>
+                <Button asChild size="sm">
+                  <Link href={`/review/${item.id}`}>./review</Link>
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       <section className="mt-12">

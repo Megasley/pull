@@ -13,6 +13,7 @@ import { LessonResourcesPanel } from "@/components/content/lesson-resources-pane
 import { LessonStudyHabits } from "@/components/content/lesson-study-habits";
 import { LessonStudyPlan } from "@/components/content/lesson-study-plan";
 import { StickyTableOfContents } from "@/components/content/sticky-table-of-contents";
+import { SiteContainer } from "@/components/layout/site-container";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAuthSession } from "@/hooks/use-auth-session";
@@ -113,7 +114,7 @@ export function LessonExperience({
         canToggleComplete={isAuthenticated}
       />
 
-      <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+      <SiteContainer className="py-10">
         <header className="mb-10 max-w-3xl border-b border-border pb-8">
           <p className="tech-eyebrow">
             <Link
@@ -252,7 +253,7 @@ export function LessonExperience({
             </div>
           </aside>
         </div>
-      </div>
+      </SiteContainer>
     </>
   );
 }

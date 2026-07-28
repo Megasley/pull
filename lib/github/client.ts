@@ -72,7 +72,6 @@ export class GithubClient {
       const reset = Number(response.headers.get("x-ratelimit-reset"));
 
       if (response.status === 403 || response.status === 429) {
-        const retryAfter = Number(response.headers.get("retry-after"));
         throw new GithubApiError(
           `GitHub rate limit or forbidden (${response.status})`,
           {

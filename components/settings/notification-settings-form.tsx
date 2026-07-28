@@ -115,7 +115,7 @@ export function NotificationSettingsForm({
         </p>
       ) : null}
 
-      <Button type="submit" loading={pending} className="rounded-none">
+      <Button type="submit" loading={pending}>
         {pending ? "Saving…" : "Save preferences"}
       </Button>
     </form>

@@ -2,7 +2,6 @@ import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 
 import { AchievementCard } from "@/components/achievements/achievement-card";
-import { Muted } from "@/components/design-system";
 import {
   ContributionStatsGrid,
   FeaturedProjectsSection,
@@ -14,13 +13,23 @@ import {
   SocialChip,
   WebsiteChip,
 } from "@/components/profile/portfolio-sections";
+import { ProfileEmptyState } from "@/components/profile/profile-empty-state";
 import { ShareProfileButton } from "@/components/profile/share-profile-button";
+import { SiteContainer } from "@/components/layout/site-container";
 import { BuilderScorePanel } from "@/components/score/builder-score-panel";
 import { ReputationPanel } from "@/components/reputation/reputation-panel";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  buildPublicReputationSummary,
+  withPublicReputationCopy,
+} from "@/lib/reputation";
+import {
+  buildPublicBuilderScoreSummary,
+  withPublicBuilderScoreCopy,
+} from "@/lib/score";
 import { siteConfig } from "@/lib/site-config";
+import { cn } from "@/lib/utils";
 import type { PublicBuilderProfileData } from "@/types/profile";
 
 type PublicBuilderProfileProps = {
@@ -54,57 +63,85 @@ export function PublicBuilderProfile({ data }: PublicBuilderProfileProps) {
 
   const profileUrl = `${siteConfig.url}/u/${profile.username}`;
   const githubUrl = `https://github.com/${profile.githubUsername}`;
+  const publicBuilderScore = withPublicBuilderScoreCopy(builderScore);
+  const publicReputation = withPublicReputationCopy(reputation);
+  const publicBuilderSummary = buildPublicBuilderScoreSummary(publicBuilderScore);
+  const publicReputationSummary = buildPublicReputationSummary(publicReputation);
 
   return (
-    <div>
-      <div className="mx-auto w-full max-w-5xl px-4 pt-12 pb-20 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-6 border-b border-border pb-8 lg:flex-row lg:items-end lg:justify-between">
+    <div className="profile-page">
+      <SiteContainer className="pb-20">
+        <header className="profile-header">
           <div className="flex min-w-0 flex-col gap-5 sm:flex-row sm:items-start">
-            <Avatar className="size-20 rounded-none border border-border sm:size-24">
+            <Avatar className="profile-avatar rounded-full">
               {profile.avatar ? (
                 <AvatarImage src={profile.avatar} alt={profile.displayName} />
               ) : null}
-              <AvatarFallback className="rounded-none font-mono text-lg">
+              <AvatarFallback className="rounded-full bg-signal/30 font-mono text-lg text-ink">
                 {initials}
               </AvatarFallback>
             </Avatar>
 
-            <div className="min-w-0">
-              <p className="tech-eyebrow">builder // @{profile.username}</p>
-              <h1 className="mt-3 text-[clamp(2rem,5vw,3.25rem)] leading-[1.08] font-bold tracking-[-0.04em]">
-                {profile.displayName}
-              </h1>
-              <p className="mt-1 font-mono text-xs text-muted-foreground">
-                @{profile.username}
+            <div className="min-w-0 flex-1">
+              <p className="profile-eyebrow">
+                Builder // @{profile.username}
               </p>
-              <p className="mt-3 max-w-2xl font-mono text-sm leading-relaxed text-muted-foreground">
+              <h1 className="profile-name">{profile.displayName}</h1>
+              <p className="profile-handle">@{profile.username}</p>
+              <p className="profile-tagline mt-2">
                 {profile.bio.trim() ||
                   "Open source builder on Pull - learning, shipping, and contributing."}
               </p>
 
               <div className="mt-4 flex flex-wrap gap-2">
-                <Badge variant="secondary">
-                  Builder Score {builderScore.score}
-                </Badge>
-                <Badge variant="secondary">
-                  OSS Reputation {reputation.score}
-                </Badge>
-                <Badge variant="outline" className="font-mono text-[11px]">
+                <span className="profile-badge profile-badge-accent">
+                  Builder score {builderScore.score}
+                </span>
+                <span className="profile-badge profile-badge-accent">
+                  OSS reputation {reputation.score}
+                </span>
+                <span className="profile-badge profile-badge-level">
                   Level {level.level}
-                </Badge>
-                <Badge variant="outline" className="font-mono text-[11px]">
-                  {level.xp} XP
-                </Badge>
+                </span>
+                <span className="profile-badge">{level.xp} XP</span>
                 {stats.mergedPullRequests > 0 ? (
-                  <Badge variant="outline" className="font-mono text-[11px]">
+                  <span className="profile-badge">
                     {stats.mergedPullRequests} merged PRs
-                  </Badge>
+                  </span>
+                ) : null}
+              </div>
+
+              <div className="mt-4 flex flex-wrap gap-4">
+                <SocialChip
+                  href={githubUrl}
+                  label={`@${profile.githubUsername}`}
+                  icon={<ExternalLink className="size-3.5" />}
+                  profile
+                />
+                {profile.website ? (
+                  <WebsiteChip href={profile.website} profile />
+                ) : null}
+                {profile.twitterUrl ? (
+                  <SocialChip
+                    href={profile.twitterUrl}
+                    label="X / Twitter"
+                    icon={<ExternalLink className="size-3.5" />}
+                    profile
+                  />
+                ) : null}
+                {profile.linkedinUrl ? (
+                  <SocialChip
+                    href={profile.linkedinUrl}
+                    label="LinkedIn"
+                    icon={<ExternalLink className="size-3.5" />}
+                    profile
+                  />
                 ) : null}
               </div>
             </div>
           </div>
 
-          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
+          <div className="profile-actions">
             {isOwner ? (
               <Button asChild variant="outline" className="w-full sm:w-auto">
                 <Link href="/settings/profile">Edit portfolio</Link>
@@ -113,124 +150,132 @@ export function PublicBuilderProfile({ data }: PublicBuilderProfileProps) {
             <Button asChild variant="outline" className="w-full sm:w-auto">
               <Link href={`/u/${profile.username}/portfolio`}>PR portfolio</Link>
             </Button>
-            <div className="w-full sm:w-auto [&_button]:w-full sm:[&_button]:w-auto">
-              <ShareProfileButton url={profileUrl} />
-            </div>
+            <ShareProfileButton
+              url={profileUrl}
+              label="Copy share link"
+              className="w-full sm:w-auto"
+            />
             <Button asChild className="w-full sm:w-auto">
-              <a href={githubUrl} target="_blank" rel="noopener noreferrer">
+              <a
+                href={githubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 GitHub
-                <ExternalLink aria-hidden />
+                <ExternalLink className="size-3.5" aria-hidden />
               </a>
             </Button>
           </div>
-        </div>
+        </header>
 
-        <div className="mt-6 flex flex-wrap gap-3 text-sm">
-          <SocialChip
-            href={githubUrl}
-            label={`@${profile.githubUsername}`}
-            icon={<ExternalLink className="size-3.5" />}
-          />
-          {profile.website ? <WebsiteChip href={profile.website} /> : null}
-          {profile.twitterUrl ? (
-            <SocialChip
-              href={profile.twitterUrl}
-              label="X / Twitter"
-              icon={<ExternalLink className="size-3.5" />}
+        <ContributionStatsGrid stats={stats} profile />
+
+        <div className="profile-section">
+          <div className="grid gap-5 lg:grid-cols-2">
+            <BuilderScorePanel
+              score={publicBuilderScore}
+              compact
+              variant="profile"
+              summaryText={publicBuilderSummary}
             />
-          ) : null}
-          {profile.linkedinUrl ? (
-            <SocialChip
-              href={profile.linkedinUrl}
-              label="LinkedIn"
-              icon={<ExternalLink className="size-3.5" />}
+            <ReputationPanel
+              reputation={publicReputation}
+              compact
+              variant="profile"
+              summaryText={publicReputationSummary}
             />
-          ) : null}
-        </div>
-
-        <div className="mt-10 space-y-12">
-          <ContributionStatsGrid stats={stats} />
-
-          <div className="grid gap-10 lg:grid-cols-2">
-            <BuilderScorePanel score={builderScore} />
-            <ReputationPanel reputation={reputation} compact />
           </div>
+        </div>
 
-          <SkillsTechnologiesSection
-            skills={skills}
-            technologies={technologies}
-          />
+        <SkillsTechnologiesSection
+          skills={skills}
+          technologies={technologies}
+          profile
+        />
 
-          <FeaturedRepositoriesSection repositories={featuredRepositories} />
+        <FeaturedRepositoriesSection
+          repositories={featuredRepositories}
+          profile
+        />
 
-          <FeaturedProjectsSection projects={featuredProjects} />
+        <MergedPrHighlightsSection
+          items={mergedPrHighlights}
+          username={profile.username}
+          profile
+        />
 
-          <MergedPrHighlightsSection
-            items={mergedPrHighlights}
-            username={profile.username}
-          />
+        <PublicTimelineSection events={timeline} profile />
 
-          <PublicTimelineSection events={timeline} />
-
-          <PortfolioSection title="Roadmaps">
-            {roadmaps.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                No roadmap progress yet.
-              </p>
-            ) : (
-              <ul className="grid gap-3 md:grid-cols-2">
-                {roadmaps.map((roadmap) => (
-                  <li
-                    key={roadmap.roadmapSlug}
-                    className="rounded-none border border-border bg-card p-4"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="font-medium">{roadmap.title}</p>
-                        <p className="mt-1 text-xs text-muted-foreground">
-                          {roadmap.completed}/{roadmap.total} lessons
-                        </p>
-                      </div>
-                      <Badge variant="outline" className="font-mono text-[11px]">
-                        {roadmap.percentage}%
-                      </Badge>
-                    </div>
-                    <div className="mt-3 h-1.5 overflow-hidden rounded-none bg-muted/60">
-                      <div
-                        className="h-full rounded-none bg-foreground"
-                        style={{ width: `${roadmap.percentage}%` }}
-                      />
-                    </div>
-                    <Button asChild variant="ghost" size="sm" className="mt-3 -ml-2">
+        <PortfolioSection title="Roadmaps" profile>
+          {roadmaps.length === 0 ? (
+            <ProfileEmptyState
+              title="No roadmap progress yet"
+              description="Complete lessons on a roadmap to show progress here."
+              ctaLabel="Browse roadmaps →"
+              ctaHref="/roadmaps"
+            />
+          ) : (
+            <ul className="grid gap-5 md:grid-cols-2">
+              {roadmaps.map((roadmap) => (
+                <li key={roadmap.roadmapSlug} className="profile-rm-card">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <p className="text-[15px] font-bold">{roadmap.title}</p>
+                    <span
+                      className={cn(
+                        roadmap.percentage > 0
+                          ? "profile-rm-pct-active"
+                          : "profile-rm-pct-zero",
+                      )}
+                    >
+                      {roadmap.percentage}%
+                    </span>
+                  </div>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {roadmap.completed}/{roadmap.total} lessons
+                  </p>
+                  <div className="profile-rm-bar mt-2.5">
+                    <div
+                      className="profile-rm-bar-fill"
+                      style={{ width: `${roadmap.percentage}%` }}
+                    />
+                  </div>
+                  <div className="mt-3">
+                    <Button asChild variant="outline" size="sm">
                       <Link href={`/roadmaps/${roadmap.roadmapSlug}`}>
                         View roadmap
                       </Link>
                     </Button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </PortfolioSection>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </PortfolioSection>
 
-          <PortfolioSection title="Achievements">
-            {achievements.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                No achievements unlocked yet.
-              </p>
-            ) : (
-              <ul className="grid gap-3 sm:grid-cols-2">
-                {achievements.map((achievement, index) => (
-                  <AchievementCard
-                    key={achievement.id}
-                    achievement={achievement}
-                    index={index}
-                  />
-                ))}
-              </ul>
-            )}
-          </PortfolioSection>
-        </div>
-      </div>
+        <PortfolioSection title="Achievements" profile>
+          {achievements.length === 0 ? (
+            <ProfileEmptyState
+              title="No achievements unlocked yet"
+              description="Complete lessons, projects, and roadmaps to earn achievements."
+              ctaLabel="Open dashboard →"
+              ctaHref="/dashboard"
+            />
+          ) : (
+            <ul className="grid gap-3.5 sm:grid-cols-2">
+              {achievements.map((achievement, index) => (
+                <AchievementCard
+                  key={achievement.id}
+                  achievement={achievement}
+                  index={index}
+                  variant="profile"
+                />
+              ))}
+            </ul>
+          )}
+        </PortfolioSection>
+
+        <FeaturedProjectsSection projects={featuredProjects} profile />
+      </SiteContainer>
     </div>
   );
 }

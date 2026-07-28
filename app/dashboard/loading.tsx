@@ -3,11 +3,12 @@ import {
   GridSkeleton,
   PageHeaderSkeleton,
 } from "@/components/design-system/loading-skeleton";
+import { SiteContainer } from "@/components/layout/site-container";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DashboardLoading() {
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+    <SiteContainer className="py-10">
       <PageHeaderSkeleton />
 
       <div className="mt-8 flex items-center gap-4 rounded-none border border-border bg-card p-4">
@@ -34,6 +35,6 @@ export default function DashboardLoading() {
         <CardSkeleton />
         <CardSkeleton />
       </div>
-    </div>
+    </SiteContainer>
   );
 }

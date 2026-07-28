@@ -15,10 +15,12 @@ import {
 } from "@/lib/projects/catalog";
 import { cn } from "@/lib/utils";
 import type { ProjectCatalogItem, ProjectCategory } from "@/types/project";
+import type { SubmissionStatus } from "@/types/submission";
 import type { RoadmapDifficulty } from "@/types";
 
 type ProjectLibraryProps = {
   projects: ProjectCatalogItem[];
+  submissionStatusBySlug?: Record<string, SubmissionStatus>;
 };
 
 const difficultyLabels: Record<RoadmapDifficulty | "all", string> = {
@@ -28,7 +30,10 @@ const difficultyLabels: Record<RoadmapDifficulty | "all", string> = {
   advanced: "Advanced",
 };
 
-export function ProjectLibrary({ projects }: ProjectLibraryProps) {
+export function ProjectLibrary({
+  projects,
+  submissionStatusBySlug = {},
+}: ProjectLibraryProps) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<ProjectCategory | "all">("all");
   const [difficulty, setDifficulty] = useState<RoadmapDifficulty | "all">("all");
@@ -159,7 +164,12 @@ export function ProjectLibrary({ projects }: ProjectLibraryProps) {
         <>
           <div className="grid gap-5 md:grid-cols-2">
             {paginated.items.map((project, index) => (
-              <ProjectCard key={project.slug} project={project} index={index} />
+              <ProjectCard
+                key={project.slug}
+                project={project}
+                index={index}
+                submissionStatus={submissionStatusBySlug[project.slug] ?? null}
+              />
             ))}
           </div>
 

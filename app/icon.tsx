@@ -25,7 +25,6 @@ export default async function Icon() {
           background: "#231e1e",
         }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={markSrc as unknown as string} width={22} height={22} alt="" />
       </div>
     ),

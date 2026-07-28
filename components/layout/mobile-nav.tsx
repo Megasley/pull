@@ -6,6 +6,7 @@ import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { signOut } from "@/app/actions/auth";
+import { SiteContainer } from "@/components/layout/site-container";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -131,11 +132,13 @@ export function MobileNav({
 }: MobileNavProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [pathnameWhenOpen, setPathnameWhenOpen] = useState(pathname);
   const close = () => setOpen(false);
 
-  useEffect(() => {
-    close();
-  }, [pathname]);
+  // Close the drawer after client navigation (adjust state during render).
+  if (open && pathnameWhenOpen !== pathname) {
+    setOpen(false);
+  }
 
   useEffect(() => {
     if (!open) {
@@ -178,7 +181,14 @@ export function MobileNav({
         aria-expanded={open}
         aria-controls="mobile-navigation"
         aria-label={open ? "Close menu" : "Open menu"}
-        onClick={() => setOpen((current) => !current)}
+        onClick={() =>
+          setOpen((current) => {
+            if (!current) {
+              setPathnameWhenOpen(pathname);
+            }
+            return !current;
+          })
+        }
       >
         {open ? <X className="size-4" /> : <Menu className="size-4" />}
       </Button>
@@ -201,9 +211,10 @@ export function MobileNav({
             : "pointer-events-none -translate-y-2 opacity-0",
         )}
       >
-        <nav
+        <SiteContainer
+          as="nav"
           aria-label="Mobile navigation"
-          className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-5 pb-10"
+          className="flex flex-col gap-4 py-5 pb-10"
         >
           {isAuthenticated ? (
             <div className="flex items-center gap-3 border border-border bg-card px-3 py-3">
@@ -341,7 +352,7 @@ export function MobileNav({
               </Link>
             </NavSection>
           )}
-        </nav>
+        </SiteContainer>
       </div>
     </div>
   );

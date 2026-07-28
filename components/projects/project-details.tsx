@@ -2,7 +2,9 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, Clock } from "lucide-react";
 
 import { Muted } from "@/components/design-system";
+import { SiteContainer } from "@/components/layout/site-container";
 import { ProjectBookmarkButton } from "@/components/projects/project-bookmark-button";
+import { SubmissionStatusBadge } from "@/components/projects/submission-status-badge";
 import {
   ProjectBulletList,
   ProjectDetailsToc,
@@ -12,7 +14,10 @@ import {
 } from "@/components/projects/project-detail-sections";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { bootstrapCurrentUserProfile } from "@/lib/auth/session";
+import { isDatabaseConfigured } from "@/lib/db/env";
 import { compileProjectMdx } from "@/lib/projects/compile-spec";
+import { getActiveSubmission, listUserSubmissionStatusByProjectSlug } from "@/lib/submissions/repository";
 import type { ProjectSpec } from "@/types/project";
 import type { RoadmapDifficulty } from "@/types";
 
@@ -51,9 +56,20 @@ export async function ProjectDetails({ project }: ProjectDetailsProps) {
   const lessonHref = `/roadmaps/${project.roadmapSlug}/lessons/${project.lessonSlug}`;
   const roadmapHref = `/roadmaps/${project.roadmapSlug}`;
 
+  const profile = await bootstrapCurrentUserProfile();
+  const submissionStatusBySlug =
+    profile && isDatabaseConfigured()
+      ? await listUserSubmissionStatusByProjectSlug(profile.id)
+      : {};
+  const submissionStatus = submissionStatusBySlug[project.slug] ?? null;
+  const activeSubmission =
+    profile && isDatabaseConfigured()
+      ? await getActiveSubmission(profile.id, project.slug)
+      : null;
+
   return (
     <div>
-      <div className="mx-auto w-full max-w-6xl px-4 pt-12 pb-20 sm:px-6 lg:px-8">
+      <SiteContainer className="pt-12 pb-20">
         <Button asChild variant="ghost" size="sm" className="-ml-2 mb-8">
           <Link href="/projects">
             <ArrowLeft aria-hidden />
@@ -84,6 +100,9 @@ export async function ProjectDetails({ project }: ProjectDetailsProps) {
                   <Clock className="size-3" aria-hidden />
                   {project.estimatedTime}
                 </Badge>
+                {submissionStatus ? (
+                  <SubmissionStatusBadge status={submissionStatus} />
+                ) : null}
               </div>
               <ProjectBookmarkButton
                 slug={project.slug}
@@ -94,7 +113,13 @@ export async function ProjectDetails({ project }: ProjectDetailsProps) {
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild className="w-full sm:w-auto">
                 <Link href={`/projects/${project.slug}/submit`}>
-                  ./submit
+                  {activeSubmission?.status === "draft"
+                    ? "./continue-draft"
+                    : activeSubmission?.status === "needs_changes"
+                      ? "./revise"
+                      : activeSubmission
+                        ? "./view-submission"
+                        : "./submit"}
                   <ArrowRight aria-hidden />
                 </Link>
               </Button>
@@ -196,7 +221,7 @@ export async function ProjectDetails({ project }: ProjectDetailsProps) {
             </div>
           </aside>
         </div>
-      </div>
+      </SiteContainer>
     </div>
   );
 }

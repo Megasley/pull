@@ -7,6 +7,7 @@ import { ContinueLearningSection } from "@/components/dashboard/continue-learnin
 import { ContributionStreakSection } from "@/components/dashboard/contribution-streak-section";
 import { ContributingReposSection } from "@/components/dashboard/contributing-repos-section";
 import { DashboardAccountMenu } from "@/components/dashboard/dashboard-account-menu";
+import { SiteContainer } from "@/components/layout/site-container";
 import { DashboardSectionNav } from "@/components/dashboard/dashboard-section-nav";
 import {
   DashboardSetupStrip,
@@ -130,7 +131,7 @@ export function DashboardView({ data, github, signOutAction }: DashboardViewProp
     data.achievements.some((item) => item.earned);
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-10 pt-12 sm:px-6 sm:py-12 lg:px-8">
+    <SiteContainer className="py-10 pt-12 sm:py-12">
       <header className="flex flex-col gap-6 border-b border-border pb-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
@@ -276,6 +277,6 @@ export function DashboardView({ data, github, signOutAction }: DashboardViewProp
           <AchievementsSection achievements={data.achievements} />
         </section>
       </div>
-    </div>
+    </SiteContainer>
   );
 }

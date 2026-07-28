@@ -1,9 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
+import Script from "next/script";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Analytics } from "@vercel/analytics/next";
 
 import { SiteLayout } from "@/components/layout/site-layout";
+import { DEV_CHUNK_RECOVERY_SCRIPT } from "@/lib/dev/chunk-error-recovery";
 import { siteConfig } from "@/lib/site-config";
 
 import "@/styles/index.css";
@@ -65,6 +67,11 @@ export default function RootLayout({
       className={`${spaceGrotesk.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col overflow-x-hidden font-sans text-foreground">
+        {process.env.NODE_ENV === "development" ? (
+          <Script id="pull-chunk-recovery" strategy="beforeInteractive">
+            {DEV_CHUNK_RECOVERY_SCRIPT}
+          </Script>
+        ) : null}
         <SiteLayout>{children}</SiteLayout>
         <Analytics />
         {gaId ? <GoogleAnalytics gaId={gaId} /> : null}

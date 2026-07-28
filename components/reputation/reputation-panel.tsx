@@ -1,3 +1,4 @@
+import { SegmentBar } from "@/components/profile/segment-bar";
 import { cn } from "@/lib/utils";
 import type {
   ReputationFactor,
@@ -16,13 +17,18 @@ type ReputationPanelProps = {
   reputation: ReputationResult;
   className?: string;
   compact?: boolean;
+  variant?: "default" | "profile";
+  summaryText?: string;
 };
 
 export function ReputationPanel({
   reputation,
   className,
   compact = false,
+  variant = "default",
+  summaryText,
 }: ReputationPanelProps) {
+  const isProfile = variant === "profile";
   const maxMonth = Math.max(
     1,
     ...reputation.monthly.map((month) => month.total),
@@ -31,31 +37,53 @@ export function ReputationPanel({
   return (
     <div
       className={cn(
-        "rounded-none border border-border bg-card p-5",
+        isProfile
+          ? "profile-score-card"
+          : "rounded-none border border-border bg-card p-5",
         className,
       )}
     >
       <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-center gap-5">
-          <ScoreRing value={reputation.score} />
+          <ScoreRing value={reputation.score} variant={variant} />
           <div className="min-w-0">
-            <p className="text-sm text-muted-foreground">
-              Open Source Reputation
-              <span className="ml-2 font-mono text-[10px] uppercase tracking-wide text-muted-foreground/80">
-                {reputation.version}
-              </span>
+            <p
+              className={cn(
+                isProfile
+                  ? "text-[15px] font-bold text-foreground"
+                  : "text-sm text-muted-foreground",
+              )}
+            >
+              {isProfile ? (
+                <>Open Source Reputation — {reputation.score}/100</>
+              ) : (
+                <>
+                  Open Source Reputation
+                  <span className="ml-2 font-mono text-[10px] uppercase tracking-wide text-muted-foreground/80">
+                    {reputation.version}
+                  </span>
+                </>
+              )}
             </p>
-            <p className="text-3xl font-semibold tracking-tight sm:text-4xl">
-              {reputation.score}
-              <span className="ml-1 text-base font-normal text-muted-foreground">
-                / 100
-              </span>
-            </p>
-            {!compact ? (
-              <p className="mt-2 max-w-md text-sm text-muted-foreground">
-                {reputation.summary}
+            {!isProfile ? (
+              <p className="text-3xl font-semibold tracking-tight sm:text-4xl">
+                {reputation.score}
+                <span className="ml-1 text-base font-normal text-muted-foreground">
+                  / 100
+                </span>
               </p>
             ) : null}
+            <p
+              className={cn(
+                isProfile
+                  ? "mt-1 text-[13px] leading-relaxed text-muted-foreground"
+                  : compact
+                    ? "hidden"
+                    : "mt-2 max-w-md text-sm text-muted-foreground",
+              )}
+            >
+              {summaryText ?? reputation.summary}
+            </p>
           </div>
         </div>
       </div>
@@ -63,15 +91,15 @@ export function ReputationPanel({
       <div
         className={cn(
           "mt-6 grid gap-3",
-          compact ? "sm:grid-cols-2" : "md:grid-cols-2",
+          compact || isProfile ? "sm:grid-cols-2" : "md:grid-cols-2",
         )}
       >
         {reputation.factors.map((factor) => (
-          <FactorRow key={factor.id} factor={factor} />
+          <FactorRow key={factor.id} factor={factor} variant={variant} />
         ))}
       </div>
 
-      {!compact ? (
+      {!compact && !isProfile ? (
         <>
           <section className="mt-8 space-y-3">
             <h3 className="text-sm font-medium">Monthly progress</h3>
@@ -139,70 +167,127 @@ export function ReputationPanel({
   );
 }
 
-function ScoreRing({ value }: { value: number }) {
+function ScoreRing({
+  value,
+  variant,
+}: {
+  value: number;
+  variant: "default" | "profile";
+}) {
   const radius = 36;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (value / 100) * circumference;
+  const isProfile = variant === "profile";
+  const center = isProfile ? 42 : 44;
+  const strokeWidth = isProfile ? 9 : 6;
 
   return (
     <div
-      className="relative size-20 shrink-0"
+      className={cn("relative shrink-0", isProfile ? "size-[84px]" : "size-20")}
       role="img"
       aria-label={`Open Source Reputation ${value} out of 100`}
     >
-      <svg className="size-full -rotate-90" viewBox="0 0 88 88" aria-hidden>
+      <svg
+        className="size-full -rotate-90"
+        viewBox={isProfile ? "0 0 84 84" : "0 0 88 88"}
+        aria-hidden
+      >
         <circle
-          cx="44"
-          cy="44"
+          cx={center}
+          cy={center}
           r={radius}
           fill="none"
           stroke="currentColor"
-          strokeWidth="6"
-          className="text-muted/50"
+          strokeWidth={strokeWidth}
+          className="text-secondary"
         />
         <circle
-          cx="44"
-          cy="44"
+          cx={center}
+          cy={center}
           r={radius}
           fill="none"
-          stroke="currentColor"
-          strokeWidth="6"
+          stroke="var(--signal)"
+          strokeWidth={strokeWidth}
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
-          className="text-foreground transition-[stroke-dashoffset] duration-700 ease-out"
+          className="transition-[stroke-dashoffset] duration-700 ease-out"
         />
       </svg>
-      <span className="absolute inset-0 flex items-center justify-center text-lg font-semibold tabular-nums">
+      <span
+        className={cn(
+          "absolute inset-0 flex items-center justify-center font-bold tabular-nums",
+          isProfile ? "text-[22px]" : "text-lg font-semibold",
+        )}
+      >
         {value}
       </span>
     </div>
   );
 }
 
-function FactorRow({ factor }: { factor: ReputationFactor }) {
+function FactorRow({
+  factor,
+  variant,
+}: {
+  factor: ReputationFactor;
+  variant: "default" | "profile";
+}) {
+  const isProfile = variant === "profile";
+
   return (
-    <div className="rounded-none border border-border bg-transparent px-3.5 py-3">
+    <div
+      className={cn(
+        isProfile
+          ? "profile-mini-card"
+          : "rounded-none border border-border bg-transparent px-3.5 py-3",
+      )}
+    >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-sm font-medium">{factor.label}</p>
-          <p className="mt-0.5 text-xs text-muted-foreground">
+          <p className={cn(isProfile ? "text-[13px] font-bold" : "text-sm font-medium")}>
+            {factor.label}
+          </p>
+          <p
+            className={cn(
+              isProfile
+                ? "mt-1 text-[11.5px] leading-snug text-muted-foreground"
+                : "mt-0.5 text-xs text-muted-foreground",
+            )}
+          >
             {factor.description}
           </p>
         </div>
-        <span className="shrink-0 rounded-none border border-border px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+        <span
+          className={cn(
+            isProfile
+              ? cn(
+                  "profile-mini-tag",
+                  factor.strength === "emerging"
+                    ? "profile-mini-tag-emerging"
+                    : "profile-mini-tag-building",
+                )
+              : "shrink-0 rounded-none border border-border px-2 py-0.5 text-[11px] font-medium text-muted-foreground",
+          )}
+        >
           {STRENGTH_LABEL[factor.strength]}
         </span>
       </div>
-      <div className="mt-3 h-1.5 overflow-hidden rounded-none bg-muted/60">
-        <div
-          className="h-full rounded-none bg-foreground/80 transition-[width] duration-700 ease-out"
-          style={{ width: `${factor.strengthPercent}%` }}
-        />
-      </div>
-      <p className="mt-2 text-[11px] tabular-nums text-muted-foreground">
-        Signal {factor.raw}
-      </p>
+      {isProfile ? (
+        <SegmentBar percent={factor.strengthPercent} className="mt-2" />
+      ) : (
+        <div className="mt-3 h-1.5 overflow-hidden rounded-none bg-muted/60">
+          <div
+            className="h-full rounded-none bg-foreground/80 transition-[width] duration-700 ease-out"
+            style={{ width: `${factor.strengthPercent}%` }}
+          />
+        </div>
+      )}
+      {!isProfile ? (
+        <p className="mt-2 text-[11px] tabular-nums text-muted-foreground">
+          Signal {factor.raw}
+        </p>
+      ) : null}
     </div>
   );
 }

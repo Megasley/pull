@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Reveal, RevealStagger } from "@/components/landing/reveal";
+import { SiteContainer } from "@/components/layout/site-container";
 
 const STEPS = [
   {
@@ -48,7 +49,7 @@ export function BuilderLoopSection() {
       aria-labelledby="builder-loop-heading"
       className="border-b border-border"
     >
-      <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+      <SiteContainer className="py-16 sm:py-20">
         <Reveal variant="clip">
           <p className="tech-eyebrow">pipeline // builder loop</p>
         </Reveal>
@@ -107,7 +108,7 @@ export function BuilderLoopSection() {
             </div>
           ))}
         </RevealStagger>
-      </div>
+      </SiteContainer>
     </section>
   );
 }

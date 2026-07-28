@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { RoadmapEngine } from "@/components/roadmap";
+import { SiteContainer } from "@/components/layout/site-container";
 import { Button } from "@/components/ui/button";
 import { availableRoadmaps } from "@/lib/landing-data";
 import { getRoadmap, getRoadmapSlugs } from "@/lib/roadmap/load-roadmap";
@@ -57,7 +58,7 @@ export default async function RoadmapPage({ params }: RoadmapPageProps) {
   }
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+    <SiteContainer className="py-10">
       <div className="mb-10 max-w-3xl border-b border-border pb-8">
         <p className="tech-eyebrow">roadmap // {roadmapData.id}</p>
         <h1 className="mt-3 text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.05] font-bold tracking-[-0.04em]">
@@ -87,6 +88,6 @@ export default async function RoadmapPage({ params }: RoadmapPageProps) {
           <Link href="/roadmaps">ls ./roadmaps</Link>
         </Button>
       </div>
-    </div>
+    </SiteContainer>
   );
 }

@@ -65,6 +65,7 @@ export async function connectGithubFromSession(
 }
 
 export async function refreshGithubAccessTokenFromSession(userId: string) {
+  void userId;
   const token = await getSessionGithubAccessToken();
   if (!token) return null;
   return token;

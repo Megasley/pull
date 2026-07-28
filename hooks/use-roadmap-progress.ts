@@ -48,6 +48,7 @@ function dispatchProgressChange(slug: string) {
 }
 
 export function useRoadmapProgress(slug: string, data: RoadmapJson) {
+  void data;
   const { userId, ready: authReady } = useAuthSession();
 
   const snapshot = useSyncExternalStore(

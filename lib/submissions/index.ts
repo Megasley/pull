@@ -3,6 +3,7 @@ export {
   getActiveSubmission,
   getEditableDraft,
   listRecentUserSubmissions,
+  listUserSubmissionStatusByProjectSlug,
   listUserSubmissionsForProject,
   saveDraftSubmission,
   submitProjectSubmission,

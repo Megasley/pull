@@ -83,7 +83,8 @@ export function calculateRoadmapProgress(
 }
 
 /** Fresh progress starts empty. Completion only comes from user actions / synced DB. */
-export function getInitialCompletedIds(_data: RoadmapJson): Set<string> {
+export function getInitialCompletedIds(data: RoadmapJson): Set<string> {
+  void data;
   return new Set();
 }
 

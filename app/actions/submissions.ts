@@ -15,7 +15,10 @@ import { getProjectBySlug } from "@/lib/projects/catalog";
 function revalidateSubmissionPaths(projectSlug: string) {
   revalidatePath(`/projects/${projectSlug}`);
   revalidatePath(`/projects/${projectSlug}/submit`);
+  revalidatePath("/projects");
   revalidatePath("/dashboard");
+  revalidatePath("/review");
+  revalidatePath("/admin");
 }
 
 export async function getProjectSubmissionStateAction(projectSlug: string) {

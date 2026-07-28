@@ -1,14 +1,16 @@
 import { SectionHeader } from "@/components/design-system";
 import { Reveal } from "@/components/landing/reveal";
+import { SiteContainer } from "@/components/layout/site-container";
 import { RoadmapCard } from "@/components/landing/roadmap-card";
 import { availableRoadmaps } from "@/lib/landing-data";
 
 export function AvailableRoadmapsSection() {
   return (
-    <section
+    <SiteContainer
+      as="section"
       id="roadmaps"
       aria-labelledby="available-roadmaps-heading"
-      className="mx-auto w-full max-w-6xl scroll-mt-24 px-4 py-16 sm:px-6 lg:px-8"
+      className="scroll-mt-24 py-16"
     >
       <Reveal>
         <SectionHeader
@@ -27,6 +29,6 @@ export function AvailableRoadmapsSection() {
           </Reveal>
         ))}
       </div>
-    </section>
+    </SiteContainer>
   );
 }

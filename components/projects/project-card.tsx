@@ -11,8 +11,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { SubmissionStatusBadge } from "@/components/projects/submission-status-badge";
 import { cn } from "@/lib/utils";
 import type { ProjectCatalogItem } from "@/types/project";
+import type { SubmissionStatus } from "@/types/submission";
 import type { RoadmapDifficulty } from "@/types";
 
 const difficultyLabels: Record<RoadmapDifficulty, string> = {
@@ -31,9 +33,15 @@ type ProjectCardProps = {
   project: ProjectCatalogItem;
   index?: number;
   className?: string;
+  submissionStatus?: SubmissionStatus | null;
 };
 
-export function ProjectCard({ project, index = 0, className }: ProjectCardProps) {
+export function ProjectCard({
+  project,
+  index = 0,
+  className,
+  submissionStatus = null,
+}: ProjectCardProps) {
   return (
     <Card
       className={cn(
@@ -57,6 +65,9 @@ export function ProjectCard({ project, index = 0, className }: ProjectCardProps)
             <Clock className="size-3" aria-hidden />
             {project.estimatedTime}
           </Badge>
+          {submissionStatus ? (
+            <SubmissionStatusBadge status={submissionStatus} />
+          ) : null}
           <span className="font-mono text-[10px] tracking-wide text-muted-foreground uppercase">
             {project.roadmapSlug}
           </span>
@@ -106,7 +117,7 @@ export function ProjectCard({ project, index = 0, className }: ProjectCardProps)
         </div>
       </CardContent>
 
-      <CardFooter>
+      <CardFooter className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
         <Button asChild className="w-full sm:w-auto">
           <Link href={`/projects/${project.slug}`}>
             ./view-project
@@ -116,6 +127,15 @@ export function ProjectCard({ project, index = 0, className }: ProjectCardProps)
             />
           </Link>
         </Button>
+        {submissionStatus ? (
+          <Button asChild variant="outline" className="w-full sm:w-auto">
+            <Link href={`/projects/${project.slug}/submit`}>
+              {submissionStatus === "draft" || submissionStatus === "needs_changes"
+                ? "./continue"
+                : "./submission"}
+            </Link>
+          </Button>
+        ) : null}
       </CardFooter>
     </Card>
   );

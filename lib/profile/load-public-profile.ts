@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import { getRoadmap } from "@/lib/roadmap/load-roadmap";
 import { buildAllRoadmapProgressSummaries } from "@/lib/progress/summary";
 import { getAllCompletedNodeSlugs } from "@/lib/progress/repository";
@@ -14,12 +16,13 @@ import {
 } from "@/lib/profile/portfolio";
 import {
   listUserAchievements,
-  syncAchievementsForUser,
 } from "@/lib/xp/achievements";
 import { buildLevelInfo } from "@/lib/xp/levels";
 import { loadBuilderScore } from "@/lib/score";
 import { loadOpenSourceReputation } from "@/lib/reputation";
 import {
+  listGithubCommits,
+  listGithubIssues,
   listGithubPullRequests,
   listGithubRepositories,
 } from "@/lib/github/store";
@@ -78,17 +81,14 @@ function buildFeaturedProjects(
   return merged.slice(0, 6);
 }
 
-export async function loadPublicBuilderProfile(
+async function loadPublicBuilderProfileData(
   username: string,
-  viewerUserId?: string | null,
-): Promise<PublicBuilderProfileData | null> {
+): Promise<Omit<PublicBuilderProfileData, "isOwner"> | null> {
   const profile = await getUserByUsername(username);
 
   if (!profile) {
     return null;
   }
-
-  await syncAchievementsForUser(profile.id);
 
   const progressByRoadmap = await getAllCompletedNodeSlugs(profile.id);
   const [
@@ -96,19 +96,24 @@ export async function loadPublicBuilderProfile(
     approvedCount,
     approved,
     builderScore,
-    reputation,
     repositories,
     pullRequests,
-    timelineData,
+    commits,
+    issues,
   ] = await Promise.all([
     listUserAchievements(profile.id, progressByRoadmap),
     getApprovedSubmissionCount(profile.id),
     listApprovedSubmissionsForUser(profile.id),
     loadBuilderScore(profile.id, progressByRoadmap),
-    loadOpenSourceReputation(profile.id),
     listGithubRepositories(profile.id, { limit: 30 }),
     listGithubPullRequests(profile.id, 80),
-    loadContributionTimeline(profile.id),
+    listGithubCommits(profile.id, 100),
+    listGithubIssues(profile.id, 100),
+  ]);
+
+  const [reputation, timelineData] = await Promise.all([
+    loadOpenSourceReputation(profile.id),
+    loadContributionTimeline(profile.id, { pullRequests, commits, issues }),
   ]);
 
   const roadmaps = buildAllRoadmapProgressSummaries(progressByRoadmap);
@@ -157,6 +162,23 @@ export async function loadPublicBuilderProfile(
     roadmaps,
     achievements: achievements.filter((item) => item.earned),
     recentProjects: featuredProjects,
-    isOwner: Boolean(viewerUserId && viewerUserId === profile.id),
+  };
+}
+
+const loadPublicBuilderProfileCached = cache(loadPublicBuilderProfileData);
+
+export async function loadPublicBuilderProfile(
+  username: string,
+  viewerUserId?: string | null,
+): Promise<PublicBuilderProfileData | null> {
+  const data = await loadPublicBuilderProfileCached(username);
+
+  if (!data) {
+    return null;
+  }
+
+  return {
+    ...data,
+    isOwner: Boolean(viewerUserId && viewerUserId === data.profile.id),
   };
 }

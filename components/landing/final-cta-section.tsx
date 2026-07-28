@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Reveal } from "@/components/landing/reveal";
+import { SiteContainer } from "@/components/layout/site-container";
 import { Button } from "@/components/ui/button";
 
 export function FinalCtaSection() {
@@ -14,7 +15,7 @@ export function FinalCtaSection() {
         <div className="tech-grid absolute inset-0 opacity-[0.1]" />
       </div>
 
-      <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
+      <SiteContainer className="relative flex flex-col gap-8 py-20 sm:py-24">
         <Reveal variant="clip">
           <p className="font-mono text-[11px] tracking-[0.14em] text-ink/65 uppercase">
             exec // next
@@ -43,7 +44,7 @@ export function FinalCtaSection() {
             <Link href="/roadmaps">./start-building</Link>
           </Button>
         </Reveal>
-      </div>
+      </SiteContainer>
     </section>
   );
 }

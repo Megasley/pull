@@ -1,7 +1,10 @@
 import Link from "next/link";
 
+import { DemoProfilePreview } from "@/components/landing/demo-profile-preview";
 import { Reveal, RevealStagger } from "@/components/landing/reveal";
+import { SiteContainer } from "@/components/layout/site-container";
 import { Button } from "@/components/ui/button";
+import { DEMO_PROFILE_USERNAME } from "@/lib/demo/constants";
 
 const PROOF_ITEMS = [
   {
@@ -37,7 +40,7 @@ export function ProofSection() {
       aria-labelledby="proof-heading"
       className="bg-ink text-[var(--background)]"
     >
-      <div className="relative mx-auto w-full max-w-6xl overflow-hidden px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+      <SiteContainer className="relative overflow-hidden py-16 sm:py-20">
         <div aria-hidden className="pointer-events-none absolute inset-0">
           <div className="tech-grid absolute inset-0 opacity-[0.08] invert" />
         </div>
@@ -48,21 +51,41 @@ export function ProofSection() {
               surfaces // portfolio
             </p>
           </Reveal>
-          <Reveal variant="up" delayMs={90}>
-            <h2
-              id="proof-heading"
-              className="mt-3 max-w-3xl text-[clamp(2rem,5vw,3.5rem)] leading-[1.08] font-bold tracking-[-0.04em]"
-            >
-              Your work becomes a public builder identity
-            </h2>
-          </Reveal>
-          <Reveal variant="fade" delayMs={150}>
-            <p className="mt-4 max-w-2xl font-mono text-sm leading-relaxed text-white/65 sm:text-base">
-              Courses end with a certificate. Pull ends with evidence - a portfolio
-              others can verify. Show employers, maintainers, grant programs, and
-              communities what you&apos;ve actually built.
-            </p>
-          </Reveal>
+
+          <div className="mt-3 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:items-start lg:gap-12">
+            <div>
+              <Reveal variant="up" delayMs={90}>
+                <h2
+                  id="proof-heading"
+                  className="max-w-3xl text-[clamp(2rem,5vw,3.5rem)] leading-[1.08] font-bold tracking-[-0.04em]"
+                >
+                  Your work becomes a public builder identity
+                </h2>
+              </Reveal>
+              <Reveal variant="fade" delayMs={150}>
+                <p className="mt-4 max-w-xl font-mono text-sm leading-relaxed text-white/65 sm:text-base">
+                  Courses end with a certificate. Pull ends with evidence: a portfolio
+                  others can verify. Show employers, maintainers, grant programs, and
+                  communities what you&apos;ve actually built.
+                </p>
+              </Reveal>
+              <Reveal variant="fade" delayMs={190}>
+                <p className="mt-4 font-mono text-xs leading-relaxed text-white/45">
+                  Example profile:{" "}
+                  <Link
+                    href={`/u/${DEMO_PROFILE_USERNAME}`}
+                    className="text-[var(--signal)] underline decoration-[var(--signal)]/40 underline-offset-4 hover:decoration-[var(--signal)]"
+                  >
+                    /u/{DEMO_PROFILE_USERNAME}
+                  </Link>
+                </p>
+              </Reveal>
+            </div>
+
+            <Reveal variant="zoom" delayMs={120}>
+              <DemoProfilePreview />
+            </Reveal>
+          </div>
 
           <RevealStagger
             className="mt-12 grid gap-px bg-white/10 sm:grid-cols-2"
@@ -100,12 +123,22 @@ export function ProofSection() {
                 asChild
                 className="h-12 w-full border-white/25 bg-transparent px-6 text-[var(--background)] hover:bg-white/5 hover:text-[var(--background)] sm:w-auto"
               >
+                <Link href={`/u/${DEMO_PROFILE_USERNAME}`}>
+                  ./view-demo-profile
+                </Link>
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                asChild
+                className="h-12 w-full border-white/25 bg-transparent px-6 text-[var(--background)] hover:bg-white/5 hover:text-[var(--background)] sm:w-auto"
+              >
                 <Link href="/sign-in">./auth --github</Link>
               </Button>
             </div>
           </Reveal>
         </div>
-      </div>
+      </SiteContainer>
     </section>
   );
 }

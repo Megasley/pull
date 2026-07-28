@@ -41,9 +41,16 @@ const TYPE_TONE: Record<TimelineEventType, string> = {
 type TimelineItemProps = {
   event: TimelineEvent;
   index: number;
+  profile?: boolean;
+  groupCount?: number;
 };
 
-export function TimelineItem({ event, index }: TimelineItemProps) {
+export function TimelineItem({
+  event,
+  index,
+  profile = false,
+  groupCount,
+}: TimelineItemProps) {
   const Icon = TYPE_ICON[event.type];
   const time = Number.isFinite(Date.parse(event.occurredAt))
     ? new Date(event.occurredAt).toLocaleTimeString(undefined, {
@@ -51,6 +58,53 @@ export function TimelineItem({ event, index }: TimelineItemProps) {
         minute: "2-digit",
       })
     : null;
+
+  if (profile) {
+    const content = (
+      <>
+        <div className="profile-tl-dot">
+          <Icon className="size-3.5" aria-hidden />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="font-mono text-[10.5px] text-muted-foreground">
+            <span className="font-semibold text-foreground/80">
+              {TIMELINE_TYPE_SINGULAR[event.type]}
+            </span>
+            {event.meta ? ` · ${event.meta}` : ""}
+            {time ? ` · ${time}` : ""}
+          </p>
+          <p className="text-[13.5px] font-semibold">
+            {event.title}
+            {groupCount && groupCount > 1 ? (
+              <span className="profile-tl-group-count">×{groupCount}</span>
+            ) : null}
+          </p>
+          <p className="text-xs text-muted-foreground">{event.description}</p>
+        </div>
+        {event.href ? (
+          <ExternalLink
+            className="size-3.5 shrink-0 text-muted-foreground opacity-50"
+            aria-hidden
+          />
+        ) : null}
+      </>
+    );
+
+    if (event.href) {
+      const external = event.href.startsWith("http");
+      return (
+        <a
+          href={event.href}
+          className="profile-tl-item group transition-colors hover:bg-muted/20"
+          {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
+        >
+          {content}
+        </a>
+      );
+    }
+
+    return <div className="profile-tl-item">{content}</div>;
+  }
 
   const content = (
     <>

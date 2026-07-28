@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Reveal, RevealStagger } from "@/components/landing/reveal";
+import { SiteContainer } from "@/components/layout/site-container";
 import { RoadmapCard } from "@/components/landing/roadmap-card";
 import { Button } from "@/components/ui/button";
 import { availableRoadmaps } from "@/lib/landing-data";
@@ -14,7 +15,7 @@ export function FeaturedRoadmapsSection() {
       aria-labelledby="featured-roadmaps-heading"
       className="border-b border-border"
     >
-      <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+      <SiteContainer className="py-16 sm:py-20">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div className="max-w-2xl">
             <Reveal variant="clip">
@@ -52,7 +53,7 @@ export function FeaturedRoadmapsSection() {
             <RoadmapCard key={roadmap.slug} roadmap={roadmap} />
           ))}
         </RevealStagger>
-      </div>
+      </SiteContainer>
     </section>
   );
 }

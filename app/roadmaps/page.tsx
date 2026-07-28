@@ -1,6 +1,7 @@
 import { AvailableRoadmapsSection } from "@/components/landing/available-roadmaps-section";
 import { ComingSoonSection } from "@/components/landing/coming-soon-section";
 import { PageHeader } from "@/components/design-system";
+import { SiteContainer } from "@/components/layout/site-container";
 
 export const metadata = {
   title: "Roadmaps",
@@ -10,14 +11,14 @@ export const metadata = {
 export default function RoadmapsPage() {
   return (
     <div>
-      <div className="mx-auto w-full max-w-6xl px-4 pt-12 sm:px-6 lg:px-8">
+      <SiteContainer className="pt-12">
         <PageHeader
           eyebrow="catalog // roadmaps"
           title="Roadmaps"
           description="Structured paths from fundamentals to open source contribution. Start with Bitcoin, then unlock Lightning and upcoming tracks. Lessons are public beta — curriculum under technical review."
           meta="status // 2 live · under review · more incoming"
         />
-      </div>
+      </SiteContainer>
 
       <AvailableRoadmapsSection />
       <ComingSoonSection />

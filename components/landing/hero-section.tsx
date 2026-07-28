@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 
 import { Button } from "@/components/ui/button";
+import { SiteContainer } from "@/components/layout/site-container";
 import { siteConfig } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
 
@@ -14,46 +15,65 @@ const BOOT_LINES = [
   "> ready.",
 ] as const;
 
+function subscribeReducedMotion(onStoreChange: () => void) {
+  const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+  media.addEventListener("change", onStoreChange);
+  return () => media.removeEventListener("change", onStoreChange);
+}
+
+function getReducedMotionSnapshot() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function getReducedMotionServerSnapshot() {
+  return false;
+}
+
+/** True after hydration so typewriter/boot animations can start on the client. */
+function useHydrated() {
+  return useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
+}
+
 function useTypewriter(text: string, enabled: boolean, speed = 55) {
-  const [value, setValue] = useState("");
-  const [done, setDone] = useState(false);
+  const [tick, setTick] = useState(0);
 
   useEffect(() => {
     if (!enabled) {
-      setValue("");
-      setDone(false);
       return;
     }
 
     let i = 0;
-    setValue("");
-    setDone(false);
-
     const id = window.setInterval(() => {
       i += 1;
-      setValue(text.slice(0, i));
+      setTick(i);
       if (i >= text.length) {
         window.clearInterval(id);
-        setDone(true);
       }
     }, speed);
 
     return () => window.clearInterval(id);
   }, [text, enabled, speed]);
 
-  return { value, done };
+  if (!enabled) {
+    return { value: "", done: false };
+  }
+
+  const value = text.slice(0, Math.min(tick, text.length));
+  return { value, done: tick >= text.length };
 }
 
 export function HeroSection() {
-  const [bootIndex, setBootIndex] = useState(0);
-  const [started, setStarted] = useState(false);
-  const [reduceMotion, setReduceMotion] = useState(false);
-
-  useEffect(() => {
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    setReduceMotion(reduced);
-    setStarted(true);
-  }, []);
+  const started = useHydrated();
+  const reduceMotion = useSyncExternalStore(
+    subscribeReducedMotion,
+    getReducedMotionSnapshot,
+    getReducedMotionServerSnapshot,
+  );
+  const [bootTick, setBootTick] = useState(0);
 
   const title = useTypewriter(siteConfig.name, started && !reduceMotion, 70);
   const tagline = useTypewriter(
@@ -63,26 +83,25 @@ export function HeroSection() {
   );
 
   useEffect(() => {
-    if (!started) return;
-
-    if (reduceMotion) {
-      setBootIndex(BOOT_LINES.length);
+    if (!started || reduceMotion) {
       return;
     }
 
-    setBootIndex(0);
+    let current = 0;
     const id = window.setInterval(() => {
-      setBootIndex((current) => {
-        if (current >= BOOT_LINES.length) {
-          window.clearInterval(id);
-          return current;
-        }
-        return current + 1;
-      });
+      current += 1;
+      setBootTick(current);
+      if (current >= BOOT_LINES.length) {
+        window.clearInterval(id);
+      }
     }, 420);
 
     return () => window.clearInterval(id);
   }, [started, reduceMotion]);
+
+  const bootIndex = reduceMotion
+    ? BOOT_LINES.length
+    : Math.min(bootTick, BOOT_LINES.length);
 
   const displayTitle = reduceMotion
     ? siteConfig.name
@@ -105,7 +124,7 @@ export function HeroSection() {
         <div className="absolute right-6 bottom-6 size-8 border-r-2 border-b-2 border-ink/45 sm:right-10 sm:bottom-10" />
       </div>
 
-      <div className="relative mx-auto flex w-full max-w-6xl flex-col px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
+      <SiteContainer className="relative flex flex-col py-20 sm:py-28">
         <div className="flex flex-wrap items-center gap-3">
           <p className="font-mono text-[11px] tracking-[0.14em] text-ink/70 uppercase">
             sys.boot // open-source
@@ -181,7 +200,7 @@ export function HeroSection() {
             <Link href="#loop">man ./loop</Link>
           </Button>
         </div>
-      </div>
+      </SiteContainer>
     </section>
   );
 }

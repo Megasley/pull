@@ -1,17 +1,33 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
+
+function subscribeReducedMotion(onStoreChange: () => void) {
+  const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+  media.addEventListener("change", onStoreChange);
+  return () => media.removeEventListener("change", onStoreChange);
+}
+
+function getReducedMotionSnapshot() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function getReducedMotionServerSnapshot() {
+  return true;
+}
 
 export function ScrollProgress() {
+  const reduceMotion = useSyncExternalStore(
+    subscribeReducedMotion,
+    getReducedMotionSnapshot,
+    getReducedMotionServerSnapshot,
+  );
   const [progress, setProgress] = useState(0);
-  const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (reduceMotion) {
       return;
     }
-
-    setEnabled(true);
 
     const update = () => {
       const doc = document.documentElement;
@@ -26,9 +42,9 @@ export function ScrollProgress() {
       window.removeEventListener("scroll", update);
       window.removeEventListener("resize", update);
     };
-  }, []);
+  }, [reduceMotion]);
 
-  if (!enabled) return null;
+  if (reduceMotion) return null;
 
   return (
     <div

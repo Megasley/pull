@@ -1,4 +1,5 @@
 import { and, count, eq } from "drizzle-orm";
+import { cache } from "react";
 
 import { evaluateEarnedAchievementSlugs } from "@/lib/achievements/evaluate";
 import { ACHIEVEMENT_DEFINITIONS } from "@/lib/achievements/definitions";
@@ -70,7 +71,7 @@ async function getApprovedSubmissionCount(userId: string): Promise<number> {
   return Number(rows[0]?.value ?? 0);
 }
 
-export async function ensureAchievementsCatalog() {
+export const ensureAchievementsCatalog = cache(async function ensureAchievementsCatalog() {
   if (!isDatabaseConfigured()) {
     return;
   }
@@ -98,7 +99,7 @@ export async function ensureAchievementsCatalog() {
         set: payload,
       });
   }
-}
+});
 
 export async function syncAchievementsForUser(userId: string): Promise<string[]> {
   if (!isDatabaseConfigured()) {
