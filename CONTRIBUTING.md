@@ -179,8 +179,8 @@ lab:
 
 Available in lessons (see `components/mdx/`):
 
-- `<Mermaid chart="..." caption="..." />` — diagrams
-- `<LessonImage />` — static assets under `public/lessons/`
+- `<Mermaid chart="..." caption="..." />` — diagrams (rendered at runtime via Mermaid; do not add hand-authored SVG flowcharts under `public/lessons/`)
+- `<LessonImage />` — photos or screenshots only (not flowcharts)
 - Standard GFM: tables, fenced code, callouts
 
 ### Interactive labs

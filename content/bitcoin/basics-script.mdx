@@ -17,30 +17,30 @@ resources:
   - title: 'Decoding Bitcoin: Locking & unlocking'
     url: 'https://bitcoindevs.xyz/decoding/locking-unlocking'
     kind: interactive
-    note: Start here — scriptPubKey vs scriptSig/witness mental model.
+    note: Start here - scriptPubKey vs scriptSig/witness mental model.
     required: true
   - title: 'Decoding Bitcoin: P2PK'
     url: 'https://bitcoindevs.xyz/decoding/p2pk'
     kind: interactive
-    note: 'Ladder step 1 — pay to public key (and why wallets moved on).'
+    note: 'Ladder step 1 - pay to public key (and why wallets moved on).'
     required: true
   - title: 'Decoding Bitcoin: P2PKH'
     url: 'https://bitcoindevs.xyz/decoding/p2pkh'
     kind: interactive
-    note: 'Ladder step 2 — hash the key; complete at least one P2PKH exercise.'
+    note: 'Ladder step 2 - hash the key; complete at least one P2PKH exercise.'
     required: true
   - title: 'Decoding Bitcoin: P2SH'
     url: 'https://bitcoindevs.xyz/decoding/p2sh'
     kind: interactive
-    note: 'Ladder step 3 — hide redeem scripts until spend (BIP16).'
+    note: 'Ladder step 3 - hide redeem scripts until spend (BIP16).'
   - title: 'Decoding Bitcoin: P2MS'
     url: 'https://bitcoindevs.xyz/decoding/p2ms'
     kind: interactive
-    note: 'Ladder step 4 — bare multisig vs P2SH-wrapped policy.'
+    note: 'Ladder step 4 - bare multisig vs P2SH-wrapped policy.'
   - title: 'Decoding Bitcoin: Build a Bitcoin stack'
     url: 'https://bitcoindevs.xyz/decoding/project'
     kind: interactive
-    note: Capstone mini-project — stack execution before descriptors/Miniscript.
+    note: Capstone mini-project - stack execution before descriptors/Miniscript.
   - title: Script opcodes reference
     url: 'https://en.bitcoin.it/wiki/Script'
     kind: docs
@@ -49,7 +49,7 @@ resources:
     kind: docs
 reflectionPrompts:
   - >-
-    Explain Bitcoin Script to a teammate without jargon — what problem does it
+    Explain Bitcoin Script to a teammate without jargon - what problem does it
     solve?
   - What would break in production if you misunderstood Bitcoin Script?
   - >-
@@ -95,11 +95,11 @@ When spending:
 
 Do not memorize every opcode first. Climb the historical ladder (Decoding Bitcoin modules linked in the study plan):
 
-1. **P2PK** — pay directly to a public key (simple, leaks the key early)
-2. **P2PKH** — pay to `HASH160(pubkey)`; classic `1...` / wrapped patterns
-3. **P2SH** — pay to a script hash; reveal the redeem script only at spend (BIP16)
-4. **P2MS** — bare multisig; usually wrapped in P2SH/P2WSH in practice
-5. **SegWit / Taproot** — witness programs (`P2WPKH`, `P2WSH`, `P2TR`) — covered in later lessons
+1. **P2PK** - pay directly to a public key (simple, leaks the key early)
+2. **P2PKH** - pay to `HASH160(pubkey)`; classic `1...` / wrapped patterns
+3. **P2SH** - pay to a script hash; reveal the redeem script only at spend (BIP16)
+4. **P2MS** - bare multisig; usually wrapped in P2SH/P2WSH in practice
+5. **SegWit / Taproot** - witness programs (`P2WPKH`, `P2WSH`, `P2TR`) - covered in later lessons
 
 ```text
 # Conceptual P2WPKH witness stack (after the ladder)

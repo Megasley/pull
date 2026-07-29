@@ -221,7 +221,7 @@
     "difficulty": "beginner",
     "reviewFocus": ["developer UX", "regtest"],
     "estimatedMinutes": 25,
-    "summary": "Polar powers most labs — review a small issue that improves local Lightning learning.",
+    "summary": "Polar powers most labs - review a small issue that improves local Lightning learning.",
     "tracks": ["lightning"]
   },
   {

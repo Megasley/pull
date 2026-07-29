@@ -21,7 +21,7 @@ resources:
     kind: article
 reflectionPrompts:
   - >-
-    Explain PSBT Workflows to a teammate without jargon — what problem does it
+    Explain PSBT Workflows to a teammate without jargon - what problem does it
     solve?
   - What would break in production if you misunderstood PSBT Workflows?
   - >-
@@ -51,12 +51,6 @@ Hardware wallets, multisig cosigners, and watch-only constructors should not inv
 A PSBT is a shared clipboard for a group project: one person drafts the document, others add signatures in the right places, someone finalizes, then you submit.
 
 ## Roles
-
-<LessonImage
-  src="/lessons/bitcoin/dev-psbt/psbt-roles.svg"
-  alt="PSBT creator updater signers finalizer broadcast"
-  caption="PSBT moves through roles until signatures are complete and extractable."
-/>
 
 <Mermaid caption="PSBT moves through roles until signatures are complete and extractable." chart="flowchart LR
     C[Creator] --> U[Updater]

@@ -22,7 +22,7 @@ resources:
     kind: tool
 reflectionPrompts:
   - >-
-    Explain inbound vs outbound to a teammate who only knows on-chain Bitcoin —
+    Explain inbound vs outbound to a teammate who only knows on-chain Bitcoin  - 
     what is different?
   - >-
     Your node shows 1 BTC total channel capacity but cannot receive a 50k sat
@@ -42,7 +42,7 @@ lab:
 searchQueries:
   - inbound capacity
 ---
-Channel **liquidity** is not how much bitcoin you locked — it is **which side of each channel holds that balance**. Lightning is directional: the same channel can send easily in one direction and fail in the other.
+Channel **liquidity** is not how much bitcoin you locked - it is **which side of each channel holds that balance**. Lightning is directional: the same channel can send easily in one direction and fail in the other.
 
 ## Why this matters
 
@@ -50,20 +50,20 @@ This is the Lightning-specific idea that confuses people the first time. On-chai
 
 ## Fixed capacity
 
-Total channel capacity is fixed until you splice, dual-fund, or close. Payments move balance between the two sides — they do not create new capacity.
+Total channel capacity is fixed until you splice, dual-fund, or close. Payments move balance between the two sides - they do not create new capacity.
 
-<LessonImage
-  src="/lessons/lightning/ln-overview/channel-balance.svg"
-  alt="Channel outbound versus inbound capacity"
-  caption="Outbound is your spendable side; inbound is what lets you receive."
-/>
+<Mermaid caption="Outbound is your spendable side; inbound is what lets you receive." chart="flowchart LR
+    subgraph channel [Fixed channel capacity]
+        Out[Your outbound]
+        In[Inbound - theirs]
+    end" />
 
 ## Inbound vs outbound
 
 | Term | Meaning |
 |------|---------|
-| **Outbound** | Your side's balance — what you can send or forward |
-| **Inbound** | Counterparty's balance on your channel — what you can receive |
+| **Outbound** | Your side's balance - what you can send or forward |
+| **Inbound** | Counterparty's balance on your channel - what you can receive |
 
 After a typical single-funded open, the funder starts **outbound-heavy** (can send, cannot receive much). The peer starts **inbound-heavy** relative to the funder.
 
@@ -81,16 +81,16 @@ After a typical single-funded open, the funder starts **outbound-heavy** (can se
 
 ## Forwarding locks liquidity
 
-When your node forwards an HTLC, that slice of outbound is reserved until the payment settles or fails. Heavy routing without balanced channels drains outbound on busy edges — another reason direction matters before you study pathfinding.
+When your node forwards an HTLC, that slice of outbound is reserved until the payment settles or fails. Heavy routing without balanced channels drains outbound on busy edges - another reason direction matters before you study pathfinding.
 
 ## Try it in Polar or regtest
 
 1. Open a channel between two nodes.
 2. Check `local_balance` vs `remote_balance` (or equivalent).
-3. Pay from the funder toward the peer — should succeed.
-4. Pay back the full amount — may fail if inbound is insufficient.
+3. Pay from the funder toward the peer - should succeed.
+4. Pay back the full amount - may fail if inbound is insufficient.
 5. Write one sentence explaining the failure in inbound/outbound terms.
 
 ## Next steps
 
-Commitment transactions — the signed states that make channel updates safe.
+Commitment transactions - the signed states that make channel updates safe.

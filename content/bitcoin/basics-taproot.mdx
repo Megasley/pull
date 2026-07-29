@@ -27,7 +27,7 @@ resources:
   - title: 'Decoding Bitcoin: Schnorr signatures'
     url: 'https://bitcoindevs.xyz/decoding/schnorr-signature'
     kind: interactive
-    note: Pair with tagged hashes — why Taproot prefers Schnorr.
+    note: Pair with tagged hashes - why Taproot prefers Schnorr.
   - title: 'Decoding Bitcoin: Tagged hashes'
     url: 'https://bitcoindevs.xyz/decoding/tagged-hashes'
     kind: interactive
@@ -42,7 +42,7 @@ resources:
     kind: bip
 reflectionPrompts:
   - >-
-    Explain Taproot & Tapscript to a teammate without jargon — what problem does
+    Explain Taproot & Tapscript to a teammate without jargon - what problem does
     it solve?
   - What would break in production if you misunderstood Taproot & Tapscript?
   - >-
@@ -75,14 +75,12 @@ A Taproot output is a house with a normal front door (key path) and several secr
 
 ## Two ways to spend
 
-<LessonImage
-  src="/lessons/bitcoin/basics-taproot/taproot-paths.svg"
-  alt="Key-path versus script-path Taproot spends"
-  caption="Key-path spends look like simple single-sig; script-path reveals only the used leaf."
-/>
-
 1. **Key-path**: sign with the tweaked output key, cheapest and most private
 2. **Script-path**: reveal a script leaf + merkle proof + satisfy that script
+
+<Mermaid caption="Key-path spends look like simple single-sig; script-path reveals only the used leaf." chart="flowchart TD
+    Out[P2TR output] --> KeyPath[Key-path spend<br/>Schnorr signature]
+    Out --> ScriptPath[Script-path spend<br/>reveal one leaf + proof]" />
 
 <Mermaid caption="The output key commits to an optional script tree without revealing it upfront." chart="flowchart TD
     Internal[Internal key] --> Tweak[TapTweak with merkle root]

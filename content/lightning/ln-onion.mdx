@@ -21,7 +21,7 @@ resources:
     kind: article
 reflectionPrompts:
   - >-
-    Explain Onion Routing to a teammate without jargon — what problem does it
+    Explain Onion Routing to a teammate without jargon - what problem does it
     solve?
   - What would break in production if you misunderstood Onion Routing?
   - >-
@@ -50,18 +50,11 @@ Without onions, intermediate nodes would see the full route and payload. Privacy
 
 Nested envelopes. Each post office opens only its envelope, stamps the next address, and cannot read the inner letters.
 
-<LessonImage
-  src="/lessons/lightning/ln-onion/onion-layers.svg"
-  alt="Onion layers peeled by each hop"
-  caption="Each hop peels one layer; the full path stays hidden."
-/>
-
-<Mermaid caption="Layered encryption limits per-hop knowledge." chart="flowchart LR
-    Outer[Outer layer for Hop1] --> H1[Hop1 peels]
-    H1 --> Mid[Layer for Hop2]
-    Mid --> H2[Hop2 peels]
-    H2 --> Inner[Final payload]
-    Inner --> Payee[Payee]" />
+<Mermaid caption="Each hop peels one layer; the full path stays hidden." chart="flowchart LR
+    Payer[Payer] --> H1[Hop 1 peels<br/>outer layer]
+    H1 --> H2[Hop 2 peels<br/>middle layer]
+    H2 --> H3[Hop 3 peels<br/>inner layer]
+    H3 --> Payee[Payee]" />
 
 <Callout type="info" title="Privacy is not absolute">
   Amounts, timing, and graph structure can still leak information. Design threat models honestly.

@@ -21,7 +21,7 @@ resources:
     kind: article
 reflectionPrompts:
   - >-
-    Explain Commitment Transactions to a teammate without jargon — what problem
+    Explain Commitment Transactions to a teammate without jargon - what problem
     does it solve?
   - What would break in production if you misunderstood Commitment Transactions?
   - >-
@@ -53,18 +53,17 @@ Every time you update the bar tab, you both sign a new “final bill” and dest
 
 When state advances to `n`, state `n-1` is revoked. Publishing a revoked commitment lets the peer sweep funds via a **penalty** (justice) transaction.
 
-<LessonImage
-  src="/lessons/lightning/ln-commitments/revocation.svg"
-  alt="Publishing an old commitment risks a penalty transaction"
-  caption="Old commitments are toxic, broadcasting them can forfeit the channel."
-/>
-
-<Mermaid caption="Advance state, revoke previous, punish cheaters who publish old states." chart="flowchart TD
-    StateN[Commitment n] --> Coop[Cooperative updates]
-    Coop --> StateN1[Commitment n+1]
-    StateN1 --> Revoke[Revoke n secrets exchanged]
-    BroadcastOld[Broadcast old n] --> Penalty[Peer justice tx]
-    Penalty --> Lost[Broadcaster loses funds]" />
+<Mermaid caption="Old commitments are toxic; broadcasting them can forfeit the channel." chart="flowchart TD
+    subgraph honest [Honest path]
+        StateN[Commitment n] --> Coop[Cooperative<br/>updates]
+        Coop --> StateN1[Commitment<br/>n+1]
+        StateN1 --> Revoke[Revoke n secrets<br/>exchanged]
+    end
+    subgraph penalty [Penalty path]
+        Old[Commitment n-1<br/>revoked] --> Broadcast[Broadcast old n?]
+        Broadcast --> Justice[Peer justice tx]
+        Justice --> Lost[Broadcaster<br/>loses funds]
+    end" />
 
 <Callout type="danger" title="Always watch the chain">
   Offline nodes can miss revocation windows. Watchtowers exist for this failure mode.

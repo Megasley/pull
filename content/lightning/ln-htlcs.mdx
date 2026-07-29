@@ -21,7 +21,7 @@ resources:
     kind: article
 reflectionPrompts:
   - >-
-    Explain HTLC Mechanics to a teammate without jargon — what problem does it
+    Explain HTLC Mechanics to a teammate without jargon - what problem does it
     solve?
   - What would break in production if you misunderstood HTLC Mechanics?
   - >-
@@ -49,20 +49,14 @@ Every routed payment is an HTLC dance. Debugging failures means reading hashes, 
 
 A locked briefcase opens with a secret word (preimage). Each courier along the path holds a briefcase with the same word requirement but earlier deadlines. When the final person learns the word, it propagates back so everyone can settle.
 
-<LessonImage
-  src="/lessons/lightning/ln-htlcs/htlc-flow.svg"
-  alt="HTLCs across Alice Bob Carol with decreasing timelocks"
-  caption="Same payment hash along the path; timelocks decrease toward the payee."
-/>
-
-<Mermaid caption="Forward HTLCs, then fulfill backward with the preimage." chart="sequenceDiagram
+<Mermaid caption="Same payment hash along the path; timelocks decrease toward the payee." chart="sequenceDiagram
     participant A as Alice
     participant B as Bob
     participant C as Carol
-    A->>B: add_htlc(H, amt, T_high)
-    B->>C: add_htlc(H, amt', T_low)
-    C->>B: fulfill(preimage)
-    B->>A: fulfill(preimage)" />
+    A->>B: add_htlc H, T=40
+    B->>C: add_htlc H, T=20
+    C->>B: fulfill preimage R
+    B->>A: fulfill preimage R" />
 
 <Callout type="info" title="Atomicity">
   Either the preimage settles the chain, or timeouts refund. Intermediaries should not lose funds if they follow protocol and stay online as required.

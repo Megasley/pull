@@ -18,7 +18,7 @@ resources:
   - title: 'Decoding Bitcoin: UTXO'
     url: 'https://bitcoindevs.xyz/decoding/utxo'
     kind: interactive
-    note: Interactive explainer — contrast UTXO vs account before the lab.
+    note: Interactive explainer - contrast UTXO vs account before the lab.
     required: true
   - title: 'Decoding Bitcoin: Transaction structure'
     url: 'https://bitcoindevs.xyz/decoding/transaction-structure'
@@ -32,7 +32,7 @@ resources:
     kind: article
 reflectionPrompts:
   - >-
-    Explain UTXO Model to a teammate without jargon — what problem does it
+    Explain UTXO Model to a teammate without jargon - what problem does it
     solve?
   - What would break in production if you misunderstood UTXO Model?
   - >-
@@ -66,18 +66,12 @@ A transaction:
 2. **Creates** one or more new outputs
 3. Pays the difference as a miner fee (no explicit fee output)
 
-<LessonImage
-  src="/lessons/bitcoin/basics-utxo/utxo-spend.svg"
-  alt="Diagram of two inputs creating a payment and change output"
-  caption="Inputs are fully consumed; change is a new UTXO; the remainder is the fee."
-/>
-
-<Mermaid caption="Value conservation: sum(inputs) = sum(outputs) + fee." chart="flowchart LR
-    U1[UTXO 0.05] --> Tx[Transaction]
-    U2[UTXO 0.02] --> Tx
-    Tx --> Pay[Output 0.06]
-    Tx --> Chg[Change 0.009]
-    Tx --> Fee[Fee 0.001]" />
+<Mermaid caption="Inputs are fully consumed; change is a new UTXO; the remainder is the fee." chart="flowchart LR
+    U1[Input A<br/>0.05 BTC] --> Tx[Transaction]
+    U2[Input B<br/>0.02 BTC] --> Tx
+    Tx --> Pay[Payment<br/>0.06 BTC]
+    Tx --> Chg[Change<br/>0.009 BTC]
+    Tx --> Fee[Fee 0.001 BTC]" />
 
 ```typescript
 type Utxo = {

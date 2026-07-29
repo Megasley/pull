@@ -9,7 +9,7 @@ objectives:
   - Know where to follow spec discussions
 resources:
   - title: Lightning BOLTs
-    url: 'https://github.com/lightning/bolts'
+    url: 'https://github.com/lightning/bolts/blob/master/00-introduction.md'
     kind: bolt
     required: true
   - title: Mastering the Lightning Network
@@ -21,12 +21,12 @@ resources:
     kind: docs
 reflectionPrompts:
   - >-
-    Explain BOLTs & Spec Landscape to a teammate without jargon — what problem
+    Explain BOLTs & Spec Landscape to a teammate without jargon - what problem
     does it solve?
   - What would break in production if you misunderstood BOLTs & Spec Landscape?
   - >-
-    Which BOLT (or implementation doc) is the source of truth for this topic,
-    and what did you verify there?
+    Which BOLT or implementation doc did you treat as the source of truth, and
+    what did you confirm by reading it?
 lab:
   title: Polar check
   description: >-
@@ -50,17 +50,18 @@ Without shared specs, every implementation would be an island. Builders reading 
 
 BOLTs are the electrical code for Lightning. Different manufacturers (LND/CLN/LDK) can ship distinct products, but plugs must still fit.
 
-## Map of essentials
+## Orientation map
 
-| BOLT | Focus |
-|------|--------|
-| 1 | Peer protocol foundation |
-| 2 | Channel management / HTLCs |
-| 3 | Transactions |
-| 4 | Onion routing |
-| 7 | Gossip |
-| 11 | Invoices |
-| 12 | Offers (evolving) |
+You do **not** need to read these now - each gets a dedicated lesson later. This table is a reference so you know where to look when debugging.
+
+| BOLT | Focus | Lesson |
+|------|--------|--------|
+| 2 | Channel management / HTLCs | Channels & HTLCs |
+| 3 | Transactions | Commitment Transactions |
+| 4 | Onion routing | Onion Routing |
+| 7 | Gossip | Routing & Pathfinding |
+| 11 | Invoices | BOLT11 Invoices |
+| 12 | Offers (evolving) | BOLT12 Offers |
 
 <Mermaid caption="Multiple implementations converge on BOLTs for network compatibility." chart="flowchart TD
     Bolts[BOLTs specs] --> LND[LND]
@@ -70,8 +71,8 @@ BOLTs are the electrical code for Lightning. Different manufacturers (LND/CLN/LD
     CLN --> Net
     LDK --> Net" />
 
-<Callout type="tip" title="Read with a question">
-  Do not read BOLTs cover-to-cover first. Open the BOLT that matches your bug (invoice decode, channel open, onion) and keep Mastering Lightning nearby for narrative.
+<Callout type="tip" title="Read with a question, not cover-to-cover">
+  This lesson is about knowing the landscape. Open a BOLT only when a later lesson or a bug points you there. Keep Mastering Lightning nearby for narrative context.
 </Callout>
 
 ## Common mistakes

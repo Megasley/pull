@@ -21,7 +21,7 @@ resources:
     kind: bip
 reflectionPrompts:
   - >-
-    Explain Keys & Addresses to a teammate without jargon — what problem does it
+    Explain Keys & Addresses to a teammate without jargon - what problem does it
     solve?
   - What would break in production if you misunderstood Keys & Addresses?
   - >-
@@ -52,11 +52,10 @@ Your **private key** is the only key to a mailbox. The **public key** is a lock 
 
 ## One-way derivation
 
-<LessonImage
-  src="/lessons/bitcoin/basics-keys/key-to-address.svg"
-  alt="Private key to public key to address"
-  caption="Derivation is one-way: addresses do not reveal private keys."
-/>
+<Mermaid caption="Derivation is one-way: addresses do not reveal private keys." chart="flowchart LR
+    Priv[Private key] --> Pub[Public key]
+    Pub --> Hash[Hash160 /<br/>tweaked key]
+    Hash --> Addr[Address]" />
 
 ```text
 private key  →  public key  →  hashing / tweaking  →  address string

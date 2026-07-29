@@ -10,6 +10,21 @@ export async function getMermaid() {
         securityLevel: "strict",
         theme: "dark",
         fontFamily: "inherit",
+        flowchart: {
+          useMaxWidth: true,
+          htmlLabels: true,
+          curve: "basis",
+          padding: 20,
+          nodeSpacing: 50,
+          rankSpacing: 60,
+          diagramPadding: 16,
+        },
+        themeVariables: {
+          fontSize: "14px",
+          fontFamily: "inherit",
+          clusterBkg: "#0d1117",
+          clusterBorder: "#3d4f5f",
+        },
       });
     });
   }

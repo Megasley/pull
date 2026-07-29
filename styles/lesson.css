@@ -14,8 +14,8 @@
   letter-spacing: -0.01em;
 }
 
-.lesson-content p,
-.lesson-content li {
+.lesson-content p:not(.mermaid-frame *),
+.lesson-content li:not(.mermaid-frame *) {
   font-size: 1.02rem;
   line-height: 1.8;
 }

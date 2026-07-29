@@ -20,7 +20,7 @@ resources:
     chapter: 'Ch. 8: Routing (liquidity context)'
     required: true
 reflectionPrompts:
-  - Explain Liquidity to a teammate without jargon — what problem does it solve?
+  - Explain Liquidity to a teammate without jargon - what problem does it solve?
   - What would break in production if you misunderstood Liquidity?
   - >-
     Which BOLT (or implementation doc) is the source of truth for this topic,
@@ -39,16 +39,16 @@ You already understand **inbound vs outbound** from the Channels chapter. This l
 
 ## Why this matters
 
-A node with lots of bitcoin locked but zero inbound capacity still cannot get paid. Liquidity ops is the business of Lightning routing revenue and merchant receive capacity — loops, swaps, rebalancing, and peer management.
+A node with lots of bitcoin locked but zero inbound capacity still cannot get paid. Liquidity ops is the business of Lightning routing revenue and merchant receive capacity - loops, swaps, rebalancing, and peer management.
 
 ## Analogy
 
 A highway with all cars stuck on one side of a toll bridge. You need flows (or trucks repositioning cars) to free lanes in both directions.
 
 <Mermaid caption="Different shortages call for rebalancing, loops, or peer liquidity." chart="flowchart LR
-    Out[Outbound heavy] --> Rebalance[Circular rebalance]
-    In[Inbound heavy] --> LoopOut[Loop out / spend]
-    NeedIn[Need inbound] --> Buy[Liquidity ads / peers]
+    Out[Outbound<br/>liquidity] --> Rebalance[Circular<br/>rebalance]
+    In[Inbound<br/>liquidity] --> LoopOut[Loop out /<br/>Splice out]
+    NeedIn[Need inbound<br/>liquidity] --> Ads[Liquidity ads /<br/>peer liquidity]
     NeedIn --> LoopIn[Loop in]" />
 
 <Callout type="info" title="Capital has cost">

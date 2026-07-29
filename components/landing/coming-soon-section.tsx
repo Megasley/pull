@@ -16,7 +16,7 @@ export function ComingSoonSection() {
           eyebrow="catalog // coming-soon"
           title="The ecosystem is expanding"
           titleId="coming-soon-heading"
-          description="More specialized tracks are on the way - from protocol research to wallet engineering."
+          description="More specialized tracks are on the way"
           className="mb-10"
         />
       </Reveal>

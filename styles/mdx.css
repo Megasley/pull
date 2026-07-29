@@ -71,13 +71,25 @@
   color: #e6edf3;
 }
 
-.mermaid-svg svg {
-  max-width: 100%;
-  height: auto;
+.mermaid-frame {
+  width: 100%;
+  overflow: visible;
+  background: #0d1117;
 }
 
-.mermaid-frame {
-  background: #0d1117;
+.mermaid-svg,
+.mermaid {
+  width: 100%;
+  overflow: visible;
+}
+
+.mermaid-svg svg,
+.mermaid svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  max-width: none;
 }
 
 .mermaid-error {

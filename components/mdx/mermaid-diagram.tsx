@@ -2,7 +2,9 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 
+import { adaptChartForViewport } from "@/lib/mermaid/chart";
 import { getMermaid } from "@/lib/mermaid/init";
+import { normalizeMermaidSvg } from "@/lib/mermaid/normalize-svg";
 import { cn } from "@/lib/utils";
 
 type MermaidDiagramProps = {
@@ -10,6 +12,27 @@ type MermaidDiagramProps = {
   caption?: string;
   className?: string;
 };
+
+function usePreferVerticalChart() {
+  const [preferVertical, setPreferVertical] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 767px)");
+
+    const update = () => {
+      setPreferVertical(media.matches);
+    };
+
+    update();
+    media.addEventListener("change", update);
+
+    return () => {
+      media.removeEventListener("change", update);
+    };
+  }, []);
+
+  return preferVertical;
+}
 
 export function MermaidDiagram({
   chart,
@@ -19,6 +42,8 @@ export function MermaidDiagram({
   const reactId = useId().replace(/:/g, "");
   const renderSeq = useRef(0);
   const source = chart.trim();
+  const preferVertical = usePreferVerticalChart();
+  const chartSource = adaptChartForViewport(source, preferVertical);
   const [svg, setSvg] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,7 +52,7 @@ export function MermaidDiagram({
     const renderId = `mermaid-${reactId}-${renderSeq.current++}`;
 
     async function renderChart() {
-      if (!source) {
+      if (!chartSource) {
         setError("Diagram source is empty.");
         setSvg(null);
         return;
@@ -35,10 +60,10 @@ export function MermaidDiagram({
 
       try {
         const mermaid = await getMermaid();
-        const { svg: rendered } = await mermaid.render(renderId, source);
+        const { svg: rendered } = await mermaid.render(renderId, chartSource);
 
         if (!cancelled) {
-          setSvg(rendered);
+          setSvg(normalizeMermaidSvg(rendered));
           setError(null);
         }
       } catch (err) {
@@ -56,18 +81,18 @@ export function MermaidDiagram({
     return () => {
       cancelled = true;
     };
-  }, [source, reactId]);
+  }, [chartSource, reactId]);
 
   return (
     <figure className={cn("my-8 not-prose", className)}>
-      <div className="mermaid-frame overflow-x-auto rounded-none border border-border p-4">
+      <div className="mermaid-frame rounded-none border border-border p-4 sm:p-6">
         {error ? (
           <pre className="mermaid-error whitespace-pre-wrap font-mono text-sm">
             {error}
           </pre>
         ) : svg ? (
           <div
-            className="mermaid-svg flex justify-center"
+            className="mermaid-svg mermaid"
             dangerouslySetInnerHTML={{ __html: svg }}
           />
         ) : (
