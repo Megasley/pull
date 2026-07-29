@@ -40,7 +40,13 @@ export function OnboardingWizard({ githubConnected }: OnboardingWizardProps) {
       });
 
       if (!result.ok) {
-        setError("Could not save onboarding. Try again.");
+        setError(
+          result.reason === "database_unconfigured"
+            ? "Database is not configured."
+            : result.reason === "invalid_roadmap"
+              ? "Pick Bitcoin or Lightning to continue."
+              : "Could not save onboarding. Try again.",
+        );
         return;
       }
 

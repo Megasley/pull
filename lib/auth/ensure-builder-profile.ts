@@ -1,9 +1,19 @@
 import type { User } from "@supabase/supabase-js";
 
+import { eq } from "drizzle-orm";
+
 import { resolveUserRole } from "@/lib/auth/roles";
+import { getDb } from "@/lib/db";
+import { isDatabaseConfigured } from "@/lib/db/env";
+import { users } from "@/lib/db/schema";
 import { notifyWelcomeAsync } from "@/lib/notifications/dispatch";
 import { createClient } from "@/lib/supabase/server";
 import { mapBuilderProfile, type BuilderProfile } from "@/types/user";
+
+import {
+  normalizeAccountStatus,
+  type UserAccountStatus,
+} from "./account-status";
 
 /** Throttle DB writes — enough for MAU, light on write load. */
 const ACTIVITY_TOUCH_MS = 60 * 60 * 1000;
@@ -66,6 +76,48 @@ function getGithubIdentity(user: User) {
   return { githubUsername, displayName, avatar, email };
 }
 
+/**
+ * PostgREST schema cache can lag behind migrations. Read launch columns via
+ * Drizzle so onboarding / moderation state stays accurate.
+ */
+async function enrichProfileFromDrizzle(
+  profile: BuilderProfile,
+): Promise<BuilderProfile> {
+  if (!isDatabaseConfigured()) {
+    return profile;
+  }
+
+  try {
+    const db = getDb();
+    const rows = await db
+      .select({
+        accountStatus: users.accountStatus,
+        moderationReason: users.moderationReason,
+        onboardingCompletedAt: users.onboardingCompletedAt,
+        preferredRoadmapSlug: users.preferredRoadmapSlug,
+      })
+      .from(users)
+      .where(eq(users.id, profile.id))
+      .limit(1);
+
+    const row = rows[0];
+    if (!row) {
+      return profile;
+    }
+
+    return {
+      ...profile,
+      accountStatus: normalizeAccountStatus(row.accountStatus as UserAccountStatus),
+      moderationReason: row.moderationReason,
+      onboardingCompletedAt: row.onboardingCompletedAt,
+      preferredRoadmapSlug: row.preferredRoadmapSlug,
+    };
+  } catch (error) {
+    console.warn("[auth] enrichProfileFromDrizzle failed", error);
+    return profile;
+  }
+}
+
 export async function ensureBuilderProfile(user: User): Promise<BuilderProfile | null> {
   const supabase = await createClient();
 
@@ -123,10 +175,10 @@ export async function ensureBuilderProfile(user: User): Promise<BuilderProfile |
         throw updateError;
       }
 
-      return mapBuilderProfile(updated);
+      return enrichProfileFromDrizzle(mapBuilderProfile(updated));
     }
 
-    return mapBuilderProfile(existing);
+    return enrichProfileFromDrizzle(mapBuilderProfile(existing));
   }
 
   const username = await generateUniqueUsername(supabase, githubUsername);
@@ -161,13 +213,13 @@ export async function ensureBuilderProfile(user: User): Promise<BuilderProfile |
         .eq("id", user.id)
         .single();
 
-      return profile ? mapBuilderProfile(profile) : null;
+      return profile ? enrichProfileFromDrizzle(mapBuilderProfile(profile)) : null;
     }
 
     throw createError;
   }
 
-  const profile = mapBuilderProfile(created);
+  const profile = await enrichProfileFromDrizzle(mapBuilderProfile(created));
   notifyWelcomeAsync({
     userId: profile.id,
     displayName: profile.displayName,
@@ -192,5 +244,5 @@ export async function getBuilderProfile(
     throw error;
   }
 
-  return data ? mapBuilderProfile(data) : null;
+  return data ? enrichProfileFromDrizzle(mapBuilderProfile(data)) : null;
 }
