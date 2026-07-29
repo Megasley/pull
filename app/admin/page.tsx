@@ -9,6 +9,7 @@ import {
   getCronSyncHealth,
   getPlatformMetrics,
   getReviewHealth,
+  listRecentSubmissionsForAdmin,
 } from "@/lib/admin/repository";
 import {
   getLearningFunnel,
@@ -20,7 +21,7 @@ import { bootstrapCurrentUserProfile } from "@/lib/auth/session";
 import { isDatabaseConfigured } from "@/lib/db/env";
 import { getPlatformHealth } from "@/lib/platform/health";
 import { listReviewQueue } from "@/lib/reviews/repository";
-import { SUBMISSION_STATUS_LABELS } from "@/types/submission";
+import { REVIEW_QUEUE_STATUSES, SUBMISSION_STATUS_LABELS } from "@/types/submission";
 
 export const metadata = {
   title: "Admin",
@@ -30,7 +31,13 @@ export const metadata = {
 /** Allow longer runs on Pro; Hobby still caps lower. */
 export const maxDuration = 30;
 
-export default async function AdminOverviewPage() {
+export default async function AdminOverviewPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ funnel?: string }>;
+}) {
+  const { funnel: funnelRangeParam } = await searchParams;
+  const funnelRange = funnelRangeParam === "30d" ? "30d" : "all";
   const profile = await bootstrapCurrentUserProfile();
 
   if (!profile) {
@@ -97,7 +104,7 @@ export default async function AdminOverviewPage() {
         countUsersByRole(),
         getPlatformMetrics(),
         getCronSyncHealth(),
-        getLearningFunnel("30d"),
+        getLearningFunnel(funnelRange),
         getLessonDropOff(10),
       ]),
       7_000,
@@ -108,6 +115,7 @@ export default async function AdminOverviewPage() {
   const platformHealth = getPlatformHealth();
 
   const openQueue = await listReviewQueue(profile.id);
+  const recentSubmissions = await listRecentSubmissionsForAdmin(25);
 
   const userTotal =
     roleCounts.builder + roleCounts.reviewer + roleCounts.admin;
@@ -177,11 +185,11 @@ export default async function AdminOverviewPage() {
             emphasize={health.stuckClaims > 0}
           />
         </div>
-        {health.openTotal === 0 ? (
+        {openQueue.length === 0 ? (
           <div className="mt-4">
             <EmptyState
               title="Queue is clear"
-              description="No open submissions (submitted, in review, or needs changes). Drafts are not counted — builders must click Submit for review."
+              description="No open submissions (submitted, in review, or needs changes). Drafts are not counted here — see Recent submissions below."
             />
           </div>
         ) : (
@@ -211,6 +219,57 @@ export default async function AdminOverviewPage() {
                 <Button asChild size="sm">
                   <Link href={`/review/${item.id}`}>./review</Link>
                 </Button>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="mt-12">
+        <h2 className="text-lg font-semibold tracking-tight">Recent submissions</h2>
+        <p className="mt-1 font-mono text-[11px] text-muted-foreground">
+          All statuses, newest first — includes drafts that were saved but not
+          submitted for review.
+        </p>
+        {recentSubmissions.length === 0 ? (
+          <p className="mt-4 text-sm text-muted-foreground">No submissions yet.</p>
+        ) : (
+          <div className="mt-4 space-y-3">
+            {recentSubmissions.map((item) => (
+              <div
+                key={item.id}
+                className="flex flex-col gap-3 rounded-none border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div className="space-y-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="font-medium">{item.projectTitle}</p>
+                    <Badge variant="secondary">
+                      {SUBMISSION_STATUS_LABELS[item.status]}
+                    </Badge>
+                  </div>
+                  <p className="font-mono text-[11px] text-muted-foreground">
+                    {item.builderDisplayName} (@{item.builderUsername})
+                    {item.submittedAt
+                      ? ` · submitted ${new Date(item.submittedAt).toLocaleString()}`
+                      : ` · updated ${new Date(item.updatedAt).toLocaleString()}`}
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Button asChild size="sm" variant="outline">
+                    <Link href={`/admin/users/${item.userId}`}>User</Link>
+                  </Button>
+                  {REVIEW_QUEUE_STATUSES.includes(item.status) ? (
+                    <Button asChild size="sm">
+                      <Link href={`/review/${item.id}`}>Review</Link>
+                    </Button>
+                  ) : (
+                    <Button asChild size="sm" variant="outline">
+                      <Link href={`/projects/${item.projectSlug}/submit`}>
+                        Submit page
+                      </Link>
+                    </Button>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -249,7 +308,34 @@ export default async function AdminOverviewPage() {
       </section>
 
       <section className="mt-12">
-        <h2 className="text-lg font-semibold tracking-tight">Learning funnel (30d)</h2>
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold tracking-tight">
+              Learning funnel ({funnelRange === "30d" ? "30d" : "all-time"})
+            </h2>
+            <p className="mt-1 font-mono text-[11px] text-muted-foreground">
+              {funnelRange === "30d"
+                ? "Counts signups and activity in the last 30 days only."
+                : "Counts all users and activity since launch."}
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              asChild
+              variant={funnelRange === "all" ? "default" : "outline"}
+              size="sm"
+            >
+              <Link href="/admin">All-time</Link>
+            </Button>
+            <Button
+              asChild
+              variant={funnelRange === "30d" ? "default" : "outline"}
+              size="sm"
+            >
+              <Link href="/admin?funnel=30d">30d</Link>
+            </Button>
+          </div>
+        </div>
         <div className="mt-4 overflow-x-auto">
           <table className="w-full min-w-[480px] border-collapse text-sm">
             <thead>

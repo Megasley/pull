@@ -11,9 +11,9 @@ import { withTimeout } from "@/lib/async/with-timeout";
 import { getAllDiscoveryRepositories } from "@/lib/discovery/catalog";
 import { getDb, getPostgresClient, withDbRetry } from "@/lib/db";
 import { isDatabaseConfigured } from "@/lib/db/env";
-import { users } from "@/lib/db/schema";
+import { projectSubmissions, projects, users } from "@/lib/db/schema";
 import { getAllProjects } from "@/lib/projects/catalog";
-import type { UserRole } from "@/types/submission";
+import type { SubmissionStatus, UserRole } from "@/types/submission";
 import { REVIEW_QUEUE_STATUSES } from "@/types/submission";
 
 /** Soft budget so /admin never burns a full Vercel function timeout. */
@@ -80,6 +80,49 @@ function mapAdminUser(row: typeof users.$inferSelect): AdminUserRecord {
     level: row.level,
     createdAt: row.createdAt,
   };
+}
+
+export type AdminSubmissionRecord = {
+  id: string;
+  userId: string;
+  status: SubmissionStatus;
+  submittedAt: string | null;
+  updatedAt: string;
+  projectSlug: string;
+  projectTitle: string;
+  builderUsername: string;
+  builderDisplayName: string;
+  repoUrl: string | null;
+};
+
+export async function listRecentSubmissionsForAdmin(
+  limit = 25,
+): Promise<AdminSubmissionRecord[]> {
+  if (!isDatabaseConfigured()) {
+    return [];
+  }
+
+  const db = getDb();
+  const rows = await db
+    .select({
+      id: projectSubmissions.id,
+      userId: projectSubmissions.userId,
+      status: projectSubmissions.status,
+      submittedAt: projectSubmissions.submittedAt,
+      updatedAt: projectSubmissions.updatedAt,
+      projectSlug: projects.slug,
+      projectTitle: projects.title,
+      builderUsername: users.username,
+      builderDisplayName: users.displayName,
+      repoUrl: projectSubmissions.repoUrl,
+    })
+    .from(projectSubmissions)
+    .innerJoin(projects, eq(projectSubmissions.projectId, projects.id))
+    .innerJoin(users, eq(projectSubmissions.userId, users.id))
+    .orderBy(desc(projectSubmissions.updatedAt))
+    .limit(limit);
+
+  return rows;
 }
 
 export async function listUsersForAdmin(input?: {

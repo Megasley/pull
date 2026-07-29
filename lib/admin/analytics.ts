@@ -212,7 +212,7 @@ export async function getUserSubmissionsForAdmin(userId: string, limit = 10) {
     .from(projectSubmissions)
     .innerJoin(projects, eq(projectSubmissions.projectId, projects.id))
     .where(eq(projectSubmissions.userId, userId))
-    .orderBy(desc(projectSubmissions.submittedAt))
+    .orderBy(desc(projectSubmissions.updatedAt))
     .limit(limit);
 
   return rows;
