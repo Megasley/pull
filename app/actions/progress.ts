@@ -4,6 +4,10 @@ import { revalidatePath } from "next/cache";
 
 import { getCurrentUser } from "@/lib/auth/session";
 import {
+  moderationBlockedMessage,
+  requireActiveAccount,
+} from "@/lib/auth/require-active-account";
+import {
   getAllCompletedNodeSlugs,
   getCompletedNodeSlugs,
   mergeRoadmapProgress,
@@ -39,13 +43,17 @@ export async function toggleLessonProgressAction(
   nodeSlug: string,
   completed: boolean,
 ) {
-  const user = await getCurrentUser();
+  const gate = await requireActiveAccount();
 
-  if (!user) {
-    return { ok: false as const, reason: "unauthenticated" as const };
+  if (!gate.ok) {
+    return {
+      ok: false as const,
+      reason: gate.reason,
+      error: moderationBlockedMessage(gate.reason),
+    };
   }
 
-  await setNodeCompletion(user.id, roadmapSlug, nodeSlug, completed);
+  await setNodeCompletion(gate.profile.id, roadmapSlug, nodeSlug, completed);
   revalidatePath("/dashboard");
   revalidatePath(`/roadmaps/${roadmapSlug}`);
   revalidatePath(`/roadmaps/${roadmapSlug}/lessons/${nodeSlug}`);
@@ -57,13 +65,17 @@ export async function mergeRoadmapProgressAction(
   roadmapSlug: string,
   completedNodeSlugs: string[],
 ) {
-  const user = await getCurrentUser();
+  const gate = await requireActiveAccount();
 
-  if (!user) {
+  if (!gate.ok) {
     return { ok: false as const, completedNodeSlugs };
   }
 
-  const merged = await mergeRoadmapProgress(user.id, roadmapSlug, completedNodeSlugs);
+  const merged = await mergeRoadmapProgress(
+    gate.profile.id,
+    roadmapSlug,
+    completedNodeSlugs,
+  );
   revalidatePath("/dashboard");
 
   return { ok: true as const, completedNodeSlugs: merged };
@@ -81,14 +93,14 @@ export async function replaceRoadmapProgressAction(
   roadmapSlug: string,
   completedNodeSlugs: string[],
 ) {
-  const user = await getCurrentUser();
+  const gate = await requireActiveAccount();
 
-  if (!user) {
+  if (!gate.ok) {
     return { ok: false as const, completedNodeSlugs };
   }
 
   const replaced = await replaceRoadmapProgress(
-    user.id,
+    gate.profile.id,
     roadmapSlug,
     completedNodeSlugs,
   );
@@ -142,14 +154,14 @@ export async function submitChapterQuizAction(input: {
   quizId: string;
   score: number;
 }) {
-  const user = await getCurrentUser();
+  const gate = await requireActiveAccount();
 
-  if (!user) {
-    return { ok: false as const, reason: "unauthenticated" as const };
+  if (!gate.ok) {
+    return { ok: false as const, reason: gate.reason };
   }
 
   await recordChapterQuizPassed({
-    userId: user.id,
+    userId: gate.profile.id,
     roadmapSlug: input.roadmapSlug,
     quizId: input.quizId,
     score: input.score,
@@ -164,14 +176,14 @@ export async function skipChapterQuizAction(input: {
   roadmapSlug: string;
   quizId: string;
 }) {
-  const user = await getCurrentUser();
+  const gate = await requireActiveAccount();
 
-  if (!user) {
-    return { ok: false as const, reason: "unauthenticated" as const };
+  if (!gate.ok) {
+    return { ok: false as const, reason: gate.reason };
   }
 
   await recordChapterQuizSkipped({
-    userId: user.id,
+    userId: gate.profile.id,
     roadmapSlug: input.roadmapSlug,
     quizId: input.quizId,
   });

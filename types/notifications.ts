@@ -6,10 +6,10 @@ export type EmailNotificationPrefs = {
 };
 
 export const DEFAULT_EMAIL_NOTIFICATION_PREFS: EmailNotificationPrefs = {
-  reviewOutcomes: true,
-  reviewQueue: true,
-  achievements: true,
-  product: true,
+  reviewOutcomes: false,
+  reviewQueue: false,
+  achievements: false,
+  product: false,
 };
 
 export type EmailNotificationPrefKey = keyof EmailNotificationPrefs;

@@ -79,6 +79,10 @@ export function NotificationSettingsForm({
         ) : null}
       </div>
 
+      <p className="font-mono text-xs text-muted-foreground">
+        Email notifications are off until you enable each category below.
+      </p>
+
       <fieldset className="space-y-4">
         <legend className="tech-eyebrow">categories</legend>
         {TOGGLES.map((item) => (

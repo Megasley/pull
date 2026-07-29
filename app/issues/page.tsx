@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -58,7 +59,9 @@ export default async function IssuesPage() {
       />
 
       <div className="mt-10">
-        <IssueRecommendations context={context} />
+        <Suspense fallback={<p className="text-sm text-muted-foreground">Loading recommendations…</p>}>
+          <IssueRecommendations context={context} />
+        </Suspense>
       </div>
     </div>
   );

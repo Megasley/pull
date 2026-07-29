@@ -6,6 +6,7 @@ import {
   or,
 } from "drizzle-orm";
 
+import { recordAdminAction } from "@/lib/admin/audit-log";
 import { withTimeout } from "@/lib/async/with-timeout";
 import { getAllDiscoveryRepositories } from "@/lib/discovery/catalog";
 import { getDb, getPostgresClient, withDbRetry } from "@/lib/db";
@@ -25,6 +26,11 @@ export type AdminUserRecord = {
   avatar: string | null;
   githubUsername: string;
   role: UserRole;
+  accountStatus: "active" | "suspended" | "banned";
+  moderationReason: string | null;
+  moderatedAt: string | null;
+  onboardingCompletedAt: string | null;
+  preferredRoadmapSlug: string | null;
   xp: number;
   level: number;
   createdAt: string;
@@ -65,6 +71,11 @@ function mapAdminUser(row: typeof users.$inferSelect): AdminUserRecord {
     avatar: row.avatar,
     githubUsername: row.githubUsername,
     role: row.role,
+    accountStatus: row.accountStatus,
+    moderationReason: row.moderationReason,
+    moderatedAt: row.moderatedAt,
+    onboardingCompletedAt: row.onboardingCompletedAt,
+    preferredRoadmapSlug: row.preferredRoadmapSlug,
     xp: row.xp,
     level: row.level,
     createdAt: row.createdAt,
@@ -176,6 +187,16 @@ export async function updateUserRole(input: {
   if (!updated) {
     return { ok: false, reason: "not_found" };
   }
+
+  await recordAdminAction({
+    actorUserId: input.actorUserId,
+    targetUserId: input.userId,
+    action: "role_change",
+    metadata: {
+      from: existing.role,
+      to: input.role,
+    },
+  });
 
   if (input.role === "reviewer" || input.role === "admin") {
     const { notifyRoleGrantedAsync } = await import(
@@ -407,3 +428,172 @@ export async function getPlatformMetrics(): Promise<PlatformMetrics> {
     return empty;
   }
 }
+
+export type ModerationResult =
+  | { ok: true; user: AdminUserRecord }
+  | {
+      ok: false;
+      reason: "database_unconfigured" | "not_found" | "invalid_status";
+    };
+
+async function applyModeration(input: {
+  userId: string;
+  actorUserId: string;
+  action: "suspend" | "ban" | "restore";
+  reason?: string;
+}): Promise<ModerationResult> {
+  if (!isDatabaseConfigured()) {
+    return { ok: false, reason: "database_unconfigured" };
+  }
+
+  const db = getDb();
+  const existingRows = await db
+    .select()
+    .from(users)
+    .where(eq(users.id, input.userId))
+    .limit(1);
+
+  const existing = existingRows[0];
+  if (!existing) {
+    return { ok: false, reason: "not_found" };
+  }
+
+  const now = new Date().toISOString();
+  const patch =
+    input.action === "restore"
+      ? {
+          accountStatus: "active" as const,
+          moderationReason: null,
+          moderatedAt: null,
+          moderatedBy: null,
+          updatedAt: now,
+        }
+      : {
+          accountStatus: input.action === "ban" ? ("banned" as const) : ("suspended" as const),
+          moderationReason: input.reason?.trim() || null,
+          moderatedAt: now,
+          moderatedBy: input.actorUserId,
+          updatedAt: now,
+        };
+
+  const [updated] = await db
+    .update(users)
+    .set(patch)
+    .where(eq(users.id, input.userId))
+    .returning();
+
+  if (!updated) {
+    return { ok: false, reason: "not_found" };
+  }
+
+  await recordAdminAction({
+    actorUserId: input.actorUserId,
+    targetUserId: input.userId,
+    action: input.action,
+    metadata: {
+      reason: input.reason?.trim() || null,
+      previousStatus: existing.accountStatus,
+    },
+  });
+
+  return { ok: true, user: mapAdminUser(updated) };
+}
+
+export async function suspendUser(input: {
+  userId: string;
+  actorUserId: string;
+  reason?: string;
+}) {
+  return applyModeration({ ...input, action: "suspend" });
+}
+
+export async function banUser(input: {
+  userId: string;
+  actorUserId: string;
+  reason?: string;
+}) {
+  return applyModeration({ ...input, action: "ban" });
+}
+
+export async function restoreUser(input: {
+  userId: string;
+  actorUserId: string;
+}) {
+  return applyModeration({ ...input, action: "restore" });
+}
+
+export type CronSyncHealth = {
+  lastSyncedAt: string | null;
+  errorCount: number;
+  recentErrors: string[];
+};
+
+export async function getCronSyncHealth(): Promise<CronSyncHealth> {
+  const empty: CronSyncHealth = {
+    lastSyncedAt: null,
+    errorCount: 0,
+    recentErrors: [],
+  };
+
+  if (!isDatabaseConfigured()) {
+    return empty;
+  }
+
+  try {
+    return await withTimeout(
+      withDbRetry(async () => {
+        const sql = getPostgresClient();
+        const rows = await sql.begin(async (tx) => {
+          await tx`SELECT set_config('statement_timeout', '2500', true)`;
+          return tx<{
+            last_synced_at: string | null;
+            error_count: number;
+            recent_errors: string[] | null;
+          }[]>`
+            SELECT
+              MAX(last_synced_at) AS last_synced_at,
+              COUNT(*) FILTER (WHERE sync_status = 'error')::int AS error_count,
+              (
+                SELECT ARRAY_AGG(sub.sync_error ORDER BY sub.updated_at DESC)
+                FROM (
+                  SELECT sync_error, updated_at
+                  FROM github_connections
+                  WHERE sync_status = 'error'
+                    AND sync_error IS NOT NULL
+                  ORDER BY updated_at DESC
+                  LIMIT 5
+                ) sub
+              ) AS recent_errors
+            FROM github_connections
+          `;
+        });
+
+        const row = rows[0];
+        return {
+          lastSyncedAt: row?.last_synced_at ?? null,
+          errorCount: row?.error_count ?? 0,
+          recentErrors: (row?.recent_errors ?? [])
+            .filter(Boolean)
+            .map((item) => item.slice(0, 180)),
+        };
+      }),
+      ADMIN_QUERY_BUDGET_MS,
+      empty,
+      "getCronSyncHealth",
+    );
+  } catch (error) {
+    console.warn("[admin] getCronSyncHealth failed", error);
+    return empty;
+  }
+}
+
+export async function getAdminUserById(userId: string): Promise<AdminUserRecord | null> {
+  if (!isDatabaseConfigured()) {
+    return null;
+  }
+
+  const db = getDb();
+  const rows = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+  return rows[0] ? mapAdminUser(rows[0]) : null;
+}
+

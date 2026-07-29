@@ -4,6 +4,10 @@ import { revalidatePath } from "next/cache";
 
 import { getCurrentUser } from "@/lib/auth/session";
 import {
+  moderationBlockedMessage,
+  requireActiveAccount,
+} from "@/lib/auth/require-active-account";
+import {
   getActiveSubmission,
   listUserSubmissionsForProject,
   saveDraftSubmission,
@@ -48,10 +52,14 @@ export async function saveProjectDraftAction(
   projectSlug: string,
   formData: FormData,
 ) {
-  const user = await getCurrentUser();
+  const gate = await requireActiveAccount();
 
-  if (!user) {
-    return { ok: false as const, reason: "unauthenticated" as const };
+  if (!gate.ok) {
+    return {
+      ok: false as const,
+      reason: gate.reason,
+      error: moderationBlockedMessage(gate.reason),
+    };
   }
 
   if (!getProjectBySlug(projectSlug)) {
@@ -74,7 +82,7 @@ export async function saveProjectDraftAction(
     return { ok: false as const, reason: "validation" as const, error: validation.error };
   }
 
-  const result = await saveDraftSubmission(user.id, projectSlug, {
+  const result = await saveDraftSubmission(gate.profile.id, projectSlug, {
     repoUrl: validation.data.repoUrl,
     prUrl: validation.data.prUrl,
     liveDemoUrl: validation.data.liveDemoUrl,
@@ -104,10 +112,14 @@ export async function submitProjectAction(
   projectSlug: string,
   formData: FormData,
 ) {
-  const user = await getCurrentUser();
+  const gate = await requireActiveAccount();
 
-  if (!user) {
-    return { ok: false as const, reason: "unauthenticated" as const };
+  if (!gate.ok) {
+    return {
+      ok: false as const,
+      reason: gate.reason,
+      error: moderationBlockedMessage(gate.reason),
+    };
   }
 
   if (!getProjectBySlug(projectSlug)) {
@@ -130,7 +142,7 @@ export async function submitProjectAction(
     return { ok: false as const, reason: "validation" as const, error: validation.error };
   }
 
-  const result = await submitProjectSubmission(user.id, projectSlug, {
+  const result = await submitProjectSubmission(gate.profile.id, projectSlug, {
     repoUrl: validation.data.repoUrl,
     prUrl: validation.data.prUrl,
     liveDemoUrl: validation.data.liveDemoUrl,

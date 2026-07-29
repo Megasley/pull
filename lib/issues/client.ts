@@ -2,6 +2,7 @@ import type {
   IssueCategory,
   IssueRecommendationContext,
 } from "@/types/issues";
+import type { RoadmapDifficulty } from "@/types";
 
 import { recommendIssues } from "./engine";
 
@@ -9,7 +10,11 @@ import { recommendIssues } from "./engine";
 export function rankIssuesForClient(
   context: IssueRecommendationContext,
   prefs: { savedIssueIds: string[]; dismissedIssueIds: string[] },
-  category: IssueCategory | "all" = "all",
+  options: {
+    category?: IssueCategory | "all";
+    difficulty?: RoadmapDifficulty | "all";
+    skill?: string | "all";
+  } = {},
 ) {
   return recommendIssues(
     {
@@ -17,7 +22,13 @@ export function rankIssuesForClient(
       savedIssueIds: prefs.savedIssueIds,
       dismissedIssueIds: prefs.dismissedIssueIds,
     },
-    { limit: 18, category, maxPerRepo: 2 },
+    {
+      limit: 18,
+      category: options.category ?? "all",
+      difficulty: options.difficulty ?? "all",
+      skill: options.skill ?? "all",
+      maxPerRepo: 2,
+    },
   );
 }
 
@@ -26,6 +37,7 @@ export {
   groupRecommendationsByCategory,
   getAllCuratedIssues,
   getCuratedIssueById,
+  getCuratedIssueSkills,
   ISSUE_CATEGORIES,
   ISSUE_CATEGORY_LABEL,
   ISSUE_CATEGORY_SINGULAR,

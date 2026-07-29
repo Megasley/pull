@@ -15,6 +15,14 @@ export default function Error({ error, reset }: ErrorPageProps) {
     console.error("[pull] route error:", error);
   }, [error]);
 
+  const message = error.message?.toLowerCase() ?? "";
+  const isDatabaseIssue =
+    message.includes("database_unconfigured") ||
+    message.includes("database is not configured");
+  const isGithubIssue =
+    message.includes("github") &&
+    (message.includes("sync") || message.includes("oauth"));
+
   return (
     <div className="bg-signal relative min-h-[70vh] overflow-hidden">
       <div aria-hidden className="pointer-events-none absolute inset-0">
@@ -34,6 +42,22 @@ export default function Error({ error, reset }: ErrorPageProps) {
         <p className="mt-3 max-w-xl text-base leading-snug tracking-[-0.01em] text-ink/75">
           Something blew up while rendering this route. The failure was logged.
           You can retry, or head back to safer ground.
+          {isDatabaseIssue ? (
+            <>
+              {" "}
+              The database may be misconfigured — check your environment and
+              restart the dev server.
+            </>
+          ) : null}
+          {isGithubIssue ? (
+            <>
+              {" "}
+              <Link href="/settings/github" className="underline underline-offset-4">
+                GitHub settings
+              </Link>{" "}
+              may help if sync or OAuth failed.
+            </>
+          ) : null}
         </p>
 
         <div className="mt-8 overflow-hidden rounded-none border border-ink/20 bg-ink text-[var(--background)]">

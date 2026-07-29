@@ -3,6 +3,11 @@ import {
   type EmailNotificationPrefs,
 } from "@/types/notifications";
 
+import {
+  normalizeAccountStatus,
+  type UserAccountStatus,
+} from "@/lib/auth/account-status";
+
 export type BuilderProfile = {
   id: string;
   username: string;
@@ -17,16 +22,20 @@ export type BuilderProfile = {
   skills: string[];
   emailNotifications: EmailNotificationPrefs;
   role: "builder" | "reviewer" | "admin";
+  accountStatus: UserAccountStatus;
+  moderationReason: string | null;
+  onboardingCompletedAt: string | null;
+  preferredRoadmapSlug: string | null;
   xp: number;
   level: number;
   createdAt: string;
   updatedAt: string;
 };
 
-/** Safe subset for anonymous public portfolio pages (no email / prefs). */
+/** Safe subset for anonymous public portfolio pages (no email / prefs / moderation). */
 export type PublicBuilderProfile = Omit<
   BuilderProfile,
-  "email" | "emailNotifications"
+  "email" | "emailNotifications" | "moderationReason"
 >;
 
 export function toPublicBuilderProfile(
@@ -44,6 +53,9 @@ export function toPublicBuilderProfile(
     linkedinUrl: profile.linkedinUrl,
     skills: profile.skills,
     role: profile.role,
+    accountStatus: profile.accountStatus,
+    onboardingCompletedAt: profile.onboardingCompletedAt,
+    preferredRoadmapSlug: profile.preferredRoadmapSlug,
     xp: profile.xp,
     level: profile.level,
     createdAt: profile.createdAt,
@@ -65,6 +77,10 @@ export type BuilderProfileRow = {
   skills?: string[] | null;
   email_notifications?: EmailNotificationPrefs | null;
   role?: "builder" | "reviewer" | "admin" | null;
+  account_status?: UserAccountStatus | null;
+  moderation_reason?: string | null;
+  onboarding_completed_at?: string | null;
+  preferred_roadmap_slug?: string | null;
   xp: number;
   level: number;
   created_at: string;
@@ -94,6 +110,10 @@ export function mapBuilderProfile(row: BuilderProfileRow): BuilderProfile {
     skills: normalizeSkills(row.skills),
     emailNotifications: normalizeEmailNotificationPrefs(row.email_notifications),
     role: row.role ?? "builder",
+    accountStatus: normalizeAccountStatus(row.account_status),
+    moderationReason: row.moderation_reason ?? null,
+    onboardingCompletedAt: row.onboarding_completed_at ?? null,
+    preferredRoadmapSlug: row.preferred_roadmap_slug ?? null,
     xp: row.xp,
     level: row.level,
     createdAt: row.created_at,

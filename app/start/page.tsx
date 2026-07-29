@@ -10,8 +10,12 @@ export default async function StartPage() {
   const profile = await bootstrapCurrentUserProfile();
 
   if (!profile) {
-    redirect("/sign-in?next=/roadmaps");
+    redirect("/sign-in?next=/start");
   }
 
-  redirect("/roadmaps");
+  if (!profile.onboardingCompletedAt) {
+    redirect("/onboarding");
+  }
+
+  redirect(profile.preferredRoadmapSlug ? `/roadmaps/${profile.preferredRoadmapSlug}` : "/roadmaps");
 }

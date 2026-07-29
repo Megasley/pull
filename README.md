@@ -300,9 +300,11 @@ Recommended: **Vercel + Supabase**.
 
 Post-deploy smoke test:
 
-- [ ] Logged-out lesson URL loads and shares OG metadata  
-- [ ] GitHub sign-in → dashboard → complete a lesson → refresh persists progress  
+- [ ] Logged-out lesson URL loads and shares OG metadata (roadmap + lesson opengraph-image)  
+- [ ] GitHub sign-in → new user onboarding wizard → dashboard → complete a lesson → refresh persists progress  
 - [ ] `/settings/github` connect + sync (if promoting GitHub features)  
+- [ ] `/settings` email notifications default off until opted in  
+- [ ] `/admin` platform config + funnel panels load; user detail moderation (suspend/ban/restore)  
 
 ---
 

@@ -22,7 +22,14 @@ export const metadata = {
   description: "Review submitted Pull projects.",
 };
 
-export default async function ReviewQueuePage() {
+type ReviewQueuePageProps = {
+  searchParams: Promise<{ status?: string }>;
+};
+
+export default async function ReviewQueuePage({
+  searchParams,
+}: ReviewQueuePageProps) {
+  const { status: statusFilter } = await searchParams;
   const profile = await bootstrapCurrentUserProfile();
 
   if (!profile) {
@@ -33,9 +40,20 @@ export default async function ReviewQueuePage() {
   const allQueue = isDatabaseConfigured()
     ? await listReviewQueue(profile.id)
     : [];
+
+  const nowIso = new Date().toISOString();
+  const filteredQueue = allQueue.filter((item) => {
+    if (!statusFilter || statusFilter === "all") return true;
+    if (statusFilter === "stuck") {
+      if (!item.claimedBy || !item.claimExpiresAt) return false;
+      return item.claimExpiresAt <= nowIso;
+    }
+    return item.status === statusFilter;
+  });
+
   const queue = ctx.isStaff
-    ? allQueue
-    : allQueue.filter((item) => item.userId !== profile.id);
+    ? filteredQueue
+    : filteredQueue.filter((item) => item.userId !== profile.id);
   const ownPending = ctx.isStaff
     ? []
     : allQueue.filter((item) => item.userId === profile.id);
@@ -48,8 +66,17 @@ export default async function ReviewQueuePage() {
         eyebrow="review // queue"
         title="Community review"
         description={`Eligible peers and staff review submissions. Approvals need ${required} peer votes (staff can finalize alone). Claims last ${getClaimMinutes()} minutes.`}
-        meta={`open // ${queue.length}`}
+        meta={`open // ${queue.length}${statusFilter ? ` · ${statusFilter}` : ""}`}
       />
+
+      {statusFilter ? (
+        <p className="mt-4 font-mono text-[11px] text-muted-foreground">
+          Filter: {statusFilter}.{" "}
+          <Link href="/review" className="underline underline-offset-4">
+            Clear filter
+          </Link>
+        </p>
+      ) : null}
 
       {!ctx.isStaff ? (
         <p className="mt-4 font-mono text-[11px] text-muted-foreground">

@@ -86,7 +86,7 @@ async function loadPublicBuilderProfileData(
 ): Promise<Omit<PublicBuilderProfileData, "isOwner"> | null> {
   const profile = await getUserByUsername(username);
 
-  if (!profile) {
+  if (!profile || profile.accountStatus !== "active") {
     return null;
   }
 

@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { EmptyState } from "@/components/design-system";
 import { useIssuePreferenceIds } from "@/components/issues/issue-actions";
@@ -10,33 +11,89 @@ import { Button } from "@/components/ui/button";
 import {
   ISSUE_CATEGORIES,
   ISSUE_CATEGORY_LABEL,
+  getCuratedIssueSkills,
   groupRecommendationsByCategory,
   rankIssuesForClient,
 } from "@/lib/issues/client";
 import { getCuratedIssueById } from "@/lib/issues/engine";
 import { undismissIssue } from "@/lib/issues/preferences";
 import { cn } from "@/lib/utils";
+import type { RoadmapDifficulty } from "@/types";
 import type { IssueCategory, IssueRecommendationContext } from "@/types/issues";
+
+const DIFFICULTY_OPTIONS: Array<RoadmapDifficulty | "all"> = [
+  "all",
+  "beginner",
+  "intermediate",
+  "advanced",
+];
+
+const difficultyLabels: Record<RoadmapDifficulty | "all", string> = {
+  all: "All levels",
+  beginner: "Beginner",
+  intermediate: "Intermediate",
+  advanced: "Advanced",
+};
 
 type IssueRecommendationsProps = {
   context: IssueRecommendationContext;
 };
 
 export function IssueRecommendations({ context }: IssueRecommendationsProps) {
-  const [category, setCategory] = useState<IssueCategory | "all">("all");
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [showSavedOnly, setShowSavedOnly] = useState(false);
   const [pending, startTransition] = useTransition();
   const { savedIssueIds, dismissedIssueIds } = useIssuePreferenceIds();
+
+  const category = (searchParams.get("category") as IssueCategory | "all" | null) ?? "all";
+  const difficulty =
+    (searchParams.get("difficulty") as RoadmapDifficulty | "all" | null) ?? "all";
+  const skill = searchParams.get("skill") ?? "all";
+  const skills = useMemo(() => getCuratedIssueSkills(), []);
+
+  function updateFilters(next: {
+    category?: IssueCategory | "all";
+    difficulty?: RoadmapDifficulty | "all";
+    skill?: string | "all";
+  }) {
+    const params = new URLSearchParams(searchParams.toString());
+    const values = {
+      category: next.category ?? category,
+      difficulty: next.difficulty ?? difficulty,
+      skill: next.skill ?? skill,
+    };
+
+    for (const [key, value] of Object.entries(values)) {
+      if (!value || value === "all") {
+        params.delete(key);
+      } else {
+        params.set(key, value);
+      }
+    }
+
+    const query = params.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+  }
 
   const recommendations = useMemo(() => {
     const ranked = rankIssuesForClient(
       context,
       { savedIssueIds, dismissedIssueIds },
-      category,
+      { category, difficulty, skill },
     );
     if (!showSavedOnly) return ranked;
     return ranked.filter((item) => savedIssueIds.includes(item.issue.id));
-  }, [context, savedIssueIds, dismissedIssueIds, category, showSavedOnly]);
+  }, [
+    context,
+    savedIssueIds,
+    dismissedIssueIds,
+    category,
+    difficulty,
+    skill,
+    showSavedOnly,
+  ]);
 
   const groups = useMemo(
     () => groupRecommendationsByCategory(recommendations),
@@ -55,7 +112,7 @@ export function IssueRecommendations({ context }: IssueRecommendationsProps) {
               active={category === "all"}
               onClick={() =>
                 startTransition(() => {
-                  setCategory("all");
+                  updateFilters({ category: "all" });
                   setShowSavedOnly(false);
                 })
               }
@@ -68,7 +125,7 @@ export function IssueRecommendations({ context }: IssueRecommendationsProps) {
                 active={category === item}
                 onClick={() =>
                   startTransition(() => {
-                    setCategory(item);
+                    updateFilters({ category: item });
                     setShowSavedOnly(false);
                   })
                 }
@@ -78,6 +135,63 @@ export function IssueRecommendations({ context }: IssueRecommendationsProps) {
             ))}
           </div>
         </div>
+
+        <div className="space-y-2">
+          <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+            Difficulty
+          </p>
+          <div className="-mx-1 flex flex-nowrap gap-2 overflow-x-auto overscroll-x-contain px-1 pb-1 [scrollbar-width:thin]">
+            {DIFFICULTY_OPTIONS.map((item) => (
+              <FilterChip
+                key={item}
+                active={difficulty === item}
+                onClick={() =>
+                  startTransition(() => {
+                    updateFilters({ difficulty: item });
+                    setShowSavedOnly(false);
+                  })
+                }
+              >
+                {difficultyLabels[item]}
+              </FilterChip>
+            ))}
+          </div>
+        </div>
+
+        {skills.length > 0 ? (
+          <div className="space-y-2">
+            <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+              Skill
+            </p>
+            <div className="-mx-1 flex flex-nowrap gap-2 overflow-x-auto overscroll-x-contain px-1 pb-1 [scrollbar-width:thin]">
+              <FilterChip
+                active={skill === "all"}
+                onClick={() =>
+                  startTransition(() => {
+                    updateFilters({ skill: "all" });
+                    setShowSavedOnly(false);
+                  })
+                }
+              >
+                All skills
+              </FilterChip>
+              {skills.map((item) => (
+                <FilterChip
+                  key={item}
+                  active={skill === item}
+                  onClick={() =>
+                    startTransition(() => {
+                      updateFilters({ skill: item });
+                      setShowSavedOnly(false);
+                    })
+                  }
+                >
+                  {item}
+                </FilterChip>
+              ))}
+            </div>
+          </div>
+        ) : null}
 
         <div className="-mx-1 flex flex-nowrap gap-2 overflow-x-auto overscroll-x-contain px-1 pb-1 [scrollbar-width:thin]">
           <FilterChip
@@ -95,7 +209,7 @@ export function IssueRecommendations({ context }: IssueRecommendationsProps) {
             onClick={() =>
               startTransition(() => {
                 setShowSavedOnly(true);
-                setCategory("all");
+                updateFilters({ category: "all", difficulty: "all", skill: "all" });
               })
             }
           >

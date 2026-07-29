@@ -31,6 +31,7 @@ export async function generateMetadata({ params }: RoadmapPageProps) {
   const title = `${roadmap.title} roadmap`;
   const description =
     "description" in roadmap ? roadmap.description : undefined;
+  const imageUrl = `${base}${path}/opengraph-image`;
 
   return {
     title,
@@ -41,6 +42,13 @@ export async function generateMetadata({ params }: RoadmapPageProps) {
       url: `${base}${path}`,
       siteName: siteConfig.name,
       type: "website",
+      images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [imageUrl],
     },
     alternates: {
       canonical: `${base}${path}`,

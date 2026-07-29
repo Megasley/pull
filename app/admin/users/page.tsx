@@ -104,7 +104,7 @@ export default async function AdminUsersPage({
                 key={user.id}
                 className="flex flex-col gap-4 rounded-none border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between"
               >
-                <div className="flex min-w-0 items-center gap-3">
+                <div className="flex min-w-0 flex-1 items-center gap-3">
                   <Avatar className="size-10 rounded-none">
                     {user.avatar ? (
                       <AvatarImage src={user.avatar} alt={user.displayName} />
@@ -124,11 +124,16 @@ export default async function AdminUsersPage({
                     </p>
                   </div>
                 </div>
-                <AdminUserRoleSelect
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                  <Button asChild variant="outline" size="sm">
+                    <Link href={`/admin/users/${user.id}`}>View</Link>
+                  </Button>
+                  <AdminUserRoleSelect
                   userId={user.id}
                   currentRole={user.role}
                   isSelf={user.id === profile.id}
                 />
+                </div>
               </div>
             );
           })

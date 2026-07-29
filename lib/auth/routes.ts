@@ -1,5 +1,6 @@
 export const protectedRoutes = [
   "/start",
+  "/onboarding",
   "/dashboard",
   "/achievements",
   "/settings",
@@ -16,6 +17,10 @@ export const protectedRoutes = [
 
 export function isProtectedRoute(pathname: string): boolean {
   if (pathname === "/start" || pathname.startsWith("/start/")) {
+    return true;
+  }
+
+  if (pathname === "/onboarding" || pathname.startsWith("/onboarding/")) {
     return true;
   }
 

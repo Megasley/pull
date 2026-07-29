@@ -55,6 +55,8 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
           <p className="text-sm text-destructive">
             {params.error === "configuration"
               ? "Authentication is not configured yet."
+              : params.error === "banned"
+                ? "Your account has been banned. Contact support if you think this is a mistake."
               : decodeURIComponent(params.error)}
           </p>
         </div>

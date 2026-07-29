@@ -33,6 +33,7 @@ export async function generateMetadata({ params }: LessonPageProps) {
   const path = `/roadmaps/${slug}/lessons/${lesson}`;
   const title = `${lessonData.title} · ${slug} roadmap`;
   const description = lessonData.description;
+  const imageUrl = `${base}${path}/opengraph-image`;
 
   return {
     title,
@@ -43,11 +44,13 @@ export async function generateMetadata({ params }: LessonPageProps) {
       url: `${base}${path}`,
       siteName: siteConfig.name,
       type: "article",
+      images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title,
       description,
+      images: [imageUrl],
     },
     alternates: {
       canonical: `${base}${path}`,

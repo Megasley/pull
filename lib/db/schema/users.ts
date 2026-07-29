@@ -11,7 +11,7 @@ import {
 import type { EmailNotificationPrefs } from "@/types/notifications";
 import { DEFAULT_EMAIL_NOTIFICATION_PREFS } from "@/types/notifications";
 
-import { userRoleEnum } from "./enums";
+import { userAccountStatusEnum, userRoleEnum } from "./enums";
 
 export const users = pgTable(
   "users",
@@ -32,6 +32,17 @@ export const users = pgTable(
       .notNull()
       .default(DEFAULT_EMAIL_NOTIFICATION_PREFS),
     role: userRoleEnum("role").notNull().default("builder"),
+    accountStatus: userAccountStatusEnum("account_status")
+      .notNull()
+      .default("active"),
+    moderationReason: text("moderation_reason"),
+    moderatedAt: timestamp("moderated_at", { withTimezone: true, mode: "string" }),
+    moderatedBy: uuid("moderated_by"),
+    onboardingCompletedAt: timestamp("onboarding_completed_at", {
+      withTimezone: true,
+      mode: "string",
+    }),
+    preferredRoadmapSlug: text("preferred_roadmap_slug"),
     xp: integer("xp").notNull().default(0),
     level: integer("level").notNull().default(1),
     createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
@@ -49,6 +60,7 @@ export const users = pgTable(
     index("users_username_idx").on(table.username),
     index("users_github_username_idx").on(table.githubUsername),
     index("users_role_idx").on(table.role),
+    index("users_account_status_idx").on(table.accountStatus),
     index("users_last_active_at_idx").on(table.lastActiveAt),
   ],
 );

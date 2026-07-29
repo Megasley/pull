@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { after } from "next/server";
 
 import { sanitizeRedirectPath } from "@/lib/auth/routes";
+import { canSignIn } from "@/lib/auth/account-status";
 import { ensureBuilderProfile } from "@/lib/auth/ensure-builder-profile";
 import {
   connectGithubFromSession,
@@ -45,6 +46,11 @@ export async function GET(request: Request) {
   if (user) {
     const profile = await ensureBuilderProfile(user);
 
+    if (profile && !canSignIn(profile.accountStatus)) {
+      await supabase.auth.signOut();
+      return NextResponse.redirect(new URL("/sign-in?error=banned", request.url));
+    }
+
     if (profile) {
       // Capture provider token in request context — `after()` cannot call cookies().
       const accessToken = await getSessionGithubAccessToken();
@@ -56,6 +62,17 @@ export async function GET(request: Request) {
           await runGithubSync(profile.id, { accessToken });
         }
       });
+    }
+
+    if (profile && !profile.onboardingCompletedAt) {
+      const skipOnboarding =
+        next.startsWith("/admin") ||
+        next.startsWith("/settings") ||
+        next.startsWith("/onboarding");
+
+      if (!skipOnboarding) {
+        return NextResponse.redirect(new URL("/onboarding", origin));
+      }
     }
   }
 

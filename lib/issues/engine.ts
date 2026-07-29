@@ -1,5 +1,6 @@
 import issuesCatalog from "@/content/discovery/issues.json";
 import { getDiscoveryRepositoryById } from "@/lib/discovery/catalog";
+import type { RoadmapDifficulty } from "@/types";
 import type {
   CuratedIssue,
   IssueCategory,
@@ -37,6 +38,16 @@ export function getAllCuratedIssues(): CuratedIssue[] {
   return issues;
 }
 
+export function getCuratedIssueSkills(): string[] {
+  const skills = new Set<string>();
+  for (const issue of issues) {
+    for (const skill of issue.skills) {
+      skills.add(skill);
+    }
+  }
+  return [...skills].sort((a, b) => a.localeCompare(b));
+}
+
 export function getCuratedIssueById(id: string): CuratedIssue | null {
   return issues.find((issue) => issue.id === id) ?? null;
 }
@@ -50,6 +61,8 @@ export function recommendIssues(
   options: {
     limit?: number;
     category?: IssueCategory | "all";
+    difficulty?: RoadmapDifficulty | "all";
+    skill?: string | "all";
     maxPerRepo?: number;
   } = {},
 ): IssueRecommendation[] {
@@ -67,6 +80,18 @@ export function recommendIssues(
   for (const issue of issues) {
     if (dismissed.has(issue.id)) continue;
     if (options.category && options.category !== "all" && issue.category !== options.category) {
+      continue;
+    }
+
+    if (
+      options.difficulty &&
+      options.difficulty !== "all" &&
+      issue.difficulty !== options.difficulty
+    ) {
+      continue;
+    }
+
+    if (options.skill && options.skill !== "all" && !issue.skills.includes(options.skill)) {
       continue;
     }
 

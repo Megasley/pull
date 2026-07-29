@@ -1,3 +1,4 @@
+export * from "./admin-audit-log";
 export * from "./enums";
 export * from "./github";
 export * from "./goals";

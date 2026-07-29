@@ -40,6 +40,12 @@ export const userRoleEnum = pgEnum("user_role", [
   "admin",
 ]);
 
+export const userAccountStatusEnum = pgEnum("user_account_status", [
+  "active",
+  "suspended",
+  "banned",
+]);
+
 export const reviewEventTypeEnum = pgEnum("review_event_type", [
   "status_change",
   "comment",

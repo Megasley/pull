@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { isAdminRole } from "@/lib/auth/roles";
 import { bootstrapCurrentUserProfile, getCurrentUser } from "@/lib/auth/session";
-import { updateUserRole } from "@/lib/admin/repository";
+import { updateUserRole, suspendUser, banUser, restoreUser } from "@/lib/admin/repository";
 import type { UserRole } from "@/types/submission";
 
 const VALID_ROLES: UserRole[] = ["builder", "reviewer", "admin"];
@@ -69,5 +69,92 @@ export async function updateUserRoleAction(userId: string, role: UserRole) {
 
   revalidatePath("/admin");
   revalidatePath("/admin/users");
+  revalidatePath(`/admin/users/${userId}`);
+  return { ok: true as const, user: result.user };
+}
+
+function moderationErrorMessage(reason: string) {
+  switch (reason) {
+    case "not_found":
+      return "User not found.";
+    default:
+      return "Could not update account status.";
+  }
+}
+
+export async function suspendUserAction(userId: string, reason?: string) {
+  const gate = await requireAdmin();
+  if (!gate.ok) {
+    return { ok: false as const, reason: gate.reason };
+  }
+
+  const result = await suspendUser({
+    userId,
+    actorUserId: gate.user.id,
+    reason,
+  });
+
+  if (!result.ok) {
+    return {
+      ok: false as const,
+      reason: result.reason,
+      error: moderationErrorMessage(result.reason),
+    };
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/admin/users");
+  revalidatePath(`/admin/users/${userId}`);
+  return { ok: true as const, user: result.user };
+}
+
+export async function banUserAction(userId: string, reason?: string) {
+  const gate = await requireAdmin();
+  if (!gate.ok) {
+    return { ok: false as const, reason: gate.reason };
+  }
+
+  const result = await banUser({
+    userId,
+    actorUserId: gate.user.id,
+    reason,
+  });
+
+  if (!result.ok) {
+    return {
+      ok: false as const,
+      reason: result.reason,
+      error: moderationErrorMessage(result.reason),
+    };
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/admin/users");
+  revalidatePath(`/admin/users/${userId}`);
+  return { ok: true as const, user: result.user };
+}
+
+export async function restoreUserAction(userId: string) {
+  const gate = await requireAdmin();
+  if (!gate.ok) {
+    return { ok: false as const, reason: gate.reason };
+  }
+
+  const result = await restoreUser({
+    userId,
+    actorUserId: gate.user.id,
+  });
+
+  if (!result.ok) {
+    return {
+      ok: false as const,
+      reason: result.reason,
+      error: moderationErrorMessage(result.reason),
+    };
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/admin/users");
+  revalidatePath(`/admin/users/${userId}`);
   return { ok: true as const, user: result.user };
 }

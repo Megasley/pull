@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { bootstrapCurrentUserProfile, getCurrentUser } from "@/lib/auth/session";
+import { requireActiveAccount } from "@/lib/auth/require-active-account";
 import {
   isEligiblePeer,
   loadPeerReviewContext,
@@ -16,19 +16,13 @@ import {
 import type { ReviewAction } from "@/types/submission";
 
 async function requireReviewActor() {
-  const user = await getCurrentUser();
+  const gate = await requireActiveAccount();
 
-  if (!user) {
-    return { ok: false as const, reason: "unauthenticated" as const };
+  if (!gate.ok) {
+    return { ok: false as const, reason: gate.reason };
   }
 
-  const profile = await bootstrapCurrentUserProfile();
-
-  if (!profile) {
-    return { ok: false as const, reason: "unauthenticated" as const };
-  }
-
-  return { ok: true as const, user, profile };
+  return { ok: true as const, user: { id: gate.profile.id }, profile: gate.profile };
 }
 
 function revalidateReviewPaths(submissionId: string, projectSlug?: string) {
