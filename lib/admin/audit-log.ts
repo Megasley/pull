@@ -46,20 +46,25 @@ export async function listAuditLogForUser(
     return [];
   }
 
-  const db = getDb();
-  const rows = await db
-    .select()
-    .from(adminAuditLog)
-    .where(eq(adminAuditLog.targetUserId, userId))
-    .orderBy(desc(adminAuditLog.createdAt))
-    .limit(limit);
+  try {
+    const db = getDb();
+    const rows = await db
+      .select()
+      .from(adminAuditLog)
+      .where(eq(adminAuditLog.targetUserId, userId))
+      .orderBy(desc(adminAuditLog.createdAt))
+      .limit(limit);
 
-  return rows.map((row) => ({
-    id: row.id,
-    actorUserId: row.actorUserId,
-    targetUserId: row.targetUserId,
-    action: row.action,
-    metadata: row.metadata ?? {},
-    createdAt: row.createdAt,
-  }));
+    return rows.map((row) => ({
+      id: row.id,
+      actorUserId: row.actorUserId,
+      targetUserId: row.targetUserId,
+      action: row.action,
+      metadata: row.metadata ?? {},
+      createdAt: row.createdAt,
+    }));
+  } catch (error) {
+    console.warn("[admin] listAuditLogForUser failed", error);
+    return [];
+  }
 }

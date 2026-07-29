@@ -4,9 +4,16 @@ import {
   eq,
   ilike,
   or,
+  sql,
 } from "drizzle-orm";
 
 import { recordAdminAction } from "@/lib/admin/audit-log";
+import {
+  countMonthlyActiveUsers,
+  countRegisteredUsers,
+  countReviewHealthStats,
+  fetchCronSyncHealth,
+} from "@/lib/admin/metrics-queries";
 import { withTimeout } from "@/lib/async/with-timeout";
 import { getAllDiscoveryRepositories } from "@/lib/discovery/catalog";
 import { getDb, getPostgresClient, withDbRetry } from "@/lib/db";
@@ -14,7 +21,6 @@ import { isDatabaseConfigured } from "@/lib/db/env";
 import { projectSubmissions, projects, users } from "@/lib/db/schema";
 import { getAllProjects } from "@/lib/projects/catalog";
 import type { SubmissionStatus, UserRole } from "@/types/submission";
-import { REVIEW_QUEUE_STATUSES } from "@/types/submission";
 
 /** Soft budget so /admin never burns a full Vercel function timeout. */
 const ADMIN_QUERY_BUDGET_MS = 4_000;
@@ -119,6 +125,9 @@ export async function listRecentSubmissionsForAdmin(
     .from(projectSubmissions)
     .innerJoin(projects, eq(projectSubmissions.projectId, projects.id))
     .innerJoin(users, eq(projectSubmissions.userId, users.id))
+    .where(
+      sql`lower(${users.username}) <> 'satoshee'`,
+    )
     .orderBy(desc(projectSubmissions.updatedAt))
     .limit(limit);
 
@@ -268,58 +277,9 @@ export async function getReviewHealth(): Promise<ReviewHealth> {
     return empty;
   }
 
-  const now = new Date().toISOString();
-  const statuses = [...REVIEW_QUEUE_STATUSES];
-
   try {
-    return await withTimeout(
-      withDbRetry(async () => {
-        const sql = getPostgresClient();
-        const rows = await sql.begin(async (tx) => {
-          await tx`SELECT set_config('statement_timeout', '3000', true)`;
-          return tx<{
-            submitted: number;
-            under_review: number;
-            needs_changes: number;
-            active_claims: number;
-            stuck_claims: number;
-          }[]>`
-            SELECT
-              COUNT(*) FILTER (WHERE status = 'submitted')::int AS submitted,
-              COUNT(*) FILTER (WHERE status = 'under_review')::int AS under_review,
-              COUNT(*) FILTER (WHERE status = 'needs_changes')::int AS needs_changes,
-              COUNT(*) FILTER (
-                WHERE claimed_by IS NOT NULL
-                  AND claim_expires_at IS NOT NULL
-                  AND claim_expires_at > ${now}
-              )::int AS active_claims,
-              COUNT(*) FILTER (
-                WHERE claimed_by IS NOT NULL
-                  AND claim_expires_at IS NOT NULL
-                  AND claim_expires_at <= ${now}
-              )::int AS stuck_claims
-            FROM project_submissions
-            WHERE status = ANY(${statuses}::text[])
-          `;
-        });
-
-        const row = rows[0];
-        const submitted = row?.submitted ?? 0;
-        const underReview = row?.under_review ?? 0;
-        const needsChanges = row?.needs_changes ?? 0;
-
-        return {
-          submitted,
-          underReview,
-          needsChanges,
-          openTotal: submitted + underReview + needsChanges,
-          activeClaims: row?.active_claims ?? 0,
-          stuckClaims: row?.stuck_claims ?? 0,
-        };
-      }),
-      ADMIN_QUERY_BUDGET_MS,
-      empty,
-      "getReviewHealth",
+    return await withDbRetry(async () =>
+      countReviewHealthStats(new Date().toISOString()),
     );
   } catch (error) {
     console.warn("[admin] getReviewHealth failed", error);
@@ -438,32 +398,17 @@ export async function getPlatformMetrics(): Promise<PlatformMetrics> {
   ).toISOString();
 
   try {
-    const counts = await withTimeout(
-      withDbRetry(async () => {
-        const sql = getPostgresClient();
-        return sql.begin(async (tx) => {
-          await tx`SELECT set_config('statement_timeout', '3000', true)`;
-          return tx<{ registered: number; mau: number }[]>`
-            SELECT
-              COUNT(*)::int AS registered,
-              COUNT(*) FILTER (
-                WHERE last_active_at IS NOT NULL
-                  AND last_active_at >= ${thirtyDaysAgo}
-              )::int AS mau
-            FROM users
-          `;
-        });
-      }),
-      ADMIN_QUERY_BUDGET_MS,
-      null,
-      "getPlatformMetrics.counts",
+    const [registeredUsers, monthlyActiveUsers] = await withDbRetry(async () =>
+      Promise.all([
+        countRegisteredUsers(),
+        countMonthlyActiveUsers(thirtyDaysAgo),
+      ]),
     );
 
     return {
-      registeredUsers: counts?.[0]?.registered ?? 0,
-      monthlyActiveUsers: counts?.[0]?.mau ?? 0,
+      registeredUsers,
+      monthlyActiveUsers,
       projectsListed,
-      // Expensive join — skip on page render; show 0 rather than timing out /admin.
       firstOssViaPull: 0,
     };
   } catch (error) {
@@ -583,47 +528,7 @@ export async function getCronSyncHealth(): Promise<CronSyncHealth> {
   }
 
   try {
-    return await withTimeout(
-      withDbRetry(async () => {
-        const sql = getPostgresClient();
-        const rows = await sql.begin(async (tx) => {
-          await tx`SELECT set_config('statement_timeout', '2500', true)`;
-          return tx<{
-            last_synced_at: string | null;
-            error_count: number;
-            recent_errors: string[] | null;
-          }[]>`
-            SELECT
-              MAX(last_synced_at) AS last_synced_at,
-              COUNT(*) FILTER (WHERE sync_status = 'error')::int AS error_count,
-              (
-                SELECT ARRAY_AGG(sub.sync_error ORDER BY sub.updated_at DESC)
-                FROM (
-                  SELECT sync_error, updated_at
-                  FROM github_connections
-                  WHERE sync_status = 'error'
-                    AND sync_error IS NOT NULL
-                  ORDER BY updated_at DESC
-                  LIMIT 5
-                ) sub
-              ) AS recent_errors
-            FROM github_connections
-          `;
-        });
-
-        const row = rows[0];
-        return {
-          lastSyncedAt: row?.last_synced_at ?? null,
-          errorCount: row?.error_count ?? 0,
-          recentErrors: (row?.recent_errors ?? [])
-            .filter(Boolean)
-            .map((item) => item.slice(0, 180)),
-        };
-      }),
-      ADMIN_QUERY_BUDGET_MS,
-      empty,
-      "getCronSyncHealth",
-    );
+    return await withDbRetry(fetchCronSyncHealth);
   } catch (error) {
     console.warn("[admin] getCronSyncHealth failed", error);
     return empty;

@@ -7,17 +7,17 @@ import { PageHeader } from "@/components/design-system";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  getLearningFunnel,
   getUserGithubSyncForAdmin,
   getUserSubmissionsForAdmin,
 } from "@/lib/admin/analytics";
 import { listAuditLogForUser } from "@/lib/admin/audit-log";
 import { getAdminUserById } from "@/lib/admin/repository";
+import { isUuid } from "@/lib/admin/validate-user-id";
 import { isAdminRole } from "@/lib/auth/roles";
 import { bootstrapCurrentUserProfile } from "@/lib/auth/session";
+import { isDatabaseConfigured } from "@/lib/db/env";
 import { buildAllRoadmapProgressSummaries } from "@/lib/progress/summary";
 import { getAllCompletedNodeSlugs } from "@/lib/progress/repository";
-import { isDatabaseConfigured } from "@/lib/db/env";
 import { SUBMISSION_STATUS_LABELS } from "@/types/submission";
 
 type AdminUserDetailPageProps = {
@@ -43,7 +43,7 @@ export default async function AdminUserDetailPage({
 
   const { id } = await params;
 
-  if (!isDatabaseConfigured()) {
+  if (!isDatabaseConfigured() || !isUuid(id)) {
     notFound();
   }
 
@@ -61,7 +61,6 @@ export default async function AdminUserDetailPage({
   ]);
 
   const roadmaps = buildAllRoadmapProgressSummaries(progressByRoadmap);
-  const funnel = await getLearningFunnel("all");
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 pt-12 pb-20 sm:px-6 lg:px-8">
@@ -69,7 +68,7 @@ export default async function AdminUserDetailPage({
         eyebrow="admin // user"
         title={user.displayName}
         description={`@${user.username} · gh:${user.githubUsername}`}
-        meta={`joined ${new Date(user.createdAt).toLocaleDateString()}`}
+        meta={`id ${user.id} · joined ${new Date(user.createdAt).toLocaleDateString()}`}
         actions={
           <Button asChild variant="outline">
             <Link href="/admin/users">./users</Link>
@@ -98,16 +97,20 @@ export default async function AdminUserDetailPage({
 
           <div className="rounded-none border border-border bg-card p-4">
             <h2 className="text-sm font-semibold">Roadmap progress</h2>
-            <ul className="mt-3 space-y-2 text-sm">
-              {roadmaps.map((item) => (
-                <li key={item.roadmapSlug} className="flex justify-between gap-3">
-                  <span>{item.title}</span>
-                  <span className="font-mono text-xs text-muted-foreground">
-                    {item.completed}/{item.total}
-                  </span>
-                </li>
-              ))}
-            </ul>
+            {roadmaps.length === 0 ? (
+              <p className="mt-2 text-sm text-muted-foreground">No lesson progress yet.</p>
+            ) : (
+              <ul className="mt-3 space-y-2 text-sm">
+                {roadmaps.map((item) => (
+                  <li key={item.roadmapSlug} className="flex justify-between gap-3">
+                    <span>{item.title}</span>
+                    <span className="font-mono text-xs text-muted-foreground">
+                      {item.completed}/{item.total}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
           <div className="rounded-none border border-border bg-card p-4">
@@ -178,28 +181,6 @@ export default async function AdminUserDetailPage({
                 ))}
               </ul>
             )}
-          </div>
-
-          <div className="rounded-none border border-border bg-card p-4">
-            <h2 className="text-sm font-semibold">Platform funnel (all-time)</h2>
-            <dl className="mt-3 space-y-1 text-sm">
-              <div className="flex justify-between">
-                <dt>Registered</dt>
-                <dd>{funnel.registeredUsers}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt>≥1 lesson</dt>
-                <dd>{funnel.completedLessonUsers}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt>≥1 quiz passed</dt>
-                <dd>{funnel.passedQuizUsers}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt>≥1 submission</dt>
-                <dd>{funnel.submittedProjectUsers}</dd>
-              </div>
-            </dl>
           </div>
         </aside>
       </div>

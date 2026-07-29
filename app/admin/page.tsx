@@ -15,7 +15,7 @@ import {
   getLearningFunnel,
   getLessonDropOff,
 } from "@/lib/admin/analytics";
-import { withTimeout } from "@/lib/async/with-timeout";
+import { filterDemoSubmissions } from "@/lib/admin/metrics-queries";
 import { isAdminRole } from "@/lib/auth/roles";
 import { bootstrapCurrentUserProfile } from "@/lib/auth/session";
 import { isDatabaseConfigured } from "@/lib/db/env";
@@ -68,53 +68,21 @@ export default async function AdminOverviewPage({
     );
   }
 
-  const emptyHealth = {
-    submitted: 0,
-    underReview: 0,
-    needsChanges: 0,
-    openTotal: 0,
-    activeClaims: 0,
-    stuckClaims: 0,
-  };
-  const emptyRoles = { builder: 0, reviewer: 0, admin: 0 };
-  const emptyMetrics = {
-    registeredUsers: 0,
-    monthlyActiveUsers: 0,
-    projectsListed: 0,
-    firstOssViaPull: 0,
-  };
-  const emptyCron = {
-    lastSyncedAt: null as string | null,
-    errorCount: 0,
-    recentErrors: [] as string[],
-  };
-  const emptyFunnel = {
-    registeredUsers: 0,
-    completedLessonUsers: 0,
-    passedQuizUsers: 0,
-    submittedProjectUsers: 0,
-    firstOssViaPull: 0,
-  };
-
-  // Hard ceiling so a stuck DB connection cannot burn the whole invocation.
   const [health, roleCounts, metrics, cronHealth, funnel, dropOff] =
-    await withTimeout(
-      Promise.all([
-        getReviewHealth(),
-        countUsersByRole(),
-        getPlatformMetrics(),
-        getCronSyncHealth(),
-        getLearningFunnel(funnelRange),
-        getLessonDropOff(10),
-      ]),
-      7_000,
-      [emptyHealth, emptyRoles, emptyMetrics, emptyCron, emptyFunnel, []],
-      "admin.overview",
-    );
+    await Promise.all([
+      getReviewHealth(),
+      countUsersByRole(),
+      getPlatformMetrics(),
+      getCronSyncHealth(),
+      getLearningFunnel(funnelRange),
+      getLessonDropOff(10),
+    ]);
 
   const platformHealth = getPlatformHealth();
 
-  const openQueue = await listReviewQueue(profile.id);
+  const openQueue = filterDemoSubmissions(
+    await listReviewQueue(profile.id),
+  );
   const recentSubmissions = await listRecentSubmissionsForAdmin(25);
 
   const userTotal =
