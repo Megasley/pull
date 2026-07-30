@@ -39,7 +39,7 @@ Pull is the operating system for open source builders: **learn → ship → cont
 
 - [x] **Supabase Auth** — GitHub OAuth
 - [x] **Drizzle ORM** — migrations through `0016_admin_metrics_snapshots`
-- [x] **Admin ops** — funnel metrics (15m snapshot), live review queue, user detail, suspend/ban/restore, audit log
+- [x] **Admin ops** — funnel metrics (daily snapshot), live review queue, user detail, suspend/ban/restore, audit log
 - [x] **Content validation** — roadmap JSON + MDX lint scripts
 - [x] **SEO** — sitemap, Open Graph images on roadmaps and lessons
 - [x] **Public beta framing** — Beta badge in nav + Feedback → GitHub Issues

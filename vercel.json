@@ -6,7 +6,7 @@
     },
     {
       "path": "/api/cron/admin-metrics",
-      "schedule": "*/15 * * * *"
+      "schedule": "30 6 * * *"
     }
   ]
 }

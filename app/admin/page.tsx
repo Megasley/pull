@@ -117,7 +117,7 @@ export default async function AdminOverviewPage({
       <MetricsBanner
         tone="warn"
         title="Aggregates unavailable"
-        body="Launch metrics, funnel, and drop-off have not been computed yet. Use Refresh metrics or wait for the 15-minute cron."
+        body="Launch metrics, funnel, and drop-off have not been computed yet. Use Refresh metrics or wait for the daily cron."
       />
     ) : snapshot.status === "error" ? (
       <MetricsBanner
@@ -133,7 +133,7 @@ export default async function AdminOverviewPage({
       <MetricsBanner
         tone="warn"
         title="Aggregates are stale"
-        body="Snapshot is older than 45 minutes. Cron may be missing CRON_SECRET or failing — try Refresh metrics."
+        body="Snapshot is older than ~36 hours. Cron may be missing CRON_SECRET or failing — try Refresh metrics."
       />
     ) : null;
 
@@ -142,7 +142,7 @@ export default async function AdminOverviewPage({
       <PageHeader
         eyebrow="admin // overview"
         title="Platform admin"
-        description="Review queue is live. Launch metrics and funnel come from a DB snapshot refreshed every 15 minutes."
+        description="Review queue is live. Launch metrics and funnel come from a DB snapshot refreshed daily (or via Refresh metrics)."
         meta={
           userTotal == null
             ? snapshotMetaLabel(snapshot)

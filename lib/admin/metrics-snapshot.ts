@@ -18,8 +18,8 @@ import type { UserRole } from "@/types/submission";
 
 export const ADMIN_METRICS_SNAPSHOT_ID = "overview";
 
-/** Treat snapshot as stale after 3 missed 15-minute crons. */
-export const ADMIN_METRICS_STALE_MS = 45 * 60 * 1000;
+/** Treat snapshot as stale after ~36h (missed a daily cron). */
+export const ADMIN_METRICS_STALE_MS = 36 * 60 * 60 * 1000;
 
 export type AdminMetricsSnapshotPayload = {
   version: 1;
