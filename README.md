@@ -307,7 +307,7 @@ Post-deploy smoke test:
 - [ ] GitHub sign-in → new user onboarding wizard → dashboard → complete a lesson → refresh persists progress  
 - [ ] `/settings/github` connect + sync (if promoting GitHub features)  
 - [ ] `/settings` email notifications default off until opted in  
-- [ ] `/admin` platform config + funnel panels load; user detail moderation (suspend/ban/restore)  
+- [ ] `/admin` platform config + live review queue load; snapshot metrics refresh (cron or Refresh metrics); user detail moderation (suspend/ban/restore)  
 
 ---
 

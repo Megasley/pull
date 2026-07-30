@@ -2,9 +2,15 @@
 
 import { revalidatePath } from "next/cache";
 
+import { refreshAdminMetricsSnapshot } from "@/lib/admin/metrics-snapshot";
+import {
+  banUser,
+  restoreUser,
+  suspendUser,
+  updateUserRole,
+} from "@/lib/admin/repository";
 import { isAdminRole } from "@/lib/auth/roles";
 import { bootstrapCurrentUserProfile, getCurrentUser } from "@/lib/auth/session";
-import { updateUserRole, suspendUser, banUser, restoreUser } from "@/lib/admin/repository";
 import type { UserRole } from "@/types/submission";
 
 const VALID_ROLES: UserRole[] = ["builder", "reviewer", "admin"];
@@ -157,4 +163,29 @@ export async function restoreUserAction(userId: string) {
   revalidatePath("/admin/users");
   revalidatePath(`/admin/users/${userId}`);
   return { ok: true as const, user: result.user };
+}
+
+/** Manually recompute launch/funnel metrics snapshot (same work as the cron). */
+export async function refreshAdminMetricsAction() {
+  const gate = await requireAdmin();
+  if (!gate.ok) {
+    return { ok: false as const, reason: gate.reason };
+  }
+
+  const result = await refreshAdminMetricsSnapshot();
+  revalidatePath("/admin");
+
+  if (!result.ok) {
+    return {
+      ok: false as const,
+      reason: "refresh_failed" as const,
+      error: result.error ?? "Could not refresh metrics.",
+      computedAt: result.computedAt,
+    };
+  }
+
+  return {
+    ok: true as const,
+    computedAt: result.computedAt,
+  };
 }

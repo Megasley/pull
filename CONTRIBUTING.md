@@ -88,7 +88,7 @@ npm run db:migrate
 npm run db:validate
 ```
 
-Legacy Supabase SQL files in `supabase/migrations/` may exist for older deployments; new installs should rely on Drizzle through the latest journal entry (currently `0015_launch_admin`).
+Legacy Supabase SQL files in `supabase/migrations/` may exist for older deployments; new installs should rely on Drizzle through the latest journal entry (currently `0016_admin_metrics_snapshots`).
 
 ### 4. GitHub OAuth
 

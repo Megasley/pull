@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/github-sync",
       "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/admin-metrics",
+      "schedule": "*/15 * * * *"
     }
   ]
 }
