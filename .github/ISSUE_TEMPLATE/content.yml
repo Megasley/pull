@@ -1,0 +1,43 @@
+name: Curriculum / content
+description: Lesson error, outdated guidance, broken link, or unclear exercise
+title: "[content] "
+labels: ["content"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this for factual errors, dead links, or exercises that don’t work as written.
+  - type: input
+    id: lesson
+    attributes:
+      label: Lesson or project
+      description: Slug or URL (e.g. `basics-script` or `/roadmaps/bitcoin/lessons/basics-script`).
+      placeholder: basics-utxo
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind of issue
+      options:
+        - Factual error
+        - Outdated guidance
+        - Broken / dead link
+        - Misleading simplification
+        - Lab / exercise problem
+        - Typo / clarity
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: What’s wrong?
+      description: Quote the line if you can, and what it should say instead.
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: Sources (optional)
+      description: BIP, BOLT, book chapter, or docs that support the correction.

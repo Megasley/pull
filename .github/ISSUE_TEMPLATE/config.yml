@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: X / @pullosdev
+    url: https://x.com/pullosdev
+    about: Quick product notes and launch updates
+  - name: Email
+    url: mailto:hello@pullos.dev
+    about: Privacy, security, or private reports

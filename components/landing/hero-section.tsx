@@ -131,7 +131,7 @@ export function HeroSection() {
             <span className="tech-blink ml-2 inline-block h-2.5 w-2 bg-ink align-middle" />
           </p>
           <span className="border border-ink/35 bg-ink/5 px-2 py-1 font-mono text-[10px] tracking-[0.14em] text-ink uppercase">
-            beta // curriculum under review
+            Beta
           </span>
         </div>
 

@@ -27,27 +27,32 @@ Pull is the operating system for open source builders: **learn → ship → cont
 ### Builder workspace
 
 - [x] **Dashboard** — continue learning, roadmap progress, projects, GitHub activity, weekly goals
+- [x] **Onboarding wizard** — preferred roadmap + completion marker for new builders
 - [x] **Projects & submissions** — build challenges tied to lessons, submission workflow
 - [x] **GitHub integration** — OAuth token sync, PR/issue activity, scheduled cron sync
 - [x] **Portfolio & reputation** — public builder profiles, PR portfolio, peer review workflow
 - [x] **Achievements & XP** — builder level progression
-- [x] **Email notifications** — optional Resend integration
+- [x] **Email notifications** — opt-in Resend integration (defaults off)
+- [x] **Discover / issues** — contribution discovery with difficulty and skill filters
 
 ### Platform
 
 - [x] **Supabase Auth** — GitHub OAuth
-- [x] **Drizzle ORM** — migrations through `0013_user_weekly_goals`
+- [x] **Drizzle ORM** — migrations through `0015_launch_admin`
+- [x] **Admin ops** — funnel metrics, user detail, suspend/ban/restore, audit log
 - [x] **Content validation** — roadmap JSON + MDX lint scripts
-- [x] **SEO** — sitemap, Open Graph metadata on roadmaps and lessons
+- [x] **SEO** — sitemap, Open Graph images on roadmaps and lessons
+- [x] **Public beta framing** — Beta badge in nav + Feedback → GitHub Issues
+- [x] **Social links** — GitHub + X in site config / footer
 
 ---
 
 ## In progress / polish
 
 - [ ] **Screenshot gallery** in README (`docs/screenshots/`)
-- [ ] **Social links** in site config when accounts are public
 - [ ] **Self-host documentation** — production checklist for Vercel + Supabase deployers
-- [ ] **Contributor onboarding** — good-first-issue labels and content contribution templates
+- [ ] **Good first issue** labels + content contribution triage
+- [ ] **P0 curriculum accuracy pass** — see [docs/pre-launch-checklist.md](./docs/pre-launch-checklist.md)
 
 ---
 
@@ -61,13 +66,12 @@ Pull is the operating system for open source builders: **learn → ship → cont
 
 ### Product
 
-- [ ] Improved **discover / issues** matching (skills, repo tags, difficulty)
+- [ ] Deeper **discover / issues** matching (repo tags, richer skill signals)
 - [ ] **Offline-friendly** reading mode or export for lessons
 - [ ] **Roadmap analytics** for maintainers (completion funnels, drop-off nodes)
 
 ### Open source
 
-- [ ] Published **GitHub org** + issue templates
 - [ ] **Good first issue** triage for docs and small UI fixes
 - [ ] **Plugin-style content packs** — document how third parties add a new `content/<roadmap>/` tree
 

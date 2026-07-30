@@ -10,17 +10,28 @@ import {
   getPlatformMetrics,
   getReviewHealth,
   listRecentSubmissionsForAdmin,
+  type AdminSubmissionRecord,
+  type CronSyncHealth,
+  type PlatformMetrics,
+  type ReviewHealth,
 } from "@/lib/admin/repository";
 import {
   getLearningFunnel,
   getLessonDropOff,
+  type FunnelMetrics,
+  type LessonDropOff,
 } from "@/lib/admin/analytics";
 import { filterDemoSubmissions } from "@/lib/admin/metrics-queries";
+import { withTimeout } from "@/lib/async/with-timeout";
 import { isAdminRole } from "@/lib/auth/roles";
 import { bootstrapCurrentUserProfile } from "@/lib/auth/session";
 import { isDatabaseConfigured } from "@/lib/db/env";
 import { getPlatformHealth } from "@/lib/platform/health";
 import { listReviewQueue } from "@/lib/reviews/repository";
+import type {
+  ProjectSubmissionRecord,
+  UserRole,
+} from "@/types/submission";
 import { REVIEW_QUEUE_STATUSES, SUBMISSION_STATUS_LABELS } from "@/types/submission";
 
 export const metadata = {
@@ -28,8 +39,46 @@ export const metadata = {
   description: "Platform admin overview for Pull.",
 };
 
-/** Allow longer runs on Pro; Hobby still caps lower. */
+/** Soft ceiling — prefer fail-soft metrics over FUNCTION_INVOCATION_TIMEOUT. */
 export const maxDuration = 30;
+
+const ADMIN_OVERVIEW_BUDGET_MS = 8_000;
+
+const EMPTY_HEALTH: ReviewHealth = {
+  submitted: 0,
+  underReview: 0,
+  needsChanges: 0,
+  openTotal: 0,
+  activeClaims: 0,
+  stuckClaims: 0,
+};
+
+const EMPTY_ROLES: Record<UserRole, number> = {
+  builder: 0,
+  reviewer: 0,
+  admin: 0,
+};
+
+const EMPTY_METRICS: PlatformMetrics = {
+  registeredUsers: 0,
+  monthlyActiveUsers: 0,
+  projectsListed: 0,
+  firstOssViaPull: null,
+};
+
+const EMPTY_CRON: CronSyncHealth = {
+  lastSyncedAt: null,
+  errorCount: 0,
+  recentErrors: [],
+};
+
+const EMPTY_FUNNEL: FunnelMetrics = {
+  registeredUsers: 0,
+  completedLessonUsers: 0,
+  passedQuizUsers: 0,
+  submittedProjectUsers: 0,
+  firstOssViaPull: null,
+};
 
 export default async function AdminOverviewPage({
   searchParams,
@@ -68,22 +117,43 @@ export default async function AdminOverviewPage({
     );
   }
 
-  const [health, roleCounts, metrics, cronHealth, funnel, dropOff] =
-    await Promise.all([
+  const [
+    health,
+    roleCounts,
+    metrics,
+    cronHealth,
+    funnel,
+    dropOff,
+    openQueueRaw,
+    recentSubmissions,
+  ] = await withTimeout(
+    Promise.all([
       getReviewHealth(),
       countUsersByRole(),
       getPlatformMetrics(),
       getCronSyncHealth(),
       getLearningFunnel(funnelRange),
       getLessonDropOff(10),
-    ]);
+      // Skip N+1 enrichment — approval counts belong on /review/[id].
+      listReviewQueue(undefined, { enrich: false }),
+      listRecentSubmissionsForAdmin(25),
+    ]),
+    ADMIN_OVERVIEW_BUDGET_MS,
+    [
+      EMPTY_HEALTH,
+      EMPTY_ROLES,
+      EMPTY_METRICS,
+      EMPTY_CRON,
+      EMPTY_FUNNEL,
+      [] as LessonDropOff[],
+      [] as ProjectSubmissionRecord[],
+      [] as AdminSubmissionRecord[],
+    ],
+    "admin.overview",
+  );
 
   const platformHealth = getPlatformHealth();
-
-  const openQueue = filterDemoSubmissions(
-    await listReviewQueue(profile.id),
-  );
-  const recentSubmissions = await listRecentSubmissionsForAdmin(25);
+  const openQueue = filterDemoSubmissions(openQueueRaw);
 
   const userTotal =
     roleCounts.builder + roleCounts.reviewer + roleCounts.admin;
@@ -283,8 +353,8 @@ export default async function AdminOverviewPage({
             </h2>
             <p className="mt-1 font-mono text-[11px] text-muted-foreground">
               {funnelRange === "30d"
-                ? "Counts signups and activity in the last 30 days only."
-                : "Counts all users and activity since launch."}
+                ? "Counts signups and activity in the last 30 days only. First OSS is deferred."
+                : "Counts all users and activity since launch. First OSS is deferred."}
             </p>
           </div>
           <div className="flex gap-2">
@@ -331,7 +401,9 @@ export default async function AdminOverviewPage({
               </tr>
               <tr>
                 <td className="py-2 pr-4">First OSS via Pull</td>
-                <td className="py-2">{funnel.firstOssViaPull}</td>
+                <td className="py-2">
+                  {funnel.firstOssViaPull == null ? "—" : funnel.firstOssViaPull}
+                </td>
               </tr>
             </tbody>
           </table>
@@ -430,7 +502,7 @@ function StatCard({
   emphasize = false,
 }: {
   label: string;
-  value: number;
+  value: number | null;
   emphasize?: boolean;
 }) {
   return (
@@ -439,7 +511,9 @@ function StatCard({
         {label}
       </p>
       <div className="mt-2 flex items-center gap-2">
-        <p className="text-3xl font-bold tracking-tight">{value}</p>
+        <p className="text-3xl font-bold tracking-tight">
+          {value == null ? "—" : value}
+        </p>
         {emphasize ? <Badge variant="destructive">attention</Badge> : null}
       </div>
     </div>

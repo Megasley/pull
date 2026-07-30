@@ -5,6 +5,8 @@ export const siteConfig = {
   url: "https://pullos.dev",
   /** Public contact for privacy / support. */
   contactEmail: "hello@pullos.dev",
+  /** Product feedback (bugs, curriculum notes, feature requests). */
+  feedbackUrl: "https://github.com/Megasley/pull/issues/new/choose",
 } as const;
 
 /** Public social profiles. */
@@ -107,6 +109,7 @@ export const footerNav = [
     links: [
       { title: "Discover", href: "/discover" },
       { title: "Issues", href: "/issues" },
+      { title: "Feedback", href: siteConfig.feedbackUrl },
     ],
   },
   {

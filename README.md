@@ -39,11 +39,14 @@ The curriculum lives in **Git as MDX**. The app handles progress, auth, reviews,
 
 ## Try it live
 
+> **Public beta.** Core Learn → Build → Contribute → Prove loops work. Curriculum accuracy review is ongoing — [open an issue](https://github.com/Megasley/pull/issues/new/choose) if you spot a problem.
+
 | | |
 | --- | --- |
 | **Site** | [https://pullos.dev](https://pullos.dev) |
 | **Public roadmaps** | [/roadmaps/bitcoin](https://pullos.dev/roadmaps/bitcoin) · [/roadmaps/lightning](https://pullos.dev/roadmaps/lightning) |
 | **Sample lesson** | [Developer Environment](https://pullos.dev/roadmaps/bitcoin/lessons/foundations-intro) (no sign-in required) |
+| **Feedback** | [GitHub Issues](https://github.com/Megasley/pull/issues/new/choose) · [@pullosdev](https://x.com/pullosdev) |
 
 ### Screenshots
 

@@ -13,6 +13,7 @@ import {
   accountNavSections,
   isExternalHref,
   primaryNav,
+  siteConfig,
 } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
 import type { BuilderProfile } from "@/types/user";
@@ -267,6 +268,14 @@ export function MobileNav({
                 {item.title}
               </MobileLink>
             ))}
+            <MobileLink
+              href={siteConfig.feedbackUrl}
+              pathname={pathname}
+              onClick={close}
+              external
+            >
+              Feedback
+            </MobileLink>
           </NavSection>
 
           {isAuthenticated ? (

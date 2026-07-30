@@ -1,0 +1,41 @@
+name: Feature request
+description: Idea to improve Pull for builders, reviewers, or self-hosters
+title: "[feature] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Check [ROADMAP.md](https://github.com/Megasley/pull/blob/main/ROADMAP.md) first — we may already plan this.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What are you trying to do that is hard or missing today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: What would a good solution look like?
+    validations:
+      required: true
+  - type: dropdown
+    id: audience
+    attributes:
+      label: Who benefits most?
+      options:
+        - New builders
+        - Returning learners
+        - Reviewers
+        - Admins / operators
+        - Self-hosters / contributors
+        - Everyone
+    validations:
+      required: true
+  - type: textarea
+    id: extras
+    attributes:
+      label: Extra context
+      description: Mockups, related issues, or constraints.

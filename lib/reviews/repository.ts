@@ -169,11 +169,13 @@ async function enrichSubmission(
 
 export async function listReviewQueue(
   viewerId?: string,
+  options?: { enrich?: boolean },
 ): Promise<ProjectSubmissionRecord[]> {
   if (!isDatabaseConfigured()) {
     return [];
   }
 
+  const enrich = options?.enrich !== false;
   const db = getDb();
   const rows = await db
     .select({
@@ -204,6 +206,11 @@ export async function listReviewQueue(
       },
     ),
   );
+
+  // Admin overview skips enrichment to avoid N+1 approval/decision queries.
+  if (!enrich) {
+    return mapped;
+  }
 
   return Promise.all(mapped.map((item) => enrichSubmission(item, viewerId)));
 }

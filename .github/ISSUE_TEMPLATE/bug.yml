@@ -1,0 +1,58 @@
+name: Bug report
+description: Something on pullos.dev is broken or behaving wrong
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve Pull. Include enough detail to reproduce.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Auth / sign-in
+        - Onboarding
+        - Roadmaps / lessons
+        - Projects / submissions
+        - Review
+        - GitHub sync
+        - Dashboard / profile
+        - Admin
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Expected vs actual behavior.
+      placeholder: I expected… but instead…
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Go to …
+        2. Click …
+        3. See error …
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: Page URL
+      placeholder: https://pullos.dev/...
+  - type: input
+    id: browser
+    attributes:
+      label: Browser / device
+      placeholder: Chrome 128 · macOS · desktop
+  - type: textarea
+    id: extras
+    attributes:
+      label: Screenshots / logs
+      description: Optional. Paste console errors or attach screenshots.

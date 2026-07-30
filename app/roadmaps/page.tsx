@@ -15,8 +15,8 @@ export default function RoadmapsPage() {
         <PageHeader
           eyebrow="catalog // roadmaps"
           title="Roadmaps"
-          description="Structured paths from fundamentals to open source contribution. Start with Bitcoin, then unlock Lightning and upcoming tracks. Lessons are public beta — curriculum under technical review."
-          meta="status // 2 live · under review · more incoming"
+          description="Structured paths from fundamentals to open source contribution. Start with Bitcoin, then unlock Lightning and upcoming tracks."
+          meta="status // 2 live · more incoming"
         />
       </SiteContainer>
 

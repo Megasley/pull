@@ -2,7 +2,13 @@ import Link from "next/link";
 
 import { Logo } from "@/components/brand/logo";
 import { SiteContainer } from "@/components/layout/site-container";
-import { footerNav, socialLinks, type SocialIconName } from "@/lib/site-config";
+import {
+  footerNav,
+  isExternalHref,
+  siteConfig,
+  socialLinks,
+  type SocialIconName,
+} from "@/lib/site-config";
 import { cn } from "@/lib/utils";
 
 type FooterProps = {
@@ -33,7 +39,19 @@ export function Footer({ className }: FooterProps) {
           <div className="space-y-4">
             <Logo />
             <p className="max-w-sm whitespace-pre-line font-mono text-xs leading-relaxed text-muted-foreground">
-              {"Become an Open Source Builder.\n\nLearn. Build. Contribute."}
+              {"Become an Open Source Builder.\n\nLearn. Build. Contribute. Prove."}
+            </p>
+            <p className="max-w-sm font-mono text-xs leading-relaxed text-muted-foreground">
+              Feedback welcome —{" "}
+              <a
+                href={siteConfig.feedbackUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="text-foreground underline underline-offset-2 transition-colors hover:text-muted-foreground focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
+              >
+                open a GitHub issue
+              </a>
+              .
             </p>
             {socialLinks.length > 0 ? (
               <nav aria-label="Social links" className="flex items-center gap-2 pt-1">
@@ -62,15 +80,31 @@ export function Footer({ className }: FooterProps) {
                   aria-label={`${group.title} links`}
                   className="flex flex-col gap-2"
                 >
-                  {group.links.map((item) => (
-                    <Link
-                      key={`${group.title}-${item.title}`}
-                      href={item.href}
-                      className="font-mono text-xs tracking-wide text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
-                    >
-                      {item.title}
-                    </Link>
-                  ))}
+                  {group.links.map((item) => {
+                    const external = isExternalHref(item.href);
+                    const linkClass =
+                      "font-mono text-xs tracking-wide text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none";
+
+                    return external ? (
+                      <a
+                        key={`${group.title}-${item.title}`}
+                        href={item.href}
+                        target="_blank"
+                        rel="noreferrer"
+                        className={linkClass}
+                      >
+                        {item.title}
+                      </a>
+                    ) : (
+                      <Link
+                        key={`${group.title}-${item.title}`}
+                        href={item.href}
+                        className={linkClass}
+                      >
+                        {item.title}
+                      </Link>
+                    );
+                  })}
                 </nav>
               </div>
             ))}

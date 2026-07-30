@@ -1,4 +1,3 @@
-import { countFirstOssViaPull } from "@/lib/admin/repository";
 import {
   countDistinctLessonCompleters,
   countDistinctProjectSubmitters,
@@ -14,7 +13,8 @@ export type FunnelMetrics = {
   completedLessonUsers: number;
   passedQuizUsers: number;
   submittedProjectUsers: number;
-  firstOssViaPull: number;
+  /** Deferred on the request path — heavy github_pull_requests scan. */
+  firstOssViaPull: number | null;
 };
 
 export type LessonDropOff = {
@@ -34,7 +34,7 @@ export async function getLearningFunnel(
     completedLessonUsers: 0,
     passedQuizUsers: 0,
     submittedProjectUsers: 0,
-    firstOssViaPull: 0,
+    firstOssViaPull: null,
   };
 
   if (!isDatabaseConfigured()) {
@@ -52,14 +52,12 @@ export async function getLearningFunnel(
       completedLessonUsers,
       passedQuizUsers,
       submittedProjectUsers,
-      firstOssViaPull,
     ] = await withDbRetry(async () =>
       Promise.all([
         countRegisteredUsers(since),
         countDistinctLessonCompleters(since),
         countDistinctQuizPassers(since),
         countDistinctProjectSubmitters(since),
-        countFirstOssViaPull(),
       ]),
     );
 
@@ -68,7 +66,8 @@ export async function getLearningFunnel(
       completedLessonUsers,
       passedQuizUsers,
       submittedProjectUsers,
-      firstOssViaPull,
+      // Keep First OSS off the critical path — it previously timed out /admin.
+      firstOssViaPull: null,
     };
   } catch (error) {
     console.warn("[admin] getLearningFunnel failed", error);

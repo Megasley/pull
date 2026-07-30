@@ -55,7 +55,8 @@ export type PlatformMetrics = {
   registeredUsers: number;
   monthlyActiveUsers: number;
   projectsListed: number;
-  firstOssViaPull: number;
+  /** Deferred on the request path — heavy github_pull_requests scan. */
+  firstOssViaPull: number | null;
 };
 
 export type UpdateUserRoleResult =
@@ -386,7 +387,7 @@ export async function getPlatformMetrics(): Promise<PlatformMetrics> {
     registeredUsers: 0,
     monthlyActiveUsers: 0,
     projectsListed,
-    firstOssViaPull: 0,
+    firstOssViaPull: null,
   };
 
   if (!isDatabaseConfigured()) {
@@ -409,7 +410,7 @@ export async function getPlatformMetrics(): Promise<PlatformMetrics> {
       registeredUsers,
       monthlyActiveUsers,
       projectsListed,
-      firstOssViaPull: 0,
+      firstOssViaPull: null,
     };
   } catch (error) {
     console.warn("[admin] getPlatformMetrics failed", error);
