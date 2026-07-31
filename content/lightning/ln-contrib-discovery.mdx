@@ -11,9 +11,11 @@ resources:
   - title: lightningnetwork/lnd
     url: 'https://github.com/lightningnetwork/lnd'
     kind: docs
+    required: true
   - title: ElementsProject/lightning
     url: 'https://github.com/ElementsProject/lightning'
     kind: docs
+    required: true
   - title: lightningdevkit
     url: 'https://github.com/lightningdevkit'
     kind: docs
@@ -26,18 +28,30 @@ reflectionPrompts:
     Which BOLT (or implementation doc) is the source of truth for this topic,
     and what did you verify there?
 lab:
-  title: Contribution artifact
+  title: Issue shortlist + plan
   description: >-
-    Produce a contribution artifact for Contribution Discovery: issue shortlist,
-    review notes, or PR draft that a maintainer could act on.
+    Complete Steps 2–3. Shortlist 2–3 Lightning issues (Review Club, /discover,
+    or labeled GFI), pick one matching your stack, and write a short approach
+    before coding.
   evidence:
-    - Issue URL(s) or PR URL
-    - Written approach / review checklist
-    - Self-score against the meaningful-PR rubric
+    - Issue URL(s) with one selected as primary
+    - Written approach (problem, files likely touched, how you will test)
+    - Draft self-score against the meaningful-PR rubric
 ---
 Lightning OSS spans Go, C, Rust, and many app repos. Pick a lane that matches your stack.
 
-Pull curates Lightning repositories and GFIs on **[Contribution Discovery](/discover)** and **[Issue recommendations](/issues)** - start there before manually searching GitHub.
+Complete **Step 1 // Required reading** in the study plan above, then continue here. This opens **Contribution**.
+
+## Step 2 — Context: map repos to skills
+
+Pull curates Lightning repositories and GFIs on **[Contribution Discovery](/discover)** and **[Issue recommendations](/issues)** — start there before manually searching GitHub.
+
+| Stack | Typical homes |
+| --- | --- |
+| Go | LND and tools |
+| C | Core Lightning |
+| Rust | LDK and related crates |
+| TS / apps | Wallets, POS, explorers |
 
 <Mermaid caption="Match language skills to repos, then scope an issue." chart="flowchart TD
     Skills[Go / C / Rust / TS] --> Repo[Pick implementation]
@@ -49,6 +63,20 @@ Pull curates Lightning repositories and GFIs on **[Contribution Discovery](/disc
   Improving docs or sample apps is a high-leverage first PR.
 </Callout>
 
-## Next steps
+**Done when:** You can name one repo that fits your language and why.
 
-Practice reviewing peer PRs before you ship your own.
+## Step 3 — Practice: shortlist and plan (lab)
+
+Pick 2–3 candidate issues. Select one. Write problem, likely files, Polar/regtest or unit test plan.
+
+### Checklist
+
+- [ ] Issue matches a skill you practiced on this roadmap
+- [ ] Scope is one problem, not a drive-by refactor
+- [ ] You know how you will prove it works
+
+**Done when:** Lab evidence (URLs + approach + draft self-score) is complete.
+
+### Next lesson
+
+**Code Review Practice** — review peer PRs before you ship your own.

@@ -26,16 +26,19 @@ reflectionPrompts:
   - "How will you handle a request to shrink scope or add integration tests?"
 lab:
   title: Rubric self-score
-  description: Pick a real issue on LND, CLN, LDK, or a Lightning tool. Write a plan and self-score 0–2 on each rubric row before coding.
+  description: >-
+    Complete Steps 2–3. Pick a real issue on LND, CLN, LDK, or a Lightning
+    tool. Write a plan and self-score 0–2 on each rubric row before coding.
   evidence:
     - Issue URL and approach doc
     - Rubric score table with notes
     - Draft first comment or PR body
 ---
-
 Lightning contributions inherit Bitcoin’s review culture plus **interop risk** across implementations. Use the same meaningful-PR bar, with extra weight on reproduction notes.
 
-## Rubric (score each 0–2)
+Complete **Step 1 // Required reading** in the study plan above, then continue here.
+
+## Step 2 — Context: the ship bar
 
 | Row | 0 | 1 | 2 |
 | --- | --- | --- | --- |
@@ -47,19 +50,31 @@ Lightning contributions inherit Bitcoin’s review culture plus **interop risk**
 
 **Ship bar:** total ≥ 8/10 before requesting review.
 
-## Evidence pack
+Evidence pack for Pull / maintainers:
 
-1. Issue / PR URLs  
-2. Rubric self-score  
-3. Polar/regtest or unit test notes  
-4. Interop note if behavior could differ across LND/CLN/LDK  
-
-## Anti-patterns
-
-- Untested protocol tweaks
-- Ignoring macaroon / permission surfaces in examples
-- Demanding merge on soft forks of personal preference
+1. Issue / PR URLs
+2. Rubric self-score
+3. Polar/regtest or unit test notes
+4. Interop note if behavior could differ across LND/CLN/LDK
 
 <Callout type="info" title="Start smaller than you think">
   Docs, examples, and tests are excellent first Lightning PRs.
 </Callout>
+
+**Done when:** You can recite the five rows and the ≥ 8/10 ship bar.
+
+## Step 3 — Practice: score your plan (lab)
+
+Pick a real issue. Write a one-page approach. Score each row 0–2. Draft the issue comment or PR body.
+
+### Checklist / anti-patterns
+
+- [ ] No untested protocol tweaks
+- [ ] No ignoring macaroon / permission surfaces in examples
+- [ ] No demanding merge timelines
+
+**Done when:** Lab evidence (issue + score table + draft) is complete.
+
+### Next lesson
+
+**First Lightning PR** — reproduce, test, open, and iterate with CI.

@@ -28,28 +28,32 @@ reflectionPrompts:
     Which BOLT (or implementation doc) is the source of truth for this topic,
     and what did you verify there?
 lab:
-  title: Polar check
+  title: Close path + backup note
   description: >-
-    After reading, run one hands-on check related to Channel Lifecycle. Prefer
-    local regtest or Polar over mainnet.
+    Complete Steps 2–3. Prefer a cooperative close on Polar/regtest. Document
+    what backup you would export after open, and when you would choose force
+    close vs cooperative.
   evidence:
-    - Command output or screenshot from your local lab
-    - One sentence on what you observed vs expected
-    - Link to the required reading section you used
+    - Cooperative close proof (or documented attempt + result)
+    - Backup checklist item (SCB / recovery data note)
+    - One sentence choosing force vs cooperative for a stuck-peer scenario
+    - Link to Ch. 7 or BOLT2 closing section you used
 searchQueries:
   - BOLT2
 ---
 Channels begin with funding and end with a close. How you close determines fees, delay, and risk.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here.
+
+## Step 2 — Core idea: cooperative, force, penalty
 
 Force closes are expensive and slow. Lost channel state without backups can lose funds. Lifecycle literacy is operational safety.
 
-## Close types
-
-- **Cooperative close**: both agree, efficient on-chain settlement
-- **Force close**: broadcast latest commitment; timelocks may delay funds
-- **Penalty**: response to revoked state broadcast
+| Close type | What happens |
+| --- | --- |
+| **Cooperative** | Both agree — efficient on-chain settlement |
+| **Force** | Broadcast latest commitment — timelocks may delay funds |
+| **Penalty** | Response to revoked (old) state broadcast |
 
 <Mermaid caption="Prefer cooperative closes; prepare for force closes and breaches." chart="flowchart TD
     Open[Channel active] --> Coop[Cooperative close]
@@ -62,12 +66,20 @@ Force closes are expensive and slow. Lost channel state without backups can lose
   Export static channel backups / recovery data after opens. Test restore on regtest.
 </Callout>
 
-## Common mistakes
+**Done when:** You can pick cooperative vs force for a stuck-peer scenario in one sentence.
+
+## Step 3 — Close + backup (lab)
+
+Cooperatively close a lab channel if you can. Note backup artifacts your stack expects (e.g. LND SCB). Write the stuck-peer decision sentence.
+
+### Common mistakes
 
 - Force closing to “speed up” when fees are high
 - Running nodes without disk redundancy
 - Ignoring unresolved HTLCs during close
 
-## Next steps
+**Done when:** Lab evidence (close proof + backup note + decision sentence + source) is complete.
 
-Dual funding and splicing change capacity without a full teardown.
+### Next lesson
+
+**Dual Funding & Splicing** — change capacity without a full teardown.

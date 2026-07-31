@@ -28,26 +28,28 @@ reflectionPrompts:
     Which BOLT (or implementation doc) is the source of truth for this topic,
     and what did you verify there?
 lab:
-  title: Polar check
+  title: Multi-hop settle or fail
   description: >-
-    After reading, run one hands-on check related to HTLC Mechanics. Prefer
-    local regtest or Polar over mainnet.
+    Complete Steps 2–3. On Polar/regtest, pay across a 2–3 node path. Optionally
+    force a mid-route failure and note how unlocks unwind vs a successful
+    preimage settle.
   evidence:
-    - Command output or screenshot from your local lab
-    - One sentence on what you observed vs expected
-    - Link to the required reading section you used
+    - Successful multi-hop pay proof (or Polar UI)
+    - One sentence tracing hash forward and preimage back
+    - Note on CLTV decreasing toward the payee (or why deltas matter)
+    - Link to BOLT2 or Ch. 8 section you used
 searchQueries:
   - BOLT2
 ---
 **HTLCs** (Hash Time Locked Contracts) are conditional payments: claim with a preimage before timeout, otherwise refund. Chained HTLCs create atomic multi-hop Lightning payments.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here.
 
-Every routed payment is an HTLC dance. Debugging failures means reading hashes, CLTV deltas, and onion errors, not guessing.
+## Step 2 — Core idea: same hash, decreasing timelocks
 
-## Analogy
+Every routed payment is an HTLC dance. Debugging failures means reading hashes, CLTV deltas, and onion errors — not guessing.
 
-A locked briefcase opens with a secret word (preimage). Each courier along the path holds a briefcase with the same word requirement but earlier deadlines. When the final person learns the word, it propagates back so everyone can settle.
+**Analogy:** A locked briefcase opens with a secret word (preimage). Each courier holds a briefcase with the same word requirement but earlier deadlines. When the final person learns the word, it propagates back so everyone can settle.
 
 <Mermaid caption="Same payment hash along the path; timelocks decrease toward the payee." chart="sequenceDiagram
     participant A as Alice
@@ -58,32 +60,26 @@ A locked briefcase opens with a secret word (preimage). Each courier along the p
     C->>B: fulfill preimage R
     B->>A: fulfill preimage R" />
 
+Each hop needs enough timelock margin. Implementations enforce minimums — do not invent tighter custom deltas without reading BOLTs. Modern invoices include a **payment secret** so intermediaries cannot settle incorrectly. While an HTLC is outstanding, that slice of **outbound** is reserved — ties back to channel liquidity.
+
 <Callout type="info" title="Atomicity">
   Either the preimage settles the chain, or timeouts refund. Intermediaries should not lose funds if they follow protocol and stay online as required.
 </Callout>
 
-## Common mistakes
+**Done when:** You can contrast payment hash vs preimage and why CLTV shrinks toward the payee.
+
+## Step 3 — Try it: path pay (lab)
+
+Pay across a 2–3 node Polar path. Optionally fail mid-route and compare unwind vs successful settle.
+
+### Common mistakes
 
 - Confusing payment hash with payment secret
 - Setting timelock deltas too tight for hops
 - Ignoring that held HTLCs lock liquidity
 
-## CLTV deltas
+**Done when:** Lab evidence (pay proof + hash/preimage sentence + CLTV note + source) is complete.
 
-Each hop demands enough timelock margin to settle or fail safely. If deltas are too small, honest nodes risk loss under delay. Implementations enforce minimums; do not invent tighter custom deltas without reading BOLTs and peer requirements.
+### Next lesson
 
-## Payment secret
-
-Modern invoices include a payment secret so intermediaries cannot settle to the receiver without the payer's onion path completing correctly (anti-probing / security improvement). Decode invoices and confirm secrets are handled by your library.
-
-## Held HTLCs lock liquidity
-
-While an HTLC is outstanding, that slice of **outbound** balance cannot be used elsewhere on that channel. This ties directly to channel liquidity: a node can look healthy on total capacity but fail to forward because outbound is tied up in pending HTLCs. Long-held HTLCs (slow peers, attacks) are an operational risk. Monitor pending HTLCs on production nodes.
-
-## Try it in Polar or regtest
-
-Pay across a 3-node path, then force a failure mid-route and observe how unlocks unwind as timeouts hit, then compare with a successful preimage settle.
-
-## Next steps
-
-Study the full channel lifecycle, cooperative close, force close, and backups.
+**Channel Lifecycle** — cooperative close, force close, and backups.

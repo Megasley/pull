@@ -9,6 +9,11 @@ objectives:
   - Score edges with custom weights
   - Benchmark success vs baseline routing
 resources:
+  - title: 'Project Spec: Custom Router'
+    url: '/projects/custom-router'
+    kind: docs
+    note: Pull project page — acceptance criteria and submit flow.
+    required: true
   - title: Mastering the Lightning Network
     url: 'https://github.com/lnbook/lnbook/blob/master/12_path_finding.asciidoc'
     kind: book
@@ -31,18 +36,20 @@ reflectionPrompts:
 lab:
   title: Project milestone evidence
   description: >-
-    For Custom Router, complete the linked project spec happy path on
-    regtest/Polar and capture demo evidence before marking the lesson complete.
+    Complete Steps 2–4. Ship a service that returns ranked routes for
+    (source, dest, amount) and capture a small benchmark note vs a baseline.
   evidence:
     - Link to public repo or branch
-    - Commands or screenshots proving the happy path
-    - Short note of one failure case you tested
+    - Example route response or CLI output for a sample query
+    - Short benchmark note (success rate, fee, or latency vs baseline)
 searchQueries:
   - BOLT7
 ---
 A custom router lets you experiment with weights: fee, uptime, historical fail rates, and liquidity hints.
 
-## Build challenge
+Complete **Step 1 // Required reading** in the study plan above, then continue here. This closes **Lightning Projects**.
+
+## Step 2 — Goal
 
 Service that:
 
@@ -56,6 +63,30 @@ Service that:
     Search --> Routes[Ranked routes]
     Routes --> Bench[Benchmark harness]" />
 
-## Next steps
+**Done when:** You can write the edge-weight formula you will ship first.
 
-Find contribution opportunities across LND, CLN, and LDK.
+## Step 3 — Milestones
+
+| Phase | Ship |
+| --- | --- |
+| Milestone A | Ingest graph snapshot (file, Amboss, or node gossip export) |
+| Milestone B | Ranked routes API for amount-constrained search |
+| Milestone C | Benchmark harness vs baseline weights |
+
+**Done when:** Milestone B returns at least one path or a clear “no route” with reasons.
+
+## Step 4 — Build & evidence (lab)
+
+Implement against `/projects/custom-router`. Capture repo link, sample route output, and benchmark note.
+
+### Common mistakes
+
+- Optimizing only fees and ignoring historical fail rates
+- Treating gossip capacity as guaranteed liquidity
+- Benchmarking only on a single lucky path
+
+**Done when:** Lab evidence is filed.
+
+### Next lesson
+
+**Contribution Discovery** — find beginner-friendly issues across LND, CLN, and LDK.

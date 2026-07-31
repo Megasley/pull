@@ -37,9 +37,9 @@ reflectionPrompts:
 lab:
   title: Trust boundary map
   description: >-
-    Draw a trust-boundary diagram for a wallet product choosing (a) full node,
-    (b) Neutrino-style filters, or (c) third-party Electrum/Esplora. Label what
-    each design can detect.
+    Complete Steps 2–3. Draw a trust-boundary diagram for a wallet product
+    choosing (a) full node, (b) Neutrino-style filters, or (c) third-party
+    Electrum/Esplora. Label what each design can detect.
   evidence:
     - 'Diagram (SVG, Mermaid, or photo of whiteboard)'
     - One paragraph per option on fraud/censorship risk
@@ -48,24 +48,28 @@ searchQueries:
   - BIP157
   - BIP158
 ---
-
 “Trustless” is relative. Every Bitcoin client chooses a **security model**: what it verifies locally vs what it assumes about peers, miners, or snapshots.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here.
+
+## Step 2 — Core idea: what you verify vs what you assume
 
 Product builders who default to third-party APIs without labeling trust boundaries ship wallets that fail silently under eclipse, dishonest servers, or chain forks.
 
-## Full nodes
+| Model | Verifies locally | Main assumption |
+| --- | --- | --- |
+| **Full node** | PoW, scripts, consensus history (with pruning/assumevalid nuances) | Honest majority of work + your software |
+| **SPV** | Headers + merkle proofs for txs of interest | Miners won’t feed invalid high-work forever without detection |
+| **BIP157/158 filters** | Filters + blocks of interest you download | Peers serve honest filters; better privacy than BIP37 blooms |
+| **Indexer API** | Little on-chain verification | The server is honest and available |
+| **AssumeUTXO** | Background validation after snapshot | Snapshot commitment until validation catches up |
 
-A validating full node checks proof-of-work, scripts, and economic history rules (with pruning/assumevalid nuances). Highest assurance; highest cost.
-
-## SPV and filters
-
-Classic **SPV** verifies proof-of-work headers and merkle proofs for transactions of interest, trusting that miners will not feed an invalid-but-high-work chain forever without fraud proofs.
-
-**BIP157/158 compact block filters** let light clients request filters and download blocks of interest with better privacy than BIP37 bloom filters - still not full validation.
-
-## AssumeUTXO
+<Mermaid caption="Stronger local verification costs more; lighter clients assume more about peers and servers." chart="flowchart TD
+    Full[Full validating node] --> Filters[Compact block filters]
+    Filters --> SPV[Classic SPV]
+    SPV --> API[Third-party indexer API]
+    Full --> Assume[AssumeUTXO bootstrap]
+    Assume --> Full" />
 
 **AssumeUTXO** helps nodes sync faster by loading a committed UTXO snapshot, then background-validating. It trades bootstrap time for carefully scoped assumptions until validation completes.
 
@@ -73,8 +77,20 @@ Classic **SPV** verifies proof-of-work headers and merkle proofs for transaction
   Users deserve to know whether your app verifies scripts, trusts an indexer, or uses filters. Silence is a product bug.
 </Callout>
 
-## Common mistakes
+**Done when:** You can place a wallet design on the table above and name one failure mode it cannot detect.
+
+## Step 3 — Trust-boundary map (lab)
+
+Draw a diagram for (a) full node, (b) Neutrino-style filters, (c) Electrum/Esplora. For each: one paragraph on fraud/censorship risk. Recommend a default for a beginner builder and why.
+
+### Common mistakes
 
 - Calling any API-backed wallet “non-custodial and trustless”
 - Ignoring that light clients can be lied to about *absence* of transactions
 - Skipping background validation after snapshot sync in ops runbooks
+
+**Done when:** Lab evidence (diagram + three risk paragraphs + recommendation) is complete.
+
+### Next lesson
+
+**Soft Forks & Activation** — how consensus upgrades land without splitting the network.

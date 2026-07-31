@@ -28,24 +28,26 @@ reflectionPrompts:
     Which BOLT (or implementation doc) is the source of truth for this topic,
     and what did you verify there?
 lab:
-  title: Polar check
+  title: Dual-fund vs splice brief
   description: >-
-    After reading, run one hands-on check related to Dual Funding & Splicing.
-    Prefer local regtest or Polar over mainnet.
+    Complete Steps 2–3. From BOLT2 / Optech / CLN docs, write when you would
+    dual-fund at open vs splice later. Note support on the stack you ship.
+    Optional: attempt a dual-fund or splice on a supporting Polar/CLN lab.
   evidence:
-    - Command output or screenshot from your local lab
-    - One sentence on what you observed vs expected
-    - Link to the required reading section you used
+    - One-paragraph dual-fund vs splice decision guide
+    - Implementation support note (LND/CLN/LDK version you checked)
+    - Link to BOLT2 interactive-tx or Optech splicing section
+    - 'Optional: lab command/UI output'
 ---
 Classic channels are often single-funded. **Dual funding** lets both sides contribute at open. **Splicing** adjusts channel capacity later with an on-chain transaction without losing the channel relationship.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here. This closes **Channels & HTLCs**.
 
-Liquidity needs change. Closing and reopening wastes fees and downtime. Splicing and dual funding are how the network becomes more capital-efficient.
+## Step 2 — Core idea: reshape capacity without teardown
 
-## Analogy
+Liquidity needs change. Closing and reopening wastes fees and downtime. Splicing and dual funding make the network more capital-efficient.
 
-Dual funding is both roommates paying the security deposit. Splicing is adding money to the joint jar (or withdrawing some) without ending the lease.
+**Analogy:** Dual funding is both roommates paying the security deposit. Splicing is adding money to the joint jar (or withdrawing some) without ending the lease.
 
 <Mermaid caption="Interactive on-chain transactions reshape channel capacity." chart="flowchart LR
     Chan[Existing channel] --> Splice[Splice tx on-chain]
@@ -57,12 +59,20 @@ Dual funding is both roommates paying the security deposit. Splicing is adding m
   Support differs across LND/CLN/LDK versions. Prototype on regtest with the stack you ship.
 </Callout>
 
-## Common mistakes
+**Done when:** You can say when dual-fund beats single-fund at open, and when splice beats close/reopen.
+
+## Step 3 — Decision brief (lab)
+
+Write the dual-fund vs splice guide and check docs for your target implementation. Optional hands-on if your lab supports it.
+
+### Common mistakes
 
 - Assuming splice always beats open/close without fee math
 - Interrupting interactive funding flows mid-protocol
 - Neglecting backup updates after capacity changes
 
-## Next steps
+**Done when:** Lab evidence (decision paragraph + support note + source) is complete. Complete the **chapter quiz** when prompted.
 
-Routing: how payments choose paths across many channels.
+### Next lesson
+
+**Liquidity Operations** — loops, swaps, rebalancing, and inbound capacity.

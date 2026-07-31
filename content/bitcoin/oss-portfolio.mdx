@@ -11,11 +11,12 @@ resources:
   - title: GitHub profile README
     url: 'https://docs.github.com/en/account-and-profile'
     kind: docs
-  - title: Bitcoin Optech
-    url: 'https://bitcoinops.org/'
-    kind: article
+    required: true
   - title: Conventional Commits
     url: 'https://www.conventionalcommits.org/'
+    kind: article
+  - title: Bitcoin Optech
+    url: 'https://bitcoinops.org/'
     kind: article
 reflectionPrompts:
   - >-
@@ -26,21 +27,24 @@ reflectionPrompts:
     Which BIP, book chapter, or Core doc is authoritative here, and what did you
     verify?
 lab:
-  title: Contribution artifact
+  title: Portfolio draft
   description: >-
-    Produce a contribution artifact for Builder Portfolio: issue shortlist,
-    review notes, or PR draft that a maintainer could act on.
+    Complete Steps 2–3. Draft or update your Pull profile / public writeup with
+    at least one project, one PR or commit link, and a short builder narrative
+    without hype.
   evidence:
-    - Issue URL(s) or PR URL
-    - Written approach / review checklist
-    - Self-score against the meaningful-PR rubric
+    - Link to Pull profile or public portfolio page
+    - Links to project(s) and PR(s) / commits cited
+    - Short narrative (problem → approach → result) for one artifact
 ---
 Your portfolio is evidence: repositories, PRs, writeups, and demos. Hiring managers and OSS maintainers trust artifacts over adjectives.
 
-## What to include
+Complete **Step 1 // Required reading** in the study plan above, then continue here. This closes the **Bitcoin** roadmap’s open-source chapter.
+
+## Step 2 — Context: what to include
 
 - Mini wallet / explorer / processor links
-- 2, 3 merged (or deeply reviewed) PRs
+- 2–3 merged (or deeply reviewed) PRs
 - A diagram of architecture for one project
 - Regtest demo script or short recording
 
@@ -54,6 +58,20 @@ Your portfolio is evidence: repositories, PRs, writeups, and demos. Hiring manag
   One well-documented wallet beats ten empty repos named `bitcoin-bot`.
 </Callout>
 
-## Next steps
+**Done when:** You can name the three artifact types you will show first.
 
-Begin the Lightning roadmap, channels, invoices, and off-chain Bitcoin payments.
+## Step 3 — Practice: ship the draft (lab)
+
+Update your Pull profile (or public README). For one flagship artifact, write problem → approach → result. Link verifiable commits/PRs.
+
+### Checklist
+
+- [ ] At least one project with a clear problem statement
+- [ ] At least one verifiable PR or commit URL
+- [ ] Narrative without hype or unverifiable claims
+
+**Done when:** Lab evidence (profile link + citations + narrative) is complete. Complete the **chapter quiz** when prompted.
+
+### Next lesson
+
+Begin the **Lightning** roadmap — channels, invoices, and off-chain Bitcoin payments (`/roadmaps/lightning`).

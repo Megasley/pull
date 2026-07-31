@@ -9,17 +9,19 @@ objectives:
   - Track UTXOs and build a funded transaction on regtest
   - Sign and broadcast with tests covering change and fees
 resources:
-  - title: 'Project Spec, Mini Wallet'
+  - title: 'Project Spec: Mini Wallet'
+    url: '/projects/mini-wallet'
     kind: docs
-    note: Follow the Pull project spec in content/projects/specs.
-  - title: BDK
-    url: 'https://bitcoindevkit.org/'
-    kind: docs
+    note: Pull project page — acceptance criteria and submit flow.
+    required: true
   - title: Mastering Bitcoin
     url: 'https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch05_wallets.adoc'
     kind: book
     chapter: 'Ch. 5: Wallets'
     required: true
+  - title: BDK
+    url: 'https://bitcoindevkit.org/'
+    kind: docs
 reflectionPrompts:
   - >-
     Explain Mini Wallet Project to a teammate without jargon - what problem does
@@ -31,16 +33,19 @@ reflectionPrompts:
 lab:
   title: Project milestone evidence
   description: >-
-    For Mini Wallet Project, complete the linked project spec happy path on
-    regtest/Polar and capture demo evidence before marking the lesson complete.
+    Complete Steps 2–4. Ship the Mini Wallet happy path on regtest and capture
+    demo evidence before marking the lesson complete. Submit via the project
+    page when ready for review.
   evidence:
     - Link to public repo or branch
-    - Commands or screenshots proving the happy path
-    - Short note of one failure case you tested
+    - Commands or screenshots proving receive + send on regtest
+    - Short note of one failure case you tested (fee, change, or sync)
 ---
 This project turns protocol lessons into a working tool: a command-line wallet on regtest that can receive and send bitcoin.
 
-## Build challenge
+Complete **Step 1 // Required reading** in the study plan above (project spec + wallets chapter), then continue here. This opens **Projects**.
+
+## Step 2 — Goal
 
 Ship a CLI that can:
 
@@ -55,15 +60,34 @@ Ship a CLI that can:
     CLI --> Build[Build + sign tx]
     Build --> Core" />
 
+**Done when:** You can describe the happy path in four bullets without opening the code.
+
+## Step 3 — Milestones
+
+| Phase | Ship |
+| --- | --- |
+| Milestone A | Address generation + sync/balance on regtest |
+| Milestone B | Coin selection, change, broadcast, fee unit tests |
+| Milestone C | Acceptance test: mine → send half → assert balances after one block |
+
 <Callout type="tip" title="Acceptance tests first">
   Write a test that mines funds to your wallet, sends half to a second wallet, and asserts balances after one block.
 </Callout>
 
-## Suggested milestones
+**Done when:** Milestone A works end-to-end before you start fee edge cases.
 
-- Week 1: address generation + sync/balance
-- Week 2: coin selection, change, broadcast, fee unit tests
+## Step 4 — Build & evidence (lab)
 
-## Next steps
+Implement against `/projects/mini-wallet`. Capture repo link, happy-path proof, and one failure case you tested.
 
-After the wallet works, visualize the chain with a Block Explorer UI project.
+### Common mistakes
+
+- Hard-coding mainnet network objects in tests
+- Forgetting change and overpaying the fee
+- Demo without a reproducible test command
+
+**Done when:** Lab evidence is filed (and optionally submitted for review).
+
+### Next lesson
+
+**Block Explorer UI** — visualize blocks, txs, and mempool for your private chain.

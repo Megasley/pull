@@ -28,28 +28,26 @@ reflectionPrompts:
     Which BOLT (or implementation doc) is the source of truth for this topic,
     and what did you verify there?
 lab:
-  title: Polar check
+  title: Open a lab channel
   description: >-
-    After reading, run one hands-on check related to Opening Channels. Prefer
-    local regtest or Polar over mainnet.
+    Complete Steps 2–3. On Polar/regtest, connect two nodes and open a channel.
+    Note funding confirmation depth and local/remote balance after open.
   evidence:
-    - Command output or screenshot from your local lab
-    - One sentence on what you observed vs expected
-    - Link to the required reading section you used
+    - connect + openchannel (or Polar UI) proof
+    - Balance split after open (local vs remote)
+    - Link to Mastering Lightning Ch. 7 section you used
 searchQueries:
   - BOLT2
 ---
 Opening a channel locks on-chain funds into a collaborative contract so you can send many off-chain payments later.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here. This opens **Channels & HTLCs**.
 
-Channel opens lock capital on-chain. Whether you can send or receive depends on how balance is split - covered in depth in the next lesson on **channel liquidity**.
+## Step 2 — Core idea: fund, confirm, activate
 
-## Analogy
+Channel opens lock capital on-chain. Whether you can send or receive depends on how balance is split — covered next in **Channel Liquidity**.
 
-Opening a channel is stocking a cash drawer between two cashiers. The total cash is fixed until you restock (splice/dual-fund) or close.
-
-## Open flow
+**Analogy:** Stocking a cash drawer between two cashiers. Total cash is fixed until you restock (splice/dual-fund) or close.
 
 <Mermaid caption="Fund on-chain, wait for depth, then activate the channel." chart="sequenceDiagram
     participant A as Node A
@@ -68,20 +66,26 @@ lncli connect <pubkey>@host:port
 lncli openchannel <pubkey> <local_amt>
 ```
 
+Single-funded opens usually leave the funder **outbound-heavy**. Do not route large value before your configured confirmation depth.
+
 <Callout type="tip" title="Confirmations matter">
-  Do not route large value on a channel that has not reached your configured confirmation depth.
+  Wait for channel readiness (and your depth policy) before treating the channel as operational.
 </Callout>
 
-## Balance direction (preview)
+**Done when:** You can narrate open → funding tx → confirmations → channel_ready.
 
-Single-funded opens usually leave the funder **outbound-heavy**. You will study inbound vs outbound, forwarding constraints, and failure modes in **Channel Liquidity** before routing.
+## Step 3 — Try it: open on Polar (lab)
 
-## Common mistakes
+Connect two lab nodes and open a channel. Record local vs remote balance right after open.
+
+### Common mistakes
 
 - Opening to random public nodes without operational needs
 - Ignoring on-chain fees and reserve requirements
 - Forgetting backups after open
 
-## Next steps
+**Done when:** Lab evidence (open proof + balance split + source link) is complete.
 
-**Channel Liquidity** - why balance direction matters before you route a single payment.
+### Next lesson
+
+**Channel Liquidity** — why balance direction matters before you route a single payment.

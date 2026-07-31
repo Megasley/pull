@@ -9,6 +9,7 @@ Thank you for helping build the operating system for open source builders. This 
 - [Development setup](#development-setup)
 - [Project conventions](#project-conventions)
 - [Contributing content (MDX lessons)](#contributing-content-mdx-lessons)
+- [Lesson guide style](#lesson-guide-style)
 - [Contributing code](#contributing-code)
 - [Validation and checks](#validation-and-checks)
 - [Pull request process](#pull-request-process)
@@ -174,6 +175,32 @@ lab:
     - Artifact the learner should submit
 ---
 ```
+
+### Lesson guide style
+
+Lessons should read like an **easy-to-follow guide**: numbered steps, clear goals, and checkable progress. Match the skeleton to the lesson type — do not force the same headings on every file.
+
+**Step count is flexible.** Use as many or as few steps as the content needs (often 3–7). There is no requirement to hit exactly five.
+
+| Type | Typical flow (expand or shrink) |
+| --- | --- |
+| **Setup / how-to** | Study-plan Step 1 (required reading) → Terms → Setup & verify → Lab → Next lesson |
+| **Concept** | Study-plan Step 1 → Core idea → Try it → Lab / mistakes → Next lesson |
+| **Project** | Study-plan Step 1 → Goal → Milestones → Build / evidence → Next lesson |
+| **OSS / soft skill** | Study-plan Step 1 → Context → Practice → Checklist → Next lesson |
+
+**Rules**
+
+1. Use `## Step N — …` headings in MDX for the article body. Number consecutively; use as many or as few steps as the content needs (no fixed count).
+2. Prefer a short **Done when:** line after major steps.
+3. Map `lab.evidence` to a hands-on step — do not leave a generic “regtest check” when the lesson is about Git or economics.
+4. **Required reading is rendered once** by the study plan as **Step 1 // Required reading** from frontmatter `required: true`. **Do not** add `## Step 1 — Required reading` (or a duplicate link list) in MDX.
+5. Start MDX steps at **Step 1** only when there is **no** required reading; otherwise start at **Step 2** (terms / core idea / setup) so numbering stays continuous with the study plan.
+6. **Optional further reading** is rendered once by the auto panel under the article (non-required resources). **Do not** add `## Step N — Optional further reading` (or any duplicate link list) in MDX — it duplicates the panel.
+7. End with a **Next lesson** pointer that matches `content/roadmaps/*.json` order.
+8. Keep analogies and Mermaid diagrams — they support the guide; they do not replace steps.
+
+Pilots: Full **Bitcoin** and **Lightning** tracks use the lesson guide pattern (study-plan Step 1 for required reading; MDX starts at Step 2; no duplicate further-reading or required-reading lists in MDX).
 
 ### MDX components
 

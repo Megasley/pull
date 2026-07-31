@@ -18,7 +18,7 @@ resources:
     url: 'https://noiseexplorer.com/patterns/XK/'
     kind: docs
     required: true
-  - title: BOLT
+  - title: BOLT8 Transport
     url: 'https://github.com/lightning/bolts/blob/master/08-transport.md'
     kind: bolt
     required: true
@@ -37,9 +37,9 @@ reflectionPrompts:
 lab:
   title: Peer identity checklist
   description: >-
-    On Polar or a testnode, identify your node pubkey, list peers, and document
-    how you would verify you are talking to the intended peer before opening a
-    channel.
+    Complete Steps 2–3. On Polar or a testnode, identify your node pubkey, list
+    peers, and document how you would verify you are talking to the intended
+    peer before opening a channel.
   evidence:
     - Node pubkey and peer list excerpt (redact secrets)
     - Short verification procedure you would use in production
@@ -48,29 +48,46 @@ searchQueries:
   - Noise protocol
   - Lightning transport
 ---
-
 Lightning peers speak BOLT messages over an **encrypted, authenticated transport**. The ecosystem standardized on the **Noise protocol framework**, commonly the **XK** pattern, rather than inventing a bespoke handshake.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here.
+
+## Step 2 — Core idea: authenticate the peer, encrypt the link
 
 Channel state machines assume you are talking to the correct peer over a confidential link. Broken transport assumptions become fund-loss or privacy bugs.
 
-## What Noise buys you
+Noise patterns compose Diffie–Hellman and symmetric crypto into documented handshakes. Lightning’s transport BOLT specifies how node static keys participate so peers authenticate identities as they set up sessions.
 
-Noise patterns compose Diffie–Hellman and symmetric crypto into documented handshakes with clear payload encryption rules. Lightning’s transport BOLT specifies how node static keys participate so peers authenticate identities as they set up sessions.
+<Mermaid caption="Noise handshake authenticates node identity and encrypts BOLT messages." chart="flowchart LR
+    A[Node A pubkey] --> HS[Noise XK handshake]
+    B[Node B pubkey] --> HS
+    HS --> Sess[Encrypted session]
+    Sess --> Msgs[BOLT peer messages]" />
 
-## Builder rules
+Builder rules:
 
-1. Never roll your own handshake - use the implementation’s transport.
-2. Treat node pubkeys as identities; verify out-of-band when opening large channels.
-3. Separate clearnet exposure, Tor, and key backup OPSEC.
+1. Never roll your own handshake — use the implementation’s transport
+2. Treat node pubkeys as identities; verify out-of-band for large channels
+3. Separate clearnet exposure, Tor, and key backup OPSEC
 
 <Callout type="warning" title="Encryption ≠ economic security">
-  Transport secrecy does not stop channel probing, fee griefing, or offline breach risk. It is one layer in the onion of LN security.
+  Transport secrecy does not stop channel probing, fee griefing, or offline breach risk. It is one layer in LN security.
 </Callout>
 
-## Common mistakes
+**Done when:** You can name what Noise provides that plain TCP lacks for Lightning peers.
+
+## Step 3 — Peer identity checklist (lab)
+
+List your pubkey and peers. Write a production verification procedure and one phishing/misbinding scenario with mitigation.
+
+### Common mistakes
 
 - Pasting node URIs from untrusted chats without verifying the pubkey
 - Logging session secrets or static keys
 - Assuming LAN Lightning needs no auth because “it’s private”
+
+**Done when:** Lab evidence (pubkey/peers + procedure + scenario) is complete.
+
+### Next lesson
+
+**Pathfinding** — algorithms that turn the channel graph into a route.

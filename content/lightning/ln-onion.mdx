@@ -28,27 +28,28 @@ reflectionPrompts:
     Which BOLT (or implementation doc) is the source of truth for this topic,
     and what did you verify there?
 lab:
-  title: Polar check
+  title: Hop visibility brief
   description: >-
-    After reading, run one hands-on check related to Onion Routing. Prefer local
-    regtest or Polar over mainnet.
+    Complete Steps 2–3. Write what an intermediate hop learns vs does not learn
+    on a 3-hop payment. Optionally pay on Polar and note you cannot see the full
+    path from a middle node’s logs (if inspected).
   evidence:
-    - Command output or screenshot from your local lab
-    - One sentence on what you observed vs expected
-    - Link to the required reading section you used
+    - Table or bullets: hop learns / does not learn
+    - One honest privacy caveat (amount, timing, or graph leakage)
+    - Link to Ch. 10 or BOLT4 section you used
 searchQueries:
   - BOLT4
   - onion routing
 ---
 Lightning payments travel in **onion packets**: each hop peels one layer, learns only the next peer and its instructions, then forwards.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here.
 
-Without onions, intermediate nodes would see the full route and payload. Privacy and security against some attackers depend on this layering, but Lightning is not anonymous cash by default.
+## Step 2 — Core idea: peel one layer
 
-## Analogy
+Without onions, intermediate nodes would see the full route and payload. Privacy and security against some attackers depend on this layering — but Lightning is not anonymous cash by default.
 
-Nested envelopes. Each post office opens only its envelope, stamps the next address, and cannot read the inner letters.
+**Analogy:** Nested envelopes. Each post office opens only its envelope, stamps the next address, and cannot read the inner letters.
 
 <Mermaid caption="Each hop peels one layer; the full path stays hidden." chart="flowchart LR
     Payer[Payer] --> H1[Hop 1 peels<br/>outer layer]
@@ -56,24 +57,22 @@ Nested envelopes. Each post office opens only its envelope, stamps the next addr
     H2 --> H3[Hop 3 peels<br/>inner layer]
     H3 --> Payee[Payee]" />
 
+Each peeled layer yields instructions: next node, amounts, outgoing CLTV, maybe custom records. Failures return encrypted **error onions** the payer can interpret for retries.
+
+Builder habits: do not log decrypted onion internals; treat timing correlation as a leak vector; lengthen routes only within fee/latency budgets.
+
 <Callout type="info" title="Privacy is not absolute">
   Amounts, timing, and graph structure can still leak information. Design threat models honestly.
 </Callout>
 
-## Hop payloads
+**Done when:** You can state what a middle hop must not learn about the final destination.
 
-Each peeled layer yields instructions: next node, amounts, outgoing CLTV, and possibly custom records. Intermediate hops should not learn the final destination (beyond probabilistic guesses from graph/timing).
+## Step 3 — Visibility brief (lab)
 
-## Error onions
+Write the learns / does not learn list for a middle hop. Add one privacy caveat you would put in a README.
 
-Failures return encrypted error packets that only the payer can fully interpret for the failed hop, enabling retries without broadcasting the entire route to every peer.
+**Done when:** Lab evidence (visibility brief + caveat + source) is complete.
 
-## Builder guidance
+### Next lesson
 
-- Do not log decrypted onion internals in production
-- Treat timing correlation as a real privacy leak vector
-- Prefer longer randomized routes only when fees/latency budgets allow
-
-## Next steps
-
-Pathfinding algorithms: how wallets pick the hops that fill the onion.
+**Transport & Noise** — encrypted authenticated peer links under the BOLTs.

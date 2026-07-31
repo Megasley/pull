@@ -28,29 +28,29 @@ reflectionPrompts:
     Which BOLT (or implementation doc) is the source of truth for this topic,
     and what did you verify there?
 lab:
-  title: Polar check
+  title: Offer vs invoice contrast
   description: >-
-    After reading, run one hands-on check related to BOLT12 Offers. Prefer local
-    regtest or Polar over mainnet.
+    Complete Steps 2–3. From BOLT12 (and CLN docs if useful), write a short
+    contrast of BOLT11 vs offers. Optionally create/decode an offer on a CLN
+    Polar node if your lab supports it.
   evidence:
-    - Command output or screenshot from your local lab
-    - One sentence on what you observed vs expected
-    - Link to the required reading section you used
+    - One-paragraph contrast: BOLT11 one-shot vs offer → fresh invoice
+    - Note on implementation support for a wallet/node you care about
+    - Link to BOLT12 section you used
+    - 'Optional: offer create/decode output from CLN'
 searchQueries:
   - BOLT12
   - Lightning offers
 ---
 **Offers (BOLT12)** aim to replace many awkward invoice flows with reusable, negotiable payment requests delivered over onion messages.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here.
 
-Static QR codes, refunds, and recurring flows are painful with single-use BOLT11 strings. Offers are the protocol direction for better UX, but support varies by implementation.
+## Step 2 — Core idea: reusable ask, fresh invoice
 
-## Analogy
+Static QR codes, refunds, and recurring flows are painful with single-use BOLT11 strings. Offers are the protocol direction for better UX — but support varies by implementation.
 
-BOLT11 is a single-use concert ticket printed on demand. An offer is a box office that can issue fresh tickets when you ask, without reprinting a giant static poster that goes stale.
-
-## Mental model
+**Analogy:** BOLT11 is a single-use concert ticket printed on demand. An offer is a box office that can issue fresh tickets when you ask, without a giant static poster that goes stale.
 
 1. Payee publishes an **offer**
 2. Payer requests an invoice over Lightning messaging
@@ -68,12 +68,20 @@ BOLT11 is a single-use concert ticket printed on demand. An offer is a box offic
   Before betting a product on offers, verify your target wallets and node implementations support the flows you need.
 </Callout>
 
-## Common mistakes
+**Done when:** You can explain why an offer is not itself the final BOLT11 string.
+
+## Step 3 — Contrast + optional lab
+
+Write the BOLT11 vs offers contrast. Check one implementation’s docs (e.g. CLN) for offer support. Optional Polar/CLN create/decode if available.
+
+### Common mistakes
 
 - Assuming every wallet can scan offers today
 - Mixing offer UX copy with BOLT11 field names in APIs
 - Ignoring onion message connectivity requirements
 
-## Next steps
+**Done when:** Lab evidence (contrast + support note + BOLT12 link) is complete.
 
-LNURL bridges UX today with HTTP-based flows still widely deployed.
+### Next lesson
+
+**LNURL** — HTTP-based UX still widely deployed alongside offers.

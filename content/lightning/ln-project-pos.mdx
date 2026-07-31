@@ -9,6 +9,11 @@ objectives:
   - Subscribe to invoice settlement events
   - Design a cashier UX for pending vs paid
 resources:
+  - title: 'Project Spec: Lightning POS'
+    url: '/projects/lightning-pos'
+    kind: docs
+    note: Pull project page — acceptance criteria and submit flow.
+    required: true
   - title: BOLT11
     url: 'https://github.com/lightning/bolts/blob/master/11-payment-encoding.md'
     kind: bolt
@@ -31,18 +36,20 @@ reflectionPrompts:
 lab:
   title: Project milestone evidence
   description: >-
-    For Lightning POS, complete the linked project spec happy path on
-    regtest/Polar and capture demo evidence before marking the lesson complete.
+    Complete Steps 2–4. Ship create invoice → QR → settle (or expire) on
+    Polar/regtest and capture demo evidence before marking complete.
   evidence:
     - Link to public repo or branch
-    - Commands or screenshots proving the happy path
-    - Short note of one failure case you tested
+    - Screenshots or commands proving charge → paid (and expiry path)
+    - Short note of one failure case (duplicate charge, late pay, node down)
 searchQueries:
   - BOLT11
 ---
 A Lightning POS turns protocol knowledge into a merchant tool: show QR, wait for payment, print/mark paid.
 
-## Build challenge
+Complete **Step 1 // Required reading** in the study plan above, then continue here. This opens **Lightning Projects**.
+
+## Step 2 — Goal
 
 1. Create invoice for cart total
 2. Display BOLT11 QR
@@ -60,10 +67,34 @@ A Lightning POS turns protocol knowledge into a merchant tool: show QR, wait for
     LN->>POS: Settled
     POS->>Cashier: Paid" />
 
+**Done when:** You can narrate pending vs paid vs expired without opening the code.
+
+## Step 3 — Milestones
+
+| Phase | Ship |
+| --- | --- |
+| Milestone A | Backend mint invoice + return bolt11 |
+| Milestone B | Cashier UI: QR + pending/paid states |
+| Milestone C | Subscribe to settle; expiry/cancel; idempotent charge keys |
+
 <Callout type="tip" title="Idempotent tickets">
   Bind each charge to an idempotency key so refreshes do not create duplicate invoices accidentally.
 </Callout>
 
-## Next steps
+**Done when:** Milestone A works before you polish UI chrome.
 
-Build a Node Ops Dashboard for channels and routing revenue.
+## Step 4 — Build & evidence (lab)
+
+Implement against `/projects/lightning-pos`. Capture repo link, happy-path demo, and one failure case.
+
+### Common mistakes
+
+- Creating a new invoice on every UI refresh
+- Treating “invoice created” as paid
+- Blocking the cashier UI on synchronous pay RPCs without a pending state
+
+**Done when:** Lab evidence is filed.
+
+### Next lesson
+
+**Node Ops Dashboard** — channels, peers, balances, and routing revenue.

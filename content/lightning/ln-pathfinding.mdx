@@ -29,24 +29,25 @@ reflectionPrompts:
     Which BOLT (or implementation doc) is the source of truth for this topic,
     and what did you verify there?
 lab:
-  title: Polar check
+  title: Weight + retry sketch
   description: >-
-    After reading, run one hands-on check related to Pathfinding. Prefer local
-    regtest or Polar over mainnet.
+    Complete Steps 2–3. Write a cost formula (fees + risk) for one edge, then
+    describe what you update after a temporary failure before retrying on
+    Polar or in notes.
   evidence:
-    - Command output or screenshot from your local lab
-    - One sentence on what you observed vs expected
-    - Link to the required reading section you used
+    - Sketch of edge weight (base fee, proportional, risk penalty)
+    - One sentence on learn → retry after a transient failure
+    - Link to Ch. 12 section you used
 ---
 **Pathfinding** searches the gossip graph (plus hints) for a path that can deliver an amount under fee and timelock constraints, even with incomplete liquidity knowledge.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here.
+
+## Step 2 — Core idea: search, attempt, learn, retry
 
 Dijkstra-with-fees is only the start. Production routers track historical failures and prefer reliable edges.
 
-## Analogy
-
-GPS with imperfect live traffic. You pick a route, hit a jam (insufficient balance), then reroute using what you learned.
+**Analogy:** GPS with imperfect live traffic. You pick a route, hit a jam (insufficient balance), then reroute using what you learned.
 
 <Mermaid caption="Search, attempt, learn, retry. Liquidity is uncertain." chart="flowchart TD
     Graph[Gossip graph] --> Weight[Weight edges by fee/risk]
@@ -66,6 +67,14 @@ type Edge = { from: string; to: string; feeBase: number; feeProportional: number
   Show a max fee to users. Silent overpaying destroys trust.
 </Callout>
 
-## Next steps
+**Done when:** You can explain why the first path often fails and retries are normal.
 
-Multipath payments and failure handling - when one path cannot carry the full amount or retries are needed.
+## Step 3 — Weight sketch (lab)
+
+Write a simple edge cost. Describe the learn → retry loop after a temporary imbalance failure.
+
+**Done when:** Lab evidence (weight sketch + retry sentence + source) is complete.
+
+### Next lesson
+
+**Multipath Payments** — split when one path cannot carry the full amount.

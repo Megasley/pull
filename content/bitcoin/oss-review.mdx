@@ -11,9 +11,11 @@ resources:
   - title: Bitcoin Core CONTRIBUTING
     url: 'https://github.com/bitcoin/bitcoin/blob/master/CONTRIBUTING.md'
     kind: docs
+    required: true
   - title: Conventional comments
     url: 'https://conventionalcomments.org/'
     kind: article
+    required: true
   - title: Bitcoin Optech Newsletter
     url: 'https://bitcoinops.org/en/newsletters/'
     kind: article
@@ -26,20 +28,25 @@ reflectionPrompts:
     Which BIP, book chapter, or Core doc is authoritative here, and what did you
     verify?
 lab:
-  title: Contribution artifact
+  title: Written review notes
   description: >-
-    Produce a contribution artifact for Code Review Practice: issue shortlist,
-    review notes, or PR draft that a maintainer could act on.
+    Complete Steps 2–3. Review one open PR (Review Club or Bitcoin-track
+    /issues). Leave or draft actionable comments covering correctness, tests,
+    and clarity.
   evidence:
-    - Issue URL(s) or PR URL
-    - Written approach / review checklist
-    - Self-score against the meaningful-PR rubric
+    - PR URL reviewed
+    - Written review notes (or link to your GitHub comments)
+    - One sentence on whether you would ACK, NACK, or request changes — and why
 ---
 Reviewing is how Bitcoin stays safe. You will learn more from careful review than from rushing another feature PR.
 
-Use Pull's **Review Club** picks on this lesson, or browse [open issues](/issues) filtered for Bitcoin tracks.
+Complete **Step 1 // Required reading** in the study plan above, then continue here.
 
-## What to check
+## Step 2 — Context: what maintainers expect
+
+Use Pull’s **Review Club** picks on this lesson, or browse [open issues](/issues) filtered for Bitcoin tracks.
+
+What to check:
 
 1. Does it solve the claimed problem?
 2. Are there tests?
@@ -56,6 +63,20 @@ Use Pull's **Review Club** picks on this lesson, or browse [open issues](/issues
   Prefer “This breaks reorg handling because X” over “Hmm not sure.”
 </Callout>
 
-## Next steps
+**Done when:** You can explain why silence is not an ACK.
 
-Take a substantive contribution through maintainer feedback cycles.
+## Step 3 — Practice: review one PR (lab)
+
+Read the description, inspect the diff, run or reason about tests if feasible. Draft comments using conventional-comment prefixes where helpful (`nit:`, `suggestion:`, `issue:`).
+
+### Checklist
+
+- [ ] Comments are actionable (what + why)
+- [ ] You checked tests / verification claims
+- [ ] You stated ACK / NACK / request-changes clearly
+
+**Done when:** Lab evidence (PR URL + notes + verdict sentence) is complete.
+
+### Next lesson
+
+**Contribution Rubric** — score your own attempt before asking for review.

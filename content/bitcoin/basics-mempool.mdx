@@ -28,35 +28,34 @@ reflectionPrompts:
     Which BIP, book chapter, or Core doc is authoritative here, and what did you
     verify?
 lab:
-  title: Regtest check
+  title: Fee rate + bump strategy
   description: >-
-    After reading, run one hands-on check related to Mempool & Fees. Prefer
-    local regtest or Polar over mainnet.
+    Complete Steps 2–3. On regtest (or with estimatesmartfee), compute a
+    sat/vB example and write which bump tool you would use if the tx stalled —
+    RBF or CPFP — and why.
   evidence:
-    - Command output or screenshot from your local lab
-    - One sentence on what you observed vs expected
-    - Link to the required reading section you used
+    - 'Fee rate calculation (feeSats / vsize) or estimatesmartfee output'
+    - One sentence choosing RBF vs CPFP for a stuck payment scenario
+    - Link to Mastering Bitcoin Ch. 9 or Optech fee-bumping section you used
 searchQueries:
   - mempool
   - BIP125
 ---
-The **mempool** is each node’s holding area for valid unconfirmed transactions. Miners (and other nodes) choose what to relay and mine based on **policy** and fees, not every consensus-valid transaction is welcome under default policy.
+The **mempool** is each node’s holding area for valid unconfirmed transactions. Miners (and other nodes) choose what to relay and mine based on **policy** and fees — not every consensus-valid transaction is welcome under default policy.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here. This lesson closes the **Bitcoin Basics** chapter.
+
+## Step 2 — Core idea: auction, policy, bumping
 
 Users experience Bitcoin through confirmation delays and fee spikes. Wallets that cannot bump fees create support nightmares.
 
-## Analogy
-
-The mempool is an auction house lobby. Anyone can submit a bid (transaction). Higher fee rates tend to get seated (mined) first when space is scarce. Some items are rejected at the door for policy reasons even if they are “legal.”
-
-## Fee rate basics
+**Analogy:** An auction-house lobby. Anyone can submit a bid (transaction). Higher fee rates tend to get seated (mined) first when space is scarce. Some items are rejected at the door for policy reasons even if they are “legal.”
 
 ```typescript
 const feeRateSatVb = feeSats / vsize;
 ```
 
-Estimate using node RPCs (`estimatesmartfee`) or public observers, then add UX affordances for slow/medium/fast targets.
+Estimate using node RPCs (`estimatesmartfee`) or public observers, then expose slow/medium/fast targets in UX.
 
 <Mermaid caption="Stuck transactions need fee bumping via RBF or CPFP." chart="flowchart LR
     Tx[Broadcast tx] --> Mempool[Node mempools]
@@ -68,21 +67,32 @@ Estimate using node RPCs (`estimatesmartfee`) or public observers, then add UX a
     RBF --> Mine
     CPFP --> Mine" />
 
-## RBF and CPFP
-
 - **RBF (BIP-125)**: replace an unconfirmed tx with a higher-fee variant (signals required)
 - **CPFP**: spend an unconfirmed output with a high-fee child that incentivizes mining both
 
 <Callout type="info" title="Policy ≠ consensus">
-  A transaction can be consensus-valid yet non-standard under default mempool policy. Builders must test relay behavior, not only block validity on regtest miner shortcuts.
+  A transaction can be consensus-valid yet non-standard under default mempool policy. Test relay behavior, not only block validity on regtest miner shortcuts.
 </Callout>
 
-## Common mistakes
+**Done when:** You can explain when RBF vs CPFP is the right bump tool.
+
+## Step 3 — Try it: fee math + bump choice (lab)
+
+```bash
+bitcoin-cli -regtest estimatesmartfee 6
+# Or after a send: feeSats / vsize from getrawtransaction ... true
+```
+
+Pick a stuck-payment scenario (e.g. low fee, no RBF signal, or you control a change output). Write which bump you would use and why.
+
+### Common mistakes
 
 - Broadcasting without RBF signaling when users may need to bump
 - Overpaying dramatically due to stale fee estimates
 - Creating long unconfirmed chains that hit ancestor/descendant limits
 
-## Next steps
+**Done when:** Lab evidence (fee calc + RBF/CPFP choice + source link) is complete. Complete the **chapter quiz** when prompted.
 
-Study the P2P network: how transactions and blocks actually propagate, then mining and consensus.
+### Next lesson
+
+**P2P Network** (Protocol Depth) — how transactions and blocks actually propagate.

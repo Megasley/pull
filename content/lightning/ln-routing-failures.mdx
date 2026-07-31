@@ -28,29 +28,31 @@ reflectionPrompts:
     Which BOLT (or implementation doc) is the source of truth for this topic,
     and what did you verify there?
 lab:
-  title: Polar check
+  title: Failure triage
   description: >-
-    After reading, run one hands-on check related to Failure Handling. Prefer
-    local regtest or Polar over mainnet.
+    Complete Steps 2–3. Trigger or simulate a failed payment on Polar (wrong
+    amount route, closed channel, or expired invoice). Classify transient vs
+    permanent and write your retry policy.
   evidence:
-    - Command output or screenshot from your local lab
-    - One sentence on what you observed vs expected
-    - Link to the required reading section you used
+    - Failure evidence (error text, Polar UI, or simulated scenario notes)
+    - Classification: transient vs permanent + retry yes/no
+    - Idempotency note (payment hash / key) for merchant UX
+    - Link to BOLT4 failures section you used
 searchQueries:
   - BOLT4
 ---
 Most Lightning payments fail at least once before succeeding. Good software treats failure as information, not as a dead end.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here.
+
+## Step 2 — Core idea: transient vs permanent
 
 Naive “try once and show error” UX makes Lightning feel broken. Smart retries with fee budgets make it feel instant.
 
-## Failure classes
-
-- Temporary channel imbalance / unknown liquidity
-- Expiry too tight
-- Fee insufficient
-- Permanent: unknown peer, invalid invoice, exhausted expiry
+| Class | Examples | Action |
+| --- | --- | --- |
+| **Transient** | Imbalance, unknown liquidity, tight fees | Update scores / route; retry within budget |
+| **Permanent** | Invalid invoice, unknown peer, exhausted expiry | Stop; surface clear error |
 
 <Mermaid caption="Parse errors, retry when sensible, stop when permanent." chart="flowchart TD
     Attempt[Pay attempt] --> Fail[Onion error]
@@ -64,6 +66,14 @@ Naive “try once and show error” UX makes Lightning feel broken. Smart retrie
   Never double-charge a merchant because a retry raced a slow success. Key payments by payment hash / idempotency keys.
 </Callout>
 
-## Next steps
+**Done when:** You can triage one failure into transient vs permanent without guessing.
 
-Implementation deep dives: start with LND’s APIs and auth model.
+## Step 3 — Triage a failure (lab)
+
+Cause or simulate a failure. Classify it. State retry policy and idempotency key.
+
+**Done when:** Lab evidence (failure + classification + idempotency + source) is complete.
+
+### Next lesson
+
+**Lightning Attack Surface** — congestion, probing, watchtowers, and CVE lessons.

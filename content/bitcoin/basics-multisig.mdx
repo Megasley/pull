@@ -32,29 +32,28 @@ reflectionPrompts:
     Which BIP, book chapter, or Core doc is authoritative here, and what did you
     verify?
 lab:
-  title: Regtest check
+  title: Policy sketch + BIP check
   description: >-
-    After reading, run one hands-on check related to Multisig & Timelocks.
-    Prefer local regtest or Polar over mainnet.
+    Complete Steps 2–3. Write a one-line custody policy (m-of-n and/or
+    recovery after delay), map it to CLTV vs CSV, and cite the BIP section you
+    used. Optionally inspect a multisig descriptor on regtest.
   evidence:
-    - Command output or screenshot from your local lab
-    - One sentence on what you observed vs expected
-    - Link to the required reading section you used
+    - One-line policy (e.g. 2-of-3 OR Alice after N blocks) and whether CLTV or CSV fits
+    - Link or quote pointer to BIP-65, BIP-68, or BIP-112 you relied on
+    - 'Optional: getdescriptorinfo / getaddressinfo for a multisig or Taproot descriptor'
 searchQueries:
   - multisig
   - BIP67
 ---
 **Multisig** means multiple keys must cooperate to spend. **Timelocks** add “not before” constraints. Together they power vaults, inheritance designs, and Lightning’s security model.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here.
 
-Shared custody without multisig is usually a single point of failure. Lightning’s justice system depends on relative timelocks. Builders who blur absolute vs relative time create unsafe contracts.
+## Step 2 — Core idea: thresholds and time
 
-## Analogy
+Shared custody without multisig is usually a single point of failure. Lightning’s justice system depends on relative timelocks. Blurring absolute vs relative time creates unsafe contracts.
 
-Multisig is a safe deposit box needing two keys. A timelock is a time-delay lock that refuses to open until a date, or until enough time has passed since the box was last sealed.
-
-## Multisig patterns
+**Analogy:** Multisig is a safe deposit box needing two keys. A timelock is a time-delay lock that refuses to open until a date — or until enough time has passed since the box was last sealed.
 
 Classic Script uses `OP_CHECKMULTISIG` for on-chain m-of-n. Modern approaches often prefer Taproot + MuSig2 so cooperative spends look like single-sig.
 
@@ -69,10 +68,8 @@ Policy example: 2-of-3 keys OR (1 key after 90 days)
     Rec --> Wait[Wait for CLTV/CSV]
     Wait --> Done" />
 
-## Absolute vs relative timelocks
-
-- **CLTV** (BIP-65): absolute, unlock after a block height or timestamp
-- **CSV** (BIP-112 / BIP-68): relative, unlock after the output has confirmed for a relative period
+- **CLTV** (BIP-65): absolute — unlock after a block height or timestamp
+- **CSV** (BIP-112 / BIP-68): relative — unlock after the output has confirmed for a relative period
 
 Lightning commitments lean on CSV so old states become punishable after delays.
 
@@ -80,12 +77,34 @@ Lightning commitments lean on CSV so old states become punishable after delays.
   Nodes use block-based rules. Designing “7 days” means encoding that delay in locktime semantics, not trusting a server clock alone.
 </Callout>
 
-## Common mistakes
+**Done when:** You can say when you’d pick CLTV vs CSV for a recovery path.
+
+## Step 3 — Try it: sketch a policy (lab)
+
+Write one custody policy in plain language, then map it:
+
+| Need | Prefer |
+| --- | --- |
+| Unlock after a calendar/height date | CLTV |
+| Unlock N blocks after this output confirms | CSV |
+| Cooperative spend looks like single-sig | Taproot + MuSig-style |
+
+Optionally on regtest:
+
+```bash
+bitcoin-cli -regtest getdescriptorinfo "wsh(multi(2,...))"
+```
+
+(Use a real descriptor from your wallet docs — do not invent keys for mainnet.)
+
+### Common mistakes
 
 - Building 2-of-3 without tested recovery paths and key ceremonies
 - Using absolute locks where relative locks were required (and vice versa)
 - Forgetting that mempool policy may delay non-standard scripts
 
-## Next steps
+**Done when:** Lab evidence (policy line + BIP pointer + optional descriptor) is complete.
 
-Learn how unconfirmed transactions compete in the mempool and how fee bumping works.
+### Next lesson
+
+**Mempool & Fees** — how unconfirmed transactions compete and how fee bumping works.

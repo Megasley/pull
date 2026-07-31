@@ -26,24 +26,25 @@ reflectionPrompts:
     Which BOLT (or implementation doc) is the source of truth for this topic,
     and what did you verify there?
 lab:
-  title: Polar check
+  title: Path factors worksheet
   description: >-
-    After reading, run one hands-on check related to Routing. Prefer local
-    regtest or Polar over mainnet.
+    Complete Steps 2–3. On Polar, attempt a multi-hop pay (or inspect a failed
+    attempt). List fee, CLTV, and liquidity factors that mattered. Optionally
+    skim Amboss for one public path intuition.
   evidence:
-    - Command output or screenshot from your local lab
-    - One sentence on what you observed vs expected
-    - Link to the required reading section you used
+    - Pay attempt result (success or failure) from Polar/CLI
+    - Short list: fees, CLTV/capacity, reliability — which dominated?
+    - Link to Ch. 8 section you used
 ---
-**Routing is liquidity-aware path selection.** The payer (usually) constructs a path across the public graph plus hints, then onion-encrypts hop instructions. Every hop must have enough **outbound** on the forward edge - you already know from channel liquidity why that is not guaranteed.
+**Routing is liquidity-aware path selection.** The payer (usually) constructs a path across the public graph plus hints, then onion-encrypts hop instructions. Every hop must have enough **outbound** on the forward edge.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here.
+
+## Step 2 — Core idea: cheap ≠ successful
 
 Routing success rates define UX. A path that looks cheap on fees still fails if any hop lacks outbound. Fee-aware, reliability-aware pathfinding separates toy demos from production wallets.
 
-## Analogy
-
-You plan a road trip with toll costs and bridge weight limits. If a bridge is “full” (insufficient balance), you detour, often without knowing the exact traffic until you try.
+**Analogy:** You plan a road trip with toll costs and bridge weight limits. If a bridge is “full” (insufficient balance), you detour — often without knowing exact traffic until you try.
 
 <Mermaid caption="Build a path from gossip + hints, then send an onion." chart="flowchart LR
     Payer[Payer] --> G[Channel graph]
@@ -52,16 +53,26 @@ You plan a road trip with toll costs and bridge weight limits. If a bridge is �
     Onion --> Hops[Hop1 Hop2 Hop3]
     Hops --> Payee[Payee]" />
 
+Factor in: fees, CLTV budget, max HTLC / capacity, private channel hints from invoices, and learned reliability (mission-control style).
+
 <Callout type="tip" title="Probe carefully">
-  Liquidity is not fully public. Nodes learn from failures (mission control style) without leaking customer details into logs carelessly.
+  Liquidity is not fully public. Nodes learn from failures without leaking customer details into logs carelessly.
 </Callout>
 
-## Common mistakes
+**Done when:** You can name three inputs to route choice beyond “lowest fee.”
+
+## Step 3 — Try a path (lab)
+
+Multi-hop pay on Polar. Note which constraint bit you if it fails. Optional Amboss skim for graph intuition.
+
+### Common mistakes
 
 - Optimizing only for lowest fee and ignoring success probability
 - Ignoring max HTLC / capacity constraints
 - Forgetting private channel hints from invoices
 
-## Next steps
+**Done when:** Lab evidence (attempt + factor list + source) is complete.
 
-Onion routing: how hop payloads stay private.
+### Next lesson
+
+**Onion Routing** — how hop payloads stay private.

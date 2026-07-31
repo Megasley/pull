@@ -28,29 +28,27 @@ reflectionPrompts:
     Which BIP, book chapter, or Core doc is authoritative here, and what did you
     verify?
 lab:
-  title: Regtest check
+  title: Address types on regtest
   description: >-
-    After reading, run one hands-on check related to Keys & Addresses. Prefer
-    local regtest or Polar over mainnet.
+    Complete Steps 2–3. Generate Bech32 and Bech32m addresses on regtest and
+    inspect scriptPubKey / descriptor fields with getaddressinfo.
   evidence:
-    - Command output or screenshot from your local lab
-    - One sentence on what you observed vs expected
-    - Link to the required reading section you used
+    - 'getnewaddress output for bech32 and bech32m (or equivalent)'
+    - getaddressinfo snippet showing scriptPubKey or desc for one address
+    - One sentence linking the address string to the locking condition
 searchQueries:
   - BIP32
   - BIP39
 ---
-An address is not a bank account number stored in a central database. It is a compact encoding of a **locking condition**, usually “prove you control this public key.”
+An address is not a bank account number in a central database. It is a compact encoding of a **locking condition** — usually “prove you control this public key.”
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here.
 
-Wrong address type, wrong network prefix, or a typo can permanently lose funds. Builders must validate addresses and understand what each format commits to.
+## Step 2 — Core idea: private → public → address
 
-## Analogy
+Wrong address type, wrong network prefix, or a typo can permanently lose funds. Validate addresses and know what each format commits to.
 
-Your **private key** is the only key to a mailbox. The **public key** is a lock design others can verify. The **address** is the mailbox label printed so people can send mail without seeing the lock’s internals.
-
-## One-way derivation
+**Analogy:** The **private key** is the only key to a mailbox. The **public key** is a lock design others can verify. The **address** is the mailbox label so people can send mail without seeing the lock’s internals.
 
 <Mermaid caption="Derivation is one-way: addresses do not reveal private keys." chart="flowchart LR
     Priv[Private key] --> Pub[Public key]
@@ -63,10 +61,8 @@ private key  →  public key  →  hashing / tweaking  →  address string
 
 Never type private keys into random websites. In apps, keep keys in secure modules or hardware wallets.
 
-## Address families you will see
-
 | Type | Looks like | Notes |
-|------|------------|-------|
+| --- | --- | --- |
 | P2PKH | starts with `1` | Legacy Base58Check |
 | P2SH | starts with `3` | Script hash wrapper |
 | P2WPKH / P2WSH | `bc1q...` | SegWit v0 Bech32 |
@@ -84,30 +80,16 @@ Testnet/regtest use different HRPs (`tb1`, `bcrt1`, etc.). Always check the netw
     P2SH --> Addr" />
 
 <Callout type="warning" title="Checksums are not enough">
-  Address checksums catch typos, but they do not stop you from sending to the wrong person or the wrong network. Confirm amount, asset, and destination out-of-band for large transfers.
+  Address checksums catch typos, but they do not stop you from sending to the wrong person or the wrong network.
 </Callout>
 
-## Builder checklist
+**Base58Check** (legacy) mixes numbers and letters and appends a checksum. **Bech32** has stronger error detection; **Bech32m** (BIP-350) tweaks the checksum for Taproot (`bc1p`). If a library says “invalid checksum,” regenerate — do not hand-edit the string.
 
-- Validate address with a library, not regex alone
-- Refuse to send to addresses for the wrong chain
-- Prefer Bech32/Bech32m for new wallets (fees + error detection)
+HD wallets derive many keys from one seed. Back up the seed/mnemonic, the descriptor or derivation standard, and multisig cosigner records if applicable.
 
-## Encoding details builders hit
+**Done when:** You can map each address family in the table to an encoding and network HRP.
 
-**Base58Check** (legacy) mixes numbers and letters, omits confusing characters, and appends a checksum. **Bech32** uses a different alphabet and stronger error detection; **Bech32m** (BIP-350) tweaks the checksum constant for Taproot (`bc1p`).
-
-If a library says "invalid checksum," do not "fix" the string by hand, regenerate from keys/descriptors.
-
-## Derivation vs address
-
-HD wallets derive many keys from one seed. Addresses are presentations of locking conditions for specific keys/scripts. Back up:
-
-1. The seed/mnemonic
-2. The descriptor or derivation standard you used
-3. Multisig cosigner records if applicable
-
-## Try it
+## Step 3 — Try it on regtest (lab)
 
 ```bash
 bitcoin-cli -regtest getnewaddress "" "bech32"
@@ -115,8 +97,16 @@ bitcoin-cli -regtest getnewaddress "" "bech32m"
 bitcoin-cli -regtest getaddressinfo <addr>
 ```
 
-Read `scriptPubKey` and `desc` fields, they connect the address string to the underlying lock.
+Read `scriptPubKey` and `desc` — they connect the address string to the underlying lock.
 
-## Next steps
+### Builder habits
 
-See how confirmed UTXOs live inside blocks, then learn the full transaction structure.
+- Validate with a library, not regex alone
+- Refuse sends to the wrong chain
+- Prefer Bech32/Bech32m for new wallets (fees + error detection)
+
+**Done when:** Lab evidence (two address types + getaddressinfo + one linking sentence) is complete.
+
+### Next lesson
+
+**Blocks & Chain** — where confirmed UTXOs live and how reorgs affect finality.

@@ -51,9 +51,10 @@ reflectionPrompts:
 lab:
   title: Taproot interactive + regtest
   description: >-
-    Complete Decoding Bitcoin's Introduction to Taproot (and Schnorr or tagged
-    hashes if needed). Then on regtest create or inspect a Taproot address /
-    key-path spend and note what appears on-chain vs what stays hidden.
+    Complete Steps 2–3. Finish Decoding Bitcoin's Introduction to Taproot
+    (and Schnorr or tagged hashes if needed). Then on regtest create or inspect
+    a Taproot address / key-path spend and note what appears on-chain vs what
+    stays hidden.
   evidence:
     - Screenshot or notes from Decoding Bitcoin Introduction to Taproot
     - 'Regtest address or tx showing a bc1p / witness v1 output (or descriptor)'
@@ -65,17 +66,17 @@ searchQueries:
 ---
 **Taproot** (SegWit v1) lets coins be spent with a single Schnorr signature in the common case, while still allowing complex scripts as hidden alternatives. Addresses look like `bc1p...` (Bech32m).
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here.
+
+## Step 2 — Core idea: key-path vs script-path
 
 Taproot improves privacy and efficiency for multisig-like policies and future Lightning constructions. Modern wallet descriptors increasingly default to Taproot.
 
-## Analogy
+**Analogy:** A house with a normal front door (key path) and several secret side doors (script leaves). Neighbors usually only see the front door — they never learn which side doors exist unless you open one.
 
-A Taproot output is a house with a normal front door (key path) and several secret side doors (script leaves). Neighbors usually only see you use the front door, they never learn which side doors exist unless you open one.
+Two ways to spend:
 
-## Two ways to spend
-
-1. **Key-path**: sign with the tweaked output key, cheapest and most private
+1. **Key-path**: sign with the tweaked output key — cheapest and most private
 2. **Script-path**: reveal a script leaf + merkle proof + satisfy that script
 
 <Mermaid caption="Key-path spends look like simple single-sig; script-path reveals only the used leaf." chart="flowchart TD
@@ -89,38 +90,37 @@ A Taproot output is a house with a normal front door (key path) and several secr
     Out --> KeyPath[Key-path Schnorr spend]
     Out --> ScriptPath[Script-path leaf spend]" />
 
-## Tapscript
+Script-path leaves use **Tapscript** — Script with Taproot-specific rules and Schnorr CHECKSIG behavior. Multisig and timelock policies can live in leaves while cooperative spends stay on the key path (especially with MuSig-style aggregation).
 
-Script-path leaves use **Tapscript**, Script with Taproot-specific rules and Schnorr CHECKSIG behavior. Multisig and timelock policies can live in leaves while cooperative spends stay on the key path (especially with MuSig-style aggregation).
+Taproot output keys commit to an internal key tweaked by a merkle root of scripts (or a nothing-up-my-sleeve tweak when no scripts). Unused leaves remain hidden — a privacy win versus revealing a full redeem script every time (as with many P2SH spends).
 
 <Callout type="info" title="Privacy wins when you cooperate">
   If parties always cooperate, they can prefer key-path spends so onlookers cannot tell a complex policy was involved.
 </Callout>
 
-## Common mistakes
+If you support Taproot script trees, backups must include enough data to reconstruct spends for every leaf you might need — not only the key path.
+
+**Done when:** You can contrast key-path vs script-path privacy in one sentence.
+
+## Step 3 — Try it: interactive + regtest (lab)
+
+Complete Decoding Bitcoin’s Introduction to Taproot. Then:
+
+```bash
+ADDR=$(bitcoin-cli -regtest getnewaddress "" "bech32m")
+bitcoin-cli -regtest getaddressinfo "$ADDR"
+```
+
+Note witness version / descriptor. Optionally fund and spend so you see a key-path-style spend on-chain. One sentence: what stays hidden until script-path is used?
+
+### Common mistakes
 
 - Treating Taproot as “just a new address” without descriptors/backup of the script tree
 - Losing the internal key / merkle info needed for script-path recovery
 - Mixing Bech32 (v0) and Bech32m (v1) validation
 
-## Internal key and tweak
+**Done when:** Lab evidence (Decoding notes + bc1p/descriptor + privacy contrast) is complete.
 
-Taproot output keys commit to an internal key tweaked by a merkle root of scripts (or a nothing-up-my-sleeve tweak when no scripts). Cooperative MuSig-style key aggregation can make complex custody look like a single key on-chain when everyone agrees.
+### Next lesson
 
-## When script path appears
-
-Script path reveals:
-
-- The leaf script used
-- A merkle proof to the tweak
-- Satisfaction data (signatures, preimages, etc.)
-
-Unused leaves remain hidden, a privacy and fungibility win versus revealing a full redeem script every time (as with many P2SH spends).
-
-## Wallet responsibilities
-
-If you support Taproot script trees, backups must include enough data to reconstruct spends for every leaf you might need, not only the key path.
-
-## Next steps
-
-Study multisig and timelocks, the policies often hidden inside Taproot trees and Lightning scripts.
+**Multisig & Timelocks** — policies often hidden inside Taproot trees and Lightning scripts.

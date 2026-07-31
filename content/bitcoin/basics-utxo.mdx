@@ -41,24 +41,23 @@ reflectionPrompts:
 lab:
   title: Trace a UTXO spend
   description: >-
-    Complete the Decoding Bitcoin UTXO module, then on regtest list unspent
-    outputs, spend one, and show the new change/payment UTXOs created.
+    Complete Steps 2–3. Finish the Decoding Bitcoin UTXO module, then on
+    regtest list unspent outputs, spend one, and show the new change/payment
+    UTXOs created.
   evidence:
     - Note or screenshot from the Decoding Bitcoin UTXO interactive section
     - 'Before/after listunspent (or wallet UTXO view) from regtest'
     - One sentence explaining which output was consumed and which new locks appeared
 ---
-Bitcoin does not keep a global balance per address. Instead, it tracks **unspent transaction outputs (UTXOs)**, discrete chunks of value that can be spent exactly once.
+Bitcoin does not keep a global balance per address. It tracks **unspent transaction outputs (UTXOs)** — discrete chunks of value that can be spent exactly once.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here. Use your Foundations **regtest** node for the hands-on step.
 
-If you think in “account balance” terms (like a bank), you will mis-build wallets, explorers, and Lightning funding logic. UTXOs are the native accounting unit.
+## Step 2 — Core idea: inputs, outputs, change
 
-## Analogy
+If you think in bank-style “account balance” terms, you will mis-build wallets, explorers, and Lightning funding logic. UTXOs are the native accounting unit.
 
-Imagine cash bills in a wallet. You do not “subtract $7 from a $20 balance” in place. You hand over bills and get change back. Each bill is a UTXO. Spending consumes whole bills; change is a new bill returned to you.
-
-## Inputs and outputs
+**Analogy:** Cash bills in a wallet. You do not subtract $7 from a $20 balance in place — you hand over bills and get change. Each bill is a UTXO.
 
 A transaction:
 
@@ -84,31 +83,19 @@ type Utxo = {
 const balance = utxos.reduce((sum, u) => sum + u.valueSats, 0);
 ```
 
-## Wallet balances
+Wallet balance is the sum of UTXOs your keys can unlock — not a single number stored on-chain.
 
-Your wallet balance is the sum of UTXOs it can unlock with its keys, not a single number stored on-chain.
-
-## Coin selection
-
-When sending, wallets choose which UTXOs to spend. Goals often include:
-
-- Minimizing fees (prefer fewer / appropriately sized inputs)
-- Avoiding unnecessary change
-- Preserving privacy when possible
+When sending, wallets **select coins**. Goals often include minimizing fees, avoiding unnecessary change, and preserving privacy when possible.
 
 <Callout type="info" title="No partial spends">
   Each input is fully consumed. There is no “spend half of this UTXO” without creating change.
 </Callout>
 
-## Common mistakes
+**Done when:** You can explain fee = inputs − outputs and why change is a new UTXO.
 
-- Forgetting change and accidentally overpaying the fee
-- Creating dust outputs that cost more to spend later than they are worth
-- Assuming address balance APIs equal UTXO-aware wallet state
+## Step 3 — Try it: count and spend UTXOs (lab)
 
-## Try it: count UTXOs
-
-On regtest, fund an address, then inspect UTXOs:
+Complete the Decoding Bitcoin UTXO interactive, then on regtest:
 
 ```bash
 ADDR=$(bitcoin-cli -regtest getnewaddress)
@@ -116,18 +103,18 @@ bitcoin-cli -regtest generatetoaddress 101 "$ADDR"
 bitcoin-cli -regtest listunspent
 ```
 
-Each `listunspent` row is a UTXO your wallet can spend. Notice `txid`, `vout`, and `amount`. When you send, some rows disappear and new ones appear (payment + change).
+Each `listunspent` row is a UTXO (`txid`, `vout`, `amount`). Send, then list again — some rows disappear and new ones appear (payment + change).
 
-## Dust and consolidation
+Very small UTXOs can cost more in fees to spend than they are worth (**dust**). Consolidation improves future fee efficiency but links history (privacy tradeoff).
 
-Very small UTXOs can cost more in fees to spend than they are worth, that is **dust**. Wallets sometimes consolidate many small UTXOs into one when fees are low. Consolidation improves future fee efficiency but links history (privacy tradeoff).
+### Common mistakes
 
-## Builders checklist
+- Forgetting change and accidentally overpaying the fee
+- Creating dust that costs more to spend later than it is worth
+- Assuming address-balance APIs equal UTXO-aware wallet state
 
-- Always compute change explicitly in tests
-- Log fee = inputs − outputs on every send path
-- Never assume an "address balance" API matches your local UTXO set during reorgs
+**Done when:** Lab evidence (Decoding note + before/after listunspent + one-sentence spend story) is complete.
 
-## Next steps
+### Next lesson
 
-Learn how keys become addresses, then how UTXOs get confirmed inside blocks.
+**Keys & Addresses** — how private keys become the locking conditions on those UTXOs.

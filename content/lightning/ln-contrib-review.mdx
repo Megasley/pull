@@ -29,20 +29,25 @@ reflectionPrompts:
     Which BOLT (or implementation doc) is the source of truth for this topic,
     and what did you verify there?
 lab:
-  title: Contribution artifact
+  title: Spec review writeup
   description: >-
-    Produce a contribution artifact for Protocol Review Practice: issue
-    shortlist, review notes, or PR draft that a maintainer could act on.
+    Complete Steps 2–3. Pick an open or recent bolts PR (or Optech Lightning
+    note). Write a structured interop review: problem, rollout behavior, new
+    failure modes, test vectors.
   evidence:
-    - Issue URL(s) or PR URL
-    - Written approach / review checklist
-    - Self-score against the meaningful-PR rubric
+    - BOLT PR or proposal URL
+    - Structured review answering the four checklist questions
+    - One sentence separating “implementation bug” vs “spec ambiguity” if relevant
 ---
 Specification review keeps the network coherent. Practice evaluating proposals for clarity, edge cases, and backward compatibility.
 
-Start with **Review Club** spec picks on this lesson, especially open PRs on [lightning/bolts](https://github.com/lightning/bolts/pulls).
+Complete **Step 1 // Required reading** in the study plan above, then continue here. This closes the **Lightning** roadmap.
 
-## Review checklist
+## Step 2 — Context: interop first
+
+Start with **Review Club** spec picks or open PRs on [lightning/bolts](https://github.com/lightning/bolts/pulls).
+
+Review checklist:
 
 1. What problem does this solve?
 2. How do existing nodes behave during rollout?
@@ -59,6 +64,18 @@ Start with **Review Club** spec picks on this lesson, especially open PRs on [li
   Spec debates can be intense. Be precise, charitable, and evidence-based.
 </Callout>
 
-## Congratulations
+**Done when:** You can separate an implementation bug from a spec ambiguity in one example.
 
-You now have a full Lightning builder path, from invoices to protocol review. Keep building, keep testing on regtest, and keep contributing.
+## Step 3 — Practice: write the review (lab)
+
+Pick a bolts PR or Optech Lightning note. Answer all four checklist questions. Note rollout risk for LND/CLN/LDK if relevant.
+
+### Checklist
+
+- [ ] Problem stated in your own words
+- [ ] Rollout / backward-compat considered
+- [ ] Failure modes and tests called out
+
+**Done when:** Lab evidence (URL + structured review) is complete. Complete the **chapter quiz** when prompted.
+
+You now have a full Lightning builder path — from invoices to protocol review. Keep building, keep testing on regtest, and keep contributing.

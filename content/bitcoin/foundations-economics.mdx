@@ -17,9 +17,11 @@ resources:
     url: 'https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch02_overview.adoc'
     kind: book
     chapter: 'Ch. 2: Overview'
+    required: true
   - title: 'Bitcoin Optech: Transaction fees'
     url: 'https://bitcoinops.org/en/topics/fee-bumping/'
     kind: article
+    required: true
 reflectionPrompts:
   - >-
     Explain Bitcoin Economics to a teammate without jargon - what problem does
@@ -29,28 +31,34 @@ reflectionPrompts:
     Which BIP, book chapter, or Core doc is authoritative here, and what did you
     verify?
 lab:
-  title: Regtest check
+  title: Fee and subsidy check
   description: >-
-    After reading, run one hands-on check related to Bitcoin Economics. Prefer
-    local regtest or Polar over mainnet.
+    Complete Steps 2–3. On regtest, observe a mining reward / balance change,
+    then compute a simple sat/vB example from a lab send or decoded fee fields.
   evidence:
-    - Command output or screenshot from your local lab
-    - One sentence on what you observed vs expected
-    - Link to the required reading section you used
+    - Regtest command output or screenshot showing a mined block / wallet balance after generatetoaddress
+    - One sat/vB (or fee) calculation with the numbers you used
+    - Link to the Mastering Bitcoin or Optech section you relied on
 ---
-Bitcoin is software *and* an incentive system. If you only memorize data structures, you will still be surprised when fees spike, blocks fill, or miners orphan a chain tip. Economics explains the behavior.
+Bitcoin is software *and* an incentive system. If you only memorize data structures, you will still be surprised when fees spike or blocks fill.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here. Use your Foundations **regtest** node for the hands-on step.
 
-Builders ship wallets, fee estimators, and Lightning nodes. All of them live inside a fee market and a security budget. Ignoring incentives leads to stuck transactions and brittle products.
+## Step 2 — Core idea: supply, fees, security
 
-## Analogy
+| Term | Meaning | Builder impact |
+| --- | --- | --- |
+| **Block subsidy** | New bitcoin paid to the miner | Shrinks over halvings |
+| **Halving** | Subsidy cut ~every 210,000 blocks | Security shifts toward fees |
+| **Fee / sat/vB** | What users bid for block space | Wallet urgency |
+| **Mempool** | Waiting room for unconfirmed txs | Fee market venue |
 
-Block space is like seats on a fixed-size bus that leaves every ~10 minutes. When demand is high, people bid higher fares (fees). Miners are drivers paid by the fare box plus a scheduled subsidy that halves over time.
+**Analogy:** Block space is seats on a fixed-size bus every ~10 minutes. High demand → higher fares. Miners earn fare box + subsidy.
 
-## Supply schedule
-
-New bitcoin enters circulation through the **block subsidy**. Approximately every 210,000 blocks (~4 years), the subsidy **halves**. Eventually the subsidy trends toward zero and security relies more on fees.
+```typescript
+const feeSats = inputSumSats - outputSumSats;
+const satPerVb = feeSats / virtualSize;
+```
 
 <Mermaid caption="Users bid for inclusion; miners earn subsidy and fees; hashpower secures the ledger." chart="flowchart TD
     Users[Users broadcast txs] --> Mempool[Mempool bids with fees]
@@ -58,31 +66,34 @@ New bitcoin enters circulation through the **block subsidy**. Approximately ever
     Miners --> Block[New block + subsidy + fees]
     Block --> Security[Hashpower secures history]" />
 
-## Fee markets
-
-A transaction pays a fee equal to inputs minus outputs. Wallets express urgency as **sat/vB** (satoshis per virtual byte). Higher fees usually confirm faster when the mempool is congested.
-
-```typescript
-const feeSats = inputSumSats - outputSumSats;
-const satPerVb = feeSats / virtualSize;
-```
-
 <Callout type="info" title="Security assumption">
-  Bitcoin’s security assumes that attacking the chain (for example, rewriting recent history) costs more than it is worth, primarily because honest mining is rewarded and hashpower is expensive. Fees and subsidy fund that hashpower.
+  Attacking the chain should cost more than it is worth. Fees and subsidy fund the hashpower that makes that true.
 </Callout>
 
-## What builders should design for
+Design for fee spikes (RBF/CPFP), dust UTXOs, and different confirmation targets.
 
-- Fee spikes: always support fee bumping (RBF/CPFP) for on-chain sends
-- Dust and uneconomical UTXOs: tiny outputs can cost more to spend than they are worth
-- Confirmation targets: “next block” vs “within a day” are different products
+**Done when:** You can point to subsidy and fees in the Mermaid flow.
 
-## Common mistakes
+## Step 3 — Try it on regtest (lab)
 
-- Hard-coding a fee like “10 sat/vB forever”
-- Treating the 21 million cap as a UX detail instead of a consensus rule
-- Assuming Lightning removes the need to understand fees, channels still open/close on-chain
+```bash
+ADDR=$(bitcoin-cli -regtest getnewaddress)
+bitcoin-cli -regtest generatetoaddress 1 "$ADDR"
+bitcoin-cli -regtest getbalance
+```
 
-## Next steps
+Remember: coinbase needs **100** confirmations before spend — mining many blocks or observing immature balance is fine.
 
-Read Mastering Bitcoin chapters 1, 2, then start the UTXO model, the accounting system every wallet actually uses.
+Then compute **fee** / approximate **sat/vB** for any lab send or decoded example. One sentence: what breaks if a wallet hard-codes `10 sat/vB` forever?
+
+### Common mistakes
+
+- Hard-coding fees forever  
+- Treating the 21M cap as UX fluff  
+- Assuming Lightning removes on-chain fee literacy  
+
+**Done when:** Lab evidence (balance output + fee calc + source link) is complete.
+
+### Next lesson
+
+Start **UTXO Model** — the accounting system every wallet actually uses. Basics labs assume your local regtest chain.

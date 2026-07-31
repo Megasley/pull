@@ -8,17 +8,18 @@ objectives:
   - Understand plugins and hooks
   - Know where CLN often leads on protocol features
 resources:
-  - title: Core Lightning docs
-    url: 'https://docs.corelightning.org/'
-    kind: docs
-  - title: CLN plugins
-    url: 'https://docs.corelightning.org/docs/plugins'
-    kind: docs
   - title: Mastering the Lightning Network
     url: 'https://github.com/lnbook/lnbook/blob/master/04_node_client.asciidoc'
     kind: book
     chapter: 'Ch. 4: Lightning Node Software'
     required: true
+  - title: Core Lightning docs
+    url: 'https://docs.corelightning.org/'
+    kind: docs
+    required: true
+  - title: CLN plugins
+    url: 'https://docs.corelightning.org/docs/plugins'
+    kind: docs
 reflectionPrompts:
   - >-
     Explain Core Lightning to a teammate without jargon - what problem does it
@@ -28,18 +29,21 @@ reflectionPrompts:
     Which BOLT (or implementation doc) is the source of truth for this topic,
     and what did you verify there?
 lab:
-  title: Polar check
+  title: CLN RPC + plugin map
   description: >-
-    After reading, run one hands-on check related to Core Lightning. Prefer
-    local regtest or Polar over mainnet.
+    Complete Steps 2–3. On Polar/CLN, run getinfo and create an invoice. Skim
+    the plugin docs and list one hook or plugin you would use for a custom
+    feature.
   evidence:
-    - Command output or screenshot from your local lab
-    - One sentence on what you observed vs expected
-    - Link to the required reading section you used
+    - getinfo + invoice (or Polar) proof
+    - One plugin/hook you would extend and why
+    - Link to CLN docs or plugin guide section you used
 ---
 **Core Lightning (CLN)** emphasizes modularity: a lean daemon extended by plugins. It frequently ships cutting-edge protocol features early.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here.
+
+## Step 2 — Core idea: daemon + plugins
 
 If you need custom RPC behavior or want to experiment with offers/splicing, CLN’s plugin system is a powerful builder surface.
 
@@ -55,9 +59,17 @@ lightning-cli invoice 100000 "label" "desc"
 ```
 
 <Callout type="tip" title="Start with existing plugins">
-  Read maintained plugins before writing your own, patterns around JSON-RPC and notifications save weeks.
+  Read maintained plugins before writing your own — patterns around JSON-RPC and notifications save weeks.
 </Callout>
 
-## Next steps
+**Done when:** You can contrast CLN’s plugin model with LND’s gRPC app integration style in one sentence.
 
-LDK, embed Lightning directly into applications.
+## Step 3 — Try it: RPC + plugin pick (lab)
+
+Run getinfo and mint an invoice on CLN. From the plugin docs, name one hook/plugin for a feature you care about (offers helper, webhook, accounting).
+
+**Done when:** Lab evidence (RPC proof + plugin pick + source) is complete.
+
+### Next lesson
+
+**LDK** — embed Lightning as a library inside your app.

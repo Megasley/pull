@@ -8,13 +8,14 @@ objectives:
   - Keep PRs rebase-friendly and focused
   - Document decisions for future reviewers
 resources:
-  - title: 'GitHub, Addressing review feedback'
-    url: 'https://docs.github.com/en/pull-requests'
-    kind: docs
-  - title: Bitcoin Core contributing
+  - title: Bitcoin Core CONTRIBUTING
     url: 'https://github.com/bitcoin/bitcoin/blob/master/CONTRIBUTING.md'
     kind: docs
-  - title: 'Pro Git, Rewriting history'
+    required: true
+  - title: 'GitHub: Addressing review feedback'
+    url: 'https://docs.github.com/en/pull-requests'
+    kind: docs
+  - title: 'Pro Git: Rewriting history'
     url: 'https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History'
     kind: docs
 reflectionPrompts:
@@ -28,18 +29,21 @@ reflectionPrompts:
     Which BIP, book chapter, or Core doc is authoritative here, and what did you
     verify?
 lab:
-  title: Contribution artifact
+  title: Feedback-cycle artifact
   description: >-
-    Produce a contribution artifact for Maintainer Collaboration: issue
-    shortlist, review notes, or PR draft that a maintainer could act on.
+    Complete Steps 2–3. Open or update a PR (or draft responses for an existing
+    review). Document one full feedback round: comment → your reply → what you
+    changed.
   evidence:
-    - Issue URL(s) or PR URL
-    - Written approach / review checklist
-    - Self-score against the meaningful-PR rubric
+    - PR URL (or draft PR + planned upstream)
+    - Summary of one review round (what changed, what remains open)
+    - Updated rubric self-score after the revision
 ---
 Landing a meaningful PR is a communication skill. Expect iterations. Maintainers juggle scarcity of attention and high cost of mistakes.
 
-## Collaboration loop
+Complete **Step 1 // Required reading** in the study plan above, then continue here.
+
+## Step 2 — Context: the collaboration loop
 
 <Mermaid caption="Expect multiple rounds; keep commits and responses crisp." chart="sequenceDiagram
     participant You
@@ -54,6 +58,22 @@ Landing a meaningful PR is a communication skill. Expect iterations. Maintainers
   Reply with what changed and what remains open. Save reviewers time.
 </Callout>
 
-## Next steps
+Keep the PR rebase-friendly and focused. Prefer force-push only when the project’s guide allows it — and say so when you rewrite history.
 
-Package your work into a Builder Portfolio, proof of skill for employers and collaborators.
+**Done when:** You can describe how you would respond to a NACK without escalating.
+
+## Step 3 — Practice: one feedback round (lab)
+
+Take a live or draft PR through one full cycle. Capture: reviewer ask → your technical reply → code/test change → remaining questions.
+
+### Checklist
+
+- [ ] Each push has a short summary comment
+- [ ] Diff stays scoped to the stated problem
+- [ ] Rubric score is still ≥ 8/10 (or you document why not yet)
+
+**Done when:** Lab evidence (PR URL + round summary + updated score) is complete.
+
+### Next lesson
+
+**Builder Portfolio** — package projects and PRs as verifiable proof of skill.
