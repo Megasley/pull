@@ -109,6 +109,7 @@ export const footerNav = [
     links: [
       { title: "Discover", href: "/discover" },
       { title: "Issues", href: "/issues" },
+      { title: "Support", href: "/support" },
       { title: "Feedback", href: siteConfig.feedbackUrl },
     ],
   },
