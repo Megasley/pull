@@ -25,16 +25,20 @@ reflectionPrompts:
   - "How will you respond to a NACK or request for deeper tests without derailing?"
 lab:
   title: Rubric self-score
-  description: Pick a real issue on a Bitcoin or Lightning repo. Write a one-page plan and self-score it 0–2 on each rubric row below before coding.
+  description: >-
+    Complete Steps 2–3. Pick a real issue on a Bitcoin or Lightning repo. Write
+    a one-page plan and self-score it 0–2 on each rubric row before coding (or
+    before requesting review).
   evidence:
     - Issue URL and your approach doc
     - Rubric score table (0–2 per row) with notes
     - Draft first issue comment or PR body
 ---
+A **meaningful PR** is not measured by lines changed. It is measured by clarity, testability, and respect for maintainer time — the same bar Btrust/Chaincode-style BOSS programs expect.
 
-A **meaningful PR** is not measured by lines changed. It is measured by clarity, testability, and respect for maintainer time - the same bar Btrust/Chaincode-style BOSS programs expect.
+Complete **Step 1 // Required reading** in the study plan above, then continue here.
 
-## Rubric (score each 0–2)
+## Step 2 — Context: the ship bar
 
 | Row | 0 | 1 | 2 |
 | --- | --- | --- | --- |
@@ -46,8 +50,6 @@ A **meaningful PR** is not measured by lines changed. It is measured by clarity,
 
 **Ship bar:** total ≥ 8/10 before you request maintainer review.
 
-## Evidence pack for Pull review
-
 When you submit contribution progress on Pull, include:
 
 1. Issue / PR URLs
@@ -55,13 +57,25 @@ When you submit contribution progress on Pull, include:
 3. What you tested (commands, CI link, or Polar/regtest notes)
 4. Open questions for reviewers
 
-## Anti-patterns
-
-- Drive-by refactors unrelated to the issue
-- “LGTM” reviews with no reading
-- Demanding merge timelines
-- Mainnet experiments as proof
-
 <Callout type="info" title="Docs and tests count">
-  Documentation, vectors, and test coverage are first-class contributions - often better first PRs than consensus code.
+  Documentation, vectors, and test coverage are first-class contributions — often better first PRs than consensus code.
 </Callout>
+
+**Done when:** You can recite the five rows and the ≥ 8/10 ship bar.
+
+## Step 3 — Practice: score your plan (lab)
+
+Pick a real issue. Write a one-page approach. Score each row 0–2 with notes. Draft the issue comment or PR body you would post.
+
+### Checklist / anti-patterns
+
+- [ ] No drive-by refactors unrelated to the issue
+- [ ] No “LGTM” without reading
+- [ ] No demanding merge timelines
+- [ ] No mainnet experiments as “proof”
+
+**Done when:** Lab evidence (issue + score table + draft comment/PR) is complete.
+
+### Next lesson
+
+**Maintainer Collaboration** — take a substantive contribution through feedback cycles.

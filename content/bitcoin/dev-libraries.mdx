@@ -11,12 +11,17 @@ resources:
   - title: bitcoinjs-lib
     url: 'https://github.com/bitcoinjs/bitcoinjs-lib'
     kind: docs
+    note: JS stack - keys, addresses, and transaction construction.
+    required: true
   - title: rust-bitcoin
     url: 'https://github.com/rust-bitcoin/rust-bitcoin'
     kind: docs
+    note: Rust stack - consensus types and serialization primitives.
+    required: true
   - title: BDK documentation
     url: 'https://bitcoindevkit.org/'
     kind: docs
+    note: Wallet engine on top of rust-bitcoin - optional depth this lesson.
 reflectionPrompts:
   - >-
     Explain Bitcoin Libraries to a teammate without jargon - what problem does
@@ -26,32 +31,31 @@ reflectionPrompts:
     Which BIP, book chapter, or Core doc is authoritative here, and what did you
     verify?
 lab:
-  title: Regtest check
+  title: Network + address in a library
   description: >-
-    After reading, run one hands-on check related to Bitcoin Libraries. Prefer
-    local regtest or Polar over mainnet.
+    Complete Steps 2–3. In JS or Rust, generate a regtest address (or print
+    network params) with a maintained library. Never use mainnet keys for the
+    lab.
   evidence:
-    - Command output or screenshot from your local lab
-    - One sentence on what you observed vs expected
-    - Link to the required reading section you used
+    - Code snippet or terminal output showing a regtest address or network object
+    - Which library and version you used
+    - One sentence on why you would not hand-roll Bech32 / sighash
 ---
 You should not hand-roll Base58, Bech32, or sighash code. Use maintained libraries that track consensus and address standards.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above (skim both READMEs; go deep on the stack you will use). This opens **Development**.
 
-A one-character encoding bug can burn funds. Libraries encapsulate years of edge cases, version bytes, witness quirks, taproot tweaks.
+## Step 2 — Core idea: pick a stack, pin versions
 
-## Analogy
+A one-character encoding bug can burn funds. Libraries encapsulate years of edge cases — version bytes, witness quirks, taproot tweaks.
 
-Libraries are power tools with safety guards. You still need skill, but you should not forge your own circular saw blade from scrap metal.
-
-## Ecosystem map
+**Analogy:** Power tools with safety guards. You still need skill, but you should not forge your own circular saw blade from scrap metal.
 
 | Need | JavaScript | Rust |
-|------|------------|------|
+| --- | --- | --- |
 | Primitives | bitcoinjs-lib, @scure/btc-signer | rust-bitcoin |
 | Wallet engine | often custom + indexers | BDK |
-| secp256k1 | noble / bitcoin-secp... | secp256k1 / libsecp |
+| secp256k1 | noble / bitcoin-secp… | secp256k1 / libsecp |
 
 <Mermaid caption="Apps compose libraries for keys, tx building, and signing workflows." chart="flowchart TD
     App[Your app] --> Lib[bitcoin library]
@@ -61,27 +65,35 @@ Libraries are power tools with safety guards. You still need skill, but you shou
     Tx --> Node[Bitcoin Core / indexer]
     Psbt --> HW[Hardware signer]" />
 
-```bash
-# Rust example sketch
-cargo add bitcoin
-```
-
 ```typescript
 // Prefer well-reviewed packages; pin versions; read changelogs on upgrades
 import * as bitcoin from "bitcoinjs-lib";
 const network = bitcoin.networks.regtest;
 ```
 
+```bash
+# Rust sketch
+cargo add bitcoin
+```
+
 <Callout type="warning" title="Pin and audit upgrades">
   Consensus-adjacent upgrades can change defaults. Pin versions, read release notes, and run vectors/tests before production deploys.
 </Callout>
 
-## Common mistakes
+**Done when:** You can name your primary library and what you still should not DIY.
+
+## Step 3 — Try it: address or network object (lab)
+
+Generate a **regtest** address (or print network params) with your chosen library. Paste output or a short code snippet. Note library + version.
+
+### Common mistakes
 
 - Copy-pasting random npm snippets that use deprecated address APIs
 - Mixing mainnet and regtest network objects
 - Using non-audited “crypto helper” packages for key material
 
-## Next steps
+**Done when:** Lab evidence (output + library/version + DIY sentence) is complete.
 
-Design wallet architecture: how HD keys, accounts, and signing fit together.
+### Next lesson
+
+**Wallet Architecture** — HD keys, watch-only vs signing, and backups.

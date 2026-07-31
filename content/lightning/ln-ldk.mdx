@@ -8,17 +8,18 @@ objectives:
   - 'Identify what you must provide (chain source, persistence, networking)'
   - Sketch a mobile or server embedding architecture
 resources:
-  - title: LDK documentation
-    url: 'https://lightningdevkit.org/'
-    kind: docs
-  - title: LDK sample node
-    url: 'https://github.com/lightningdevkit'
-    kind: docs
   - title: Mastering the Lightning Network
     url: 'https://github.com/lnbook/lnbook/blob/master/04_node_client.asciidoc'
     kind: book
     chapter: 'Ch. 4: Lightning Node Software'
     required: true
+  - title: LDK documentation
+    url: 'https://lightningdevkit.org/'
+    kind: docs
+    required: true
+  - title: LDK sample node
+    url: 'https://github.com/lightningdevkit'
+    kind: docs
 reflectionPrompts:
   - Explain LDK to a teammate without jargon - what problem does it solve?
   - What would break in production if you misunderstood LDK?
@@ -26,24 +27,25 @@ reflectionPrompts:
     Which BOLT (or implementation doc) is the source of truth for this topic,
     and what did you verify there?
 lab:
-  title: Polar check
+  title: Embedding architecture sketch
   description: >-
-    After reading, run one hands-on check related to LDK. Prefer local regtest
-    or Polar over mainnet.
+    Complete Steps 2–3. Sketch how your app would supply persistence, peer
+    networking, and a chain source to LDK. Optionally run or skim an LDK sample
+    node README.
   evidence:
-    - Command output or screenshot from your local lab
-    - One sentence on what you observed vs expected
-    - Link to the required reading section you used
+    - Architecture sketch (Mermaid, diagram, or bullets) of App → LDK → deps
+    - One persistence crash-recovery requirement you would test
+    - Link to LDK docs or sample you used
 ---
 **LDK** (Lightning Development Kit) lets you embed Lightning protocol logic inside your app. You bring storage, networking, and chain monitoring.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here.
+
+## Step 2 — Core idea: you bring the chassis
 
 Mobile wallets and custom servers often cannot run a full LND/CLN sidecar. LDK is how Lightning becomes a library dependency.
 
-## Analogy
-
-LND/CLN are assembled cars. LDK is an engine kit: powerful, but you still build the chassis, fuel system, and dashboard.
+**Analogy:** LND/CLN are assembled cars. LDK is an engine kit — powerful, but you still build the chassis, fuel system, and dashboard.
 
 <Mermaid caption="LDK requires you to supply persistence, networking, and chain data." chart="flowchart TD
     App[Your application] --> LDK[LDK]
@@ -52,10 +54,20 @@ LND/CLN are assembled cars. LDK is an engine kit: powerful, but you still build 
     LDK --> Chain[Your chain source]
     Chain --> Bitcoin[Bitcoin node / electrum / esplora]" />
 
+You must provide durable channel-state storage, peer networking, and a chain source. Persistence bugs lose funds — test crash recovery aggressively.
+
 <Callout type="warning" title="Persistence bugs lose funds">
-  Channel state durability is sacred. Test crash recovery aggressively.
+  Channel state durability is sacred. Test crash recovery before mainnet value.
 </Callout>
 
-## Next steps
+**Done when:** You can list the three responsibilities LDK does **not** own for you.
 
-Watchtowers, protecting offline or intermittently connected wallets.
+## Step 3 — Architecture sketch (lab)
+
+Draw App → LDK → persistence / net / chain. Write one crash-recovery test you would run. Optional: skim LDK sample node docs.
+
+**Done when:** Lab evidence (sketch + recovery test + source) is complete.
+
+### Next lesson
+
+**Watchtowers** — breach detection when wallets are offline.

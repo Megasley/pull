@@ -26,29 +26,29 @@ reflectionPrompts:
     Which BOLT (or implementation doc) is the source of truth for this topic,
     and what did you verify there?
 lab:
-  title: Polar check
+  title: Create + decode invoice
   description: >-
-    After reading, run one hands-on check related to Invoices. Prefer local
-    regtest or Polar over mainnet.
+    Complete Steps 2–3. On Polar/CLN/LND lab, create an invoice, decode it, and
+    identify hash, amount, and expiry fields.
   evidence:
-    - Command output or screenshot from your local lab
-    - One sentence on what you observed vs expected
-    - Link to the required reading section you used
+    - Create + decode command/UI output (or screenshots)
+    - Labeled fields: payment hash (or secret), amount, expiry
+    - Link to BOLT11 section you used
 searchQueries:
   - BOLT11
   - Lightning invoice
 ---
 A **BOLT11 invoice** is a bech32-encoded payment request. It tells a payer what to pay, where hints might help, and when the request expires.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here.
+
+## Step 2 — Core idea: fields, expiry, uniqueness
 
 POS apps, SaaS billing, and wallets all mint invoices. Incorrect expiry or amount handling causes failed payments and angry users.
 
-## Analogy
+**Analogy:** A temporary ticket — amount, destination commitment (payment hash), and a deadline. After expiry, the ticket is useless even if someone pays late.
 
-An invoice is a temporary ticket: amount, destination commitment (payment hash), and a deadline. After expiry, the ticket is useless even if someone pays late.
-
-## Key fields
+Key fields:
 
 - Payment hash / payment secret
 - Amount (optional for “any amount”)
@@ -64,38 +64,34 @@ An invoice is a temporary ticket: amount, destination commitment (payment hash),
     Payer->>Payee: Route HTLCs
     Payee->>Payer: Reveal preimage on settle" />
 
-```bash
-# CLN example
-lightning-cli invoice 10000 "coffee" "cup #42"
-lightning-cli decodepay <bolt11>
-```
+Invoices can omit amount (payer chooses) — receivers must still validate paid amounts against app expectations. Long descriptions can be **hashed** into the invoice to keep QRs small; full text travels out of band.
+
+Show countdowns. Disable Pay on expiry. When regenerating, rotate payment hashes — never recycle.
 
 <Callout type="warning" title="Never reuse preimages carelessly">
   Payment hashes must be unique per payment intent. Reuse can create serious security/privacy issues.
 </Callout>
 
-## Common mistakes
+**Done when:** You can list the fields a payer UI must show before Pay is enabled.
+
+## Step 3 — Try it: create + decode (lab)
+
+```bash
+# CLN example (Polar or local)
+lightning-cli invoice 10000 "coffee" "cup #42"
+lightning-cli decodepay <bolt11>
+```
+
+Label hash, amount, and expiry in the decode output. Prefer Polar if you are not running a node yet.
+
+### Common mistakes
 
 - Showing expired invoices in UI
 - Ignoring `msat` precision vs display rounding
 - Forgetting routing hints for private channels
 
-## Amountless invoices
+**Done when:** Lab evidence (create/decode + labeled fields + BOLT11 link) is complete.
 
-Invoices can omit amount, letting the payer choose. Receivers must still validate paid amounts against application expectations (donations vs fixed checkout).
+### Next lesson
 
-## Description hash
-
-Long descriptions can be hashed into the invoice to keep QR codes smaller; the full text is transported out of band. If you use description hashes, ensure the payer UI can fetch and display the preimage text safely.
-
-## Expiry UX
-
-Show countdowns. Disable Pay on expiry. When regenerating invoices, rotate payment hashes, never recycle.
-
-## Test matrix
-
-Decode fixtures from multiple implementations (LND, CLN, LDK wallets) to ensure your parser accepts real-world BOLT11 quirks.
-
-## Next steps
-
-BOLT12 offers improve reusable payment UX beyond one-shot invoices.
+**BOLT12 Offers** — reusable payment UX beyond one-shot invoices.

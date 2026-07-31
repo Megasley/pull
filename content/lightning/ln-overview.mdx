@@ -32,38 +32,31 @@ reflectionPrompts:
     Which BOLT (or implementation doc) is the source of truth for this topic,
     and what did you verify there?
 lab:
-  title: Polar check
+  title: Network map + local peek
   description: >-
-    After reading, run one hands-on check related to Lightning Overview. Prefer
-    local regtest or Polar over mainnet.
+    Complete Steps 2–3. Skim Amboss (or similar) for one public channel
+    snapshot, then on Polar/regtest list your local nodes or note that you will
+    stand up Polar before channel labs.
   evidence:
-    - Command output or screenshot from your local lab
-    - One sentence on what you observed vs expected
-    - Link to the required reading section you used
+    - Note or screenshot from Amboss (or explorer) of one node/channel fact
+    - Polar screenshot or CLI note of your local lab status (or planned setup)
+    - Link to Mastering Lightning Ch. 1 section you used
 ---
 The Lightning Network scales Bitcoin payments by moving most transfers **off-chain** into bilateral payment channels. Users update balances locally and only settle on-chain when opening or closing channels.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here. Prefer completing the Bitcoin roadmap first — Lightning assumes UTXOs, fees, scripts/timelocks, and regtest comfort.
 
-On-chain block space is scarce. Instant coffee payments should not compete with large settlements for the same limited capacity. Lightning is how builders offer snappy UX without abandoning Bitcoin settlement.
+## Step 2 — Core idea: channels, HTLCs, invoices
 
-## Analogy
+On-chain block space is scarce. Instant coffee payments should not compete with large settlements for the same limited capacity.
 
-A channel is a bar tab between two friends. You keep a running tally (signed IOUs). When you are done hanging out, you settle the final balance once at the bank (on-chain). Routing is asking mutual friends to help settle tabs across a network of tabs.
+**Analogy:** A channel is a bar tab between two friends. You keep a running tally (signed IOUs). When you are done, you settle once at the bank (on-chain). Routing asks mutual friends to help settle tabs across a network of tabs.
 
-## Core concepts
-
-### Payment channels
-
-Two parties lock bitcoin in a 2-of-2 multisig-style funding output. They exchange signed **commitment transactions** off-chain to update balances without publishing every change.
-
-### HTLCs
-
-Hash Time Locked Contracts make multi-hop payments atomic: either the whole route completes, or it fails safely as timelocks unwind.
-
-### Invoices
-
-BOLT11 invoices encode payment requests (amount, expiry, routing hints). Wallets decode before paying.
+| Concept | Meaning |
+| --- | --- |
+| **Payment channel** | Two parties lock bitcoin; update balances with signed commitments off-chain |
+| **HTLC** | Hash Time Locked Contract — multi-hop payments complete atomically or unwind |
+| **Invoice** | BOLT11 payment request (amount, expiry, routing hints) |
 
 <Mermaid caption="Total capacity is fixed until you splice or close; payments slide the balance boundary." chart="flowchart LR
     subgraph channel [Channel capacity]
@@ -83,10 +76,20 @@ BOLT11 invoices encode payment requests (amount, expiry, routing hints). Wallets
   A channel exists between two nodes. Routing stitches channels into a network so payments can cross multiple peers.
 </Callout>
 
-## Before you build
+**Done when:** You can explain why Lightning still needs on-chain Bitcoin for open/close.
 
-Complete the Bitcoin roadmap first. Lightning assumes UTXOs, fees, scripts/timelocks, and regtest comfort.
+## Step 3 — Try it: map + local peek (lab)
 
-## Next steps
+Open Amboss (or another explorer) and note one public fact (capacity, channel count). Then check Polar/regtest: nodes up, or write your plan to install Polar before channel labs.
 
-Learn the BOLT specification landscape: how implementations stay interoperable.
+### Common mistakes
+
+- Treating Lightning as a separate coin
+- Assuming every payment is free and instant with no liquidity constraints
+- Skipping Bitcoin foundations and jumping straight to mainnet nodes
+
+**Done when:** Lab evidence (explorer note + local/Polar status + source link) is complete.
+
+### Next lesson
+
+**BOLTs & Spec Landscape** — how LND, CLN, and LDK stay interoperable.

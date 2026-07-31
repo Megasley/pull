@@ -9,17 +9,22 @@ objectives:
   - Surface inbound/outbound imbalances
   - Alert on forced closes and offline peers
 resources:
+  - title: 'Project Spec: Node Ops Dashboard'
+    url: '/projects/ln-node-dashboard'
+    kind: docs
+    note: Pull project page — acceptance criteria and submit flow.
+    required: true
+  - title: Mastering the Lightning Network
+    url: 'https://github.com/lnbook/lnbook/blob/master/05_node_operations.asciidoc'
+    kind: book
+    chapter: 'Ch. 5: Operating a Lightning Node'
+    required: true
   - title: LND prometheus metrics
     url: 'https://docs.lightning.engineering/'
     kind: docs
   - title: Amboss
     url: 'https://amboss.space/'
     kind: tool
-  - title: Mastering the Lightning Network
-    url: 'https://github.com/lnbook/lnbook/blob/master/05_node_operations.asciidoc'
-    kind: book
-    chapter: 'Ch. 5: Operating a Lightning Node'
-    required: true
 reflectionPrompts:
   - >-
     Explain Node Ops Dashboard to a teammate without jargon - what problem does
@@ -31,16 +36,18 @@ reflectionPrompts:
 lab:
   title: Project milestone evidence
   description: >-
-    For Node Ops Dashboard, complete the linked project spec happy path on
-    regtest/Polar and capture demo evidence before marking the lesson complete.
+    Complete Steps 2–4. Ship a dashboard that polls your lab node via a backend
+    proxy and capture demo evidence before marking complete.
   evidence:
     - Link to public repo or branch
-    - Commands or screenshots proving the happy path
-    - Short note of one failure case you tested
+    - Screenshot of channel/peer/balance panels
+    - Short note of one alert or failure case (peer offline, imbalance)
 ---
 Operators need one pane of glass: channels, fees collected, failed HTLCs, and peer health.
 
-## Build challenge
+Complete **Step 1 // Required reading** in the study plan above, then continue here.
+
+## Step 2 — Goal
 
 Dashboard widgets:
 
@@ -49,12 +56,38 @@ Dashboard widgets:
 - Peer online status
 - On-chain vs channel balance
 
+Never expose node admin credentials to the browser — proxy through your backend.
+
 <Mermaid caption="Collect node metrics, store snapshots, alert on anomalies." chart="flowchart LR
     Node[LN node APIs] --> ETL[Collector]
     ETL --> DB[Metrics store]
     DB --> UI[Ops dashboard]
     UI --> Alerts[Alerts]" />
 
-## Next steps
+**Done when:** You can list the RPC/API calls behind each widget.
 
-Build a Custom Router with your own pathfinding heuristics.
+## Step 3 — Milestones
+
+| Phase | Ship |
+| --- | --- |
+| Milestone A | Backend collector + channel list with balance ratio |
+| Milestone B | Peers + forwarding / fee snapshot |
+| Milestone C | Alert banner for offline peer or force-close risk |
+
+**Done when:** Milestone A never ships macaroons/RPC secrets to the client.
+
+## Step 4 — Build & evidence (lab)
+
+Implement against `/projects/ln-node-dashboard`. Capture repo link, panel screenshot, and one alert/failure note.
+
+### Common mistakes
+
+- Polling too aggressively and starving the node
+- Showing only total capacity without inbound/outbound
+- Alerting on Polar’s empty peer list without context
+
+**Done when:** Lab evidence is filed.
+
+### Next lesson
+
+**Custom Router** — pathfinding with your own fee and reliability heuristics.

@@ -28,24 +28,26 @@ reflectionPrompts:
     Which BOLT (or implementation doc) is the source of truth for this topic,
     and what did you verify there?
 lab:
-  title: Polar check
+  title: Tower threat model brief
   description: >-
-    After reading, run one hands-on check related to Watchtowers. Prefer local
-    regtest or Polar over mainnet.
+    Complete Steps 2–3. Write when a mobile/LDK wallet needs a tower, what the
+    tower learns, and one mitigation (multi-tower, self-host). Optionally enable
+    or inspect watchtower settings on LND Polar if available.
   evidence:
-    - Command output or screenshot from your local lab
-    - One sentence on what you observed vs expected
-    - Link to the required reading section you used
+    - Half-page threat model: offline breach → tower justice
+    - Privacy tradeoff note (metadata the tower may learn)
+    - Link to Ch. 16 or Optech watchtowers section
+    - 'Optional: lab config/UI proof'
 ---
 A **watchtower** monitors the blockchain for revoked commitment broadcasts on your behalf and can publish justice transactions if you are offline.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here. This closes **Implementation**.
+
+## Step 2 — Core idea: someone watches when you sleep
 
 Phones sleep. Laptops close. Lightning’s penalty model needs someone watching. Towers extend security to intermittent devices.
 
-## Analogy
-
-A neighborhood security camera that only unlocks the evidence locker if a specific break-in pattern appears, and it does so without learning your daily life.
+**Analogy:** A neighborhood security camera that only unlocks the evidence locker if a specific break-in pattern appears — without learning your daily life (ideally).
 
 <Mermaid caption="Towers watch for breaches and act when you cannot." chart="sequenceDiagram
     participant W as Wallet
@@ -60,6 +62,14 @@ A neighborhood security camera that only unlocks the evidence locker if a specif
   Towers learn some metadata. Design privacy expectations; consider multiple towers.
 </Callout>
 
-## Next steps
+**Done when:** You can explain why towers do not replace correct backups.
 
-Build a Lightning POS: invoices, webhooks, and settlement UX.
+## Step 3 — Threat model brief (lab)
+
+Write offline-breach → tower justice, privacy tradeoffs, and one mitigation. Optional LND tower config on Polar.
+
+**Done when:** Lab evidence (brief + privacy note + source) is complete. Complete the **chapter quiz** when prompted.
+
+### Next lesson
+
+**Lightning POS Project** — invoices, webhooks, and settlement UX.

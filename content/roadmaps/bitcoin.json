@@ -6,10 +6,10 @@
     {
       "id": "foundations",
       "title": "Foundations",
-      "description": "Core concepts every Bitcoin builder needs before writing protocol code.",
+      "description": "Toolchain, local regtest lab, Git, crypto, and Bitcoin economics before protocol lessons.",
       "defaultExpanded": true,
       "position": { "x": 0, "y": 0 },
-      "size": { "width": 340, "height": 430 }
+      "size": { "width": 340, "height": 510 }
     },
     {
       "id": "bitcoin-basics",
@@ -30,10 +30,10 @@
     {
       "id": "development",
       "title": "Development",
-      "description": "Libraries, wallets, descriptors, Bitcoin Core RPC, regtest, and PSBT.",
+      "description": "Libraries, wallets, descriptors, Bitcoin Core RPC, and PSBT — on the regtest habits from Foundations.",
       "defaultExpanded": true,
       "position": { "x": 1140, "y": 0 },
-      "size": { "width": 340, "height": 590 }
+      "size": { "width": 340, "height": 510 }
     },
     {
       "id": "projects",
@@ -64,15 +64,26 @@
       "position": { "x": 24, "y": 88 }
     },
     {
+      "id": "dev-regtest",
+      "sectionId": "foundations",
+      "title": "Regtest Development",
+      "description": "Run a private chain, mine blocks, and fund wallets so later lessons have a local lab.",
+      "duration": "5 days",
+      "difficulty": "beginner",
+      "lockedUntil": ["foundations-intro"],
+      "resources": ["Bitcoin Core Regtest", "Docker Compose", "Polar"],
+      "position": { "x": 24, "y": 166 }
+    },
+    {
       "id": "foundations-git",
       "sectionId": "foundations",
       "title": "Git & Open Source Workflow",
       "description": "Learn branching, pull requests, and how maintainers review contributions.",
       "duration": "4 days",
       "difficulty": "beginner",
-      "lockedUntil": ["foundations-intro"],
+      "lockedUntil": ["dev-regtest"],
       "resources": ["GitHub Flow", "Conventional Commits", "Code Review Guide"],
-      "position": { "x": 24, "y": 166 }
+      "position": { "x": 24, "y": 244 }
     },
     {
       "id": "foundations-crypto",
@@ -83,7 +94,7 @@
       "difficulty": "beginner",
       "lockedUntil": ["foundations-git"],
       "resources": ["Mastering Bitcoin Ch. 4", "Mastering Bitcoin Ch. 8", "BIP-340"],
-      "position": { "x": 24, "y": 244 }
+      "position": { "x": 24, "y": 322 }
     },
     {
       "id": "foundations-economics",
@@ -94,7 +105,7 @@
       "difficulty": "beginner",
       "lockedUntil": ["foundations-crypto"],
       "resources": ["Mastering Bitcoin Ch. 1", "Mastering Bitcoin Ch. 2", "Bitcoin Optech Fees"],
-      "position": { "x": 24, "y": 322 },
+      "position": { "x": 24, "y": 400 },
       "chapterCheckpoint": true
     },
     {
@@ -298,26 +309,15 @@
       "position": { "x": 24, "y": 322 }
     },
     {
-      "id": "dev-regtest",
-      "sectionId": "development",
-      "title": "Regtest Development",
-      "description": "Run a private chain, mine blocks, and automate integration tests.",
-      "duration": "5 days",
-      "difficulty": "intermediate",
-      "lockedUntil": ["dev-core-rpc"],
-      "resources": ["Bitcoin Core Regtest", "Docker Compose", "CI Testing"],
-      "position": { "x": 24, "y": 400 }
-    },
-    {
       "id": "dev-psbt",
       "sectionId": "development",
       "title": "PSBT Workflows",
       "description": "Coordinate multi-party signing with Partially Signed Bitcoin Transactions.",
       "duration": "6 days",
       "difficulty": "intermediate",
-      "lockedUntil": ["dev-regtest"],
+      "lockedUntil": ["dev-core-rpc"],
       "resources": ["BIP-174", "Hardware Signers", "PSBT Workflows"],
-      "position": { "x": 24, "y": 478 },
+      "position": { "x": 24, "y": 400 },
       "chapterCheckpoint": true
     },
     {
@@ -427,29 +427,29 @@
     }
   ],
   "edges": [
-    { "id": "e01", "source": "foundations-intro", "target": "foundations-git" },
-    { "id": "e02", "source": "foundations-git", "target": "foundations-crypto" },
-    { "id": "e03", "source": "foundations-crypto", "target": "foundations-economics" },
-    { "id": "e04", "source": "foundations-economics", "target": "basics-utxo" },
-    { "id": "e05", "source": "basics-utxo", "target": "basics-keys" },
-    { "id": "e06", "source": "basics-keys", "target": "basics-blocks" },
-    { "id": "e07", "source": "basics-blocks", "target": "basics-transactions" },
-    { "id": "e08", "source": "basics-transactions", "target": "basics-script" },
-    { "id": "e09", "source": "basics-script", "target": "basics-segwit" },
-    { "id": "e10", "source": "basics-segwit", "target": "basics-taproot" },
-    { "id": "e11", "source": "basics-taproot", "target": "basics-multisig" },
-    { "id": "e12", "source": "basics-multisig", "target": "basics-mempool" },
-    { "id": "e13", "source": "basics-mempool", "target": "basics-network" },
-    { "id": "e14", "source": "basics-network", "target": "basics-p2p-adversarial" },
-    { "id": "e15", "source": "basics-p2p-adversarial", "target": "basics-security-models" },
-    { "id": "e16", "source": "basics-security-models", "target": "basics-soft-forks" },
-    { "id": "e17", "source": "basics-soft-forks", "target": "basics-mining" },
-    { "id": "e18", "source": "basics-mining", "target": "dev-libraries" },
-    { "id": "e19", "source": "dev-libraries", "target": "dev-wallet" },
-    { "id": "e20", "source": "dev-wallet", "target": "dev-descriptors" },
-    { "id": "e21", "source": "dev-descriptors", "target": "dev-core-rpc" },
-    { "id": "e22", "source": "dev-core-rpc", "target": "dev-regtest" },
-    { "id": "e23", "source": "dev-regtest", "target": "dev-psbt" },
+    { "id": "e01", "source": "foundations-intro", "target": "dev-regtest" },
+    { "id": "e02", "source": "dev-regtest", "target": "foundations-git" },
+    { "id": "e03", "source": "foundations-git", "target": "foundations-crypto" },
+    { "id": "e04", "source": "foundations-crypto", "target": "foundations-economics" },
+    { "id": "e05", "source": "foundations-economics", "target": "basics-utxo" },
+    { "id": "e06", "source": "basics-utxo", "target": "basics-keys" },
+    { "id": "e07", "source": "basics-keys", "target": "basics-blocks" },
+    { "id": "e08", "source": "basics-blocks", "target": "basics-transactions" },
+    { "id": "e09", "source": "basics-transactions", "target": "basics-script" },
+    { "id": "e10", "source": "basics-script", "target": "basics-segwit" },
+    { "id": "e11", "source": "basics-segwit", "target": "basics-taproot" },
+    { "id": "e12", "source": "basics-taproot", "target": "basics-multisig" },
+    { "id": "e13", "source": "basics-multisig", "target": "basics-mempool" },
+    { "id": "e14", "source": "basics-mempool", "target": "basics-network" },
+    { "id": "e15", "source": "basics-network", "target": "basics-p2p-adversarial" },
+    { "id": "e16", "source": "basics-p2p-adversarial", "target": "basics-security-models" },
+    { "id": "e17", "source": "basics-security-models", "target": "basics-soft-forks" },
+    { "id": "e18", "source": "basics-soft-forks", "target": "basics-mining" },
+    { "id": "e19", "source": "basics-mining", "target": "dev-libraries" },
+    { "id": "e20", "source": "dev-libraries", "target": "dev-wallet" },
+    { "id": "e21", "source": "dev-wallet", "target": "dev-descriptors" },
+    { "id": "e22", "source": "dev-descriptors", "target": "dev-core-rpc" },
+    { "id": "e23", "source": "dev-core-rpc", "target": "dev-psbt" },
     { "id": "e24", "source": "dev-psbt", "target": "project-wallet" },
     { "id": "e25", "source": "project-wallet", "target": "project-explorer" },
     { "id": "e26", "source": "project-explorer", "target": "project-dashboard" },

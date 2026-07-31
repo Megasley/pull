@@ -28,34 +28,33 @@ reflectionPrompts:
     Which BOLT or implementation doc did you treat as the source of truth, and
     what did you confirm by reading it?
 lab:
-  title: Polar check
+  title: BOLT map worksheet
   description: >-
-    After reading, run one hands-on check related to BOLTs & Spec Landscape.
-    Prefer local regtest or Polar over mainnet.
+    Complete Steps 2–3. From the intro BOLT, list three BOLT numbers you will
+    hit later and which Pull lesson covers each. Skim one open bolts PR title
+    (optional).
   evidence:
-    - Command output or screenshot from your local lab
-    - One sentence on what you observed vs expected
-    - Link to the required reading section you used
+    - Table of at least three BOLT numbers → topic → later lesson name
+    - One sentence on why blogs are not authoritative over the spec
+    - Link to BOLTs intro section you used
 searchQueries:
   - BOLT
   - Lightning Network
 ---
 **BOLTs** (Basis of Lightning Technology) are the interoperability specs for Lightning. LND, Core Lightning, and LDK aim to speak the same protocol so heterogeneous nodes can route.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here.
+
+## Step 2 — Core idea: shared plugs, different products
 
 Without shared specs, every implementation would be an island. Builders reading BOLTs can debug wire mismatches and evaluate new features (offers, splicing) before they are universal.
 
-## Analogy
+**Analogy:** BOLTs are the electrical code for Lightning. Different manufacturers (LND/CLN/LDK) ship distinct products, but plugs must still fit.
 
-BOLTs are the electrical code for Lightning. Different manufacturers (LND/CLN/LDK) can ship distinct products, but plugs must still fit.
+You do **not** need to read these cover-to-cover now — each gets a dedicated lesson later:
 
-## Orientation map
-
-You do **not** need to read these now - each gets a dedicated lesson later. This table is a reference so you know where to look when debugging.
-
-| BOLT | Focus | Lesson |
-|------|--------|--------|
+| BOLT | Focus | Later lesson |
+| --- | --- | --- |
 | 2 | Channel management / HTLCs | Channels & HTLCs |
 | 3 | Transactions | Commitment Transactions |
 | 4 | Onion routing | Onion Routing |
@@ -72,15 +71,23 @@ You do **not** need to read these now - each gets a dedicated lesson later. This
     LDK --> Net" />
 
 <Callout type="tip" title="Read with a question, not cover-to-cover">
-  This lesson is about knowing the landscape. Open a BOLT only when a later lesson or a bug points you there. Keep Mastering Lightning nearby for narrative context.
+  Open a BOLT when a later lesson or a bug points you there. Keep Mastering Lightning nearby for narrative context.
 </Callout>
 
-## Common mistakes
+**Done when:** You can name LND, CLN, and LDK as implementations that target the same BOLTs.
+
+## Step 3 — Map three BOLTs (lab)
+
+Fill a three-row map from the table (or BOLTs intro). Optional: note one open [bolts PR](https://github.com/lightning/bolts/pulls) title — feature or clarification?
+
+### Common mistakes
 
 - Assuming a feature in one implementation is already a ratified BOLT everywhere
 - Treating blog posts as authoritative over the spec text
 - Ignoring feature bits / negotiations between peers
 
-## Next steps
+**Done when:** Lab evidence (BOLT map + authority sentence + source link) is complete.
 
-Study BOLT11 invoices, the payment requests wallets actually scan.
+### Next lesson
+
+**Invoices** — the BOLT11 payment requests wallets actually scan.

@@ -52,12 +52,14 @@ export function ChapterProjectCallout({
                 className="flex flex-wrap items-center justify-between gap-3 border border-border bg-background px-4 py-3"
               >
                 <div className="space-y-1">
-                  <p className="font-medium">
-                    {PROJECT_LABELS[slug] ?? slug}
+                  <p className="font-mono text-xs text-foreground">
+                    project // {slug}
                   </p>
-                  <Badge variant="outline" className="font-mono text-[10px]">
-                    {slug}
-                  </Badge>
+                  {PROJECT_LABELS[slug] ? (
+                    <Badge variant="outline" className="text-[10px]">
+                      {PROJECT_LABELS[slug]}
+                    </Badge>
+                  ) : null}
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <Button asChild size="sm" variant="outline">

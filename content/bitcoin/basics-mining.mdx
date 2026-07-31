@@ -1,12 +1,12 @@
 ---
 title: Mining & Consensus
-description: 'Proof-of-work, difficulty adjustment, and soft-fork activation for builders.'
+description: 'Proof-of-work, difficulty adjustment, and mining incentives for builders.'
 difficulty: intermediate
 duration: 5 days
 objectives:
   - Explain proof-of-work and difficulty adjustment
   - Distinguish consensus rules from miner preference
-  - Describe soft-fork activation concepts builders encounter
+  - Connect mining incentives to confirmation UX builders ship
 resources:
   - title: Mastering Bitcoin
     url: 'https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch12_mining.adoc'
@@ -28,28 +28,28 @@ reflectionPrompts:
     Which BIP, book chapter, or Core doc is authoritative here, and what did you
     verify?
 lab:
-  title: Regtest check
+  title: Regtest PoW loop
   description: >-
-    After reading, run one hands-on check related to Mining & Consensus. Prefer
-    local regtest or Polar over mainnet.
+    Complete Steps 2–3. On regtest, mine blocks with generatetoaddress, compare
+    getblockchaininfo before/after (height, difficulty), and write one sentence
+    on how this differs from mainnet competition.
   evidence:
-    - Command output or screenshot from your local lab
-    - One sentence on what you observed vs expected
-    - Link to the required reading section you used
+    - 'Before/after getblockchaininfo (or getblock) showing height change'
+    - generatetoaddress command output
+    - One sentence contrasting regtest mining with mainnet PoW competition
+    - Link to Mastering Bitcoin Ch. 12 section you used
 searchQueries:
   - BIP9
 ---
 **Mining** is the competitive process of finding a proof-of-work that makes a block header valid under current difficulty. Consensus rules define what blocks and transactions are valid; miners choose among valid templates.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here. This closes **Protocol Depth**. Soft-fork *activation* was the previous lesson — here focus on PoW and enforcement.
 
-You may never run an ASIC, but every confirmation UX, reorg assumption, and soft-fork discussion depends on mining incentives and consensus enforcement by **full nodes**.
+## Step 2 — Core idea: PoW, difficulty, who enforces
 
-## Analogy
+You may never run an ASIC, but every confirmation UX, reorg assumption, and fee-market discussion depends on mining incentives and consensus enforcement by **full nodes**.
 
-Difficulty is a treadmill that speeds up or slows down so that bags of work arrive roughly every 10 minutes. If blocks come too fast, the treadmill speeds up; too slow, it eases.
-
-## Proof-of-work loop
+**Analogy:** Difficulty is a treadmill that speeds up or slows down so bags of work arrive roughly every 10 minutes. Blocks too fast → treadmill speeds up; too slow → it eases.
 
 <Mermaid caption="Miners search for a header hash below the target; winners earn rewards." chart="flowchart LR
     Template[Block template] --> Hash[Hash header]
@@ -59,24 +59,35 @@ Difficulty is a treadmill that speeds up or slows down so that bags of work arri
     Check -->|yes| Win[Propagate block]
     Win --> Reward[Subsidy + fees]" />
 
-## Difficulty adjustment
+Approximately every **2016 blocks**, difficulty adjusts based on recent timestamps to keep average block time near 10 minutes.
 
-Approximately every 2016 blocks, difficulty adjusts based on recent timestamps to keep average block time near 10 minutes.
-
-## Soft forks
-
-A **soft fork** tightens rules in a backward-compatible way. Activation methods (BIP-9 version bits, BIP-8 discussions, Speedy Trial historically) coordinate when new rules lock in. Builders should track whether their libraries and descriptors assume post-fork features (SegWit, Taproot).
+Miners **propose** blocks; full nodes **verify**. Economic users running nodes ultimately decide which rules their software accepts. Soft forks (previous lesson) tighten those rules over time — libraries and descriptors must track whether they assume post-fork features (SegWit, Taproot).
 
 <Callout type="info" title="Nodes enforce rules">
-  Miners propose blocks; full nodes verify. Economic users running nodes ultimately decide which rules their software accepts.
+  Hashrate does not rewrite consensus by itself. Invalid blocks are rejected by validating peers even if a miner produced them.
 </Callout>
 
-## Common mistakes
+**Done when:** You can separate “miner preference among valid templates” from “consensus validity.”
+
+## Step 3 — Try it: mine on regtest (lab)
+
+```bash
+bitcoin-cli -regtest getblockchaininfo
+ADDR=$(bitcoin-cli -regtest getnewaddress)
+bitcoin-cli -regtest generatetoaddress 1 "$ADDR"
+bitcoin-cli -regtest getblockchaininfo
+```
+
+Note height (and difficulty if present). One sentence: how `generatetoaddress` differs from competing for mainnet PoW.
+
+### Common mistakes
 
 - Believing miners can arbitrarily change supply rules without node acceptance
 - Ignoring that empty blocks / fee market dynamics affect confirmation times
-- Testing only `generatetoaddress` on regtest and assuming mainnet propagation behavior matches
+- Testing only `generatetoaddress` on regtest and assuming mainnet propagation matches
 
-## Next steps
+**Done when:** Lab evidence (before/after chain info + generate output + contrast sentence + source) is complete. Complete the **chapter quiz** when prompted.
 
-Move into development: libraries, wallet architecture, descriptors, and Bitcoin Core RPC.
+### Next lesson
+
+**Bitcoin Libraries** (Development) — keys, addresses, and transaction construction in code.

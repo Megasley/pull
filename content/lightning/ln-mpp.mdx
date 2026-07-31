@@ -27,24 +27,26 @@ reflectionPrompts:
     Which BOLT (or implementation doc) is the source of truth for this topic,
     and what did you verify there?
 lab:
-  title: Polar check
+  title: Split rationale brief
   description: >-
-    After reading, run one hands-on check related to Multipath Payments. Prefer
-    local regtest or Polar over mainnet.
+    Complete Steps 2–3. Write when you would enable MPP for a product amount.
+    Note feature negotiation. Optionally pay a large-enough Polar invoice that
+    forces a split if your stack supports it.
   evidence:
-    - Command output or screenshot from your local lab
-    - One sentence on what you observed vs expected
-    - Link to the required reading section you used
+    - One paragraph: when single-path fails and MPP helps
+    - Feature-support note for payer and payee stacks you care about
+    - Link to BOLT4 MPP section you used
+    - 'Optional: Polar/CLI multipath pay proof'
 ---
 **Multipath payments** split one logical payment across several HTLC paths that share a payment secret/hash scheme so the receiver can reassemble atomically.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here.
+
+## Step 2 — Core idea: several vans beat one blocked truck
 
 Large payments often cannot fit through one channel’s available balance. MPP raises success rates and effective capacity without opening enormous channels.
 
-## Analogy
-
-Moving a couch through a city: sometimes three smaller vans beat one truck that does not fit the alley.
+**Analogy:** Moving a couch through a city — sometimes three smaller vans beat one truck that does not fit the alley.
 
 <Mermaid caption="Several HTLCs settle one logical payment." chart="flowchart TD
     Pay[Payment 1_000_000 msat] --> P1[Path A 400k]
@@ -58,6 +60,14 @@ Moving a couch through a city: sometimes three smaller vans beat one truck that 
   Both ends need compatible features. Test across LND/CLN/LDK combinations you support.
 </Callout>
 
-## Next steps
+**Done when:** You can explain atomic reassembly at the receiver in one sentence.
 
-Failure handling: what to do when paths fail and retries are required.
+## Step 3 — When to split (lab)
+
+Write the product rationale and feature-support note. Optional hands-on if your lab supports MPP.
+
+**Done when:** Lab evidence (rationale + support note + source) is complete.
+
+### Next lesson
+
+**Failure Handling** — retries, error onions, and safe refund UX.

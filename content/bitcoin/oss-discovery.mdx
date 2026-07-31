@@ -13,9 +13,12 @@ resources:
   - title: bitcoin/bitcoin
     url: 'https://github.com/bitcoin/bitcoin'
     kind: docs
+    note: Core repo - steep bar; study issue labels and CONTRIBUTING before picking.
+    required: true
   - title: Bitcoin Optech
     url: 'https://bitcoinops.org/'
     kind: article
+    required: true
   - title: rust-bitcoin
     url: 'https://github.com/rust-bitcoin/rust-bitcoin'
     kind: docs
@@ -30,22 +33,25 @@ reflectionPrompts:
     Which BIP, book chapter, or Core doc is authoritative here, and what did you
     verify?
 lab:
-  title: Contribution artifact
+  title: Issue shortlist + plan
   description: >-
-    Produce a contribution artifact for Finding Good First Issues: issue
-    shortlist, review notes, or PR draft that a maintainer could act on.
+    Complete Steps 2–3. Shortlist 2–3 issues (Review Club, /discover, or a
+    labeled GFI), pick one that matches your skills, and write a short approach
+    before coding.
   evidence:
-    - Issue URL(s) or PR URL
-    - Written approach / review checklist
-    - Self-score against the meaningful-PR rubric
+    - Issue URL(s) with one selected as primary
+    - Written approach (problem, files likely touched, how you will test)
+    - Self-score against the meaningful-PR rubric (preview is fine; full rubric next lessons)
 ---
 Contributing starts with choosing the right battlefield. “Good first issue” labels help, but judgment matters more.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here. This opens **Open Source**.
+
+## Step 2 — Context: where to look and how to scope
 
 A too-hard first PR burns motivation. A too-vague issue stalls. Builders who scope well ship.
 
-## Where to look
+Where to look:
 
 - Bitcoin Core (steep, high bar)
 - rust-bitcoin, BDK, bitcoinjs-lib
@@ -62,8 +68,22 @@ A too-hard first PR burns motivation. A too-vague issue stalls. Builders who sco
   Clarifying docs or adding a regression test is a legitimate first contribution.
 </Callout>
 
-Start with **Review Club** picks on this lesson - especially Bitcoin Core GFIs and BDK docs issues - or explore [/discover](/discover).
+Start with **Review Club** picks on this lesson — especially Bitcoin Core GFIs and BDK docs issues — or explore [/discover](/discover).
 
-## Next steps
+**Done when:** You can name one repo that fits your stack and why Core might wait.
 
-Practice reviewing others’ PRs with a maintainer mindset.
+## Step 3 — Practice: shortlist and plan (lab)
+
+Pick 2–3 candidate issues. Select one. Write: problem statement, likely files, test plan. Leave or draft an issue comment only when the plan is coherent — do not claim the issue prematurely.
+
+### Checklist
+
+- [ ] Issue matches a skill you already practiced on Pull
+- [ ] Scope is one problem, not a drive-by refactor
+- [ ] You know how you will prove it works (test/CI/manual)
+
+**Done when:** Lab evidence (URLs + approach + draft self-score) is complete.
+
+### Next lesson
+
+**Code Review Practice** — review others’ PRs with a maintainer mindset.

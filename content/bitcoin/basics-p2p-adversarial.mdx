@@ -39,9 +39,9 @@ reflectionPrompts:
 lab:
   title: Node exposure worksheet
   description: >-
-    Document your bitcoind (or Polar) peer settings - maxconnections,
-    addnode/connect, onion vs clearnet - and write a short adversarial threat
-    note for that setup.
+    Complete Steps 2–3. Document your bitcoind (or Polar) peer settings —
+    maxconnections, addnode/connect, onion vs clearnet — and write a short
+    adversarial threat note for that setup.
   evidence:
     - Export or screenshot of peer/connection config
     - Half-page threat note covering eclipse and DoS
@@ -49,20 +49,17 @@ lab:
 searchQueries:
   - BIP152
 ---
-
 Bitcoin’s **P2P network** is not just plumbing. Peer selection, relay, and topology affect censorship resistance, privacy, and whether your node sees the same chain tip as the honest majority.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here.
+
+## Step 2 — Core idea: eclipse, partitions, compact relay
 
 Wallets and services that trust a small set of peers inherit those peers’ view of the mempool and chain. Protocol builders who ignore gossip security ship fragile products.
 
-## Eclipse and partitions
-
 An **eclipse attack** aims to surround a victim with attacker-controlled peers so the victim’s view of the network is filtered. Related risks include BGP-level routing interference and intentional network partitions.
 
-## Compact blocks
-
-**BIP-152 compact blocks** reduce bandwidth when relaying new blocks by sending short transaction IDs peers likely already have. This improves propagation; it is not a substitute for validating consensus rules.
+**BIP-152 compact blocks** reduce bandwidth when relaying new blocks by sending short transaction IDs peers likely already have. This improves propagation — it is **not** a substitute for validating consensus rules.
 
 <Mermaid caption="Honest nodes need diverse peers; compacted relay speeds block gossip." chart="flowchart LR
     Miner[Miner / proposer] --> Relay[Block relay]
@@ -70,14 +67,31 @@ An **eclipse attack** aims to surround a victim with attacker-controlled peers s
     Compact --> Peers[Diverse peers]
     Peers --> Validate[Full validation]" />
 
-## Operator habits
+### Operator habits
 
 - Prefer diversity (ASNs, networks, onion where appropriate)
 - Monitor peer churn and unexpected tip disagreements
 - Separate listening services from keys when possible
 
-## Common mistakes
+**Done when:** You can name one eclipse symptom and one thing BIP-152 does *not* fix.
+
+## Step 3 — Threat note for your setup (lab)
+
+Document your node’s peer settings (`maxconnections`, `addnode`/`connect`, onion vs clearnet). Write a short threat note covering eclipse and DoS for **that** setup, plus one concrete hardening change you would make.
+
+```bash
+bitcoin-cli -regtest getnetworkinfo
+# Also note bitcoin.conf / Polar peer settings you actually use
+```
+
+### Common mistakes
 
 - Running a “full node” with one trusted outbound peer forever
 - Assuming private RPC + public P2P needs no hardening
 - Confusing relay policy DoS mitigations with consensus safety
+
+**Done when:** Lab evidence (config export + threat note + one hardening change) is complete.
+
+### Next lesson
+
+**Security Models & Light Clients** — full validation vs SPV, filters, and AssumeUTXO tradeoffs.

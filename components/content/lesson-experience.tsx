@@ -81,10 +81,10 @@ export function LessonExperience({
   );
   const roadmapProjectSlug = getProjectSlugForLesson(roadmap, lesson.slug);
   const projectSlug = lesson.project ?? roadmapProjectSlug;
-  const recommendedProjects = [
-    ...(lesson.recommendedProjects ?? []),
-    ...(chapterQuiz?.recommendedProjects ?? []),
-  ];
+  // Chapter-quiz projects render once in ChapterProjectCallout on checkpoints —
+  // do not also feed them into LessonBuildChallenge.
+  const recommendedProjects = lesson.recommendedProjects ?? [];
+  const chapterProjects = chapterQuiz?.recommendedProjects ?? [];
   const { canMarkComplete, status, hydrated, handlePassed, handleSkip } =
     useChapterQuizGate(lesson.roadmap, chapterQuiz, userId, isAuthenticated);
   const signInHref = `/sign-in?next=${encodeURIComponent(
@@ -242,17 +242,22 @@ export function LessonExperience({
               showSectionBundle={isCheckpoint}
             />
 
-            <LessonBuildChallenge
-              project={projectSlug}
-              challenge={lesson.challenge}
-              recommendedProjects={recommendedProjects}
-            />
-
-            {isCheckpoint && chapterQuiz?.recommendedProjects?.length ? (
+            {isCheckpoint && chapterProjects.length > 0 ? (
               <ChapterProjectCallout
-                projectSlugs={chapterQuiz.recommendedProjects}
+                projectSlugs={[
+                  ...(projectSlug && !chapterProjects.includes(projectSlug)
+                    ? [projectSlug]
+                    : []),
+                  ...chapterProjects,
+                ]}
               />
-            ) : null}
+            ) : (
+              <LessonBuildChallenge
+                project={projectSlug}
+                challenge={lesson.challenge}
+                recommendedProjects={recommendedProjects}
+              />
+            )}
 
             {isCheckpoint && chapterQuiz ? (
               <ChapterQuizGate

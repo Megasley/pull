@@ -51,9 +51,9 @@ export function LessonStudyPlan({
         <div>
           <p className="tech-eyebrow text-foreground">study // plan</p>
           <p className="mt-2 max-w-2xl font-mono text-xs leading-relaxed text-muted-foreground">
-            Lessons are primers. Depth comes from required reading, interactive
-            labs, reflection, and a hands-on check with evidence — the BOSS study
-            pattern.
+            Lessons are primers. Start with Step 1 (required reading) when
+            present, then follow the numbered steps in the article. Depth comes
+            from primary sources, labs, reflection, and evidence.
           </p>
         </div>
 
@@ -92,8 +92,12 @@ export function LessonStudyPlan({
         <div className="space-y-3">
           <h3 className="flex items-center gap-2 text-sm font-medium tracking-wide text-foreground uppercase">
             <BookOpenCheck className="size-4 text-ink" aria-hidden />
-            Required reading
+            Step 1 // Required reading
           </h3>
+          <p className="font-mono text-xs leading-relaxed text-muted-foreground">
+            Complete these before the numbered steps in the lesson body. Links
+            are listed here once — not repeated below.
+          </p>
           <LessonResourcesPanel resources={requiredReading} heading="" />
         </div>
       ) : null}

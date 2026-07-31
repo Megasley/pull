@@ -11,9 +11,11 @@ resources:
   - title: LND CONTRIBUTING
     url: 'https://github.com/lightningnetwork/lnd/blob/master/docs/code_contribution_guidelines.md'
     kind: docs
+    required: true
   - title: Conventional comments
     url: 'https://conventionalcomments.org/'
     kind: article
+    required: true
   - title: Core Lightning CONTRIBUTING
     url: 'https://github.com/ElementsProject/lightning/blob/master/CONTRIBUTING.md'
     kind: docs
@@ -26,22 +28,26 @@ reflectionPrompts:
     Which implementation doc is authoritative for the repo you reviewed, and
     what did you verify there?
 lab:
-  title: Contribution artifact
+  title: Written review notes
   description: >-
-    Produce a contribution artifact for Code Review Practice: pick a Review
-    Club PR, leave a constructive comment (or draft review notes), and paste
-    the URL in your evidence.
+    Complete Steps 2–3. Review one Lightning-track PR (Review Club or /issues).
+    Leave or draft actionable comments covering correctness, tests, and
+    clarity — and name one protocol concept involved.
   evidence:
-    - GitHub PR or issue URL reviewed
-    - Written review notes using the meaningful-PR checklist
-    - Link to /discover or /issues if you shortlist follow-up work
-recommendedProjects: []
+    - GitHub PR URL reviewed
+    - Written review notes (or link to your comments)
+    - One sentence: ACK / NACK / request-changes — and why
+    - Protocol concept named (HTLC, liquidity, onion, etc.)
 ---
 Reviewing is how Lightning implementations stay safe. You will learn more from careful review than from rushing another feature PR.
 
-Use Pull's [Review Club](/discover) picks on this lesson, or browse [open issues](/issues) filtered for Lightning tracks.
+Complete **Step 1 // Required reading** in the study plan above, then continue here.
 
-## What to check
+## Step 2 — Context: what maintainers expect
+
+Use Pull’s [Review Club](/discover) picks, or browse [open issues](/issues) filtered for Lightning tracks.
+
+What to check:
 
 1. Does it solve the claimed problem?
 2. Are there tests?
@@ -54,14 +60,26 @@ Use Pull's [Review Club](/discover) picks on this lesson, or browse [open issues
     Diff --> Test[Run tests]
     Test --> Comment[Comment / ACK]" />
 
+When reviewing channel, routing, or BOLT-adjacent changes, name the concept explicitly: inbound capacity, preimage flow, onion privacy, etc.
+
 <Callout type="info" title="Be precise">
-  Prefer "This breaks HTLC timeout handling because X" over "Hmm not sure."
+  Prefer “This breaks HTLC timeout handling because X” over “Hmm not sure.”
 </Callout>
 
-## Tie reviews to what you learned
+**Done when:** You can explain why silence is not an ACK.
 
-When reviewing channel, routing, or BOLT changes, name the concept explicitly: inbound capacity, preimage flow, onion privacy, etc. Maintainers reward reviewers who connect behavior to protocol rules.
+## Step 3 — Practice: review one PR (lab)
 
-## Next steps
+Read description, inspect diff, reason about tests. Draft conventional comments. State your verdict and the protocol concept involved.
 
-Score your own future PRs with the contribution rubric before opening them.
+### Checklist
+
+- [ ] Comments are actionable (what + why)
+- [ ] You checked tests / verification claims
+- [ ] You named a protocol concept from this roadmap
+
+**Done when:** Lab evidence (PR URL + notes + verdict + concept) is complete.
+
+### Next lesson
+
+**Contribution Rubric** — score your own attempt before opening a PR.

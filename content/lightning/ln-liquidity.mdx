@@ -8,17 +8,17 @@ objectives:
   - Evaluate Loop/swaps and rebalancing strategies
   - Understand liquidity ads at a high level
 resources:
+  - title: Mastering the Lightning Network
+    url: 'https://github.com/lnbook/lnbook/blob/master/08_routing_htlcs.asciidoc'
+    kind: book
+    chapter: 'Ch. 8: Routing (liquidity context)'
+    required: true
   - title: Lightning Loop
     url: 'https://docs.lightning.engineering/lightning-network-tools/loop'
     kind: docs
   - title: Liquidity advertisements
     url: 'https://bitcoinops.org/en/topics/liquidity-advertisements/'
     kind: article
-  - title: Mastering the Lightning Network
-    url: 'https://github.com/lnbook/lnbook/blob/master/08_routing_htlcs.asciidoc'
-    kind: book
-    chapter: 'Ch. 8: Routing (liquidity context)'
-    required: true
 reflectionPrompts:
   - Explain Liquidity to a teammate without jargon - what problem does it solve?
   - What would break in production if you misunderstood Liquidity?
@@ -26,24 +26,26 @@ reflectionPrompts:
     Which BOLT (or implementation doc) is the source of truth for this topic,
     and what did you verify there?
 lab:
-  title: Polar check
+  title: Shortage diagnosis
   description: >-
-    After reading, run one hands-on check related to Liquidity. Prefer local
-    regtest or Polar over mainnet.
+    Complete Steps 2–3. On Polar/regtest, inspect a channel’s local/remote
+    balance and write which shortage you have (inbound vs outbound) and which
+    op tool you would reach for first.
   evidence:
-    - Command output or screenshot from your local lab
-    - One sentence on what you observed vs expected
-    - Link to the required reading section you used
+    - Balance split excerpt (local/remote or Polar UI)
+    - Diagnosis: inbound shortage vs outbound shortage
+    - Chosen tool (rebalance / loop in / loop out / peer liquidity) and why
+    - Link to Ch. 8 section you used
 ---
 You already understand **inbound vs outbound** from the Channels chapter. This lesson covers **operations**: how to fix imbalances once you diagnose them.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here. This opens **Routing & Liquidity**.
 
-A node with lots of bitcoin locked but zero inbound capacity still cannot get paid. Liquidity ops is the business of Lightning routing revenue and merchant receive capacity - loops, swaps, rebalancing, and peer management.
+## Step 2 — Core idea: diagnose, then choose a tool
 
-## Analogy
+A node with lots of bitcoin locked but zero inbound capacity still cannot get paid. Liquidity ops is the business of routing revenue and merchant receive capacity — loops, swaps, rebalancing, and peer management.
 
-A highway with all cars stuck on one side of a toll bridge. You need flows (or trucks repositioning cars) to free lanes in both directions.
+**Analogy:** A highway with all cars stuck on one side of a toll bridge. You need flows (or trucks repositioning cars) to free lanes in both directions.
 
 <Mermaid caption="Different shortages call for rebalancing, loops, or peer liquidity." chart="flowchart LR
     Out[Outbound<br/>liquidity] --> Rebalance[Circular<br/>rebalance]
@@ -51,10 +53,23 @@ A highway with all cars stuck on one side of a toll bridge. You need flows (or t
     NeedIn[Need inbound<br/>liquidity] --> Ads[Liquidity ads /<br/>peer liquidity]
     NeedIn --> LoopIn[Loop in]" />
 
+| Shortage | Typical moves |
+| --- | --- |
+| Need **outbound** | Circular rebalance; receive more; open/fund carefully |
+| Need **inbound** | Loop in; liquidity ads / peer liquidity; dual-fund peers |
+
 <Callout type="info" title="Capital has cost">
   Every sat locked has opportunity cost. Measure routing revenue vs capital before scaling channels.
 </Callout>
 
-## Next steps
+**Done when:** You can pick a first tool from a balance screenshot without guessing.
 
-Multipath payments, splitting payments when one path cannot carry the full amount.
+## Step 3 — Diagnose your lab channel (lab)
+
+Inspect balances. Name the shortage. Choose a tool and justify it in one sentence (you do not have to execute Loop on mainnet).
+
+**Done when:** Lab evidence (balances + diagnosis + tool choice + source) is complete.
+
+### Next lesson
+
+**Routing** — liquidity-aware path selection across the public graph.

@@ -57,26 +57,25 @@ reflectionPrompts:
 lab:
   title: Script ladder + stack exercise
   description: >-
-    Complete the Decoding Bitcoin output-type ladder through P2PKH (required),
-    then either finish one P2SH/P2MS exercise or the stack project. Optionally
-    verify a matching template on regtest with `decodescript` / descriptors.
+    Complete Steps 2–3. Finish the Decoding Bitcoin output-type ladder through
+    P2PKH (required), then either one P2SH/P2MS exercise or the stack project.
+    Optionally verify a matching template on regtest with decodescript /
+    descriptors.
   evidence:
     - Link or screenshot from a completed Decoding Bitcoin P2PKH exercise
     - Evidence from one further ladder step (P2SH, P2MS, or stack project)
     - One-paragraph comparison of locking vs unlocking for the template you studied
     - 'Optional: decodescript / descriptor output from regtest matching that template'
 ---
-**Bitcoin Script** is the stack-based language that defines spending conditions. It is intentionally limited, not Turing-complete, so validation stays predictable and safe for nodes.
+**Bitcoin Script** is the stack-based language that defines spending conditions. It is intentionally limited — not Turing-complete — so validation stays predictable and safe for nodes.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above (locking/unlocking + P2PK + P2PKH), then continue here.
 
-Wallets, multisig vaults, Lightning commitments, and covenants proposals all express rules in Script (or Tapscript). Misreading a scriptPubKey means misunderstanding who can spend coins.
+## Step 2 — Core idea: lock, unlock, predicate
 
-## Analogy
+Wallets, multisig vaults, Lightning commitments, and covenant proposals all express rules in Script (or Tapscript). Misreading a scriptPubKey means misunderstanding who can spend coins.
 
-A locking script is a riddle printed on a locked box. The unlocking script (scriptSig/witness) is the answer. Nodes run both and check that the riddle evaluates to true without crashing the rules.
-
-## Locking and unlocking
+**Analogy:** A locking script is a riddle on a locked box. The unlocking script (scriptSig/witness) is the answer. Nodes run both and check that the riddle evaluates to true.
 
 When spending:
 
@@ -91,54 +90,49 @@ When spending:
     Exec --> Yes[Valid spend]
     Exec --> No[Invalid]" />
 
-## Output-type ladder
+<Callout type="info" title="Script is a predicate">
+  Think “does this satisfy the condition?”, not “run an app on-chain.” Loops and unbounded complexity are restricted for a reason.
+</Callout>
 
-Do not memorize every opcode first. Climb the historical ladder (Decoding Bitcoin modules linked in the study plan):
+Script pushes and pops values on a stack. `OP_DUP`, `OP_HASH160`, `OP_EQUALVERIFY`, and `OP_CHECKSIG` appear often in P2PKH-style templates. You rarely write these by hand today — descriptors and Miniscript generate them — but reading them debugs explorers and policy bugs.
 
-1. **P2PK** - pay directly to a public key (simple, leaks the key early)
-2. **P2PKH** - pay to `HASH160(pubkey)`; classic `1...` / wrapped patterns
-3. **P2SH** - pay to a script hash; reveal the redeem script only at spend (BIP16)
-4. **P2MS** - bare multisig; usually wrapped in P2SH/P2WSH in practice
-5. **SegWit / Taproot** - witness programs (`P2WPKH`, `P2WSH`, `P2TR`) - covered in later lessons
+Opcodes like `OP_CHECKLOCKTIMEVERIFY` (CLTV) and `OP_CHECKSEQUENCEVERIFY` (CSV) add time constraints. Lightning depends on these. Miniscript helps compose policies safely.
+
+Even if a script is consensus-valid, **mempool policy** may refuse to relay non-standard forms. Test both inclusion via miner on regtest and relay approximating mainnet policy.
+
+**Done when:** You can explain lock vs unlock and why Script is a predicate, not a general language.
+
+## Step 3 — Climb the output-type ladder (lab)
+
+Do not memorize every opcode first. Climb the historical ladder (Decoding Bitcoin modules in the study plan):
+
+1. **P2PK** — pay directly to a public key (simple, leaks the key early)
+2. **P2PKH** — pay to `HASH160(pubkey)`; classic `1...` / wrapped patterns
+3. **P2SH** — pay to a script hash; reveal the redeem script only at spend (BIP16)
+4. **P2MS** — bare multisig; usually wrapped in P2SH/P2WSH in practice
+5. **SegWit / Taproot** — witness programs (`P2WPKH`, `P2WSH`, `P2TR`) — later lessons
 
 ```text
 # Conceptual P2WPKH witness stack (after the ladder)
 <signature> <pubkey>
 ```
 
-Modern wallets mostly emit SegWit/Taproot, but reading P2PKH/P2SH is how you debug explorers, old UTXOs, and policy bugs.
+Complete required P2PKH, then one further step (P2SH, P2MS, or stack project). Optionally:
 
-<Callout type="info" title="Script is a predicate">
-  Think “does this satisfy the condition?”, not “run an app on-chain.” Loops and unbounded complexity are restricted for a reason.
-</Callout>
+```bash
+bitcoin-cli -regtest decodescript <hex>
+```
 
-## Timelocks and composeability
+Human policy (“2-of-3 keys, or Alice alone after 90 days”) becomes a composition of multisig and timelock branches. Taproot can hide unused branches until needed.
 
-Opcodes like `OP_CHECKLOCKTIMEVERIFY` (CLTV) and `OP_CHECKSEQUENCEVERIFY` (CSV) add time constraints. Lightning channel constructions depend on these. Miniscript helps compose policies safely instead of hand-writing fragile scripts.
-
-## Common mistakes
+### Common mistakes
 
 - Hand-editing scripts without policy tests
-- Confusing policy intent (“2-of-3 after 30 days”) with the exact opcode encoding
+- Confusing policy intent with exact opcode encoding
 - Assuming non-standard scripts will relay on default mempool policy
 
-## Stack execution intuition
+**Done when:** Lab evidence (P2PKH + one further ladder step + lock/unlock paragraph) is complete.
 
-Script pushes and pops values on a stack. `OP_DUP`, `OP_HASH160`, `OP_EQUALVERIFY`, and `OP_CHECKSIG` appear often in P2PKH-style templates. You rarely write these by hand today, descriptors and Miniscript generate them, but reading them debugs explorers and policy bugs.
+### Next lesson
 
-## Standardness
-
-Even if a script is consensus-valid, **mempool policy** may refuse to relay non-standard forms. Always test both:
-
-1. Inclusion via miner on regtest (`generatetoaddress` after submit)
-2. Relay behavior approximating mainnet policy
-
-## From policy to Script
-
-Human policy: "2-of-3 keys, or Alice alone after 90 days."
-
-That becomes a composition of multisig and timelock branches. Miniscript exists so you do not invent unsafe encodings. Taproot can hide unused branches until needed.
-
-## Next steps
-
-Finish the Decoding Bitcoin ladder through P2SH (and the stack project if you can). Then learn SegWit: how witnesses changed fees, malleability, and address formats. Then move on to Taproot.
+**SegWit & Bech32** — how witnesses changed fees, malleability, and address formats.

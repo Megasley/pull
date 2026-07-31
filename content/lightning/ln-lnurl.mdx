@@ -25,26 +25,26 @@ reflectionPrompts:
     Which BOLT (or implementation doc) is the source of truth for this topic,
     and what did you verify there?
 lab:
-  title: Polar check
+  title: LNURL-pay flow sketch
   description: >-
-    After reading, run one hands-on check related to LNURL. Prefer local regtest
-    or Polar over mainnet.
+    Complete Steps 2–3. Walk one LNURL LUD (pay or withdraw): list the HTTP
+    steps and where the BOLT11 appears. Optionally hit a test LNURL-pay
+    endpoint or Lightning Address resolver.
   evidence:
-    - Command output or screenshot from your local lab
-    - One sentence on what you observed vs expected
-    - Link to the required reading section you used
+    - Step list of the LNURL handshake (decode → HTTPS → invoice → pay)
+    - Note relating Lightning Address to LNURL-pay
+    - One security caution (TLS, amount check, or phishing)
+    - Link to the LUD you read
 ---
 **LNURL** is a family of bech32-encoded URLs that help wallets interact with services over HTTPS for pay, withdraw, auth, and more. **Lightning Addresses** (`name@domain`) typically resolve to LNURL-pay.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here. This closes **Lightning Basics**.
 
-Users hate pasting huge BOLT11 strings. LNURL and Lightning Addresses make Lightning feel like emailing money, with server-side responsibilities you must secure.
+## Step 2 — Core idea: short ticket → HTTPS → BOLT11
 
-## Analogy
+Users hate pasting huge BOLT11 strings. LNURL and Lightning Addresses make Lightning feel like emailing money — with server-side responsibilities you must secure.
 
-LNURL is a short coat-check ticket that maps to a locker (HTTPS API) where the real invoice is minted when you arrive.
-
-## Pay flow (simplified)
+**Analogy:** LNURL is a short coat-check ticket that maps to a locker (HTTPS API) where the real invoice is minted when you arrive.
 
 <Mermaid caption="LNURL-pay mints a fresh BOLT11 through an HTTPS handshake." chart="sequenceDiagram
     participant W as Wallet
@@ -67,12 +67,20 @@ LNURL is a short coat-check ticket that maps to a locker (HTTPS API) where the r
   Phishing, TLS failures, and malicious metadata become Lightning UX risks. Validate domains and amounts carefully.
 </Callout>
 
-## Common mistakes
+**Done when:** You can place Lightning Address on the LNURL-pay path in one sentence.
+
+## Step 3 — Sketch the handshake (lab)
+
+Pick LNURL-pay or withdraw from the LUDs. List each HTTP step and where BOLT11 appears. Call out one security check your app must enforce.
+
+### Common mistakes
 
 - Trusting amounts displayed by a service without checking invoice fields
 - Skipping success/error URL handling on withdraw
 - Logging sensitive k1 secrets from auth flows
 
-## Next steps
+**Done when:** Lab evidence (step list + address note + security caution + LUD link) is complete. Complete the **chapter quiz** when prompted.
 
-Open channels, move from UX protocols to the capacity that carries payments.
+### Next lesson
+
+**Opening Channels** (Channels & HTLCs) — move from UX protocols to the capacity that carries payments.

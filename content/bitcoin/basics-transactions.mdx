@@ -45,25 +45,26 @@ reflectionPrompts:
 lab:
   title: Decode + regtest send
   description: >-
-    Use Decoding Bitcoin's transaction decoder on a regtest (or known sample)
-    transaction, then create and broadcast a simple payment on local regtest.
+    Complete Steps 2–3. Use Decoding Bitcoin's transaction decoder on a
+    sample or regtest tx, then create and broadcast a simple payment on local
+    regtest.
   evidence:
     - Screenshot or notes from the Decoding Bitcoin transaction decoder with labeled vin/vout/fee
     - 'getrawtransaction <txid> true JSON (or equivalent) from your regtest send'
     - One sentence on what you observed vs expected
     - Link to the Decoding exercise or module section you completed
 ---
-A Bitcoin **transaction** moves value by consuming UTXOs and creating new ones. Everything else, wallets, Lightning channels, exchanges, eventually serializes to this structure.
+A Bitcoin **transaction** moves value by consuming UTXOs and creating new ones. Wallets, Lightning channels, and exchanges eventually serialize to this structure.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here.
+
+## Step 2 — Core idea: fields, fees, sighash
 
 If you cannot read a raw transaction, debugging stuck payments, wrong fees, or bad scripts becomes guesswork.
 
-## Analogy
+**Analogy:** A signed instruction — “Take these coins (inputs) and lock them under these new conditions (outputs).” Miners include it in a block; nodes verify signatures and rules.
 
-A transaction is a signed instruction: “Take these coins (inputs) and lock them under these new conditions (outputs).” Miners include the instruction in a block; nodes verify the signatures and rules.
-
-## Core fields
+Core fields:
 
 - **version**
 - **inputs**: previous txid + vout, scriptSig/witness, sequence
@@ -85,61 +86,41 @@ SegWit moves signatures into the **witness**, changing fee measurement to weight
     M->>N: New block
     N->>W: Confirmations increase" />
 
-## Regtest practice
-
-```bash
-bitcoin-cli -regtest getnewaddress
-bitcoin-cli -regtest generatetoaddress 101 "$(bitcoin-cli -regtest getnewaddress)"
-bitcoin-cli -regtest sendtoaddress <addr> 1.5
-bitcoin-cli -regtest getrawtransaction <txid> true
-```
-
-Decode the JSON and identify vin/vout, fees, and scripts.
+A signature commits to a **sighash** — a digest of (parts of) the transaction. Finalize amounts and outputs before signing; PSBT exists for multi-party construction. Most wallets commit to all inputs and outputs so the signed tx cannot be altered meaningfully.
 
 ```typescript
-type TxOut = { valueSats: number; scriptPubKey: string };
-type BuiltTx = { inputs: { txid: string; vout: number }[]; outputs: TxOut[] };
+const feeSats = Math.ceil(feeRateSatPerVb * vsize);
+// Fee = sum(inputs) − sum(outputs)
 ```
 
+SegWit txs are priced by **weight** / **vbytes**, not legacy serialized size alone.
+
 <Callout type="tip" title="Always compute fees explicitly">
-  Fee = sum(inputs) − sum(outputs). If outputs exceed inputs, nodes reject the transaction. If you under-fund fees in a busy mempool, the tx may sit forever.
+  If outputs exceed inputs, nodes reject the transaction. If you under-fund fees in a busy mempool, the tx may sit forever.
 </Callout>
 
-## What signatures cover
+**Done when:** You can label vin, vout, and fee on a decoded tx and explain why post-sign edits break signatures.
 
-A signature commits to a **sighash**, a digest of (parts of) the transaction. That is why you must finalize amounts and outputs before signing, and why PSBT workflows exist for multi-party construction.
+## Step 3 — Try it: decode + send (lab)
 
-## Common mistakes
+Walk the Decoding Bitcoin lifecycle and decoder modules. Then on regtest:
+
+```bash
+bitcoin-cli -regtest generatetoaddress 101 "$(bitcoin-cli -regtest getnewaddress)"
+TXID=$(bitcoin-cli -regtest sendtoaddress "$(bitcoin-cli -regtest getnewaddress)" 0.5)
+bitcoin-cli -regtest getrawtransaction "$TXID" true
+```
+
+Identify vin/vout, fees, and scripts. Trace which UTXOs were consumed and which new locks were created. Optional drills: [transaction exercises](https://bitcoindevs.xyz/decoding/transaction_exercises).
+
+### Common mistakes
 
 - Changing outputs after signing (invalidates signatures)
 - Mixing mainnet txids into regtest experiments
 - Forgetting change outputs
 
-## Virtual size and fees
+**Done when:** Lab evidence (decoder notes + getrawtransaction JSON + observation sentence) is complete.
 
-SegWit transactions are priced by **weight** / **vbytes**, not legacy serialized size alone. When estimating:
+### Next lesson
 
-```typescript
-const feeSats = Math.ceil(feeRateSatPerVb * vsize);
-```
-
-Underpaying relative to the mempool means waiting; overpaying wastes money. Product UX should expose slow/medium/fast targets.
-
-## Sighash flags (builder intuition)
-
-Most wallets use sighash types that commit to all inputs and outputs so the signed transaction cannot be altered meaningfully. Special flags exist for advanced contracts, avoid them until you can explain why you need them.
-
-## Decode practice
-
-Use the Decoding Bitcoin [transaction decoder](https://bitcoindevs.xyz/decoding/transaction-decoder) on a sample or your own hex, then verify the same fields locally:
-
-```bash
-TXID=$(bitcoin-cli -regtest sendtoaddress "$(bitcoin-cli -regtest getnewaddress)" 0.5)
-bitcoin-cli -regtest getrawtransaction "$TXID" true | jq '.vin,.vout,.fee'
-```
-
-Trace which UTXOs were consumed and which new locks were created. Classroom-style drills live in [transaction exercises](https://bitcoindevs.xyz/decoding/transaction_exercises).
-
-## Next steps
-
-Study Bitcoin Script, the tiny language that defines how outputs can be unlocked.
+**Bitcoin Script** — the language that defines how outputs can be unlocked.

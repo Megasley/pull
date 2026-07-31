@@ -8,13 +8,14 @@ objectives:
   - Authenticate with macaroons safely
   - 'Call key RPCs for invoices, payments, and channels'
 resources:
-  - title: LND documentation
-    url: 'https://docs.lightning.engineering/'
-    kind: docs
   - title: Mastering the Lightning Network
     url: 'https://github.com/lnbook/lnbook/blob/master/04_node_client.asciidoc'
     kind: book
     chapter: 'Ch. 4: Lightning Node Software'
+    required: true
+  - title: LND documentation
+    url: 'https://docs.lightning.engineering/'
+    kind: docs
     required: true
   - title: Lightning Terminal / Loop
     url: >-
@@ -27,24 +28,24 @@ reflectionPrompts:
     Which BOLT (or implementation doc) is the source of truth for this topic,
     and what did you verify there?
 lab:
-  title: Polar check
+  title: LND invoice round-trip
   description: >-
-    After reading, run one hands-on check related to LND. Prefer local regtest
-    or Polar over mainnet.
+    Complete Steps 2–3. On Polar/regtest with LND, run getinfo, create an
+    invoice, and pay it from a peer. Note how macaroons/TLS are configured.
   evidence:
-    - Command output or screenshot from your local lab
-    - One sentence on what you observed vs expected
-    - Link to the required reading section you used
+    - getinfo + addinvoice/payinvoice (or Polar) proof
+    - One sentence on macaroon scope (admin vs readonly) for your app
+    - Link to LND docs or Ch. 4 section you used
 ---
 **LND** is a widely deployed Lightning implementation with gRPC/REST APIs and macaroon-based auth. Many apps integrate here first.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here. This opens **Implementation**.
+
+## Step 2 — Core idea: APIs behind macaroons
 
 Production integrations live or die on auth scoping, idempotent payment calls, and careful macaroon storage.
 
-## Analogy
-
-Macaroons are VIP wristbands with permissions printed on them. Anyone holding an admin wristband is you, guard them like passwords.
+**Analogy:** Macaroons are VIP wristbands with permissions printed on them. Anyone holding an admin wristband is you — guard them like passwords.
 
 <Mermaid caption="Apps authenticate to LND; LND talks to Bitcoin and peers." chart="flowchart LR
     App[Your app] --> Mac[Macaroon + TLS]
@@ -62,6 +63,14 @@ lncli payinvoice <bolt11>
   Do not commit macaroons. Use readonly macaroons for UIs that only display data.
 </Callout>
 
-## Next steps
+**Done when:** You can name gRPC/REST + macaroon as the integration surface and one auth footgun.
 
-Compare with Core Lightning’s plugin-centric model.
+## Step 3 — Try it: invoice round-trip (lab)
+
+On Polar LND nodes (or local): `getinfo`, create invoice, pay from peer. Note TLS + macaroon paths (do not paste secrets into notes).
+
+**Done when:** Lab evidence (round-trip + macaroon scope sentence + source) is complete.
+
+### Next lesson
+
+**Core Lightning** — plugins, hooks, and a lean daemon model.

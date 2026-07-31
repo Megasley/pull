@@ -11,12 +11,15 @@ resources:
   - title: GitHub Flow
     url: 'https://docs.github.com/en/get-started/using-github/github-flow'
     kind: docs
+    required: true
   - title: Conventional Commits
     url: 'https://www.conventionalcommits.org/'
     kind: article
+    required: true
   - title: Bitcoin Core contributing
     url: 'https://github.com/bitcoin/bitcoin/blob/master/CONTRIBUTING.md'
     kind: docs
+    required: true
 reflectionPrompts:
   - >-
     Explain Git & Open Source Workflow to a teammate without jargon - what
@@ -28,26 +31,36 @@ reflectionPrompts:
     Which BIP, book chapter, or Core doc is authoritative here, and what did you
     verify?
 lab:
-  title: Regtest check
+  title: Practice PR hygiene
   description: >-
-    After reading, run one hands-on check related to Git & Open Source Workflow.
-    Prefer local regtest or Polar over mainnet.
+    Complete Steps 2–4. Create a focused branch, make a clear commit, and draft
+    a PR description (even if you only open it on a personal fork or keep it as
+    a written draft).
   evidence:
-    - Command output or screenshot from your local lab
-    - One sentence on what you observed vs expected
-    - Link to the required reading section you used
+    - Branch name + commit message you used (paste or screenshot)
+    - PR description answering problem / how tested / what to watch
+    - Link to the CONTRIBUTING or GitHub Flow section you followed
 ---
-Open source Bitcoin work is collaboration under a microscope. Your code is not “done” when it runs on your laptop, it is done when reviewers can understand, test, and trust it.
+Open source Bitcoin work is collaboration under a microscope. Your code is not “done” when it runs on your laptop — it is done when reviewers can understand, test, and trust it.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here.
 
-Bitcoin repositories move carefully. A confusing commit history or a PR that mixes five unrelated changes will stall. Learning the workflow early makes every later contribution smoother.
+## Step 2 — Key terms and why this matters
 
-## Analogy
+| Term | Meaning | Where you use it |
+| --- | --- | --- |
+| **Feature branch** | Short-lived branch for one change | Every contribution |
+| **Pull request (PR)** | Proposal to merge your branch | Review and CI |
+| **ACK** | “I support this after review” | Bitcoin Core–style review |
+| **NACK** | “I object,” with reasons | Same — silence is not approval |
 
-A pull request is like a work order on a job site: what changed, why it is safe, and how to verify it. Maintainers are the inspectors. They are not being difficult, they are protecting users’ money.
+**Analogy:** A pull request is a work order: what changed, why it is safe, and how to verify it. Maintainers are inspectors protecting users’ money.
 
-## The daily loop
+Bitcoin repositories move carefully. A confusing history or a PR that mixes five unrelated changes will stall.
+
+**Done when:** You can explain branch, PR, ACK, and NACK without looking them up.
+
+## Step 3 — The daily loop (setup and practice)
 
 <Mermaid caption="Most contributions follow a short cycle from branch to reviewed merge." chart="flowchart LR
     Issue[Issue or idea] --> Branch[Feature branch]
@@ -57,8 +70,6 @@ A pull request is like a work order on a job site: what changed, why it is safe,
     Review --> Merge[Merge]
     Review --> Revise[Address feedback]" />
 
-### Branching
-
 ```bash
 git checkout -b fix/clarify-fee-docs
 # ...edit files...
@@ -67,39 +78,36 @@ git commit -m "docs: clarify fee estimation examples"
 git push -u origin HEAD
 ```
 
-Keep branches focused: one bug, one feature, or one docs improvement.
-
-### Commits that help reviewers
+**Expected:** A new remote branch exists; `git log -1 --oneline` shows a clear message.
 
 Prefer messages that explain *why*:
 
 - Good: `wallet: avoid double-counting change in balance`
 - Weak: `fix stuff`
 
-Conventional commit prefixes (`fix:`, `feat:`, `docs:`, `test:`) help changelogs and skimming.
-
-## Pull request hygiene
-
-A strong PR description answers:
-
-1. What problem are you solving?
-2. How did you test it?
-3. What should reviewers watch for?
+A strong PR description answers: (1) What problem? (2) How did you test? (3) What should reviewers watch for?
 
 <Callout type="info" title="ACK / NACK">
-  In Bitcoin Core and related projects, reviewers often write **ACK** (I support this after review) or **NACK** (I object, with reasons). Silence is not approval. Expect technical pushback, it is normal.
+  Silence is not approval. Expect technical pushback — it is normal.
 </Callout>
 
-## Common mistakes
+### Common mistakes
 
-- Opening a PR from `main` with dozens of unrelated commits
-- Force-pushing during active review without warning
-- Ignoring CI failures and asking for review anyway
+- Opening a PR from `main` with dozens of unrelated commits  
+- Force-pushing during active review without warning  
+- Ignoring CI failures and asking for review anyway  
 
-## Practice
+**Done when:** You have created at least one focused branch with a clear commit on a machine you control.
 
-Fork a small Bitcoin-adjacent repo, fix a typo or docs issue, and open a PR following the project’s `CONTRIBUTING.md`. Treat the review comments as the real lesson.
+## Step 4 — Hands-on check (lab)
 
-## Next steps
+1. Fork or clone a small Bitcoin-adjacent repo (or use your own).  
+2. Fix a typo or docs issue on a **feature branch**.  
+3. Commit with a conventional-style message.  
+4. Open a PR **or** paste a full PR description as lab evidence.  
 
-With Git habits in place, study the cryptography that Bitcoin actually uses, hashes, key pairs, ECDSA, and Schnorr.
+**Done when:** Lab evidence includes branch/commit + PR text + which required guide you followed.
+
+### Next lesson
+
+With Git habits in place, study the **Cryptography Primer** — hashes, key pairs, ECDSA, and Schnorr.

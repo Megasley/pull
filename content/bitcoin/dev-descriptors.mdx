@@ -29,29 +29,28 @@ reflectionPrompts:
     Which BIP, book chapter, or Core doc is authoritative here, and what did you
     verify?
 lab:
-  title: Regtest check
+  title: Decode a descriptor
   description: >-
-    After reading, run one hands-on check related to Descriptors & Miniscript.
-    Prefer local regtest or Polar over mainnet.
+    Complete Steps 2–3. On regtest, run getdescriptorinfo on a sample
+    descriptor (or listdescriptors from a lab wallet) and explain receive vs
+    change in one sentence.
   evidence:
-    - Command output or screenshot from your local lab
-    - One sentence on what you observed vs expected
-    - Link to the required reading section you used
+    - getdescriptorinfo (or listdescriptors) output excerpt
+    - One sentence on what the descriptor commits to (wpkh/tr/multi…)
+    - Link to BIP-380 or Core descriptors doc you used
 searchQueries:
   - BIP380
   - output descriptors
 ---
 **Output descriptors** are a standard way to describe what scripts/keys a wallet controls. **Miniscript** helps compile human policies into safe Script fragments.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here.
+
+## Step 2 — Core idea: portable policy, not path folklore
 
 “m/84'/0'/0'” alone is incomplete if you forget whether you meant wpkh, tr, multisig, or a custom tree. Descriptors make imports, hardware coordination, and recoveries unambiguous.
 
-## Analogy
-
-A descriptor is a precise parts list and assembly diagram for your locks. Miniscript is a grammar that prevents you from building a lock that jams shut forever.
-
-## Descriptor examples
+**Analogy:** A descriptor is a precise parts list and assembly diagram for your locks. Miniscript is a grammar that prevents you from building a lock that jams shut forever.
 
 ```text
 wpkh([fingerprint/84h/1h/0h]tpub.../0/*)
@@ -72,12 +71,26 @@ Bitcoin Core RPCs like `importdescriptors` and `listdescriptors` operationalize 
   For Taproot script trees and multisig, seed words alone may be insufficient. Store descriptors (and multisig key records) with the same care as seeds.
 </Callout>
 
-## Common mistakes
+**Done when:** You can read a `wpkh(...)` / `tr(...)` line and say what locking condition it describes.
+
+## Step 3 — Try it: getdescriptorinfo (lab)
+
+```bash
+bitcoin-cli -regtest getdescriptorinfo "wpkh(tpubD6NzVbkrYhZ4XgiXtGrdW5XDAPFCL9h7we1vwNCpn8tZpoxq8n3nS8/0/*)"
+# Or after creating a wallet:
+bitcoin-cli -regtest listdescriptors
+```
+
+(Use a throwaway/example key material — never paste real mainnet xpubs into shared notes.)
+
+### Common mistakes
 
 - Exporting xpubs without origin info / fingerprints
 - Mixing receive and change descriptor chains
 - Assuming Miniscript supports every opcode policy you can imagine
 
-## Next steps
+**Done when:** Lab evidence (RPC excerpt + commitment sentence + source link) is complete.
 
-Drive Bitcoin Core via RPC, the reference implementation most builders integrate with.
+### Next lesson
+
+**Bitcoin Core & RPC** — drive the reference node for wallets, chain, and tests.

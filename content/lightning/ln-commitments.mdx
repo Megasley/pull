@@ -28,28 +28,28 @@ reflectionPrompts:
     Which BOLT (or implementation doc) is the source of truth for this topic,
     and what did you verify there?
 lab:
-  title: Polar check
+  title: Commitment security brief
   description: >-
-    After reading, run one hands-on check related to Commitment Transactions.
-    Prefer local regtest or Polar over mainnet.
+    Complete Steps 2–3. Write a half-page brief: what a commitment represents,
+    why old states are revoked, and what a justice/penalty path does. Optionally
+    inspect channel state fields on Polar after a payment.
   evidence:
-    - Command output or screenshot from your local lab
-    - One sentence on what you observed vs expected
-    - Link to the required reading section you used
+    - Half-page brief covering commitment, revocation, penalty
+    - One sentence on why offline nodes need watchtowers
+    - Link to Ch. 7 or BOLT3 section you used
+    - 'Optional: Polar/CLI channel state after an update'
 searchQueries:
   - BOLT3
 ---
-Each Lightning channel state is backed by a pair of **commitment transactions**, pre-signed on-chain settlements that either party can broadcast if cooperation fails.
+Each Lightning channel state is backed by a pair of **commitment transactions** — pre-signed on-chain settlements either party can broadcast if cooperation fails.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here.
+
+## Step 2 — Core idea: revoke old bills, punish cheats
 
 If commitments are wrong, someone can steal funds or deadlock value. This is the cryptographic spine of Lightning security.
 
-## Analogy
-
-Every time you update the bar tab, you both sign a new “final bill” and destroy the ability to cash an older bill, because an old bill would be fraud and is punishable.
-
-## Revocation and penalties
+**Analogy:** Every time you update the bar tab, you both sign a new “final bill” and destroy the ability to cash an older bill — because an old bill would be fraud and is punishable.
 
 When state advances to `n`, state `n-1` is revoked. Publishing a revoked commitment lets the peer sweep funds via a **penalty** (justice) transaction.
 
@@ -65,22 +65,28 @@ When state advances to `n`, state `n-1` is revoked. Publishing a revoked commitm
         Justice --> Lost[Broadcaster<br/>loses funds]
     end" />
 
+Commitment outputs typically pay each side with different conditions. The local party's output often includes a revocation path and a delayed CSV path. Modern channels use **anchor** outputs so fee bumping a force-close is more reliable under mempool pressure.
+
+Treat updates as a state machine: proposed → signed → committed → previous revoked. Bugs are often off-by-one state indices.
+
 <Callout type="danger" title="Always watch the chain">
   Offline nodes can miss revocation windows. Watchtowers exist for this failure mode.
 </Callout>
 
-## to_local and to_remote
+**Done when:** You can explain why broadcasting an old commitment can forfeit funds.
 
-Commitment outputs typically pay each side with different conditions. The local party's output often includes a revocation path and a delayed CSV path, enabling punishment if an old state is broadcast, while allowing honest force-close after a delay.
+## Step 3 — Security brief (lab)
 
-## Anchor outputs
+Write the half-page brief. Optional: after a Polar payment, note any state/balance fields that changed.
 
-Modern channels use **anchor** outputs so fee bumping a force-close is more reliable under mempool pressure. If you build fee logic around force closes, read your implementation's anchor behavior.
+### Common mistakes
 
-## State machine mindset
+- Treating commitments as “just accounting” without revocation
+- Ignoring CSV delays on honest force-close
+- Building fee logic without reading anchor behavior for your stack
 
-Treat channel updates as a state machine: proposed, signed, irrevocably committed, revoked previous. Bugs are often off-by-one state transitions. Log state indices carefully during development.
+**Done when:** Lab evidence (brief + watchtower sentence + source) is complete.
 
-## Next steps
+### Next lesson
 
-HTLCs add conditional payments on top of commitments for multi-hop routing.
+**HTLC Mechanics** — conditional payments on top of commitments for multi-hop routing.

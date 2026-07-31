@@ -29,34 +29,26 @@ reflectionPrompts:
     Which BIP, book chapter, or Core doc is authoritative here, and what did you
     verify?
 lab:
-  title: Regtest check
+  title: Wallet + chain RPC checklist
   description: >-
-    After reading, run one hands-on check related to Bitcoin Core & RPC. Prefer
-    local regtest or Polar over mainnet.
+    Complete Steps 2–3. On regtest, confirm getblockchaininfo, create or load a
+    dedicated lab wallet, fund an address with generatetoaddress, and note how
+    RPC auth is configured (cookie vs user/pass).
   evidence:
-    - Command output or screenshot from your local lab
-    - One sentence on what you observed vs expected
-    - Link to the required reading section you used
+    - getblockchaininfo excerpt (chain = regtest)
+    - createwallet / getnewaddress / generatetoaddress output
+    - One sentence on how you authenticate RPC (and that it is not public)
+    - Link to Mastering Bitcoin Ch. 3 section you used
 ---
 **Bitcoin Core** (`bitcoind` + `bitcoin-cli`) is the reference full node. Most serious backends either run it or carefully justify an alternative.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here. You already stood up regtest in Foundations — this lesson deepens RPC habits.
+
+## Step 2 — Core idea: engine + authenticated controls
 
 RPC is how you mine regtest blocks, fund addresses, inspect mempools, and import descriptors. Misconfigured RPC is also how servers get drained.
 
-## Analogy
-
-`bitcoind` is the engine; RPC is the instrument cluster and ignition keyed to authorized operators. Never bolt the ignition onto the public internet.
-
-## Essential workflow
-
-```bash
-bitcoind -regtest -daemon
-bitcoin-cli -regtest getblockchaininfo
-bitcoin-cli -regtest createwallet "dev"
-bitcoin-cli -regtest getnewaddress
-bitcoin-cli -regtest generatetoaddress 101 <address>
-```
+**Analogy:** `bitcoind` is the engine; RPC is the instrument cluster and ignition keyed to authorized operators. Never bolt the ignition onto the public internet.
 
 <Mermaid caption="Authenticated RPC controls node and wallet operations." chart="flowchart LR
     Cli[bitcoin-cli / app] --> Auth[Cookie or user/pass]
@@ -65,22 +57,37 @@ bitcoin-cli -regtest generatetoaddress 101 <address>
     Core --> Chain[Chainstate + mempool]
     Core --> Wallets[Wallet(s)]" />
 
-<Callout type="danger" title="RPC exposure">
-  Bind RPC to localhost. Use cookie auth or strong credentials. Never put `rpcallowip=0.0.0.0/0` on a valued node.
-</Callout>
-
-## Useful call families
+Useful call families:
 
 - Blockchain: `getblock`, `getrawtransaction`
 - Mempool: `getmempoolentry`, `estimatesmartfee`
 - Wallet: `sendtoaddress`, `importdescriptors`, PSBT RPCs
 
-## Common mistakes
+<Callout type="danger" title="RPC exposure">
+  Bind RPC to localhost. Use cookie auth or strong credentials. Never put `rpcallowip=0.0.0.0/0` on a valued node.
+</Callout>
+
+**Done when:** You can name three RPC families and one hard rule for exposure.
+
+## Step 3 — Try it: dedicated lab wallet (lab)
+
+```bash
+bitcoin-cli -regtest getblockchaininfo
+bitcoin-cli -regtest createwallet "dev-lab" || bitcoin-cli -regtest loadwallet "dev-lab"
+ADDR=$(bitcoin-cli -regtest getnewaddress)
+bitcoin-cli -regtest generatetoaddress 101 "$ADDR"
+```
+
+Confirm `chain` is `regtest`. Note cookie vs rpcuser auth from your setup.
+
+### Common mistakes
 
 - Using one wallet for experiments and savings
 - Forgetting `-regtest` and talking to the wrong chain
 - Parsing RPC errors poorly and retrying unsafe sends
 
-## Next steps
+**Done when:** Lab evidence (chain info + wallet fund flow + auth sentence + source) is complete.
 
-Automate regtest in Docker and CI so protocol tests become routine.
+### Next lesson
+
+**PSBT Workflows** — multi-party signing without proprietary blobs.

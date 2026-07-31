@@ -8,6 +8,11 @@ objectives:
   - Add or update tests with your change
   - Navigate CI and review on a Lightning repo
 resources:
+  - title: Mastering the Lightning Network
+    url: 'https://github.com/lnbook/lnbook'
+    kind: book
+    chapter: Use as protocol companion while debugging
+    required: true
   - title: LND contributing
     url: >-
       https://github.com/lightningnetwork/lnd/blob/master/docs/code_contribution_guidelines.md
@@ -16,11 +21,6 @@ resources:
     url: >-
       https://github.com/ElementsProject/lightning/blob/master/.github/CONTRIBUTING.md
     kind: docs
-  - title: Mastering the Lightning Network
-    url: 'https://github.com/lnbook/lnbook'
-    kind: book
-    chapter: Use as protocol companion while debugging
-    required: true
 reflectionPrompts:
   - >-
     Explain First Lightning PR to a teammate without jargon - what problem does
@@ -30,18 +30,23 @@ reflectionPrompts:
     Which BOLT (or implementation doc) is the source of truth for this topic,
     and what did you verify there?
 lab:
-  title: Contribution artifact
+  title: Open or draft a PR
   description: >-
-    Produce a contribution artifact for First Lightning PR: issue shortlist,
-    review notes, or PR draft that a maintainer could act on.
+    Complete Steps 2–3. Reproduce locally, add/update tests, and open a PR (or
+    a complete draft PR + planned upstream). Tie the description to the
+    protocol concept you fixed.
   evidence:
-    - Issue URL(s) or PR URL
-    - Written approach / review checklist
-    - Self-score against the meaningful-PR rubric
+    - Issue URL and PR URL (or draft PR text + branch)
+    - Test / Polar / CI notes
+    - Updated rubric self-score ≥ 8/10 (or documented gaps)
 ---
 Landing a Lightning PR requires local labs (bitcoind + peers), patience with CI, and precise reproduction notes.
 
-Use the **Review Club** picks from earlier chapters (visible on concept lessons) or find scoped work on [/issues](/issues). Tie your PR description to the protocol concept you fixed (liquidity, HTLC, routing, etc.).
+Complete **Step 1 // Required reading** in the study plan above, then continue here.
+
+## Step 2 — Context: reproduce → test → PR → iterate
+
+Use **Review Club** picks or [/issues](/issues). Tie your PR description to the protocol concept you fixed (liquidity, HTLC, routing, etc.).
 
 <Mermaid caption="Reproduce, test, PR, CI, iterate with reviewers." chart="sequenceDiagram
     participant You
@@ -53,6 +58,20 @@ Use the **Review Club** picks from earlier chapters (visible on concept lessons)
     Reviewer->>You: Feedback
     You->>CI: Update" />
 
-## Next steps
+**Done when:** You can list reproduction steps a reviewer could follow without asking you.
 
-Practice protocol review, BOLT changes and spec discussions.
+## Step 3 — Practice: ship the PR (lab)
+
+Reproduce → fix → test → open (or draft). Summarize each push. Keep rubric ≥ 8/10.
+
+### Checklist
+
+- [ ] Reproduction steps in the PR body
+- [ ] Tests or Polar notes attached
+- [ ] Protocol concept named for reviewers
+
+**Done when:** Lab evidence (issue + PR/draft + tests + score) is complete.
+
+### Next lesson
+
+**Protocol Review Practice** — BOLT PRs and interop impact.

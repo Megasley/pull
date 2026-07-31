@@ -28,29 +28,29 @@ reflectionPrompts:
     Which BIP, book chapter, or Core doc is authoritative here, and what did you
     verify?
 lab:
-  title: Regtest check
+  title: Path + backup checklist
   description: >-
-    After reading, run one hands-on check related to Wallet Architecture. Prefer
-    local regtest or Polar over mainnet.
+    Complete Steps 2–3. Write one receive derivation path for regtest (e.g.
+    BIP-84 family), list what you would back up (seed + descriptor notes), and
+    optionally derive/show a throwaway address on regtest.
   evidence:
-    - Command output or screenshot from your local lab
-    - One sentence on what you observed vs expected
-    - Link to the required reading section you used
+    - One example derivation path with network and address type labeled
+    - Backup checklist (seed / mnemonic, descriptor or account info, what not to store)
+    - Link to Mastering Bitcoin Ch. 5 or BIP-32 section you used
+    - 'Optional: getnewaddress / getaddressinfo showing a matching type'
 searchQueries:
   - BIP32
   - BIP39
 ---
-A wallet is not “an address.” It is software that manages keys, tracks UTXOs, builds transactions, and coordinates signing, often across devices.
+A wallet is not “an address.” It is software that manages keys, tracks UTXOs, builds transactions, and coordinates signing — often across devices.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here.
+
+## Step 2 — Core idea: HD tree, watch vs sign, backups
 
 Most catastrophic losses are operational: bad backups, leaked seeds, wrong derivation paths, or watching wallets that cannot spend.
 
-## Analogy
-
-An HD wallet is a tree of keys grown from one seed. The seed is the orchard’s master cutting, lose it and the orchard is gone; leak it and thieves can harvest everything.
-
-## HD derivation
+**Analogy:** An HD wallet is a tree of keys grown from one seed. The seed is the orchard’s master cutting — lose it and the orchard is gone; leak it and thieves can harvest everything.
 
 BIP-32 defines hierarchical deterministic keys. BIP-39 encodes seeds as mnemonics. Account standards (BIP-44/84/86 families) organize receiving and change chains.
 
@@ -66,8 +66,6 @@ BIP-32 defines hierarchical deterministic keys. BIP-39 encodes seeds as mnemonic
 Example (illustrative): m/84'/1'/0'/0/5  # regtest native SegWit receive index 5
 ```
 
-## Watch-only vs signing
-
 Production designs often split:
 
 - **Watching** software scans the chain / indexer
@@ -79,12 +77,25 @@ PSBTs move unsigned transactions between these roles safely.
   Never log seeds, never put them in git, never screenshot them into cloud photos. Test restore on regtest before storing real value.
 </Callout>
 
-## Common mistakes
+**Done when:** You can explain why seed-only backup can fail for Taproot/multisig without descriptor records.
+
+## Step 3 — Path + backup checklist (lab)
+
+Write one receive path for **regtest** (label address type). List what you would back up vs never store in plaintext. Optional:
+
+```bash
+bitcoin-cli -regtest getnewaddress "" "bech32"
+bitcoin-cli -regtest getaddressinfo <addr>
+```
+
+### Common mistakes
 
 - Backing up addresses instead of seed + descriptor/script info
 - Gap limit surprises (too many unused addresses, balance “missing”)
 - Reusing addresses unnecessarily (privacy) or rotating without backup updates
 
-## Next steps
+**Done when:** Lab evidence (path + checklist + source link) is complete.
 
-Output descriptors and Miniscript make wallet policies explicit and portable.
+### Next lesson
+
+**Descriptors & Miniscript** — make wallet policies explicit and portable.

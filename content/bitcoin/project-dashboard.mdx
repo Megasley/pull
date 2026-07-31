@@ -9,18 +9,23 @@ objectives:
   - 'Visualize sync progress, peer counts, and mempool size'
   - Alert on stalled IBD or RPC failures
 resources:
-  - title: Bitcoin Core RPC reference
-    url: 'https://developer.bitcoin.org/reference/rpc/'
+  - title: 'Project Spec: Node Dashboard'
+    url: '/projects/node-dashboard'
     kind: docs
-  - title: getblockchaininfo
-    url: 'https://developer.bitcoin.org/reference/rpc/getblockchaininfo.html'
-    kind: docs
+    note: Pull project page — acceptance criteria and submit flow.
+    required: true
   - title: Mastering Bitcoin
     url: >-
       https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch03_bitcoin-core.adoc
     kind: book
     chapter: 'Ch. 3: Bitcoin Core'
     required: true
+  - title: Bitcoin Core RPC reference
+    url: 'https://developer.bitcoin.org/reference/rpc/'
+    kind: docs
+  - title: getblockchaininfo
+    url: 'https://developer.bitcoin.org/reference/rpc/getblockchaininfo.html'
+    kind: docs
 reflectionPrompts:
   - >-
     Explain Node Dashboard to a teammate without jargon - what problem does it
@@ -32,16 +37,18 @@ reflectionPrompts:
 lab:
   title: Project milestone evidence
   description: >-
-    For Node Dashboard, complete the linked project spec happy path on
-    regtest/Polar and capture demo evidence before marking the lesson complete.
+    Complete Steps 2–4. Ship a dashboard that polls Core via a backend proxy
+    and capture demo evidence before marking complete.
   evidence:
     - Link to public repo or branch
-    - Commands or screenshots proving the happy path
-    - Short note of one failure case you tested
+    - Screenshot showing height/peers/mempool (or equivalent panels)
+    - Short note of one failure case (RPC down, stalled sync)
 ---
 Operators need situational awareness. A node dashboard turns RPC into signals: are we synced, connected, and estimating fees sanely?
 
-## Build challenge
+Complete **Step 1 // Required reading** in the study plan above, then continue here.
+
+## Step 2 — Goal
 
 Dashboard panels:
 
@@ -56,10 +63,34 @@ Dashboard panels:
     Poller --> Store[Snapshot store]
     Store --> UI[Charts / status]" />
 
+**Done when:** You can list the RPC calls behind each panel.
+
+## Step 3 — Milestones
+
+| Phase | Ship |
+| --- | --- |
+| Milestone A | Backend proxy + `getblockchaininfo` / peer snapshot |
+| Milestone B | Mempool + fee estimate panels with refresh |
+| Milestone C | Alert or banner for RPC failure / stalled IBD |
+
 <Callout type="danger" title="Proxy RPC">
   Browser clients must hit your backend, not `bitcoind` directly.
 </Callout>
 
-## Next steps
+**Done when:** Milestone A never exposes RPC credentials to the browser.
 
-Build a Payment Processor API that creates invoices and tracks confirmations.
+## Step 4 — Build & evidence (lab)
+
+Implement against `/projects/node-dashboard`. Capture repo link, panel screenshot, and one failure case.
+
+### Common mistakes
+
+- Polling too aggressively and starving the node
+- Exposing cookie/RPC auth to the frontend
+- Treating regtest peer count (often 0) as a production outage without context
+
+**Done when:** Lab evidence is filed.
+
+### Next lesson
+
+**Payment Processor API** — invoices, confirmations, and merchant webhooks.

@@ -28,29 +28,29 @@ reflectionPrompts:
     Which BIP, book chapter, or Core doc is authoritative here, and what did you
     verify?
 lab:
-  title: Regtest check
+  title: Funded PSBT on regtest
   description: >-
-    After reading, run one hands-on check related to PSBT Workflows. Prefer
-    local regtest or Polar over mainnet.
+    Complete Steps 2–3. On regtest, create a funded PSBT to a lab address,
+    process/sign it with the wallet, finalize, and note the role each RPC
+    played.
   evidence:
-    - Command output or screenshot from your local lab
-    - One sentence on what you observed vs expected
-    - Link to the required reading section you used
+    - walletcreatefundedpsbt (or equivalent) output excerpt
+    - walletprocesspsbt / finalizepsbt success fields (or decoded summary)
+    - One sentence mapping creator → signer → finalizer for your flow
+    - Link to BIP-174 or Optech PSBT section you used
 searchQueries:
   - BIP174
   - PSBT
 ---
 **PSBT** (Partially Signed Bitcoin Transaction) is a standard container for incomplete transactions plus the metadata signers need (UTXO info, paths, scripts, partial signatures).
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here. This closes **Development**.
+
+## Step 2 — Core idea: roles and interoperability
 
 Hardware wallets, multisig cosigners, and watch-only constructors should not invent proprietary blob formats. PSBT is the interoperability layer.
 
-## Analogy
-
-A PSBT is a shared clipboard for a group project: one person drafts the document, others add signatures in the right places, someone finalizes, then you submit.
-
-## Roles
+**Analogy:** A shared clipboard for a group project — one person drafts, others add signatures in the right places, someone finalizes, then you submit.
 
 <Mermaid caption="PSBT moves through roles until signatures are complete and extractable." chart="flowchart LR
     C[Creator] --> U[Updater]
@@ -59,22 +59,32 @@ A PSBT is a shared clipboard for a group project: one person drafts the document
     S2 --> F[Finalizer]
     F --> E[Extractor / broadcast]" />
 
-```bash
-bitcoin-cli -regtest walletcreatefundedpsbt '[]' '{"<addr>":1.0}'
-bitcoin-cli -regtest walletprocesspsbt <psbt>
-bitcoin-cli -regtest finalizepsbt <psbt>
-```
-
 <Callout type="info" title="Include witness UTXO data">
   Signers need previous output information. Incomplete PSBTs fail mysteriously on hardware devices when UTXO data is missing.
 </Callout>
 
-## Common mistakes
+**Done when:** You can name the PSBT roles and why watch-only + hardware needs this format.
+
+## Step 3 — Try it: create → process → finalize (lab)
+
+Fund a wallet first if needed, then:
+
+```bash
+ADDR=$(bitcoin-cli -regtest getnewaddress)
+bitcoin-cli -regtest walletcreatefundedpsbt '[]' "{\"$ADDR\":0.01}"
+# Then walletprocesspsbt <psbt> and finalizepsbt <psbt>
+```
+
+Map which command acted as creator, signer, and finalizer in your run.
+
+### Common mistakes
 
 - Asking hardware to sign without verifying outputs on the device screen
 - Mixing finalized and unfinalized blobs in your database
 - Forgetting change outputs belong to your descriptor
 
-## Next steps
+**Done when:** Lab evidence (PSBT RPC excerpts + role sentence + source) is complete. Complete the **chapter quiz** when prompted.
 
-Build the Mini Wallet project, apply UTXOs, descriptors, regtest, and PSBT in one CLI.
+### Next lesson
+
+**Mini Wallet Project** — apply UTXOs, descriptors, regtest, and PSBT in one CLI.

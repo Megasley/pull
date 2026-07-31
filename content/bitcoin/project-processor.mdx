@@ -9,18 +9,23 @@ objectives:
   - Detect payments and confirmation thresholds
   - Emit signed webhooks to merchants
 resources:
+  - title: 'Project Spec: Payment Processor'
+    url: '/projects/payment-processor'
+    kind: docs
+    note: Pull project page — acceptance criteria and submit flow.
+    required: true
   - title: BIP-21 URI scheme
     url: 'https://github.com/bitcoin/bips/blob/master/bip-0021.mediawiki'
     kind: bip
     required: true
-  - title: 'Bitcoin Optech: Payment tracking'
-    url: 'https://bitcoinops.org/'
-    kind: article
   - title: Mastering Bitcoin
     url: >-
       https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch06_transactions.adoc
     kind: book
     chapter: 'Ch. 6: Transactions'
+  - title: 'Bitcoin Optech'
+    url: 'https://bitcoinops.org/'
+    kind: article
 reflectionPrompts:
   - >-
     Explain Payment Processor API to a teammate without jargon - what problem
@@ -32,18 +37,20 @@ reflectionPrompts:
 lab:
   title: Project milestone evidence
   description: >-
-    For Payment Processor API, complete the linked project spec happy path on
-    regtest/Polar and capture demo evidence before marking the lesson complete.
+    Complete Steps 2–4. Ship invoice create → detect → confirm → webhook on
+    regtest and capture demo evidence before marking complete.
   evidence:
     - Link to public repo or branch
-    - Commands or screenshots proving the happy path
-    - Short note of one failure case you tested
+    - Demo of create invoice + paid/confirmed status (commands or screenshots)
+    - Short note of one failure case (underpay, expiry, webhook retry)
 searchQueries:
   - BIP21
 ---
 Merchants need idempotent invoices, confirmation policies, and reliable callbacks. This project is the on-chain cousin of a Lightning POS.
 
-## Build challenge
+Complete **Step 1 // Required reading** in the study plan above, then continue here. This closes **Projects**.
+
+## Step 2 — Goal
 
 API endpoints to:
 
@@ -51,6 +58,8 @@ API endpoints to:
 2. Query invoice status
 3. Register webhook URL
 4. Mark paid after N confirmations
+
+Return a BIP-21 URI with the invoice details.
 
 <Mermaid caption="Invoice creation, detection, confirmation, webhook." chart="sequenceDiagram
     participant M as Merchant
@@ -62,10 +71,34 @@ API endpoints to:
     P->>P: Wait confirmations
     P->>M: Webhook paid" />
 
+**Done when:** You can explain idempotency for “create invoice” retries.
+
+## Step 3 — Milestones
+
+| Phase | Ship |
+| --- | --- |
+| Milestone A | Create + get invoice with unique address / BIP-21 |
+| Milestone B | Detect payment and confirmation threshold on regtest |
+| Milestone C | Signed webhook + under/over-payment policy documented |
+
 <Callout type="warning" title="Under/over payment">
   Define policy for wrong amounts and late payments. Document it in the API.
 </Callout>
 
-## Next steps
+**Done when:** Milestone B uses a stated confirmation policy (not “seen in mempool”).
 
-Enter open source: find a good first issue in a Bitcoin repository.
+## Step 4 — Build & evidence (lab)
+
+Implement against `/projects/payment-processor`. Capture repo link, happy-path demo, and one failure case.
+
+### Common mistakes
+
+- Reusing deposit addresses across invoices
+- Firing webhooks twice without idempotency keys
+- Treating 0-conf as settled for non-trivial amounts
+
+**Done when:** Lab evidence is filed. Complete the **chapter quiz** when prompted.
+
+### Next lesson
+
+**OSS Discovery** — find a good first issue in a Bitcoin repository.

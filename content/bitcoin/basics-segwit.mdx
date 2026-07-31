@@ -30,29 +30,29 @@ reflectionPrompts:
     Which BIP, book chapter, or Core doc is authoritative here, and what did you
     verify?
 lab:
-  title: Regtest check
+  title: Native SegWit on regtest
   description: >-
-    After reading, run one hands-on check related to SegWit & Bech32. Prefer
-    local regtest or Polar over mainnet.
+    Complete Steps 2–3. Create a Bech32 address on regtest, send to it, and
+    inspect weight / vsize fields on the decoded transaction.
   evidence:
-    - Command output or screenshot from your local lab
-    - One sentence on what you observed vs expected
-    - Link to the required reading section you used
+    - 'getnewaddress "" "bech32" (or equivalent) and a send txid'
+    - Decoded tx showing vsize/weight (or fee) fields
+    - One sentence on why weight differs from legacy byte size
 searchQueries:
   - BIP141
   - SegWit
 ---
 **Segregated Witness (SegWit)** moved signature data out of the legacy transaction identifier path. That fixed transaction malleability for modern outputs and changed how block capacity and fees are measured.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here.
 
-Almost all modern wallets use SegWit or Taproot. If your mental model still prices fees in “raw bytes only,” your fee estimates and tx size math will be wrong.
+## Step 2 — Core idea: witness, weight, Bech32
 
-## Analogy
+Almost all modern wallets use SegWit or Taproot. If you still price fees in “raw bytes only,” fee estimates and size math will be wrong.
 
-Imagine a court filing where the signatures are attached in an envelope marked “witnesses.” The case ID no longer changes if someone fiddles with the signature formatting, and the court weights the witness pages differently when measuring stack size.
+**Analogy:** A court filing where signatures sit in an envelope marked “witnesses.” The case ID no longer changes if someone fiddles with signature formatting, and the court weights witness pages differently when measuring stack size.
 
-## What changed
+What changed:
 
 - **txid** no longer includes witness data (wtxid does)
 - Block limits use **weight**: witness bytes count less than non-witness bytes
@@ -63,6 +63,12 @@ const vbytes = weight / 4;
 const fee = Math.ceil(satPerVb * vbytes);
 ```
 
+Weight units:
+
+- Non-witness byte: 4 weight units
+- Witness byte: 1 weight unit
+- Block weight limit: 4,000,000 units
+
 <Mermaid caption="SegWit stabilizes txids for protocols and introduces weight-based fees." chart="flowchart TD
     Legacy[Legacy tx + scripts] --> Malleable[txid malleability risk]
     SegWit[SegWit tx] --> Witness[Witness signatures]
@@ -70,42 +76,35 @@ const fee = Math.ceil(satPerVb * vbytes);
     Base --> Txid[txid stable for contracts]
     Witness --> Weight[Weighted size for fees]" />
 
-## Bech32 addresses
+Before SegWit, third parties could tweak signatures and change txids in some cases. Second-layer protocols that pre-signed dependent transactions suffered. SegWit removed witness data from txid calculation, enabling safer Lightning-style designs.
 
-Native SegWit v0 addresses use **Bech32** (`bc1q...`). They are easier to read aloud and detect typos better than Base58 for many cases.
+Native SegWit v0 addresses use **Bech32** (`bc1q...`). **Nested SegWit** wraps witness programs inside P2SH (`3...`) for old wallet compatibility. New systems should default to native SegWit or Taproot.
 
 <Callout type="tip" title="Prefer native SegWit for new single-sig">
-  Nested SegWit (P2SH-P2WPKH) exists for compatibility, but native Bech32 usually saves fees and complexity.
+  Nested SegWit exists for compatibility, but native Bech32 usually saves fees and complexity.
 </Callout>
 
-## Builder impact
+**Done when:** You can explain why txid is stable under SegWit and compute fee from sat/vB × vbytes.
 
-- Lightning and many contracts needed malleability fixes, SegWit enabled safer off-chain protocols
-- Explorers should show both txid and wtxid when debugging
-- Always estimate fees with weight, not legacy size alone
+## Step 3 — Try it on regtest (lab)
 
-## Common mistakes
+```bash
+ADDR=$(bitcoin-cli -regtest getnewaddress "" "bech32")
+bitcoin-cli -regtest generatetoaddress 101 "$(bitcoin-cli -regtest getnewaddress)"
+TXID=$(bitcoin-cli -regtest sendtoaddress "$ADDR" 0.1)
+bitcoin-cli -regtest getrawtransaction "$TXID" true
+```
 
-- Comparing “byte size” across legacy and SegWit without weight
+Note `vsize` / weight-related fields. One sentence: why comparing “byte size” across legacy and SegWit without weight misleads.
+
+### Common mistakes
+
+- Comparing byte size across legacy and SegWit without weight
 - Sending to `bc1` on the wrong network HRP
 - Forgetting older receivers that cannot parse Bech32 (rare now, still possible)
 
-## Malleability and Lightning
+**Done when:** Lab evidence (bech32 address + decoded send + weight sentence) is complete.
 
-Before SegWit, third parties could tweak signatures and change txids without invalidating spends in some cases. Second-layer protocols that pre-signed dependent transactions suffered. SegWit removed witness data from txid calculation, enabling safer Lightning-style designs.
+### Next lesson
 
-## Nested vs native
-
-**Nested SegWit** wraps witness programs inside P2SH (`3...` addresses) for old wallet compatibility. **Native SegWit** (`bc1q...`) is cleaner and usually cheaper. New systems should default to native SegWit or Taproot.
-
-## Weight units
-
-- Non-witness byte: 4 weight units
-- Witness byte: 1 weight unit
-- Block weight limit: 4,000,000 units
-
-Fee rate UX should speak **sat/vB** consistently.
-
-## Next steps
-
-Taproot builds on SegWit v1 with Schnorr and script trees, the current best practice for many new wallets.
+**Taproot & Tapscript** — SegWit v1 with Schnorr and script trees.

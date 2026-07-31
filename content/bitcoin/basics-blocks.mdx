@@ -36,30 +36,28 @@ reflectionPrompts:
 lab:
   title: Reorg risk + header check
   description: >-
-    Use the Decoding Bitcoin reorg calculator to pick a confirmation policy,
-    then on regtest inspect a block header (`getblockheader`) and explain how
+    Complete Steps 2–3. Use the Decoding Bitcoin reorg calculator to pick a
+    confirmation policy, then on regtest inspect a block header and explain how
     the previous-block hash links the chain.
   evidence:
     - Screenshot or notes from the Decoding Bitcoin reorg calculator with your assumed attacker share
-    - 'getblockheader (or explorer) output for one regtest/mainnet tip block'
+    - 'getblockheader (or explorer) output for one regtest tip block'
     - One-sentence confirmation policy you would ship, tied to the calculator output
 ---
-A blockchain is not a magical database, it is a linked list of **blocks**, each committing to a set of transactions and to the previous block’s hash, secured by proof-of-work.
+A blockchain is a linked list of **blocks**, each committing to a set of transactions and to the previous block’s hash, secured by proof-of-work.
 
-## Why this matters
+Complete **Step 1 // Required reading** in the study plan above, then continue here.
+
+## Step 2 — Core idea: headers, merkle root, confirmations
 
 Explorers, wallets, and payment processors must decide when a payment is “final enough.” That decision is about chain tips, confirmations, and reorg risk.
 
-## Analogy
-
-Think of each block as a sealed evidence bag. The seal includes a fingerprint of the previous bag. To rewrite history, an attacker must reseal every bag after the change, and beat the honest network’s work.
-
-## Block anatomy
+**Analogy:** Each block is a sealed evidence bag. The seal includes a fingerprint of the previous bag. To rewrite history, an attacker must reseal every bag after the change — and beat the honest network’s work.
 
 A block contains:
 
 - A **header** (version, previous hash, merkle root, time, bits/difficulty, nonce)
-- A list of **transactions** (the coinbase first)
+- A list of **transactions** (coinbase first)
 
 The **merkle root** commits to all transactions so light clients can verify inclusion without downloading everything.
 
@@ -73,8 +71,6 @@ The **merkle root** commits to all transactions so light clients can verify incl
     PoW[Nonce / PoW] --> Hdr
     Hdr --> Next[Next block links here]" />
 
-## Confirmations
-
 When your transaction appears in a block, it has **1 confirmation**. Each block buried on top adds another. Deeper confirmations make reorgs that undo your payment less likely.
 
 ```typescript
@@ -82,19 +78,32 @@ const confirmations = tipHeight - txBlockHeight + 1;
 ```
 
 <Callout type="info" title="0-conf is a business risk">
-  Accepting unconfirmed transactions can be fine for tiny amounts with controls, but it is not consensus finality. Design product risk limits deliberately.
+  Accepting unconfirmed transactions can be fine for tiny amounts with controls, but it is not consensus finality.
 </Callout>
 
-## Reorgs
+Sometimes two miners find blocks near the same time. Nodes follow the heaviest valid chain. A short **reorganization** can drop a block you briefly saw — wallets should handle disappearing transactions gracefully.
 
-Sometimes two miners find blocks near the same time. Nodes follow the heaviest valid chain. A short **reorganization** can drop a block you briefly saw. Wallets should handle disappearing transactions gracefully.
+**Done when:** You can point to prev-hash and merkle root in the Mermaid flow and define confirmations in one sentence.
 
-## Common mistakes
+## Step 3 — Try it: reorg policy + header (lab)
+
+Use the Decoding Bitcoin reorg calculator with an assumed attacker share. Then on regtest:
+
+```bash
+TIP=$(bitcoin-cli -regtest getbestblockhash)
+bitcoin-cli -regtest getblockheader "$TIP"
+```
+
+Explain how `previousblockhash` links the tip to history. Write one confirmation policy you would ship for a mid-size merchant payment, tied to the calculator.
+
+### Common mistakes
 
 - Treating “seen in mempool” as settled
 - Ignoring that explorers can disagree briefly during races
-- Forgetting coinbase maturity rules when spending mining rewards on regtest
+- Forgetting coinbase maturity when spending mining rewards on regtest
 
-## Next steps
+**Done when:** Lab evidence (calculator notes + getblockheader + confirmation policy sentence) is complete.
 
-Dive into transaction structure, the bytes wallets actually sign and broadcast.
+### Next lesson
+
+**Transactions** — the bytes wallets actually sign and broadcast.
