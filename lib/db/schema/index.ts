@@ -5,4 +5,5 @@ export * from "./github";
 export * from "./goals";
 export * from "./relations";
 export * from "./roadmaps";
+export * from "./support";
 export * from "./users";
