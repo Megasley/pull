@@ -36,7 +36,7 @@ const DEFAULT_GOALS: Array<{
     targetCount: 1,
   },
   {
-    title: "Browse Discover for a contribution",
+    title: "Browse Open Source Projects for a contribution",
     targetType: "custom",
     targetCount: 1,
   },

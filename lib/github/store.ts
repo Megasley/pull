@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, lte, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray, lte, sql } from "drizzle-orm";
 
 import { getDb } from "@/lib/db";
 import { isDatabaseConfigured } from "@/lib/db/env";
@@ -593,6 +593,52 @@ export async function countGithubSyncedEntities(userId: string) {
     issues: Number(issues[0]?.value ?? 0),
     commits: Number(commits[0]?.value ?? 0),
   };
+}
+
+/** Total merged PRs synced for a user (not capped by list limits). */
+export async function countMergedGithubPullRequests(
+  userId: string,
+): Promise<number> {
+  if (!isDatabaseConfigured()) return 0;
+  const db = getDb();
+  const [row] = await db
+    .select({ value: count() })
+    .from(githubPullRequests)
+    .where(
+      and(
+        eq(githubPullRequests.userId, userId),
+        eq(githubPullRequests.merged, true),
+      ),
+    );
+  return Number(row?.value ?? 0);
+}
+
+/** Batch merged-PR counts for directory cards (same source as profile stats). */
+export async function countMergedGithubPullRequestsByUserIds(
+  userIds: string[],
+): Promise<Map<string, number>> {
+  const counts = new Map<string, number>();
+  if (!isDatabaseConfigured() || userIds.length === 0) return counts;
+
+  const db = getDb();
+  const rows = await db
+    .select({
+      userId: githubPullRequests.userId,
+      value: count(),
+    })
+    .from(githubPullRequests)
+    .where(
+      and(
+        inArray(githubPullRequests.userId, userIds),
+        eq(githubPullRequests.merged, true),
+      ),
+    )
+    .groupBy(githubPullRequests.userId);
+
+  for (const row of rows) {
+    counts.set(row.userId, Number(row.value ?? 0));
+  }
+  return counts;
 }
 
 export async function listConnectionsDueForSync(limit = 20) {

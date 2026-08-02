@@ -1,4 +1,8 @@
 import { parseSkillsInput } from "@/lib/profile/portfolio";
+import {
+  normalizeLookingFor,
+  type LookingForId,
+} from "@/lib/builders/looking-for";
 
 function isHttpUrl(value: string): boolean {
   try {
@@ -15,6 +19,11 @@ export function normalizeOptionalHttpUrl(value: string | undefined | null) {
   return trimmed.replace(/\/$/, "");
 }
 
+function parseCheckbox(value: FormDataEntryValue | null | undefined): boolean {
+  if (typeof value !== "string") return false;
+  return value === "on" || value === "true" || value === "1";
+}
+
 export type ProfileEditValidation =
   | {
       ok: true;
@@ -25,6 +34,9 @@ export type ProfileEditValidation =
         twitterUrl: string | null;
         linkedinUrl: string | null;
         skills: string[];
+        lookingFor: LookingForId[];
+        profilePublic: boolean;
+        listedInDirectory: boolean;
       };
     }
   | { ok: false; error: string };
@@ -36,6 +48,9 @@ export function validateProfileEditInput(input: {
   twitterUrl?: string;
   linkedinUrl?: string;
   skills?: string;
+  lookingFor?: string[] | string;
+  profilePublic?: FormDataEntryValue | null;
+  listedInDirectory?: FormDataEntryValue | null;
 }): ProfileEditValidation {
   const displayName = input.displayName?.trim() ?? "";
   const bio = input.bio?.trim() ?? "";
@@ -43,6 +58,17 @@ export function validateProfileEditInput(input: {
   const twitterUrl = normalizeOptionalHttpUrl(input.twitterUrl);
   const linkedinUrl = normalizeOptionalHttpUrl(input.linkedinUrl);
   const skills = parseSkillsInput(input.skills);
+  const lookingFor = normalizeLookingFor(
+    Array.isArray(input.lookingFor)
+      ? input.lookingFor
+      : typeof input.lookingFor === "string"
+        ? input.lookingFor.split(",")
+        : [],
+  );
+  const profilePublic = parseCheckbox(input.profilePublic);
+  const listedInDirectory = profilePublic
+    ? parseCheckbox(input.listedInDirectory)
+    : false;
 
   if (displayName.length < 2 || displayName.length > 80) {
     return { ok: false, error: "Display name must be between 2 and 80 characters." };
@@ -64,6 +90,16 @@ export function validateProfileEditInput(input: {
 
   return {
     ok: true,
-    data: { displayName, bio, website, twitterUrl, linkedinUrl, skills },
+    data: {
+      displayName,
+      bio,
+      website,
+      twitterUrl,
+      linkedinUrl,
+      skills,
+      lookingFor,
+      profilePublic,
+      listedInDirectory,
+    },
   };
 }

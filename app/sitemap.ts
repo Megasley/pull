@@ -19,6 +19,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/terms",
     "/credits",
     "/support",
+    "/builders",
   ].map((path) => ({
     url: `${base}${path}`,
     lastModified,

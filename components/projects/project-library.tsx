@@ -150,7 +150,7 @@ export function ProjectLibrary({
 
       {paginated.items.length === 0 ? (
         <EmptyState
-          title="No projects found"
+          title="No build projects found"
           description="Try a different search term or clear filters to see the full library."
           actionLabel="Clear filters"
           onAction={() => {

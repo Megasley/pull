@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { Logo } from "@/components/brand/logo";
 import { SiteContainer } from "@/components/layout/site-container";
+import { getCurrentSessionContext } from "@/lib/auth/session";
 import {
   footerNav,
   isExternalHref,
@@ -31,7 +32,24 @@ function SocialIcon({ name }: { name: SocialIconName }) {
   );
 }
 
-export function Footer({ className }: FooterProps) {
+const SIGNED_IN_ACCOUNT_TITLES = new Set(["Dashboard", "Settings"]);
+const SIGNED_OUT_ACCOUNT_TITLES = new Set(["Sign in"]);
+
+export async function Footer({ className }: FooterProps) {
+  const { user } = await getCurrentSessionContext();
+  const isAuthenticated = Boolean(user);
+
+  const nav = footerNav.map((group) => {
+    if (group.title !== "Account") return group;
+    const allowed = isAuthenticated
+      ? SIGNED_IN_ACCOUNT_TITLES
+      : SIGNED_OUT_ACCOUNT_TITLES;
+    return {
+      ...group,
+      links: group.links.filter((link) => allowed.has(link.title)),
+    };
+  });
+
   return (
     <footer className={cn("relative border-t border-border bg-background", className)}>
       <SiteContainer className="flex flex-col gap-10 py-12">
@@ -39,7 +57,7 @@ export function Footer({ className }: FooterProps) {
           <div className="space-y-4">
             <Logo />
             <p className="max-w-sm whitespace-pre-line font-mono text-xs leading-relaxed text-muted-foreground">
-              {"Become an Open Source Builder.\n\nLearn. Build. Contribute. Prove."}
+              {"Become an Open Source Builder.\n\nLearn. Build. Contribute. Builders."}
             </p>
             <p className="max-w-sm font-mono text-xs leading-relaxed text-muted-foreground">
               Feedback welcome —{" "}
@@ -72,8 +90,8 @@ export function Footer({ className }: FooterProps) {
             ) : null}
           </div>
 
-          <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
-            {footerNav.map((group) => (
+          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:grid-cols-6">
+            {nav.map((group) => (
               <div key={group.title} className="space-y-3">
                 <p className="tech-eyebrow">{group.title}</p>
                 <nav

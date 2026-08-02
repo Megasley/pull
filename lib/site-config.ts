@@ -51,13 +51,21 @@ export type PrimaryNavItem =
 
 /** Desktop + mobile primary navigation (public product surfaces). */
 export const primaryNav = [
-  { type: "link", title: "Roadmaps", href: "/roadmaps" },
-  { type: "link", title: "Projects", href: "/projects" },
+  {
+    type: "group",
+    title: "Learn",
+    items: [{ title: "Roadmaps", href: "/roadmaps" }],
+  },
+  {
+    type: "group",
+    title: "Build",
+    items: [{ title: "Projects", href: "/projects" }],
+  },
   {
     type: "group",
     title: "Contribute",
     items: [
-      { title: "Discover", href: "/discover" },
+      { title: "Open Source Projects", href: "/discover" },
       { title: "Issues", href: "/issues" },
       {
         title: "Open Source Guide",
@@ -66,6 +74,7 @@ export const primaryNav = [
       },
     ],
   },
+  { type: "link", title: "Builders", href: "/builders" },
 ] as const satisfies readonly PrimaryNavItem[];
 
 export type AccountNavSection = {
@@ -100,18 +109,25 @@ export const footerNav = [
     title: "Learn",
     links: [
       { title: "Roadmaps", href: "/roadmaps" },
-      { title: "Projects", href: "/projects" },
       { title: "Start Building", href: "/roadmaps" },
     ],
   },
   {
+    title: "Build",
+    links: [{ title: "Projects", href: "/projects" }],
+  },
+  {
     title: "Contribute",
     links: [
-      { title: "Discover", href: "/discover" },
+      { title: "Open Source Projects", href: "/discover" },
       { title: "Issues", href: "/issues" },
       { title: "Support", href: "/support" },
       { title: "Feedback", href: siteConfig.feedbackUrl },
     ],
+  },
+  {
+    title: "Builders",
+    links: [{ title: "Directory", href: "/builders" }],
   },
   {
     title: "Account",

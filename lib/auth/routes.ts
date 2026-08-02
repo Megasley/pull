@@ -6,8 +6,6 @@ export const protectedRoutes = [
   "/settings",
   "/repositories",
   "/activity",
-  "/discover",
-  "/issues",
   "/portfolio",
   "/reputation",
   "/projects/*/submit",
@@ -52,14 +50,6 @@ export function isProtectedRoute(pathname: string): boolean {
     return true;
   }
 
-  if (pathname === "/discover" || pathname.startsWith("/discover/")) {
-    return true;
-  }
-
-  if (pathname === "/issues" || pathname.startsWith("/issues/")) {
-    return true;
-  }
-
   if (pathname === "/portfolio" || pathname.startsWith("/portfolio/")) {
     return true;
   }
@@ -68,7 +58,8 @@ export function isProtectedRoute(pathname: string): boolean {
     return true;
   }
 
-  // Roadmaps + lessons are public to read; progress actions require auth in-app.
+  // Roadmaps + lessons + discover/issues are public to browse;
+  // progress actions and personalization require auth in-app.
   return /^\/projects\/[^/]+\/submit\/?$/.test(pathname);
 }
 

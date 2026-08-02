@@ -25,11 +25,20 @@ type MobileNavProps = {
   profile?: BuilderProfile | null;
 };
 
-type SectionTone = "learn" | "contribute" | "workspace" | "profile" | "account";
+type SectionTone =
+  | "learn"
+  | "build"
+  | "contribute"
+  | "builders"
+  | "workspace"
+  | "profile"
+  | "account";
 
 const sectionToneClass: Record<SectionTone, string> = {
   learn: "border-l-signal bg-signal/15",
+  build: "border-l-ink/50 bg-muted/30",
   contribute: "border-l-ink/40 bg-ink/[0.04]",
+  builders: "border-l-signal bg-signal/10",
   workspace: "border-l-ink bg-muted/50",
   profile: "border-l-ink/50 bg-card",
   account: "border-l-signal bg-signal/10",
@@ -37,7 +46,9 @@ const sectionToneClass: Record<SectionTone, string> = {
 
 const sectionLabelClass: Record<SectionTone, string> = {
   learn: "text-ink",
+  build: "text-foreground",
   contribute: "text-foreground",
+  builders: "text-ink",
   workspace: "text-foreground",
   profile: "text-foreground",
   account: "text-ink",
@@ -169,10 +180,14 @@ export function MobileNav({
     .slice(0, 2)
     .toUpperCase();
 
-  const learnLinks = primaryNav.filter((item) => item.type === "link");
-  const contributeLinks = primaryNav
-    .filter((item) => item.type === "group")
-    .flatMap((item) => item.items);
+  function toneForNavGroup(title: string): SectionTone {
+    const key = title.toLowerCase();
+    if (key === "learn") return "learn";
+    if (key === "build") return "build";
+    if (key === "contribute") return "contribute";
+    if (key === "builders") return "builders";
+    return "contribute";
+  }
 
   return (
     <div className="md:hidden">
@@ -240,43 +255,58 @@ export function MobileNav({
             </div>
           ) : null}
 
-          <NavSection title="Learn" tone="learn">
-            {learnLinks.map((item) => (
-              <MobileLink
-                key={item.href}
-                href={item.href}
-                pathname={pathname}
-                onClick={close}
-              >
-                {item.title}
-              </MobileLink>
-            ))}
-          </NavSection>
+          {primaryNav.map((item) => {
+            if (item.type === "link") {
+              return (
+                <NavSection
+                  key={item.href}
+                  title={item.title}
+                  tone={toneForNavGroup(item.title)}
+                >
+                  <MobileLink
+                    href={item.href}
+                    pathname={pathname}
+                    onClick={close}
+                  >
+                    {item.title}
+                  </MobileLink>
+                </NavSection>
+              );
+            }
 
-          <NavSection title="Contribute" tone="contribute">
-            {contributeLinks.map((item) => (
-              <MobileLink
-                key={item.href}
-                href={item.href}
-                pathname={pathname}
-                onClick={close}
-                external={
-                  isExternalHref(item.href) ||
-                  ("external" in item && Boolean(item.external))
-                }
+            return (
+              <NavSection
+                key={item.title}
+                title={item.title}
+                tone={toneForNavGroup(item.title)}
               >
-                {item.title}
-              </MobileLink>
-            ))}
-            <MobileLink
-              href={siteConfig.feedbackUrl}
-              pathname={pathname}
-              onClick={close}
-              external
-            >
-              Feedback
-            </MobileLink>
-          </NavSection>
+                {item.items.map((child) => (
+                  <MobileLink
+                    key={child.href}
+                    href={child.href}
+                    pathname={pathname}
+                    onClick={close}
+                    external={
+                      isExternalHref(child.href) ||
+                      ("external" in child && Boolean(child.external))
+                    }
+                  >
+                    {child.title}
+                  </MobileLink>
+                ))}
+                {item.title === "Contribute" ? (
+                  <MobileLink
+                    href={siteConfig.feedbackUrl}
+                    pathname={pathname}
+                    onClick={close}
+                    external
+                  >
+                    Feedback
+                  </MobileLink>
+                ) : null}
+              </NavSection>
+            );
+          })}
 
           {isAuthenticated ? (
             <>
@@ -295,14 +325,14 @@ export function MobileNav({
                         Builder portfolio
                       </MobileLink>
                     ) : null}
-                    {section.items.map((item) => (
+                    {section.items.map((navItem) => (
                       <MobileLink
-                        key={item.href}
-                        href={item.href}
+                        key={navItem.href}
+                        href={navItem.href}
                         pathname={pathname}
                         onClick={close}
                       >
-                        {item.title}
+                        {navItem.title}
                       </MobileLink>
                     ))}
                     {section.title === "Workspace" ? (

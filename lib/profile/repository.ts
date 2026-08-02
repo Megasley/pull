@@ -19,6 +19,12 @@ function mapDrizzleUser(row: typeof users.$inferSelect): BuilderProfile {
     twitter_url: row.twitterUrl,
     linkedin_url: row.linkedinUrl,
     skills: Array.isArray(row.skills) ? row.skills : [],
+    looking_for: Array.isArray(row.lookingFor) ? row.lookingFor : [],
+    profile_public: row.profilePublic,
+    listed_in_directory: row.listedInDirectory,
+    builder_score: row.builderScore,
+    oss_reputation: row.ossReputation,
+    scores_updated_at: row.scoresUpdatedAt,
     email_notifications: row.emailNotifications,
     role: row.role,
     account_status: row.accountStatus,
@@ -105,11 +111,17 @@ export async function updateBuilderProfileFields(
     twitterUrl: string | null;
     linkedinUrl: string | null;
     skills: string[];
+    lookingFor: string[];
+    profilePublic: boolean;
+    listedInDirectory: boolean;
   },
 ): Promise<BuilderProfile | null> {
   if (!isDatabaseConfigured()) {
     return null;
   }
+
+  const profilePublic = input.profilePublic;
+  const listedInDirectory = profilePublic ? input.listedInDirectory : false;
 
   const db = getDb();
   const [updated] = await db
@@ -121,6 +133,9 @@ export async function updateBuilderProfileFields(
       twitterUrl: input.twitterUrl,
       linkedinUrl: input.linkedinUrl,
       skills: input.skills,
+      lookingFor: input.lookingFor,
+      profilePublic,
+      listedInDirectory,
       updatedAt: new Date().toISOString(),
     })
     .where(eq(users.id, userId))

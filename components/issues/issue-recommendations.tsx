@@ -315,7 +315,7 @@ export function IssueRecommendations({ context }: IssueRecommendationsProps) {
       <p className="text-center text-sm text-muted-foreground">
         Looking for repositories first?{" "}
         <Link href="/discover" className="underline underline-offset-4">
-          Open Contribution Discovery
+          Open Source Projects
         </Link>
       </p>
     </div>

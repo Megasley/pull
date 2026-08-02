@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { updatePublicProfileAction } from "@/app/actions/profile";
 import { Button } from "@/components/ui/button";
+import { LOOKING_FOR_OPTIONS } from "@/lib/builders/looking-for";
 import { formatSkillsForInput } from "@/lib/profile/portfolio";
 import type { BuilderProfile } from "@/types/user";
 
@@ -92,6 +93,73 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
           Comma-separated. Shown on your public Builder Portfolio (up to 24).
         </p>
       </div>
+
+      <fieldset className="space-y-3">
+        <legend className="text-sm font-medium">Looking For</legend>
+        <p className="text-xs text-muted-foreground">
+          Optional. Shown on your profile and in the Builders Directory so
+          maintainers know how to engage you.
+        </p>
+        <div className="grid gap-2 sm:grid-cols-2">
+          {LOOKING_FOR_OPTIONS.map((option) => (
+            <label
+              key={option.id}
+              className="flex cursor-pointer items-start gap-2.5 border border-border px-3 py-2.5 text-sm transition-colors hover:bg-muted/20"
+            >
+              <input
+                type="checkbox"
+                name="lookingFor"
+                value={option.id}
+                defaultChecked={profile.lookingFor.includes(option.id)}
+                disabled={pending}
+                className="mt-0.5 accent-[var(--ink)]"
+              />
+              <span>{option.label}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <fieldset className="space-y-3 border border-border p-4">
+        <legend className="px-1 text-sm font-medium">Visibility</legend>
+        <p className="text-xs text-muted-foreground">
+          Control who can view your portfolio and whether you appear in the
+          public Builders Directory.
+        </p>
+        <label className="flex cursor-pointer items-start gap-2.5 text-sm">
+          <input
+            type="checkbox"
+            name="profilePublic"
+            value="on"
+            defaultChecked={profile.profilePublic}
+            disabled={pending}
+            className="mt-0.5 accent-[var(--ink)]"
+          />
+          <span>
+            <span className="font-medium">Public profile</span>
+            <span className="mt-0.5 block text-xs text-muted-foreground">
+              Anyone can open <span className="font-mono">/u/{profile.username}</span>
+            </span>
+          </span>
+        </label>
+        <label className="flex cursor-pointer items-start gap-2.5 text-sm">
+          <input
+            type="checkbox"
+            name="listedInDirectory"
+            value="on"
+            defaultChecked={profile.listedInDirectory && profile.profilePublic}
+            disabled={pending}
+            className="mt-0.5 accent-[var(--ink)]"
+          />
+          <span>
+            <span className="font-medium">List me in Builders Directory</span>
+            <span className="mt-0.5 block text-xs text-muted-foreground">
+              Appear on <span className="font-mono">/builders</span> and the
+              homepage. Requires a public profile.
+            </span>
+          </span>
+        </label>
+      </fieldset>
 
       <div>
         <label htmlFor="website" className="text-sm font-medium">

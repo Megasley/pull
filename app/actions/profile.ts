@@ -21,6 +21,9 @@ export async function updatePublicProfileAction(formData: FormData) {
     twitterUrl: String(formData.get("twitterUrl") ?? ""),
     linkedinUrl: String(formData.get("linkedinUrl") ?? ""),
     skills: String(formData.get("skills") ?? ""),
+    lookingFor: formData.getAll("lookingFor").map(String),
+    profilePublic: formData.get("profilePublic"),
+    listedInDirectory: formData.get("listedInDirectory"),
   });
 
   if (!validation.ok) {
@@ -40,6 +43,8 @@ export async function updatePublicProfileAction(formData: FormData) {
   revalidatePath(`/u/${updated.username}`);
   revalidatePath("/settings/profile");
   revalidatePath("/dashboard");
+  revalidatePath("/builders");
+  revalidatePath("/");
 
   return { ok: true as const, profile: updated };
 }

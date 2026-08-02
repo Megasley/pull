@@ -7,7 +7,7 @@ import { getAllProjects } from "@/lib/projects/catalog";
 import { listUserSubmissionStatusByProjectSlug } from "@/lib/submissions/repository";
 
 export const metadata = {
-  title: "Projects",
+  title: "Build Projects",
   description:
     "Hands-on Bitcoin and Lightning builds from beginner labs to advanced protocol tooling.",
 };
@@ -27,9 +27,9 @@ export default async function ProjectsPage() {
   return (
     <SiteContainer className="pt-12 pb-16">
       <PageHeader
-        eyebrow="catalog // projects"
-        title="Project library"
-        description="Concrete builds with clear ship criteria - not generic todos. Filter by track and difficulty, then open a project for architecture, requirements, and submission notes."
+        eyebrow="build // projects"
+        title="Build Projects"
+        description="Guided projects builders complete while progressing through roadmaps — concrete builds with clear ship criteria, not generic todos. Filter by track and difficulty, then open a project for architecture, requirements, and submission notes."
         meta={`entries // ${projects.length} · beginner ${beginner} · intermediate ${intermediate} · advanced ${advanced}`}
       />
 
