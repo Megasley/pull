@@ -13,7 +13,7 @@ export default function RoadmapsPage() {
     <div>
       <SiteContainer className="pt-12">
         <PageHeader
-          eyebrow="catalog // roadmaps"
+          eyebrow="learn // roadmaps"
           title="Roadmaps"
           description="Structured paths from fundamentals to open source contribution. Start with Bitcoin, then unlock Lightning and upcoming tracks."
           meta="status // 2 live · more incoming"

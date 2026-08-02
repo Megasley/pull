@@ -197,7 +197,7 @@ export function HeroSection() {
             asChild
             className="h-12 w-full border-ink/30 bg-transparent px-6 text-ink hover:bg-ink/5 hover:text-ink sm:w-auto"
           >
-            <Link href="#loop">man ./loop</Link>
+            <Link href="#loop">./how-it-works</Link>
           </Button>
         </div>
       </SiteContainer>

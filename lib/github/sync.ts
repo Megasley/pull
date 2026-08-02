@@ -175,6 +175,9 @@ export async function syncGithubForUser(
       nextSyncAt: nextSyncIso(),
     });
 
+    const { refreshUserScoreSnapshots } = await import("@/lib/builders/snapshots");
+    await refreshUserScoreSnapshots(userId);
+
     return {
       ok: true,
       summary: {

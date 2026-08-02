@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 const WEEKLY_GOAL_PRESETS = [
   "Complete 1 lesson",
   "Open 1 pull request",
-  "Browse Discover for a contribution",
+  "Browse Open Source Projects for a contribution",
 ] as const;
 
 type OnboardingWizardProps = {

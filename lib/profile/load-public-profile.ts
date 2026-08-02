@@ -21,6 +21,7 @@ import { buildLevelInfo } from "@/lib/xp/levels";
 import { loadBuilderScore } from "@/lib/score";
 import { loadOpenSourceReputation } from "@/lib/reputation";
 import {
+  countMergedGithubPullRequests,
   listGithubCommits,
   listGithubIssues,
   listGithubPullRequests,
@@ -90,6 +91,7 @@ async function loadPublicBuilderProfileData(
     return null;
   }
 
+  // Visibility is enforced in loadPublicBuilderProfile with viewer context.
   const progressByRoadmap = await getAllCompletedNodeSlugs(profile.id);
   const [
     achievements,
@@ -100,6 +102,7 @@ async function loadPublicBuilderProfileData(
     pullRequests,
     commits,
     issues,
+    mergedPullRequestCount,
   ] = await Promise.all([
     listUserAchievements(profile.id, progressByRoadmap),
     getApprovedSubmissionCount(profile.id),
@@ -109,12 +112,19 @@ async function loadPublicBuilderProfileData(
     listGithubPullRequests(profile.id, 80),
     listGithubCommits(profile.id, 100),
     listGithubIssues(profile.id, 100),
+    countMergedGithubPullRequests(profile.id),
   ]);
 
   const [reputation, timelineData] = await Promise.all([
     loadOpenSourceReputation(profile.id),
     loadContributionTimeline(profile.id, { pullRequests, commits, issues }),
   ]);
+
+  const { persistScoreSnapshotsAsync } = await import("@/lib/builders/snapshots");
+  persistScoreSnapshotsAsync(profile.id, {
+    builderScore: builderScore.score,
+    ossReputation: reputation.score,
+  });
 
   const roadmaps = buildAllRoadmapProgressSummaries(progressByRoadmap);
   const portfolioItems = pullRequests.map(toPortfolioItem);
@@ -148,7 +158,7 @@ async function loadPublicBuilderProfileData(
       projectsCompleted,
       projectsApproved: approvedCount,
       achievementsUnlocked: achievements.filter((item) => item.earned).length,
-      mergedPullRequests: mergedPrs.length,
+      mergedPullRequests: mergedPullRequestCount,
       repositories: repositories.length,
       uniqueContributionRepos: uniqueRepos.size,
       languagesUsed: technologies.length,
@@ -177,8 +187,13 @@ export async function loadPublicBuilderProfile(
     return null;
   }
 
+  const isOwner = Boolean(viewerUserId && viewerUserId === data.profile.id);
+  if (!data.profile.profilePublic && !isOwner) {
+    return null;
+  }
+
   return {
     ...data,
-    isOwner: Boolean(viewerUserId && viewerUserId === data.profile.id),
+    isOwner,
   };
 }

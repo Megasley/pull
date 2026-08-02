@@ -80,7 +80,7 @@ export async function ProjectDetails({ project }: ProjectDetailsProps) {
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_240px]">
           <div className="min-w-0">
             <p className="tech-eyebrow">
-              project // {project.categories.join(" · ")}
+              build // {project.categories.join(" · ")}
             </p>
             <h1 className="mt-3 text-[clamp(2rem,5vw,3.5rem)] leading-[1.08] font-bold tracking-[-0.04em]">
               {project.title}

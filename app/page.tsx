@@ -1,5 +1,8 @@
+import { Suspense } from "react";
+
 import { AudienceSection } from "@/components/landing/audience-section";
 import { BuilderLoopSection } from "@/components/landing/builder-loop-section";
+import { DiscoverBuildersSection } from "@/components/landing/discover-builders-section";
 import { FeaturedRoadmapsSection } from "@/components/landing/featured-roadmaps-section";
 import { FinalCtaSection } from "@/components/landing/final-cta-section";
 import { HeroSection } from "@/components/landing/hero-section";
@@ -19,6 +22,9 @@ export default function Home() {
       <HeroSection />
       <BuilderLoopSection />
       <FeaturedRoadmapsSection />
+      <Suspense fallback={null}>
+        <DiscoverBuildersSection />
+      </Suspense>
       <AudienceSection />
       <ProofSection />
       <FinalCtaSection />

@@ -8,6 +8,13 @@ import {
 } from "./catalog";
 import type { DiscoveryProfileContext } from "@/types/discovery";
 
+/** Public / unsigned browsing — curated catalog without personalization signals. */
+export const GUEST_DISCOVERY_CONTEXT: DiscoveryProfileContext = {
+  completedRoadmapSlugs: [],
+  languages: [],
+  level: 1,
+};
+
 export async function loadDiscoveryProfileContext(
   userId: string,
 ): Promise<DiscoveryProfileContext> {
@@ -37,8 +44,10 @@ export async function loadDiscoveryProfileContext(
   };
 }
 
-export async function loadDiscoveryPageData(userId: string) {
-  const context = await loadDiscoveryProfileContext(userId);
+export async function loadDiscoveryPageData(userId?: string | null) {
+  const context = userId
+    ? await loadDiscoveryProfileContext(userId)
+    : GUEST_DISCOVERY_CONTEXT;
   const repositories = getAllDiscoveryRepositories();
   const recommendations = recommendDiscoveryRepositories(context, 4);
 
@@ -46,6 +55,7 @@ export async function loadDiscoveryPageData(userId: string) {
     context,
     repositories,
     recommendations,
+    personalized: Boolean(userId),
   };
 }
 

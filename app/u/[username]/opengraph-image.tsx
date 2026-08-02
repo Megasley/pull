@@ -16,16 +16,40 @@ type OgProps = {
 export default async function OpenGraphImage({ params }: OgProps) {
   const { username } = await params;
   const profile = await getUserByUsername(username);
-  const level = buildLevelInfo(profile?.xp ?? 0, profile?.level);
-  const builderScore = profile ? await loadBuilderScore(profile.id) : null;
-  const reputation = profile ? await loadOpenSourceReputation(profile.id) : null;
-  const pullRequests = profile ? await listGithubPullRequests(profile.id, 100) : [];
+
+  if (!profile || profile.accountStatus !== "active" || !profile.profilePublic) {
+    return new ImageResponse(
+      (
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "#c8f231",
+            color: "#231e1e",
+            fontSize: 48,
+            fontWeight: 700,
+          }}
+        >
+          Pull Builder
+        </div>
+      ),
+      { ...size },
+    );
+  }
+
+  const level = buildLevelInfo(profile.xp, profile.level);
+  const builderScore = await loadBuilderScore(profile.id);
+  const reputation = await loadOpenSourceReputation(profile.id);
+  const pullRequests = await listGithubPullRequests(profile.id, 100);
   const mergedCount = pullRequests.filter((pr) => pr.merged).length;
 
-  const displayName = profile?.displayName ?? username;
-  const handle = `@${profile?.username ?? username}`;
-  const bio = profile?.bio?.trim() || "Open source builder on Pull.";
-  const skills = (profile?.skills ?? []).slice(0, 4).join(" · ");
+  const displayName = profile.displayName;
+  const handle = `@${profile.username}`;
+  const bio = profile.bio.trim() || "Open source builder on Pull.";
+  const skills = profile.skills.slice(0, 4).join(" · ");
 
   return new ImageResponse(
     (
@@ -52,7 +76,7 @@ export default async function OpenGraphImage({ params }: OgProps) {
           }}
         >
           <span style={{ fontWeight: 700, letterSpacing: "-0.04em" }}>Pull</span>
-          <span style={{ fontSize: 22 }}>pullos.dev/u/{profile?.username ?? username}</span>
+          <span style={{ fontSize: 22 }}>pullos.dev/u/{profile.username}</span>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
           <div
@@ -88,10 +112,8 @@ export default async function OpenGraphImage({ params }: OgProps) {
           ) : null}
         </div>
         <div style={{ display: "flex", gap: 28, fontSize: 24, opacity: 0.85 }}>
-          {builderScore ? (
-            <span>Score {builderScore.score}</span>
-          ) : null}
-          {reputation ? <span>Reputation {reputation.score}</span> : null}
+          <span>Score {builderScore.score}</span>
+          <span>Reputation {reputation.score}</span>
           <span>Level {level.level}</span>
           {mergedCount > 0 ? <span>{mergedCount} merged PRs</span> : null}
         </div>

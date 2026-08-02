@@ -7,6 +7,10 @@ import {
   normalizeAccountStatus,
   type UserAccountStatus,
 } from "@/lib/auth/account-status";
+import {
+  normalizeLookingFor,
+  type LookingForId,
+} from "@/lib/builders/looking-for";
 
 export type BuilderProfile = {
   id: string;
@@ -20,6 +24,12 @@ export type BuilderProfile = {
   twitterUrl: string | null;
   linkedinUrl: string | null;
   skills: string[];
+  lookingFor: LookingForId[];
+  profilePublic: boolean;
+  listedInDirectory: boolean;
+  builderScore: number;
+  ossReputation: number;
+  scoresUpdatedAt: string | null;
   emailNotifications: EmailNotificationPrefs;
   role: "builder" | "reviewer" | "admin";
   accountStatus: UserAccountStatus;
@@ -52,6 +62,12 @@ export function toPublicBuilderProfile(
     twitterUrl: profile.twitterUrl,
     linkedinUrl: profile.linkedinUrl,
     skills: profile.skills,
+    lookingFor: profile.lookingFor,
+    profilePublic: profile.profilePublic,
+    listedInDirectory: profile.listedInDirectory,
+    builderScore: profile.builderScore,
+    ossReputation: profile.ossReputation,
+    scoresUpdatedAt: profile.scoresUpdatedAt,
     role: profile.role,
     accountStatus: profile.accountStatus,
     onboardingCompletedAt: profile.onboardingCompletedAt,
@@ -75,6 +91,12 @@ export type BuilderProfileRow = {
   twitter_url?: string | null;
   linkedin_url?: string | null;
   skills?: string[] | null;
+  looking_for?: string[] | null;
+  profile_public?: boolean | null;
+  listed_in_directory?: boolean | null;
+  builder_score?: number | null;
+  oss_reputation?: number | null;
+  scores_updated_at?: string | null;
   email_notifications?: EmailNotificationPrefs | null;
   role?: "builder" | "reviewer" | "admin" | null;
   account_status?: UserAccountStatus | null;
@@ -108,6 +130,12 @@ export function mapBuilderProfile(row: BuilderProfileRow): BuilderProfile {
     twitterUrl: row.twitter_url ?? null,
     linkedinUrl: row.linkedin_url ?? null,
     skills: normalizeSkills(row.skills),
+    lookingFor: normalizeLookingFor(row.looking_for),
+    profilePublic: row.profile_public ?? true,
+    listedInDirectory: row.listed_in_directory ?? true,
+    builderScore: row.builder_score ?? 0,
+    ossReputation: row.oss_reputation ?? 0,
+    scoresUpdatedAt: row.scores_updated_at ?? null,
     emailNotifications: normalizeEmailNotificationPrefs(row.email_notifications),
     role: row.role ?? "builder",
     accountStatus: normalizeAccountStatus(row.account_status),

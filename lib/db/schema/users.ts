@@ -1,4 +1,5 @@
 import {
+  boolean,
   index,
   integer,
   jsonb,
@@ -27,6 +28,15 @@ export const users = pgTable(
     twitterUrl: text("twitter_url"),
     linkedinUrl: text("linkedin_url"),
     skills: jsonb("skills").$type<string[]>().notNull().default([]),
+    lookingFor: jsonb("looking_for").$type<string[]>().notNull().default([]),
+    profilePublic: boolean("profile_public").notNull().default(true),
+    listedInDirectory: boolean("listed_in_directory").notNull().default(true),
+    builderScore: integer("builder_score").notNull().default(0),
+    ossReputation: integer("oss_reputation").notNull().default(0),
+    scoresUpdatedAt: timestamp("scores_updated_at", {
+      withTimezone: true,
+      mode: "string",
+    }),
     emailNotifications: jsonb("email_notifications")
       .$type<EmailNotificationPrefs>()
       .notNull()

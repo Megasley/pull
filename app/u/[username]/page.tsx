@@ -11,7 +11,8 @@ type PublicProfilePageProps = {
 
 export async function generateMetadata({ params }: PublicProfilePageProps) {
   const { username } = await params;
-  const data = await loadPublicBuilderProfile(username);
+  const viewer = await getCurrentUser();
+  const data = await loadPublicBuilderProfile(username, viewer?.id);
 
   if (!data) {
     return { title: "Builder not found" };

@@ -18,7 +18,7 @@ const STEPS = [
     cmd: "./build",
     title: "Build real software",
     description:
-      "Build portfolio-ready software, submit proof of work, and get reviewed as you level up.",
+      "Complete Build Projects with clear ship criteria, submit proof of work, and get reviewed.",
     href: "/projects",
     linkLabel: "ls ./projects",
   },
@@ -27,18 +27,18 @@ const STEPS = [
     cmd: "./contribute",
     title: "Contribute to OSS",
     description:
-      "Discover repos and issues matched to your skills, then sync your GitHub activity.",
+      "Find open source projects and issues matched to your skills, then sync your GitHub activity.",
     href: "/discover",
-    linkLabel: "cd ./discover",
+    linkLabel: "cd ./open-source",
   },
   {
     id: "04",
-    cmd: "./prove",
-    title: "Prove it in public",
+    cmd: "./builders",
+    title: "Become a builder",
     description:
-      "Publish a builder portfolio with PRs, reputation, score, and a timeline of real work.",
-    href: "/roadmaps",
-    linkLabel: "./start-building",
+      "Publish a public profile with PRs, reputation, score, and a timeline of real work.",
+    href: "/builders",
+    linkLabel: "ls ./builders",
   },
 ] as const;
 
