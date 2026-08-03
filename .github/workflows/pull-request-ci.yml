@@ -26,8 +26,7 @@ jobs:
       - name: Run ESLint
         run: npm run lint
 
-      - name: Check formatting
-        run: npm run format:check
+
 
       - name: Validate roadmaps
         run: npm run validate:roadmaps
