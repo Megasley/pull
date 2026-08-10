@@ -33,8 +33,8 @@ const STEPS = [
   },
   {
     id: "04",
-    cmd: "./builders",
-    title: "Become a builder",
+    cmd: "./prove",
+    title: "Prove your work",
     description:
       "Publish a public profile with PRs, reputation, score, and a timeline of real work.",
     href: "/builders",

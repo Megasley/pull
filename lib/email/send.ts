@@ -11,6 +11,8 @@ export type SendEmailInput = {
   to: string;
   subject: string;
   react: ReactElement;
+  /** Overrides the default support inbox reply-to when set. */
+  replyTo?: string;
 };
 
 export type SendEmailResult =
@@ -30,7 +32,7 @@ export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult>
   try {
     const { data, error } = await resend.emails.send({
       from: getResendFromAddress(),
-      replyTo: getResendReplyToAddress(),
+      replyTo: input.replyTo?.trim() || getResendReplyToAddress(),
       to: input.to,
       subject: input.subject,
       react: input.react,

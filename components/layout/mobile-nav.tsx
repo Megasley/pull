@@ -54,6 +54,16 @@ function isActivePath(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
+function toneForNavGroup(title: string): SectionTone {
+  const key = title.toLowerCase();
+  if (key === "learn") return "learn";
+  if (key === "build") return "build";
+  if (key === "contribute") return "contribute";
+  if (key === "builders" || key === "prove") return "builders";
+  if (key === "developer tools") return "build";
+  return "contribute";
+}
+
 function NavSection({
   title,
   tone,
@@ -64,7 +74,9 @@ function NavSection({
   children: React.ReactNode;
 }) {
   return (
-    <section className={cn("border border-border border-l-4", sectionToneClass[tone])}>
+    <section
+      className={cn("border border-border border-l-4", sectionToneClass[tone])}
+    >
       <p
         className={cn(
           "border-b border-border/70 px-3 py-2 font-mono text-[10px] font-medium tracking-[0.14em] uppercase",
@@ -168,15 +180,6 @@ export function MobileNav({
     .join("")
     .slice(0, 2)
     .toUpperCase();
-
-  function toneForNavGroup(title: string): SectionTone {
-    const key = title.toLowerCase();
-    if (key === "learn") return "learn";
-    if (key === "build") return "build";
-    if (key === "contribute") return "contribute";
-    if (key === "builders") return "builders";
-    return "contribute";
-  }
 
   return (
     <div className="md:hidden">
@@ -298,7 +301,11 @@ export function MobileNav({
                   section.title === "Workspace" ? "workspace" : "profile";
 
                 return (
-                  <NavSection key={section.title} title={section.title} tone={tone}>
+                  <NavSection
+                    key={section.title}
+                    title={section.title}
+                    tone={tone}
+                  >
                     {section.title === "Profile" && profile ? (
                       <MobileLink
                         href={`/u/${profile.username}`}

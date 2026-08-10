@@ -1,7 +1,9 @@
 import type { MetadataRoute } from "next";
 
 import { getAllLessonSlugs } from "@/lib/content";
+import { listDeveloperToolSlugs } from "@/lib/developer-tools";
 import { availableRoadmaps } from "@/lib/landing-data";
+import { listOrganizationSlugs } from "@/lib/organizations";
 import { getAllProjects } from "@/lib/projects/catalog";
 import { siteConfig } from "@/lib/site-config";
 import { getSiteUrl } from "@/lib/supabase/env";
@@ -20,6 +22,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/credits",
     "/support",
     "/builders",
+    "/organizations",
+    "/developer-tools",
   ].map((path) => ({
     url: `${base}${path}`,
     lastModified,
@@ -27,12 +31,31 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: path === "" ? 1 : 0.7,
   }));
 
-  const roadmapRoutes: MetadataRoute.Sitemap = availableRoadmaps.map((roadmap) => ({
-    url: `${base}/roadmaps/${roadmap.slug}`,
-    lastModified,
-    changeFrequency: "weekly",
-    priority: 0.85,
-  }));
+  const organizationRoutes: MetadataRoute.Sitemap = listOrganizationSlugs().map(
+    (slug) => ({
+      url: `${base}/organizations/${slug}`,
+      lastModified,
+      changeFrequency: "weekly" as const,
+      priority: 0.65,
+    }),
+  );
+
+  const developerToolRoutes: MetadataRoute.Sitemap =
+    listDeveloperToolSlugs().map((slug) => ({
+      url: `${base}/developer-tools/${slug}`,
+      lastModified,
+      changeFrequency: "weekly" as const,
+      priority: 0.65,
+    }));
+
+  const roadmapRoutes: MetadataRoute.Sitemap = availableRoadmaps.map(
+    (roadmap) => ({
+      url: `${base}/roadmaps/${roadmap.slug}`,
+      lastModified,
+      changeFrequency: "weekly",
+      priority: 0.85,
+    }),
+  );
 
   const lessonRoutes: MetadataRoute.Sitemap = getAllLessonSlugs().map(
     ({ roadmap, lesson }) => ({
@@ -43,12 +66,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }),
   );
 
-  const projectRoutes: MetadataRoute.Sitemap = getAllProjects().map((project) => ({
-    url: `${base}/projects/${project.slug}`,
-    lastModified,
-    changeFrequency: "monthly",
-    priority: 0.6,
-  }));
+  const projectRoutes: MetadataRoute.Sitemap = getAllProjects().map(
+    (project) => ({
+      url: `${base}/projects/${project.slug}`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.6,
+    }),
+  );
 
-  return [...staticRoutes, ...roadmapRoutes, ...lessonRoutes, ...projectRoutes];
+  return [
+    ...staticRoutes,
+    ...organizationRoutes,
+    ...developerToolRoutes,
+    ...roadmapRoutes,
+    ...lessonRoutes,
+    ...projectRoutes,
+  ];
 }
