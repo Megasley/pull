@@ -211,6 +211,36 @@ export const attributionGroups = [
   },
 ] as const satisfies readonly AttributionGroup[];
 
+export type CurriculumReviewer = {
+  name: string;
+  /** Public profile URL (GitHub, site, etc.). */
+  href: string;
+  /** Optional short note — what they reviewed. */
+  note?: string;
+};
+
+/**
+ * People who helped review Pull curriculum. Not third-party licenses —
+ * keep this list separate from {@link attributionGroups}.
+ */
+export const curriculumReviewers = [
+  {
+    name: "Camillarhi",
+    href: "https://github.com/Camillarhi",
+    note: "Curriculum review",
+  },
+  {
+    name: "Olaniran",
+    href: "https://github.com/heyolaniran",
+    note: "Curriculum review",
+  },
+  {
+    name: "Mubarak Muhammad Aminu",
+    href: "https://github.com/mubarak23",
+    note: "Curriculum review",
+  },
+] as const satisfies readonly CurriculumReviewer[];
+
 /** Every source in one flat list (docs generation, tests, audits). */
 export function listAttributions(): Attribution[] {
   return attributionGroups.flatMap((group) => [...group.items]);

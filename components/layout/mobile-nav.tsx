@@ -25,35 +25,6 @@ type MobileNavProps = {
   profile?: BuilderProfile | null;
 };
 
-type SectionTone =
-  | "learn"
-  | "build"
-  | "contribute"
-  | "builders"
-  | "workspace"
-  | "profile"
-  | "account";
-
-const sectionToneClass: Record<SectionTone, string> = {
-  learn: "border-l-signal bg-signal/15",
-  build: "border-l-ink/50 bg-muted/30",
-  contribute: "border-l-ink/40 bg-ink/[0.04]",
-  builders: "border-l-signal bg-signal/10",
-  workspace: "border-l-ink bg-muted/50",
-  profile: "border-l-ink/50 bg-card",
-  account: "border-l-signal bg-signal/10",
-};
-
-const sectionLabelClass: Record<SectionTone, string> = {
-  learn: "text-ink",
-  build: "text-foreground",
-  contribute: "text-foreground",
-  builders: "text-ink",
-  workspace: "text-foreground",
-  profile: "text-foreground",
-  account: "text-ink",
-};
-
 function isActivePath(pathname: string, href: string) {
   if (isExternalHref(href)) return false;
   if (href === "/") return pathname === "/";
@@ -62,29 +33,19 @@ function isActivePath(pathname: string, href: string) {
 
 function NavSection({
   title,
-  tone,
   children,
 }: {
   title: string;
-  tone: SectionTone;
   children: React.ReactNode;
 }) {
   return (
-    <section
-      className={cn(
-        "border border-border border-l-4",
-        sectionToneClass[tone],
-      )}
-    >
-      <p
-        className={cn(
-          "border-b border-border/70 px-3 py-2 font-mono text-[10px] font-medium tracking-[0.14em] uppercase",
-          sectionLabelClass[tone],
-        )}
-      >
+    <section className="space-y-1">
+      <p className="px-1 font-mono text-[10px] font-medium tracking-[0.16em] text-muted-foreground uppercase">
         {title}
       </p>
-      <div className="flex flex-col">{children}</div>
+      <div className="flex flex-col border border-border bg-background">
+        {children}
+      </div>
     </section>
   );
 }
@@ -104,10 +65,10 @@ function MobileLink({
 }) {
   const active = isActivePath(pathname, href);
   const className = cn(
-    "block w-full border-b border-border/50 px-3 py-3.5 font-mono text-xs tracking-[0.1em] uppercase transition-colors last:border-b-0",
+    "block w-full border-b border-border px-3.5 py-3.5 text-sm font-medium tracking-tight transition-colors last:border-b-0",
     active
       ? "bg-ink text-[var(--background)]"
-      : "text-foreground/80 hover:bg-background hover:text-foreground",
+      : "text-foreground hover:bg-muted/40",
   );
 
   if (external || isExternalHref(href)) {
@@ -180,15 +141,6 @@ export function MobileNav({
     .slice(0, 2)
     .toUpperCase();
 
-  function toneForNavGroup(title: string): SectionTone {
-    const key = title.toLowerCase();
-    if (key === "learn") return "learn";
-    if (key === "build") return "build";
-    if (key === "contribute") return "contribute";
-    if (key === "builders") return "builders";
-    return "contribute";
-  }
-
   return (
     <div className="md:hidden">
       <Button
@@ -230,7 +182,7 @@ export function MobileNav({
         <SiteContainer
           as="nav"
           aria-label="Mobile navigation"
-          className="flex flex-col gap-4 py-5 pb-10"
+          className="flex flex-col gap-6 py-5 pb-10"
         >
           {isAuthenticated ? (
             <div className="flex items-center gap-3 border border-border bg-card px-3 py-3">
@@ -243,7 +195,7 @@ export function MobileNav({
                 </AvatarFallback>
               </Avatar>
               <div className="min-w-0 flex-1">
-                <p className="truncate font-mono text-xs font-medium tracking-wide uppercase">
+                <p className="truncate text-sm font-semibold tracking-tight">
                   {displayName}
                 </p>
                 {profile ? (
@@ -255,67 +207,58 @@ export function MobileNav({
             </div>
           ) : null}
 
-          {primaryNav.map((item) => {
-            if (item.type === "link") {
+          <div className="flex flex-col gap-5">
+            {primaryNav.map((item) => {
+              if (item.type === "link") {
+                return (
+                  <div key={item.href} className="border border-border">
+                    <MobileLink
+                      href={item.href}
+                      pathname={pathname}
+                      onClick={close}
+                    >
+                      {item.title}
+                    </MobileLink>
+                  </div>
+                );
+              }
+
               return (
-                <NavSection
-                  key={item.href}
-                  title={item.title}
-                  tone={toneForNavGroup(item.title)}
-                >
-                  <MobileLink
-                    href={item.href}
-                    pathname={pathname}
-                    onClick={close}
-                  >
-                    {item.title}
-                  </MobileLink>
+                <NavSection key={item.title} title={item.title}>
+                  {item.items.map((child) => (
+                    <MobileLink
+                      key={child.href}
+                      href={child.href}
+                      pathname={pathname}
+                      onClick={close}
+                      external={
+                        isExternalHref(child.href) ||
+                        ("external" in child && Boolean(child.external))
+                      }
+                    >
+                      {child.title}
+                    </MobileLink>
+                  ))}
+                  {item.title === "Contribute" ? (
+                    <MobileLink
+                      href={siteConfig.feedbackUrl}
+                      pathname={pathname}
+                      onClick={close}
+                      external
+                    >
+                      Feedback
+                    </MobileLink>
+                  ) : null}
                 </NavSection>
               );
-            }
-
-            return (
-              <NavSection
-                key={item.title}
-                title={item.title}
-                tone={toneForNavGroup(item.title)}
-              >
-                {item.items.map((child) => (
-                  <MobileLink
-                    key={child.href}
-                    href={child.href}
-                    pathname={pathname}
-                    onClick={close}
-                    external={
-                      isExternalHref(child.href) ||
-                      ("external" in child && Boolean(child.external))
-                    }
-                  >
-                    {child.title}
-                  </MobileLink>
-                ))}
-                {item.title === "Contribute" ? (
-                  <MobileLink
-                    href={siteConfig.feedbackUrl}
-                    pathname={pathname}
-                    onClick={close}
-                    external
-                  >
-                    Feedback
-                  </MobileLink>
-                ) : null}
-              </NavSection>
-            );
-          })}
+            })}
+          </div>
 
           {isAuthenticated ? (
             <>
-              {accountNavSections.map((section) => {
-                const tone: SectionTone =
-                  section.title === "Workspace" ? "workspace" : "profile";
-
-                return (
-                  <NavSection key={section.title} title={section.title} tone={tone}>
+              <div className="flex flex-col gap-5">
+                {accountNavSections.map((section) => (
+                  <NavSection key={section.title} title={section.title}>
                     {section.title === "Profile" && profile ? (
                       <MobileLink
                         href={`/u/${profile.username}`}
@@ -356,10 +299,10 @@ export function MobileNav({
                       </>
                     ) : null}
                   </NavSection>
-                );
-              })}
+                ))}
+              </div>
 
-              <div className="flex flex-col gap-2 pt-1">
+              <div className="flex flex-col gap-2 border-t border-border pt-4">
                 <Link
                   href="/roadmaps"
                   onClick={close}
@@ -378,18 +321,20 @@ export function MobileNav({
               </div>
             </>
           ) : (
-            <NavSection title="Account" tone="account">
-              <MobileLink href="/sign-in" pathname={pathname} onClick={close}>
-                Sign in
-              </MobileLink>
+            <div className="flex flex-col gap-2 border-t border-border pt-4">
+              <div className="border border-border">
+                <MobileLink href="/sign-in" pathname={pathname} onClick={close}>
+                  Sign in
+                </MobileLink>
+              </div>
               <Link
                 href="/roadmaps"
                 onClick={close}
-                className="block w-full border-t border-border bg-ink px-3 py-3.5 text-center font-mono text-xs font-medium tracking-[0.1em] text-[var(--background)] uppercase transition-colors hover:bg-ink/90"
+                className="block w-full border border-ink bg-ink px-3 py-3.5 text-center font-mono text-xs font-medium tracking-[0.1em] text-[var(--background)] uppercase transition-colors hover:bg-ink/90"
               >
                 ./start-building
               </Link>
-            </NavSection>
+            </div>
           )}
         </SiteContainer>
       </div>

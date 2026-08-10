@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 
 import { getAllLessonSlugs } from "@/lib/content";
+import { listDeveloperToolSlugs } from "@/lib/developer-tools";
 import { availableRoadmaps } from "@/lib/landing-data";
 import { listOrganizationSlugs } from "@/lib/organizations";
 import { getAllProjects } from "@/lib/projects/catalog";
@@ -22,6 +23,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/support",
     "/builders",
     "/organizations",
+    "/developer-tools",
   ].map((path) => ({
     url: `${base}${path}`,
     lastModified,
@@ -37,6 +39,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.65,
     }),
   );
+
+  const developerToolRoutes: MetadataRoute.Sitemap =
+    listDeveloperToolSlugs().map((slug) => ({
+      url: `${base}/developer-tools/${slug}`,
+      lastModified,
+      changeFrequency: "weekly" as const,
+      priority: 0.65,
+    }));
 
   const roadmapRoutes: MetadataRoute.Sitemap = availableRoadmaps.map(
     (roadmap) => ({
@@ -68,6 +78,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     ...staticRoutes,
     ...organizationRoutes,
+    ...developerToolRoutes,
     ...roadmapRoutes,
     ...lessonRoutes,
     ...projectRoutes,

@@ -107,6 +107,20 @@ Companion material linked from study plans.
 
 ---
 
+## Curriculum reviewers
+
+People who helped review Pull curriculum. Add names in
+[`lib/attributions.ts`](../lib/attributions.ts) (`curriculumReviewers`) — this
+section mirrors that list.
+
+| Reviewer | Profile | Note |
+| --- | --- | --- |
+| Camillarhi | [github.com/Camillarhi](https://github.com/Camillarhi) | Curriculum review |
+| Olaniran | [github.com/heyolaniran](https://github.com/heyolaniran) | Curriculum review |
+| Mubarak Muhammad Aminu | [github.com/mubarak23](https://github.com/mubarak23) | Curriculum review |
+
+---
+
 ## Application dependencies
 
 Runtime and build dependencies are declared in [`package.json`](../package.json)

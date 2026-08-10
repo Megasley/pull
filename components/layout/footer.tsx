@@ -57,7 +57,7 @@ export async function Footer({ className }: FooterProps) {
           <div className="space-y-4">
             <Logo />
             <p className="max-w-sm whitespace-pre-line font-mono text-xs leading-relaxed text-muted-foreground">
-              {"Become an Open Source Builder.\n\nLearn. Build. Contribute. Builders."}
+              {"Become an Open Source Builder.\n\nLearn. Build. Contribute. Prove."}
             </p>
             <p className="max-w-sm font-mono text-xs leading-relaxed text-muted-foreground">
               Feedback welcome —{" "}
@@ -90,7 +90,7 @@ export async function Footer({ className }: FooterProps) {
             ) : null}
           </div>
 
-          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:grid-cols-6">
+          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7">
             {nav.map((group) => (
               <div key={group.title} className="space-y-3">
                 <p className="tech-eyebrow">{group.title}</p>

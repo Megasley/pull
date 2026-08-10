@@ -74,7 +74,12 @@ export const primaryNav = [
       },
     ],
   },
-  { type: "link", title: "Builders", href: "/builders" },
+  {
+    type: "group",
+    title: "Prove",
+    items: [{ title: "Builders", href: "/builders" }],
+  },
+  { type: "link", title: "Developer Tools", href: "/developer-tools" },
 ] as const satisfies readonly PrimaryNavItem[];
 
 export type AccountNavSection = {
@@ -126,8 +131,12 @@ export const footerNav = [
     ],
   },
   {
-    title: "Builders",
-    links: [{ title: "Directory", href: "/builders" }],
+    title: "Prove",
+    links: [{ title: "Builders Directory", href: "/builders" }],
+  },
+  {
+    title: "Developer Tools",
+    links: [{ title: "Browse tools", href: "/developer-tools" }],
   },
   {
     title: "Account",

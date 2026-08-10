@@ -74,11 +74,6 @@ export default async function BuildersPage({ searchParams }: BuildersPageProps) 
         eyebrow="builders // directory"
         title="Builders"
         description="Find contributors by name, skills, reputation, and what they’re looking for. Built for maintainers hiring talent — and builders finding their next contribution."
-        meta={
-          result.total === 0
-            ? "results // 0"
-            : `results // ${result.total} · page ${result.page}/${result.totalPages}`
-        }
       />
 
       <div className="mt-10">

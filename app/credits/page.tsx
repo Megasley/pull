@@ -4,6 +4,7 @@ import Link from "next/link";
 import { PageHeader } from "@/components/design-system";
 import {
   attributionGroups,
+  curriculumReviewers,
   PULL_CURRICULUM_LICENSE,
   PULL_SOFTWARE_LICENSE,
   type Attribution,
@@ -12,7 +13,7 @@ import { siteConfig } from "@/lib/site-config";
 
 export const metadata: Metadata = {
   title: "Credits & licensing",
-  description: `Licensing for ${siteConfig.name} and attribution for the third-party books, specifications, and tools its curriculum links to.`,
+  description: `Licensing for ${siteConfig.name}, thanks to curriculum reviewers, and attribution for the third-party books, specifications, and tools its curriculum links to.`,
   alternates: { canonical: "/credits" },
 };
 
@@ -127,6 +128,38 @@ export default function CreditsPage() {
             Diagrams under <code className="font-mono text-xs">public/</code> are
             original to Pull unless the lesson credits another source.
           </li>
+        </ul>
+      </section>
+
+      <section className="mt-12 space-y-4">
+        <h2 className="text-xl font-semibold tracking-tight">
+          Curriculum reviewers
+        </h2>
+        <p className="text-sm leading-7 text-muted-foreground">
+          People who helped review Pull curriculum so builders get clearer,
+          more accurate lessons. Thank you.
+        </p>
+        <ul className="mt-2">
+          {curriculumReviewers.map((reviewer) => (
+            <li
+              key={reviewer.href}
+              className="border-t border-border py-5 first:border-t-0 first:pt-0"
+            >
+              <a
+                href={reviewer.href}
+                target="_blank"
+                rel="noreferrer"
+                className={`text-sm font-semibold ${externalLinkClass}`}
+              >
+                {reviewer.name}
+              </a>
+              {reviewer.note ? (
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  {reviewer.note}
+                </p>
+              ) : null}
+            </li>
+          ))}
         </ul>
       </section>
 
