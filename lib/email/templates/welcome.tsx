@@ -17,10 +17,12 @@ export function WelcomeEmail({ displayName, href }: WelcomeEmailProps) {
     >
       <Text style={{ margin: "0 0 12px" }}>Hey {displayName},</Text>
       <Text style={{ margin: "0 0 12px" }}>
-        You&apos;re in. Learn Bitcoin and Lightning, ship projects, and land
-        meaningful contributions.
+        You&apos;re in. Learn Bitcoin and Lightning, ship projects, and land meaningful
+        contributions.
       </Text>
-      <Text style={{ margin: 0 }}>Start with a roadmap, then ship your first project.</Text>
+      <Text style={{ margin: 0 }}>
+        Start with a roadmap, then ship your first project.
+      </Text>
     </EmailLayout>
   );
 }

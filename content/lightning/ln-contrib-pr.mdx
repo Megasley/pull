@@ -9,7 +9,7 @@ objectives:
   - Navigate CI and review on a Lightning repo
 resources:
   - title: Mastering the Lightning Network
-    url: 'https://github.com/lnbook/lnbook'
+    url: "https://github.com/lnbook/lnbook"
     kind: book
     chapter: Use as protocol companion while debugging
     required: true
@@ -40,6 +40,7 @@ lab:
     - Test / Polar / CI notes
     - Updated rubric self-score ≥ 8/10 (or documented gaps)
 ---
+
 Landing a Lightning PR requires local labs (bitcoind + peers), patience with CI, and precise reproduction notes.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here.
@@ -48,7 +49,9 @@ Complete **Step 1 // Required reading** in the study plan above, then continue h
 
 Use **Review Club** picks or [/issues](/issues). Tie your PR description to the protocol concept you fixed (liquidity, HTLC, routing, etc.).
 
-<Mermaid caption="Reproduce, test, PR, CI, iterate with reviewers." chart="sequenceDiagram
+<Mermaid
+  caption="Reproduce, test, PR, CI, iterate with reviewers."
+  chart="sequenceDiagram
     participant You
     participant CI
     participant Reviewer
@@ -56,7 +59,8 @@ Use **Review Club** picks or [/issues](/issues). Tie your PR description to the 
     You->>CI: Open PR
     CI->>You: Results
     Reviewer->>You: Feedback
-    You->>CI: Update" />
+    You->>CI: Update"
+/>
 
 **Done when:** You can list reproduction steps a reviewer could follow without asking you.
 

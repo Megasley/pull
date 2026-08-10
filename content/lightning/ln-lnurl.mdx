@@ -1,6 +1,6 @@
 ---
 title: LNURL
-description: 'Implement LNURL-withdraw, pay, and auth for better wallet UX.'
+description: "Implement LNURL-withdraw, pay, and auth for better wallet UX."
 difficulty: intermediate
 duration: 4 days
 objectives:
@@ -9,14 +9,14 @@ objectives:
   - Relate Lightning Addresses to LNURL-pay
 resources:
   - title: LNURL specifications
-    url: 'https://github.com/lnurl/luds'
+    url: "https://github.com/lnurl/luds"
     kind: docs
     required: true
   - title: Lightning Address
-    url: 'https://lightningaddress.com/'
+    url: "https://lightningaddress.com/"
     kind: article
   - title: Alby documentation
-    url: 'https://guides.getalby.com/'
+    url: "https://guides.getalby.com/"
     kind: docs
 reflectionPrompts:
   - Explain LNURL to a teammate without jargon - what problem does it solve?
@@ -36,6 +36,7 @@ lab:
     - One security caution (TLS, amount check, or phishing)
     - Link to the LUD you read
 ---
+
 **LNURL** is a family of bech32-encoded URLs that help wallets interact with services over HTTPS for pay, withdraw, auth, and more. **Lightning Addresses** (`name@domain`) typically resolve to LNURL-pay.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here. This closes **Lightning Basics**.
@@ -46,14 +47,17 @@ Users hate pasting huge BOLT11 strings. LNURL and Lightning Addresses make Light
 
 **Analogy:** LNURL is a short coat-check ticket that maps to a locker (HTTPS API) where the real invoice is minted when you arrive.
 
-<Mermaid caption="LNURL-pay mints a fresh BOLT11 through an HTTPS handshake." chart="sequenceDiagram
+<Mermaid
+  caption="LNURL-pay mints a fresh BOLT11 through an HTTPS handshake."
+  chart="sequenceDiagram
     participant W as Wallet
     participant S as Service
     W->>S: GET LNURL-pay endpoint
     S->>W: callback + metadata + limits
     W->>S: request invoice amount
     S->>W: BOLT11
-    W->>S: pay over Lightning" />
+    W->>S: pay over Lightning"
+/>
 
 ```typescript
 // Pseudo-flow
@@ -64,7 +68,8 @@ Users hate pasting huge BOLT11 strings. LNURL and Lightning Addresses make Light
 ```
 
 <Callout type="warning" title="You inherit web risks">
-  Phishing, TLS failures, and malicious metadata become Lightning UX risks. Validate domains and amounts carefully.
+  Phishing, TLS failures, and malicious metadata become Lightning UX risks. Validate
+  domains and amounts carefully.
 </Callout>
 
 **Done when:** You can place Lightning Address on the LNURL-pay path in one sentence.

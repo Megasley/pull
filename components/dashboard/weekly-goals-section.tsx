@@ -35,9 +35,7 @@ export function WeeklyGoalsSection({ goals }: WeeklyGoalsSectionProps) {
         {goals.map((goal) => {
           const pct = Math.min(
             100,
-            Math.round(
-              (goal.progressCount / Math.max(goal.targetCount, 1)) * 100,
-            ),
+            Math.round((goal.progressCount / Math.max(goal.targetCount, 1)) * 100),
           );
           const done = goal.progressCount >= goal.targetCount;
 
@@ -70,9 +68,7 @@ export function WeeklyGoalsSection({ goals }: WeeklyGoalsSectionProps) {
                     Done
                   </Button>
                 ) : done ? (
-                  <span className="font-mono text-[10px] text-ink uppercase">
-                    done
-                  </span>
+                  <span className="font-mono text-[10px] text-ink uppercase">done</span>
                 ) : null}
               </div>
               <div className="mt-2 h-1.5 overflow-hidden bg-muted/60">

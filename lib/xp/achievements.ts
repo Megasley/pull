@@ -23,9 +23,7 @@ import type { AchievementItem } from "@/types/dashboard";
 
 const RECENT_UNLOCK_MS = 5 * 60 * 1000;
 
-async function getProgressByRoadmap(
-  userId: string,
-): Promise<Record<string, string[]>> {
+async function getProgressByRoadmap(userId: string): Promise<Record<string, string[]>> {
   if (!isDatabaseConfigured()) {
     return {};
   }
@@ -71,35 +69,37 @@ async function getApprovedSubmissionCount(userId: string): Promise<number> {
   return Number(rows[0]?.value ?? 0);
 }
 
-export const ensureAchievementsCatalog = cache(async function ensureAchievementsCatalog() {
-  if (!isDatabaseConfigured()) {
-    return;
-  }
+export const ensureAchievementsCatalog = cache(
+  async function ensureAchievementsCatalog() {
+    if (!isDatabaseConfigured()) {
+      return;
+    }
 
-  const db = getDb();
+    const db = getDb();
 
-  for (const definition of ACHIEVEMENT_DEFINITIONS) {
-    const payload = {
-      title: definition.title,
-      description: definition.description,
-      icon: definition.icon,
-      xpReward: definition.xpReward,
-      criteria: definition.criteria as unknown as Record<string, unknown>,
-      updatedAt: new Date().toISOString(),
-    };
+    for (const definition of ACHIEVEMENT_DEFINITIONS) {
+      const payload = {
+        title: definition.title,
+        description: definition.description,
+        icon: definition.icon,
+        xpReward: definition.xpReward,
+        criteria: definition.criteria as unknown as Record<string, unknown>,
+        updatedAt: new Date().toISOString(),
+      };
 
-    await db
-      .insert(achievements)
-      .values({
-        slug: definition.id,
-        ...payload,
-      })
-      .onConflictDoUpdate({
-        target: achievements.slug,
-        set: payload,
-      });
-  }
-});
+      await db
+        .insert(achievements)
+        .values({
+          slug: definition.id,
+          ...payload,
+        })
+        .onConflictDoUpdate({
+          target: achievements.slug,
+          set: payload,
+        });
+    }
+  },
+);
 
 export async function syncAchievementsForUser(userId: string): Promise<string[]> {
   if (!isDatabaseConfigured()) {
@@ -156,9 +156,8 @@ export async function syncAchievementsForUser(userId: string): Promise<string[]>
   }
 
   if (unlocked.length > 0) {
-    const { notifyAchievementsUnlockedAsync } = await import(
-      "@/lib/notifications/dispatch"
-    );
+    const { notifyAchievementsUnlockedAsync } =
+      await import("@/lib/notifications/dispatch");
     notifyAchievementsUnlockedAsync({ userId, slugs: unlocked });
   }
 
@@ -190,9 +189,7 @@ export async function listUserAchievements(
       .innerJoin(achievements, eq(userAchievements.achievementId, achievements.id))
       .where(eq(userAchievements.userId, userId));
 
-    earnedAtBySlug = Object.fromEntries(
-      rows.map((row) => [row.slug, row.earnedAt]),
-    );
+    earnedAtBySlug = Object.fromEntries(rows.map((row) => [row.slug, row.earnedAt]));
 
     for (const slug of Object.keys(earnedAtBySlug)) {
       earnedSlugs.add(slug);

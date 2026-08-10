@@ -34,9 +34,7 @@ export function PortfolioSection({
         <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
           <div>
             <h2 className="profile-section-title">{title}</h2>
-            {description ? (
-              <p className="profile-section-sub">{description}</p>
-            ) : null}
+            {description ? <p className="profile-section-sub">{description}</p> : null}
           </div>
           {action}
         </div>
@@ -268,9 +266,7 @@ export function FeaturedProjectsSection({
             ctaHref="/projects"
           />
         ) : (
-          <p className="text-sm text-muted-foreground">
-            No featured projects yet.
-          </p>
+          <p className="text-sm text-muted-foreground">No featured projects yet.</p>
         )
       ) : (
         <ul className="space-y-3">
@@ -287,9 +283,7 @@ export function FeaturedProjectsSection({
                 <p className="font-medium">{project.title}</p>
                 <p className="mt-1 text-xs text-muted-foreground">
                   {project.projectSlug}
-                  {project.submissionStatus
-                    ? ` · ${project.submissionStatus}`
-                    : ""}
+                  {project.submissionStatus ? ` · ${project.submissionStatus}` : ""}
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -298,11 +292,7 @@ export function FeaturedProjectsSection({
                 </Button>
                 {project.repoUrl ? (
                   <Button asChild variant="outline" size="sm">
-                    <a
-                      href={project.repoUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
+                    <a href={project.repoUrl} target="_blank" rel="noopener noreferrer">
                       Repo
                       <ExternalLink aria-hidden />
                     </a>
@@ -512,7 +502,11 @@ export function ContributionStatsGrid({
       description="Learning progress and open source output in one view."
       profile={profile}
     >
-      <div className={profile ? "profile-stat-grid" : "grid gap-3 sm:grid-cols-2 lg:grid-cols-5"}>
+      <div
+        className={
+          profile ? "profile-stat-grid" : "grid gap-3 sm:grid-cols-2 lg:grid-cols-5"
+        }
+      >
         {items.map((item) =>
           profile ? (
             <div key={item.label} className="profile-stat-cell">
@@ -534,9 +528,7 @@ export function ContributionStatsGrid({
               <p className="text-xs uppercase tracking-wide text-muted-foreground">
                 {item.label}
               </p>
-              <p className="mt-2 text-2xl font-semibold tracking-tight">
-                {item.value}
-              </p>
+              <p className="mt-2 text-2xl font-semibold tracking-tight">{item.value}</p>
             </div>
           ),
         )}

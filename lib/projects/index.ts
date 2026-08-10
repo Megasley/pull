@@ -9,11 +9,7 @@ export {
   paginateProjects,
 } from "./catalog";
 export { compileProjectMdx } from "./compile-spec";
-export {
-  getAllProjectSpecs,
-  loadProjectSpec,
-  projectSpecExists,
-} from "./load-spec";
+export { getAllProjectSpecs, loadProjectSpec, projectSpecExists } from "./load-spec";
 export {
   getBookmarkedProjectSlugs,
   isProjectBookmarked,

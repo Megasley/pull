@@ -17,9 +17,7 @@ import type { ProjectSubmissionRecord } from "@/types/submission";
 
 const LIVE_BUDGET_MS = 5_000;
 
-export type LiveLoad<T> =
-  | { status: "ok"; data: T }
-  | { status: "unavailable" };
+export type LiveLoad<T> = { status: "ok"; data: T } | { status: "unavailable" };
 
 export type AdminLiveOps = {
   health: LiveLoad<ReviewHealth>;
@@ -49,9 +47,7 @@ export async function loadAdminLiveOps(): Promise<AdminLiveOps> {
     settleLive("admin.live.reviewHealth", () =>
       withDbRetry(() => countReviewHealthStats(new Date().toISOString())),
     ),
-    settleLive("admin.live.cronHealth", () =>
-      withDbRetry(() => fetchCronSyncHealth()),
-    ),
+    settleLive("admin.live.cronHealth", () => withDbRetry(() => fetchCronSyncHealth())),
     settleLive("admin.live.openQueue", async () => {
       const rows = await withDbRetry(() =>
         listReviewQueue(undefined, { enrich: false }),

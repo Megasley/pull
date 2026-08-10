@@ -10,15 +10,12 @@ import {
 } from "@/lib/support/repository";
 
 export type SupportActionResult<T = undefined> =
-  | { ok: true; data: T }
-  | { ok: false; error: string };
+  { ok: true; data: T } | { ok: false; error: string };
 
 const MIN_SATS = 1;
 const MAX_SATS = 2_100_000_000;
 
-export async function createSupportInvoiceAction(
-  amountSats: number,
-): Promise<
+export async function createSupportInvoiceAction(amountSats: number): Promise<
   SupportActionResult<{
     donationId: string;
     paymentRequest: string;
@@ -29,7 +26,8 @@ export async function createSupportInvoiceAction(
   if (!isBlinkReceiveConfigured()) {
     return {
       ok: false,
-      error: "Lightning donations are not configured yet. Try on-chain or silent payments.",
+      error:
+        "Lightning donations are not configured yet. Try on-chain or silent payments.",
     };
   }
 
@@ -66,9 +64,7 @@ export async function createSupportInvoiceAction(
   }
 }
 
-export async function checkSupportInvoiceAction(
-  paymentHash: string,
-): Promise<
+export async function checkSupportInvoiceAction(paymentHash: string): Promise<
   SupportActionResult<{
     donationId: string;
     status: "pending" | "paid" | "expired";

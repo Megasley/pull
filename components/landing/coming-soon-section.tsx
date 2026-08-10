@@ -6,11 +6,7 @@ import { comingSoonRoadmaps } from "@/lib/landing-data";
 
 export function ComingSoonSection() {
   return (
-    <SiteContainer
-      as="section"
-      aria-labelledby="coming-soon-heading"
-      className="py-16"
-    >
+    <SiteContainer as="section" aria-labelledby="coming-soon-heading" className="py-16">
       <Reveal>
         <SectionHeader
           eyebrow="catalog // coming-soon"

@@ -40,9 +40,7 @@ export function PullRequestCard({ item, index = 0 }: PullRequestCardProps) {
             <Badge variant="outline">
               {CONTRIBUTION_TYPE_LABEL[item.contributionType]}
             </Badge>
-            {item.language ? (
-              <Badge variant="outline">{item.language}</Badge>
-            ) : null}
+            {item.language ? <Badge variant="outline">{item.language}</Badge> : null}
             <span className="font-mono text-[11px] text-muted-foreground">
               #{item.number}
             </span>

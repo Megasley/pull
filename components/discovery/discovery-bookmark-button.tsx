@@ -56,10 +56,7 @@ export function DiscoveryBookmarkButton({
       aria-label={bookmarked ? "Remove bookmark" : "Bookmark repository"}
       className={cn(className)}
     >
-      <Bookmark
-        className={cn("size-4", bookmarked && "fill-current")}
-        aria-hidden
-      />
+      <Bookmark className={cn("size-4", bookmarked && "fill-current")} aria-hidden />
       {compact ? null : bookmarked ? "Bookmarked" : "Bookmark"}
     </Button>
   );

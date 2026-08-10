@@ -19,12 +19,9 @@ export function getLessonNavigation(
     return { previous: null, next: null };
   }
 
-  const previousNode =
-    nodeIndex > 0 ? roadmap.nodes[nodeIndex - 1] : undefined;
+  const previousNode = nodeIndex > 0 ? roadmap.nodes[nodeIndex - 1] : undefined;
   const nextNode =
-    nodeIndex < roadmap.nodes.length - 1
-      ? roadmap.nodes[nodeIndex + 1]
-      : undefined;
+    nodeIndex < roadmap.nodes.length - 1 ? roadmap.nodes[nodeIndex + 1] : undefined;
 
   const toMeta = (nodeId: string): LessonMeta | null =>
     getLessonMeta(roadmapSlug, nodeId);

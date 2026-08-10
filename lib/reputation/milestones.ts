@@ -1,7 +1,4 @@
-import type {
-  ReputationMilestone,
-  ReputationMonthPoint,
-} from "@/types/reputation";
+import type { ReputationMilestone, ReputationMonthPoint } from "@/types/reputation";
 import type { PullRequestPortfolioItem } from "@/types/portfolio";
 
 import { REPUTATION_MONTHS } from "./weights";
@@ -31,9 +28,7 @@ export function buildMonthlyProgress(
 ): ReputationMonthPoint[] {
   const keys: string[] = [];
   for (let i = months - 1; i >= 0; i -= 1) {
-    const date = new Date(
-      Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - i, 1),
-    );
+    const date = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - i, 1));
     const month = String(date.getUTCMonth() + 1).padStart(2, "0");
     keys.push(`${date.getUTCFullYear()}-${month}`);
   }

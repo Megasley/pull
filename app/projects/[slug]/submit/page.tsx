@@ -9,10 +9,7 @@ import { Button } from "@/components/ui/button";
 import { bootstrapCurrentUserProfile } from "@/lib/auth/session";
 import { isDatabaseConfigured } from "@/lib/db/env";
 import { getProjectBySlug } from "@/lib/projects/catalog";
-import {
-  getClaimMinutes,
-  getRequiredApprovals,
-} from "@/lib/reviews/community";
+import { getClaimMinutes, getRequiredApprovals } from "@/lib/reviews/community";
 import { listSubmissionTimeline } from "@/lib/reviews/repository";
 import {
   getActiveSubmission,
@@ -59,17 +56,11 @@ export default async function ProjectSubmitPage({ params }: SubmitPageProps) {
     ? await getActiveSubmission(profile.id, slug)
     : null;
   const draft =
-    active?.status === "draft" || active?.status === "needs_changes"
-      ? active
-      : null;
-  const locked = active
-    ? LOCKED_SUBMISSION_STATUSES.includes(active.status)
-    : false;
+    active?.status === "draft" || active?.status === "needs_changes" ? active : null;
+  const locked = active ? LOCKED_SUBMISSION_STATUSES.includes(active.status) : false;
 
   const timeline =
-    active && isDatabaseConfigured()
-      ? await listSubmissionTimeline(active.id)
-      : [];
+    active && isDatabaseConfigured() ? await listSubmissionTimeline(active.id) : [];
 
   const requiredApprovals = getRequiredApprovals();
   const claimMinutes = getClaimMinutes();
@@ -88,76 +79,71 @@ export default async function ProjectSubmitPage({ params }: SubmitPageProps) {
         Submit {project.title}
       </h1>
       <p className="mt-4 max-w-2xl font-mono text-sm leading-relaxed text-muted-foreground">
-        Share your repository, demos, and notes. Save a draft anytime, then
-        submit when you are ready for review.
+        Share your repository, demos, and notes. Save a draft anytime, then submit when
+        you are ready for review.
       </p>
 
       <section className="mt-8 rounded-none border border-border bg-card p-5 sm:p-6">
-        <h2 className="text-lg font-semibold tracking-tight">
-          How review works
-        </h2>
+        <h2 className="text-lg font-semibold tracking-tight">How review works</h2>
         <ol className="mt-4 space-y-3 font-mono text-sm leading-relaxed text-muted-foreground">
           <li>
-            <span className="text-foreground">1.</span> You submit artifacts.
-            Nothing is auto-approved.
+            <span className="text-foreground">1.</span> You submit artifacts. Nothing is
+            auto-approved.
           </li>
           <li>
-            <span className="text-foreground">2.</span> Eligible peers or staff
-            claim your submission ({claimMinutes} min lock) and leave feedback.
+            <span className="text-foreground">2.</span> Eligible peers or staff claim
+            your submission ({claimMinutes} min lock) and leave feedback.
           </li>
           <li>
             <span className="text-foreground">3.</span> Approval needs{" "}
             {requiredApprovals} peer votes. Staff can finalize alone.
           </li>
           <li>
-            <span className="text-foreground">4.</span> One request-changes
-            returns the build to you. Fix, resubmit, and a new review round
-            starts.
+            <span className="text-foreground">4.</span> One request-changes returns the
+            build to you. Fix, resubmit, and a new review round starts.
           </li>
         </ol>
       </section>
 
-        {!isDatabaseConfigured() ? (
-          <p className="mt-8 rounded-none border border-border bg-card p-4 text-sm text-muted-foreground">
-            Database is not configured. Add <code>DATABASE_URL</code> to enable
-            submissions.
-          </p>
-        ) : (
-          <div className="mt-10 space-y-10">
+      {!isDatabaseConfigured() ? (
+        <p className="mt-8 rounded-none border border-border bg-card p-4 text-sm text-muted-foreground">
+          Database is not configured. Add <code>DATABASE_URL</code> to enable
+          submissions.
+        </p>
+      ) : (
+        <div className="mt-10 space-y-10">
+          <section className="rounded-none border border-border bg-card p-5 sm:p-6">
+            <h2 className="mb-4 text-lg font-semibold tracking-tight">
+              {locked
+                ? "Active submission"
+                : draft?.status === "needs_changes"
+                  ? "Update after review"
+                  : draft
+                    ? "Edit draft"
+                    : "New submission"}
+            </h2>
+            <ProjectSubmissionForm
+              projectSlug={slug}
+              initial={active}
+              locked={locked}
+            />
+          </section>
+
+          {timeline.length > 0 ? (
             <section className="rounded-none border border-border bg-card p-5 sm:p-6">
               <h2 className="mb-4 text-lg font-semibold tracking-tight">
-                {locked
-                  ? "Active submission"
-                  : draft?.status === "needs_changes"
-                    ? "Update after review"
-                    : draft
-                      ? "Edit draft"
-                      : "New submission"}
+                Review timeline
               </h2>
-              <ProjectSubmissionForm
-                projectSlug={slug}
-                initial={active}
-                locked={locked}
-              />
+              <ReviewTimeline events={timeline} />
             </section>
+          ) : null}
 
-            {timeline.length > 0 ? (
-              <section className="rounded-none border border-border bg-card p-5 sm:p-6">
-                <h2 className="mb-4 text-lg font-semibold tracking-tight">
-                  Review timeline
-                </h2>
-                <ReviewTimeline events={timeline} />
-              </section>
-            ) : null}
-
-            <section className="space-y-4">
-              <h2 className="text-lg font-semibold tracking-tight">
-                Submission history
-              </h2>
-              <ProjectSubmissionHistory submissions={submissions} />
-            </section>
-          </div>
-        )}
+          <section className="space-y-4">
+            <h2 className="text-lg font-semibold tracking-tight">Submission history</h2>
+            <ProjectSubmissionHistory submissions={submissions} />
+          </section>
+        </div>
+      )}
     </div>
   );
 }

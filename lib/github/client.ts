@@ -1,8 +1,4 @@
-import {
-  GITHUB_API_BASE,
-  GITHUB_GRAPHQL_URL,
-  GITHUB_USER_AGENT,
-} from "./config";
+import { GITHUB_API_BASE, GITHUB_GRAPHQL_URL, GITHUB_USER_AGENT } from "./config";
 
 export class GithubApiError extends Error {
   status: number;
@@ -223,10 +219,7 @@ export class GithubClient {
     });
   }
 
-  private async withRetries<T>(
-    fn: () => Promise<T>,
-    attempts = 4,
-  ): Promise<T> {
+  private async withRetries<T>(fn: () => Promise<T>, attempts = 4): Promise<T> {
     let lastError: unknown;
 
     for (let attempt = 0; attempt < attempts; attempt += 1) {

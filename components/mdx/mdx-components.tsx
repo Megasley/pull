@@ -41,7 +41,10 @@ export const mdxComponents: MDXComponents = {
   ),
   p: ({ className, ...props }) => (
     <p
-      className={cn("leading-7 text-muted-foreground [&:not(:first-child)]:mt-4", className)}
+      className={cn(
+        "leading-7 text-muted-foreground [&:not(:first-child)]:mt-4",
+        className,
+      )}
       {...props}
     />
   ),
@@ -53,7 +56,10 @@ export const mdxComponents: MDXComponents = {
   ),
   ol: ({ className, ...props }) => (
     <ol
-      className={cn("my-4 list-decimal space-y-2 pl-6 text-muted-foreground", className)}
+      className={cn(
+        "my-4 list-decimal space-y-2 pl-6 text-muted-foreground",
+        className,
+      )}
       {...props}
     />
   ),
@@ -96,7 +102,10 @@ export const mdxComponents: MDXComponents = {
     if (isBlock) {
       return (
         <code
-          className={cn("bg-transparent p-0 font-mono text-[0.85em] text-inherit", className)}
+          className={cn(
+            "bg-transparent p-0 font-mono text-[0.85em] text-inherit",
+            className,
+          )}
           {...props}
         />
       );
@@ -115,7 +124,10 @@ export const mdxComponents: MDXComponents = {
   table: ({ className, ...props }) => (
     <div className="my-6 overflow-x-auto">
       <table
-        className={cn("w-full border-collapse text-sm text-muted-foreground", className)}
+        className={cn(
+          "w-full border-collapse text-sm text-muted-foreground",
+          className,
+        )}
         {...props}
       />
     </div>

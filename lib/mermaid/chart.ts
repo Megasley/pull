@@ -1,7 +1,4 @@
-export function adaptChartForViewport(
-  chart: string,
-  preferVertical: boolean,
-): string {
+export function adaptChartForViewport(chart: string, preferVertical: boolean): string {
   if (!preferVertical) {
     return chart;
   }

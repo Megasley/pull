@@ -1,6 +1,6 @@
 ---
 title: Mini Wallet Project
-description: 'Build a CLI wallet that generates addresses, receives, and sends on regtest.'
+description: "Build a CLI wallet that generates addresses, receives, and sends on regtest."
 difficulty: intermediate
 duration: 2 weeks
 project: mini-wallet
@@ -9,18 +9,18 @@ objectives:
   - Track UTXOs and build a funded transaction on regtest
   - Sign and broadcast with tests covering change and fees
 resources:
-  - title: 'Project Spec: Mini Wallet'
-    url: '/projects/mini-wallet'
+  - title: "Project Spec: Mini Wallet"
+    url: "/projects/mini-wallet"
     kind: docs
     note: Pull project page — acceptance criteria and submit flow.
     required: true
   - title: Mastering Bitcoin
-    url: 'https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch05_wallets.adoc'
+    url: "https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch05_wallets.adoc"
     kind: book
-    chapter: 'Ch. 5: Wallets'
+    chapter: "Ch. 5: Wallets"
     required: true
   - title: BDK
-    url: 'https://bitcoindevkit.org/'
+    url: "https://bitcoindevkit.org/"
     kind: docs
 reflectionPrompts:
   - >-
@@ -41,6 +41,7 @@ lab:
     - Commands or screenshots proving receive + send on regtest
     - Short note of one failure case you tested (fee, change, or sync)
 ---
+
 This project turns protocol lessons into a working tool: a command-line wallet on regtest that can receive and send bitcoin.
 
 Complete **Step 1 // Required reading** in the study plan above (project spec + wallets chapter), then continue here. This opens **Projects**.
@@ -54,24 +55,28 @@ Ship a CLI that can:
 3. Send to an address with an explicit fee rate
 4. Mine/confirm via Bitcoin Core RPC in tests
 
-<Mermaid caption="CLI drives wallet logic against a local regtest node." chart="flowchart LR
+<Mermaid
+  caption="CLI drives wallet logic against a local regtest node."
+  chart="flowchart LR
     CLI[CLI] --> Wallet[Wallet state]
     Wallet --> Core[bitcoind regtest]
     CLI --> Build[Build + sign tx]
-    Build --> Core" />
+    Build --> Core"
+/>
 
 **Done when:** You can describe the happy path in four bullets without opening the code.
 
 ## Step 3 — Milestones
 
-| Phase | Ship |
-| --- | --- |
-| Milestone A | Address generation + sync/balance on regtest |
-| Milestone B | Coin selection, change, broadcast, fee unit tests |
+| Phase       | Ship                                                                |
+| ----------- | ------------------------------------------------------------------- |
+| Milestone A | Address generation + sync/balance on regtest                        |
+| Milestone B | Coin selection, change, broadcast, fee unit tests                   |
 | Milestone C | Acceptance test: mine → send half → assert balances after one block |
 
 <Callout type="tip" title="Acceptance tests first">
-  Write a test that mines funds to your wallet, sends half to a second wallet, and asserts balances after one block.
+  Write a test that mines funds to your wallet, sends half to a second wallet, and
+  asserts balances after one block.
 </Callout>
 
 **Done when:** Milestone A works end-to-end before you start fee edge cases.

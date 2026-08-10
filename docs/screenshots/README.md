@@ -4,13 +4,13 @@ Add PNG or WebP screenshots here for the README and docs. Keep files under ~500 
 
 ## Suggested captures
 
-| File | Description |
-| --- | --- |
-| `home.png` | Landing page hero |
-| `roadmap-bitcoin.png` | Bitcoin roadmap map view |
-| `lesson-reader.png` | Lesson with study plan and TOC |
-| `dashboard.png` | Signed-in dashboard |
-| `github-sync.png` | GitHub integration settings |
+| File                  | Description                    |
+| --------------------- | ------------------------------ |
+| `home.png`            | Landing page hero              |
+| `roadmap-bitcoin.png` | Bitcoin roadmap map view       |
+| `lesson-reader.png`   | Lesson with study plan and TOC |
+| `dashboard.png`       | Signed-in dashboard            |
+| `github-sync.png`     | GitHub integration settings    |
 
 ## How to capture
 

@@ -24,8 +24,7 @@ export async function getSessionGithubScopes(): Promise<string> {
   } = await supabase.auth.getSession();
 
   const meta = session?.user?.app_metadata as
-    | { provider?: string; providers?: string[] }
-    | undefined;
+    { provider?: string; providers?: string[] } | undefined;
 
   // Supabase does not always surface scopes; keep empty when unknown.
   void meta;

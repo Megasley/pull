@@ -10,10 +10,7 @@ export function getResumeNode(
   return roadmap.nodes.find((node) => !completedIds.has(node.id)) ?? null;
 }
 
-export function getCompletedProjects(
-  roadmap: RoadmapJson,
-  completedIds: Set<string>,
-) {
+export function getCompletedProjects(roadmap: RoadmapJson, completedIds: Set<string>) {
   return roadmap.nodes
     .filter((node) => node.project && completedIds.has(node.id))
     .map((node) => ({
@@ -54,8 +51,6 @@ export function buildAllRoadmapProgressSummaries(
   progressByRoadmap: Record<string, string[]>,
 ): RoadmapProgressSummary[] {
   return getRoadmapSlugs()
-    .map((slug) =>
-      buildRoadmapProgressSummary(slug, progressByRoadmap[slug] ?? []),
-    )
+    .map((slug) => buildRoadmapProgressSummary(slug, progressByRoadmap[slug] ?? []))
     .filter((summary): summary is RoadmapProgressSummary => summary !== null);
 }

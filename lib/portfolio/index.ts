@@ -1,9 +1,6 @@
 import { listGithubPullRequests } from "@/lib/github/store";
 import { getGithubConnectionPublic } from "@/lib/github/store";
-import {
-  getPortfolioStats,
-  toPortfolioItem,
-} from "@/lib/portfolio/filter";
+import { getPortfolioStats, toPortfolioItem } from "@/lib/portfolio/filter";
 import type { PullRequestPortfolioItem } from "@/types/portfolio";
 
 export async function loadPullRequestPortfolio(userId: string): Promise<{

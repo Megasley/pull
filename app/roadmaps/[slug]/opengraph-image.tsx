@@ -16,7 +16,9 @@ export default async function OpenGraphImage({ params }: OgProps) {
 
   const title = roadmap?.title ?? slug;
   const description =
-    roadmap && "description" in roadmap ? roadmap.description : "Builder roadmap on Pull.";
+    roadmap && "description" in roadmap
+      ? roadmap.description
+      : "Builder roadmap on Pull.";
   const lessonCount = roadmap && "nodes" in roadmap ? roadmap.nodes.length : 0;
 
   return renderOgCard({

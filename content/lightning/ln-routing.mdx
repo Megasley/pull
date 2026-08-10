@@ -1,23 +1,23 @@
 ---
 title: Routing
-description: 'Liquidity-aware path selection using fee budgets, channel hints, and reliability scores.'
+description: "Liquidity-aware path selection using fee budgets, channel hints, and reliability scores."
 difficulty: advanced
 duration: 6 days
 objectives:
   - Explain source-based routing at a high level
-  - 'Factor fees, CLTV, and capacity into route choice'
+  - "Factor fees, CLTV, and capacity into route choice"
   - Use explorers to build intuition for public graph structure
 resources:
   - title: Mastering the Lightning Network
-    url: 'https://github.com/lnbook/lnbook/blob/master/08_routing_htlcs.asciidoc'
+    url: "https://github.com/lnbook/lnbook/blob/master/08_routing_htlcs.asciidoc"
     kind: book
-    chapter: 'Ch. 8: Routing on the Lightning Network'
+    chapter: "Ch. 8: Routing on the Lightning Network"
     required: true
   - title: Amboss
-    url: 'https://amboss.space/'
+    url: "https://amboss.space/"
     kind: tool
   - title: LND Mission Control
-    url: 'https://docs.lightning.engineering/'
+    url: "https://docs.lightning.engineering/"
     kind: docs
 reflectionPrompts:
   - Explain Routing to a teammate without jargon - what problem does it solve?
@@ -36,6 +36,7 @@ lab:
     - Short list: fees, CLTV/capacity, reliability — which dominated?
     - Link to Ch. 8 section you used
 ---
+
 **Routing is liquidity-aware path selection.** The payer (usually) constructs a path across the public graph plus hints, then onion-encrypts hop instructions. Every hop must have enough **outbound** on the forward edge.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here.
@@ -46,17 +47,21 @@ Routing success rates define UX. A path that looks cheap on fees still fails if 
 
 **Analogy:** You plan a road trip with toll costs and bridge weight limits. If a bridge is “full” (insufficient balance), you detour — often without knowing exact traffic until you try.
 
-<Mermaid caption="Build a path from gossip + hints, then send an onion." chart="flowchart LR
+<Mermaid
+  caption="Build a path from gossip + hints, then send an onion."
+  chart="flowchart LR
     Payer[Payer] --> G[Channel graph]
     G --> Path[Candidate path]
     Path --> Onion[Onion packet]
     Onion --> Hops[Hop1 Hop2 Hop3]
-    Hops --> Payee[Payee]" />
+    Hops --> Payee[Payee]"
+/>
 
 Factor in: fees, CLTV budget, max HTLC / capacity, private channel hints from invoices, and learned reliability (mission-control style).
 
 <Callout type="tip" title="Probe carefully">
-  Liquidity is not fully public. Nodes learn from failures without leaking customer details into logs carelessly.
+  Liquidity is not fully public. Nodes learn from failures without leaking customer
+  details into logs carelessly.
 </Callout>
 
 **Done when:** You can name three inputs to route choice beyond “lowest fee.”

@@ -35,20 +35,27 @@ export default async function DashboardPage() {
   // Sync achievements before reading XP/score so badges stay current.
   await syncAchievementsForUser(profile.id);
 
-  const [totals, achievements, builderScore, reputation, github, workspace, weeklyGoals] =
-    await Promise.all([
-      getUserXpTotals(profile.id),
-      listUserAchievements(profile.id, progressByRoadmap),
-      loadBuilderScore(profile.id, progressByRoadmap),
-      loadOpenSourceReputation(profile.id),
-      loadGithubDashboardSnapshot(profile.id),
-      loadDashboardWorkspace({
-        userId: profile.id,
-        profile,
-        progressByRoadmap,
-      }),
-      ensureWeeklyGoals(profile.id),
-    ]);
+  const [
+    totals,
+    achievements,
+    builderScore,
+    reputation,
+    github,
+    workspace,
+    weeklyGoals,
+  ] = await Promise.all([
+    getUserXpTotals(profile.id),
+    listUserAchievements(profile.id, progressByRoadmap),
+    loadBuilderScore(profile.id, progressByRoadmap),
+    loadOpenSourceReputation(profile.id),
+    loadGithubDashboardSnapshot(profile.id),
+    loadDashboardWorkspace({
+      userId: profile.id,
+      profile,
+      progressByRoadmap,
+    }),
+    ensureWeeklyGoals(profile.id),
+  ]);
 
   const refreshedProfile = {
     ...profile,
@@ -75,11 +82,5 @@ export default async function DashboardPage() {
   dashboardData.openSourceOpportunities = workspace.openSourceOpportunities;
   dashboardData.weeklyGoals = weeklyGoals;
 
-  return (
-    <DashboardView
-      data={dashboardData}
-      github={github}
-      signOutAction={signOut}
-    />
-  );
+  return <DashboardView data={dashboardData} github={github} signOutAction={signOut} />;
 }

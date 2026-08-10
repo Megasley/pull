@@ -17,7 +17,10 @@ import { Button } from "@/components/ui/button";
 import { bootstrapCurrentUserProfile } from "@/lib/auth/session";
 import { isDatabaseConfigured } from "@/lib/db/env";
 import { compileProjectMdx } from "@/lib/projects/compile-spec";
-import { getActiveSubmission, listUserSubmissionStatusByProjectSlug } from "@/lib/submissions/repository";
+import {
+  getActiveSubmission,
+  listUserSubmissionStatusByProjectSlug,
+} from "@/lib/submissions/repository";
 import type { ProjectSpec } from "@/types/project";
 import type { RoadmapDifficulty } from "@/types";
 
@@ -79,9 +82,7 @@ export async function ProjectDetails({ project }: ProjectDetailsProps) {
 
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_240px]">
           <div className="min-w-0">
-            <p className="tech-eyebrow">
-              build // {project.categories.join(" · ")}
-            </p>
+            <p className="tech-eyebrow">build // {project.categories.join(" · ")}</p>
             <h1 className="mt-3 text-[clamp(2rem,5vw,3.5rem)] leading-[1.08] font-bold tracking-[-0.04em]">
               {project.title}
             </h1>
@@ -214,8 +215,8 @@ export async function ProjectDetails({ project }: ProjectDetailsProps) {
                   {project.estimatedTime}
                 </p>
                 <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-                  Bookmark this project to find it quickly later. When you are
-                  ready, submit your repository from the submit page.
+                  Bookmark this project to find it quickly later. When you are ready,
+                  submit your repository from the submit page.
                 </p>
               </div>
             </div>

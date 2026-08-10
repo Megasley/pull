@@ -36,12 +36,8 @@ async function main() {
     await import("../lib/email/client");
   const { sendEmail } = await import("../lib/email/send");
   const { WelcomeEmail } = await import("../lib/email/templates/welcome");
-  const { ReviewOutcomeEmail } = await import(
-    "../lib/email/templates/review-outcome"
-  );
-  const { ReviewQueueEmail } = await import(
-    "../lib/email/templates/review-queue"
-  );
+  const { ReviewOutcomeEmail } = await import("../lib/email/templates/review-outcome");
+  const { ReviewQueueEmail } = await import("../lib/email/templates/review-queue");
 
   console.log("configured:", isEmailConfigured());
   console.log("from:", getResendFromAddress());

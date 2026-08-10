@@ -9,14 +9,14 @@ objectives:
   - Use Miniscript as a policy language mindset
 resources:
   - title: BIP-380 Output Script Descriptors
-    url: 'https://github.com/bitcoin/bips/blob/master/bip-0380.mediawiki'
+    url: "https://github.com/bitcoin/bips/blob/master/bip-0380.mediawiki"
     kind: bip
     required: true
   - title: Miniscript
-    url: 'https://bitcoin.sipa.be/miniscript/'
+    url: "https://bitcoin.sipa.be/miniscript/"
     kind: docs
   - title: Bitcoin Core descriptors
-    url: 'https://github.com/bitcoin/bitcoin/blob/master/doc/descriptors.md'
+    url: "https://github.com/bitcoin/bitcoin/blob/master/doc/descriptors.md"
     kind: docs
 reflectionPrompts:
   - >-
@@ -42,6 +42,7 @@ searchQueries:
   - BIP380
   - output descriptors
 ---
+
 **Output descriptors** are a standard way to describe what scripts/keys a wallet controls. **Miniscript** helps compile human policies into safe Script fragments.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here.
@@ -60,15 +61,19 @@ wsh(multi(2,key1,key2,key3))
 
 Bitcoin Core RPCs like `importdescriptors` and `listdescriptors` operationalize this.
 
-<Mermaid caption="Policies compile to scripts wrapped by portable descriptors." chart="flowchart LR
+<Mermaid
+  caption="Policies compile to scripts wrapped by portable descriptors."
+  chart="flowchart LR
     Policy[Spending policy] --> Mini[Miniscript]
     Mini --> Script[Script]
     Script --> Desc[Descriptor]
     Desc --> Core[Bitcoin Core / BDK]
-    Desc --> Backup[Backup &amp; recovery]" />
+    Desc --> Backup[Backup &amp; recovery]"
+/>
 
 <Callout type="tip" title="Backup descriptors with seeds">
-  For Taproot script trees and multisig, seed words alone may be insufficient. Store descriptors (and multisig key records) with the same care as seeds.
+  For Taproot script trees and multisig, seed words alone may be insufficient. Store
+  descriptors (and multisig key records) with the same care as seeds.
 </Callout>
 
 **Done when:** You can read a `wpkh(...)` / `tr(...)` line and say what locking condition it describes.

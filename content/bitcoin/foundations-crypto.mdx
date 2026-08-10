@@ -1,6 +1,6 @@
 ---
 title: Cryptography Primer
-description: 'Hashes, key pairs, ECDSA, and Schnorr signatures in a Bitcoin context.'
+description: "Hashes, key pairs, ECDSA, and Schnorr signatures in a Bitcoin context."
 difficulty: beginner
 duration: 5 days
 objectives:
@@ -9,37 +9,37 @@ objectives:
   - Contrast ECDSA and Schnorr at a builder level
 resources:
   - title: Mastering Bitcoin
-    url: 'https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch04_keys.adoc'
+    url: "https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch04_keys.adoc"
     kind: book
-    chapter: 'Ch. 4: Keys and Addresses'
-    note: 'Start with private keys, public keys, and address encodings.'
+    chapter: "Ch. 4: Keys and Addresses"
+    note: "Start with private keys, public keys, and address encodings."
     required: true
   - title: Mastering Bitcoin
     url: >-
       https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch08_signatures.adoc
     kind: book
-    chapter: 'Ch. 8: Signatures'
+    chapter: "Ch. 8: Signatures"
     note: Read ECDSA vs Schnorr sections.
     required: true
-  - title: 'Decoding Bitcoin: Hash functions'
-    url: 'https://bitcoindevs.xyz/decoding/hash-functions'
+  - title: "Decoding Bitcoin: Hash functions"
+    url: "https://bitcoindevs.xyz/decoding/hash-functions"
     kind: interactive
     note: Interactive hash playground - pair with the SHA-256 visualizer.
     required: true
   - title: BIP-340 Schnorr
-    url: 'https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki'
+    url: "https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki"
     kind: bip
     required: true
-  - title: 'BDP: SHA-256 hashes visualizer'
-    url: 'https://hashexplained.com'
+  - title: "BDP: SHA-256 hashes visualizer"
+    url: "https://hashexplained.com"
     kind: interactive
     note: Step through SHA-256 rounds visually (Hash Explained).
-  - title: 'Decoding Bitcoin: Schnorr signatures'
-    url: 'https://bitcoindevs.xyz/decoding/schnorr-signature'
+  - title: "Decoding Bitcoin: Schnorr signatures"
+    url: "https://bitcoindevs.xyz/decoding/schnorr-signature"
     kind: interactive
     note: Builder-level Schnorr before BIP-340.
-  - title: 'Decoding Bitcoin: Nonce reuse attack'
-    url: 'https://bitcoindevs.xyz/decoding/nonce-reuse-attack'
+  - title: "Decoding Bitcoin: Nonce reuse attack"
+    url: "https://bitcoindevs.xyz/decoding/nonce-reuse-attack"
     kind: interactive
     note: Why ECDSA nonce reuse is catastrophic - matches a reflection prompt.
 reflectionPrompts:
@@ -67,19 +67,20 @@ searchQueries:
   - BIP340
   - Schnorr
 ---
+
 Bitcoin does not “store passwords on the blockchain.” Ownership is proven with **cryptography**: one-way hashes and signatures that anyone can verify, but only the key holder can create.
 
 Complete **Step 1 // Required reading** in the study plan above (and the interactive hash lab when listed there). Optional tools sit under **further reading** beneath the article.
 
 ## Step 2 — Core idea: hashes, keys, and verify
 
-| Term | Meaning | Bitcoin use |
-| --- | --- | --- |
-| **Hash** | Fingerprint of data; one-way | Txids, block ids, script commits |
-| **Private key** | Secret that can sign | Spend authority |
-| **Public key** | Derived from private; safe to share for verify | Addresses / outputs |
-| **ECDSA** | Historical signature scheme | Pre-Taproot |
-| **Schnorr (BIP-340)** | Taproot’s preferred signatures | Smaller, aggregation-friendly |
+| Term                  | Meaning                                        | Bitcoin use                      |
+| --------------------- | ---------------------------------------------- | -------------------------------- |
+| **Hash**              | Fingerprint of data; one-way                   | Txids, block ids, script commits |
+| **Private key**       | Secret that can sign                           | Spend authority                  |
+| **Public key**        | Derived from private; safe to share for verify | Addresses / outputs              |
+| **ECDSA**             | Historical signature scheme                    | Pre-Taproot                      |
+| **Schnorr (BIP-340)** | Taproot’s preferred signatures                 | Smaller, aggregation-friendly    |
 
 **Analogy:** A hash is a fingerprint; a signature is a wax seal — anyone can check it, only the private seal can create it.
 
@@ -93,7 +94,9 @@ function commitsTo(data: Uint8Array, digest: Hash256): boolean {
 }
 ```
 
-<Mermaid caption="Signing uses the private key; verification uses the public key and message." chart="flowchart LR
+<Mermaid
+  caption="Signing uses the private key; verification uses the public key and message."
+  chart="flowchart LR
     Priv[Private key] --> Pub[Public key]
     Msg[Message / tx sighash] --> Sign[Sign with private key]
     Priv --> Sign
@@ -101,27 +104,29 @@ function commitsTo(data: Uint8Array, digest: Hash256): boolean {
     Pub --> Verify[Verify]
     Msg --> Verify
     Sig --> Verify
-    Verify --> OK[Valid or invalid]" />
+    Verify --> OK[Valid or invalid]"
+/>
 
 <Callout type="warning" title="Never invent crypto">
-  Use battle-tested libraries (`secp256k1`, `bitcoinjs-lib`, `rust-bitcoin`, BDK). A one-line RNG mistake can leak keys.
+  Use battle-tested libraries (`secp256k1`, `bitcoinjs-lib`, `rust-bitcoin`, BDK). A
+  one-line RNG mistake can leak keys.
 </Callout>
 
-Remember: private keys are secrets; signatures authorize *specific* sighashes; treat SHA-256 digests as unique IDs in practice.
+Remember: private keys are secrets; signatures authorize _specific_ sighashes; treat SHA-256 digests as unique IDs in practice.
 
 **Done when:** You can walk the Mermaid diagram out loud without notes.
 
 ## Step 3 — Try it and capture lab evidence
 
-1. Re-open the required hash-functions lab if needed; optionally use the SHA-256 visualizer from **further reading**.  
-2. Locally hash a known string; record **input + digest**.  
-3. Derive a **lab-only** address or pubkey on regtest/testnet; **discard** that key material.  
+1. Re-open the required hash-functions lab if needed; optionally use the SHA-256 visualizer from **further reading**.
+2. Locally hash a known string; record **input + digest**.
+3. Derive a **lab-only** address or pubkey on regtest/testnet; **discard** that key material.
 
 ### Common mistakes
 
-- Confusing encryption with signatures  
-- Reusing ECDSA nonces  
-- Assuming “hashed” means “secret” for low-entropy inputs  
+- Confusing encryption with signatures
+- Reusing ECDSA nonces
+- Assuming “hashed” means “secret” for low-entropy inputs
 
 **Done when:** Lab evidence is complete and you would refuse to reuse the lab key.
 

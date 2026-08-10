@@ -1,27 +1,27 @@
 ---
 title: Lightning Overview
-description: 'Understand how payment channels enable instant, low-fee Bitcoin transfers.'
+description: "Understand how payment channels enable instant, low-fee Bitcoin transfers."
 difficulty: intermediate
 duration: 4 days
 objectives:
   - Explain why Lightning exists and what problem it solves
-  - 'Describe channels, HTLCs, and invoices at a high level'
+  - "Describe channels, HTLCs, and invoices at a high level"
   - Connect Lightning concepts to prior Bitcoin roadmap knowledge
 resources:
   - title: Mastering the Lightning Network
-    url: 'https://github.com/lnbook/lnbook/blob/master/01_introduction.asciidoc'
+    url: "https://github.com/lnbook/lnbook/blob/master/01_introduction.asciidoc"
     kind: book
-    chapter: 'Ch. 1: Introduction to Lightning'
+    chapter: "Ch. 1: Introduction to Lightning"
     required: true
   - title: Mastering the Lightning Network
-    url: 'https://github.com/lnbook/lnbook/blob/master/03_how_ln_works.asciidoc'
+    url: "https://github.com/lnbook/lnbook/blob/master/03_how_ln_works.asciidoc"
     kind: book
-    chapter: 'Ch. 3: How the Lightning Network Works'
+    chapter: "Ch. 3: How the Lightning Network Works"
   - title: Lightning Network Paper
-    url: 'https://lightning.network/lightning-network-paper.pdf'
+    url: "https://lightning.network/lightning-network-paper.pdf"
     kind: article
   - title: Amboss Explorer
-    url: 'https://amboss.space/'
+    url: "https://amboss.space/"
     kind: tool
 reflectionPrompts:
   - >-
@@ -42,6 +42,7 @@ lab:
     - Polar screenshot or CLI note of your local lab status (or planned setup)
     - Link to Mastering Lightning Ch. 1 section you used
 ---
+
 The Lightning Network scales Bitcoin payments by moving most transfers **off-chain** into bilateral payment channels. Users update balances locally and only settle on-chain when opening or closing channels.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here. Prefer completing the Bitcoin roadmap first — Lightning assumes UTXOs, fees, scripts/timelocks, and regtest comfort.
@@ -52,28 +53,35 @@ On-chain block space is scarce. Instant coffee payments should not compete with 
 
 **Analogy:** A channel is a bar tab between two friends. You keep a running tally (signed IOUs). When you are done, you settle once at the bank (on-chain). Routing asks mutual friends to help settle tabs across a network of tabs.
 
-| Concept | Meaning |
-| --- | --- |
-| **Payment channel** | Two parties lock bitcoin; update balances with signed commitments off-chain |
-| **HTLC** | Hash Time Locked Contract — multi-hop payments complete atomically or unwind |
-| **Invoice** | BOLT11 payment request (amount, expiry, routing hints) |
+| Concept             | Meaning                                                                      |
+| ------------------- | ---------------------------------------------------------------------------- |
+| **Payment channel** | Two parties lock bitcoin; update balances with signed commitments off-chain  |
+| **HTLC**            | Hash Time Locked Contract — multi-hop payments complete atomically or unwind |
+| **Invoice**         | BOLT11 payment request (amount, expiry, routing hints)                       |
 
-<Mermaid caption="Total capacity is fixed until you splice or close; payments slide the balance boundary." chart="flowchart LR
+<Mermaid
+  caption="Total capacity is fixed until you splice or close; payments slide the balance boundary."
+  chart="flowchart LR
     subgraph channel [Channel capacity]
         Out[Your outbound<br/>spendable]
         In[Inbound<br/>theirs]
-    end" />
+    end"
+/>
 
-<Mermaid caption="Lightning hops across channels; Bitcoin settles channel open/close." chart="flowchart LR
+<Mermaid
+  caption="Lightning hops across channels; Bitcoin settles channel open/close."
+  chart="flowchart LR
     Payer[Payer wallet] --> NodeA[Local node]
     NodeA --> Route[Routed hops]
     Route --> NodeB[Recipient node]
     NodeB --> Payee[Payee wallet]
     NodeA -. on-chain funding .-> Chain[Bitcoin]
-    NodeB -. on-chain funding .-> Chain" />
+    NodeB -. on-chain funding .-> Chain"
+/>
 
 <Callout type="info" title="Channels are bilateral">
-  A channel exists between two nodes. Routing stitches channels into a network so payments can cross multiple peers.
+  A channel exists between two nodes. Routing stitches channels into a network so
+  payments can cross multiple peers.
 </Callout>
 
 **Done when:** You can explain why Lightning still needs on-chain Bitcoin for open/close.

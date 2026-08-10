@@ -24,10 +24,7 @@ const ICONS = {
   branch: GitBranch,
 } as const;
 
-export function DashboardSetupStrip({
-  items,
-  className,
-}: DashboardSetupStripProps) {
+export function DashboardSetupStrip({ items, className }: DashboardSetupStripProps) {
   if (items.length === 0) {
     return null;
   }
@@ -43,8 +40,8 @@ export function DashboardSetupStrip({
             setup // next steps
           </p>
           <p className="mt-1 max-w-xl font-mono text-xs text-muted-foreground">
-            Finish these once — empty dashboard cards stay hidden until you have
-            real activity.
+            Finish these once — empty dashboard cards stay hidden until you have real
+            activity.
           </p>
         </div>
       </div>

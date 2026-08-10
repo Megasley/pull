@@ -6,10 +6,7 @@ import { SiteContainer } from "@/components/layout/site-container";
 import { RepositoryExplorer } from "@/components/github/repository-explorer";
 import { Button } from "@/components/ui/button";
 import { bootstrapCurrentUserProfile } from "@/lib/auth/session";
-import {
-  getGithubConnectionPublic,
-  listGithubRepositories,
-} from "@/lib/github";
+import { getGithubConnectionPublic, listGithubRepositories } from "@/lib/github";
 
 export const metadata = {
   title: "Repositories",

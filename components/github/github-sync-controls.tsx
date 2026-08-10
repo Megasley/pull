@@ -4,10 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { RefreshCw } from "lucide-react";
 
-import {
-  connectGithubAction,
-  refreshGithubSyncAction,
-} from "@/app/actions/github";
+import { connectGithubAction, refreshGithubSyncAction } from "@/app/actions/github";
 import { reconnectGithubForSync } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
 import type { GithubSyncStatus } from "@/types/github";
@@ -17,10 +14,7 @@ type GithubSyncControlsProps = {
   syncStatus: GithubSyncStatus | null;
 };
 
-export function GithubSyncControls({
-  connected,
-  syncStatus,
-}: GithubSyncControlsProps) {
+export function GithubSyncControls({ connected, syncStatus }: GithubSyncControlsProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);

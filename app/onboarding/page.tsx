@@ -18,12 +18,15 @@ export default async function OnboardingPage() {
   }
 
   if (profile.onboardingCompletedAt) {
-    redirect(profile.preferredRoadmapSlug ? `/roadmaps/${profile.preferredRoadmapSlug}` : "/dashboard");
+    redirect(
+      profile.preferredRoadmapSlug
+        ? `/roadmaps/${profile.preferredRoadmapSlug}`
+        : "/dashboard",
+    );
   }
 
   const githubConnected =
-    isDatabaseConfigured() &&
-    Boolean(await getGithubConnectionPublic(profile.id));
+    isDatabaseConfigured() && Boolean(await getGithubConnectionPublic(profile.id));
 
   return <OnboardingWizard githubConnected={githubConnected} />;
 }

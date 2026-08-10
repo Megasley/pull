@@ -35,8 +35,8 @@ export function GithubIntegrationPanel({
       <div className="rounded-none border border-border bg-card p-5 sm:p-6">
         <h2 className="text-lg font-semibold tracking-tight">GitHub</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Connect GitHub to sync repositories, pull requests, issues, commits,
-          stars, followers, pinned repos, and your contribution graph.
+          Connect GitHub to sync repositories, pull requests, issues, commits, stars,
+          followers, pinned repos, and your contribution graph.
         </p>
         {showControls ? (
           <div className="mt-5">
@@ -72,22 +72,13 @@ export function GithubIntegrationPanel({
           ) : null}
         </div>
         {showControls ? (
-          <GithubSyncControls
-            connected
-            syncStatus={connection.syncStatus}
-          />
+          <GithubSyncControls connected syncStatus={connection.syncStatus} />
         ) : (
           <div className="flex flex-wrap gap-3">
-            <Link
-              href="/repositories"
-              className="text-sm underline underline-offset-4"
-            >
+            <Link href="/repositories" className="text-sm underline underline-offset-4">
               Explore repositories
             </Link>
-            <Link
-              href="/activity"
-              className="text-sm underline underline-offset-4"
-            >
+            <Link href="/activity" className="text-sm underline underline-offset-4">
               Activity timeline
             </Link>
             <Link

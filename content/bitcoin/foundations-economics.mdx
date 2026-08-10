@@ -1,6 +1,6 @@
 ---
 title: Bitcoin Economics
-description: 'Supply schedule, fee markets, mining incentives, and security assumptions.'
+description: "Supply schedule, fee markets, mining incentives, and security assumptions."
 difficulty: beginner
 duration: 4 days
 objectives:
@@ -9,17 +9,17 @@ objectives:
   - Connect miner incentives to network security
 resources:
   - title: Mastering Bitcoin
-    url: 'https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch01_intro.adoc'
+    url: "https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch01_intro.adoc"
     kind: book
-    chapter: 'Ch. 1: Introduction'
+    chapter: "Ch. 1: Introduction"
     required: true
   - title: Mastering Bitcoin
-    url: 'https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch02_overview.adoc'
+    url: "https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch02_overview.adoc"
     kind: book
-    chapter: 'Ch. 2: Overview'
+    chapter: "Ch. 2: Overview"
     required: true
-  - title: 'Bitcoin Optech: Transaction fees'
-    url: 'https://bitcoinops.org/en/topics/fee-bumping/'
+  - title: "Bitcoin Optech: Transaction fees"
+    url: "https://bitcoinops.org/en/topics/fee-bumping/"
     kind: article
     required: true
 reflectionPrompts:
@@ -40,18 +40,19 @@ lab:
     - One sat/vB (or fee) calculation with the numbers you used
     - Link to the Mastering Bitcoin or Optech section you relied on
 ---
-Bitcoin is software *and* an incentive system. If you only memorize data structures, you will still be surprised when fees spike or blocks fill.
+
+Bitcoin is software _and_ an incentive system. If you only memorize data structures, you will still be surprised when fees spike or blocks fill.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here. Use your Foundations **regtest** node for the hands-on step.
 
 ## Step 2 — Core idea: supply, fees, security
 
-| Term | Meaning | Builder impact |
-| --- | --- | --- |
-| **Block subsidy** | New bitcoin paid to the miner | Shrinks over halvings |
-| **Halving** | Subsidy cut ~every 210,000 blocks | Security shifts toward fees |
-| **Fee / sat/vB** | What users bid for block space | Wallet urgency |
-| **Mempool** | Waiting room for unconfirmed txs | Fee market venue |
+| Term              | Meaning                           | Builder impact              |
+| ----------------- | --------------------------------- | --------------------------- |
+| **Block subsidy** | New bitcoin paid to the miner     | Shrinks over halvings       |
+| **Halving**       | Subsidy cut ~every 210,000 blocks | Security shifts toward fees |
+| **Fee / sat/vB**  | What users bid for block space    | Wallet urgency              |
+| **Mempool**       | Waiting room for unconfirmed txs  | Fee market venue            |
 
 **Analogy:** Block space is seats on a fixed-size bus every ~10 minutes. High demand → higher fares. Miners earn fare box + subsidy.
 
@@ -60,14 +61,18 @@ const feeSats = inputSumSats - outputSumSats;
 const satPerVb = feeSats / virtualSize;
 ```
 
-<Mermaid caption="Users bid for inclusion; miners earn subsidy and fees; hashpower secures the ledger." chart="flowchart TD
+<Mermaid
+  caption="Users bid for inclusion; miners earn subsidy and fees; hashpower secures the ledger."
+  chart="flowchart TD
     Users[Users broadcast txs] --> Mempool[Mempool bids with fees]
     Mempool --> Miners[Miners select profitable txs]
     Miners --> Block[New block + subsidy + fees]
-    Block --> Security[Hashpower secures history]" />
+    Block --> Security[Hashpower secures history]"
+/>
 
 <Callout type="info" title="Security assumption">
-  Attacking the chain should cost more than it is worth. Fees and subsidy fund the hashpower that makes that true.
+  Attacking the chain should cost more than it is worth. Fees and subsidy fund the
+  hashpower that makes that true.
 </Callout>
 
 Design for fee spikes (RBF/CPFP), dust UTXOs, and different confirmation targets.
@@ -88,9 +93,9 @@ Then compute **fee** / approximate **sat/vB** for any lab send or decoded exampl
 
 ### Common mistakes
 
-- Hard-coding fees forever  
-- Treating the 21M cap as UX fluff  
-- Assuming Lightning removes on-chain fee literacy  
+- Hard-coding fees forever
+- Treating the 21M cap as UX fluff
+- Assuming Lightning removes on-chain fee literacy
 
 **Done when:** Lab evidence (balance output + fee calc + source link) is complete.
 

@@ -13,11 +13,11 @@ objectives:
   - List defensive practices and why watchtowers / uptime matter
 resources:
   - title: Payment channel congestion discussion
-    url: 'https://github.com/lightning/bolts/issues/182'
+    url: "https://github.com/lightning/bolts/issues/182"
     kind: docs
     required: true
   - title: On the Difficulty of Hiding the Balance of Lightning Network Channels
-    url: 'https://eprint.iacr.org/2019/328.pdf'
+    url: "https://eprint.iacr.org/2019/328.pdf"
     kind: article
     required: true
   - title: 2019 LND/CLN/Eclair CVE disclosure
@@ -26,7 +26,7 @@ resources:
     kind: article
     required: true
   - title: Mastering the Lightning Network
-    url: 'https://github.com/lnbook/lnbook'
+    url: "https://github.com/lnbook/lnbook"
     kind: book
     chapter: Security / attacks overview
 reflectionPrompts:
@@ -53,6 +53,7 @@ searchQueries:
   - Lightning attack surface
   - channel jamming
 ---
+
 Lightning’s safety depends on **timelocks, honesty assumptions, availability, and implementation correctness**. Attackers may not need to steal immediately — locking liquidity, probing balances, or racing offline victims can still win.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here. This closes **Routing & Liquidity**.
@@ -61,23 +62,27 @@ Complete **Step 1 // Required reading** in the study plan above, then continue h
 
 Builders shipping POS, wallets, or routing services inherit LN’s adversarial reality. Ignoring known griefing classes and past CVEs is negligence.
 
-| Class | Idea |
-| --- | --- |
-| **Congestion / jamming** | Hold HTLCs / paths to consume capacity and degrade success |
-| **Probing** | Learn balances via success/failure of trial payments |
-| **Offline breach** | Broadcast old state while victim is offline — watchtowers help |
-| **Shared CVEs** | Multi-implementation bugs — patch process matters |
+| Class                    | Idea                                                           |
+| ------------------------ | -------------------------------------------------------------- |
+| **Congestion / jamming** | Hold HTLCs / paths to consume capacity and degrade success     |
+| **Probing**              | Learn balances via success/failure of trial payments           |
+| **Offline breach**       | Broadcast old state while victim is offline — watchtowers help |
+| **Shared CVEs**          | Multi-implementation bugs — patch process matters              |
 
-<Mermaid caption="Attack classes target liquidity, privacy, or offline justice — not only direct theft." chart="flowchart TD
+<Mermaid
+  caption="Attack classes target liquidity, privacy, or offline justice — not only direct theft."
+  chart="flowchart TD
     Adv[Adversary] --> Jam[Congestion / jamming]
     Adv --> Probe[Balance probing]
     Adv --> Breach[Offline breach race]
     Jam --> Cap[Locked capacity]
     Probe --> Priv[Privacy leak]
-    Breach --> Tower[Watchtower / uptime]" />
+    Breach --> Tower[Watchtower / uptime]"
+/>
 
 <Callout type="info" title="Defense in depth">
-  Limits, monitoring, backups, towers, and conservative channel sizes beat clever one-off settings.
+  Limits, monitoring, backups, towers, and conservative channel sizes beat clever
+  one-off settings.
 </Callout>
 
 **Done when:** You can explain why locking liquidity without theft still damages a product.

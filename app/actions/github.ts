@@ -3,13 +3,18 @@
 import { revalidatePath } from "next/cache";
 
 import { bootstrapCurrentUserProfile } from "@/lib/auth/session";
-import {
-  connectGithubFromSession,
-  runGithubSync,
-} from "@/lib/github";
+import { connectGithubFromSession, runGithubSync } from "@/lib/github";
 
 export type GithubActionResult =
-  | { ok: true; summary?: { repositories: number; pullRequests: number; issues: number; commits: number } }
+  | {
+      ok: true;
+      summary?: {
+        repositories: number;
+        pullRequests: number;
+        issues: number;
+        commits: number;
+      };
+    }
   | { ok: false; error: string; reason?: "unauthenticated" };
 
 export async function connectGithubAction(): Promise<GithubActionResult> {

@@ -11,21 +11,21 @@ objectives:
   - List practical defenses for node operators and wallet backends
 resources:
   - title: Eclipse Attacks on Bitcoin’s Peer-to-Peer Network
-    url: 'https://eprint.iacr.org/2015/263.pdf'
+    url: "https://eprint.iacr.org/2015/263.pdf"
     kind: article
     required: true
   - title: BIP-152 Compact Block Relay
-    url: 'https://github.com/bitcoin/bips/blob/master/bip-0152.mediawiki'
+    url: "https://github.com/bitcoin/bips/blob/master/bip-0152.mediawiki"
     kind: bip
     required: true
   - title: Compact Blocks FAQ
-    url: 'https://bitcoincore.org/en/2016/06/07/compact-blocks-faq/'
+    url: "https://bitcoincore.org/en/2016/06/07/compact-blocks-faq/"
     kind: docs
     required: true
   - title: Mastering Bitcoin
-    url: 'https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch10_network.adoc'
+    url: "https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch10_network.adoc"
     kind: book
-    chapter: 'Ch. 10: The Bitcoin Network'
+    chapter: "Ch. 10: The Bitcoin Network"
 reflectionPrompts:
   - >-
     How can an adversary isolate a node from honest peers, and what symptoms
@@ -49,6 +49,7 @@ lab:
 searchQueries:
   - BIP152
 ---
+
 Bitcoin’s **P2P network** is not just plumbing. Peer selection, relay, and topology affect censorship resistance, privacy, and whether your node sees the same chain tip as the honest majority.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here.
@@ -61,11 +62,14 @@ An **eclipse attack** aims to surround a victim with attacker-controlled peers s
 
 **BIP-152 compact blocks** reduce bandwidth when relaying new blocks by sending short transaction IDs peers likely already have. This improves propagation — it is **not** a substitute for validating consensus rules.
 
-<Mermaid caption="Honest nodes need diverse peers; compacted relay speeds block gossip." chart="flowchart LR
+<Mermaid
+  caption="Honest nodes need diverse peers; compacted relay speeds block gossip."
+  chart="flowchart LR
     Miner[Miner / proposer] --> Relay[Block relay]
     Relay --> Compact[Compact block]
     Compact --> Peers[Diverse peers]
-    Peers --> Validate[Full validation]" />
+    Peers --> Validate[Full validation]"
+/>
 
 ### Operator habits
 
@@ -73,7 +77,7 @@ An **eclipse attack** aims to surround a victim with attacker-controlled peers s
 - Monitor peer churn and unexpected tip disagreements
 - Separate listening services from keys when possible
 
-**Done when:** You can name one eclipse symptom and one thing BIP-152 does *not* fix.
+**Done when:** You can name one eclipse symptom and one thing BIP-152 does _not_ fix.
 
 ## Step 3 — Threat note for your setup (lab)
 

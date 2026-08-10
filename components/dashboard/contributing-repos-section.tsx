@@ -8,9 +8,7 @@ type ContributingReposSectionProps = {
   repos: ContributingRepoItem[];
 };
 
-export function ContributingReposSection({
-  repos,
-}: ContributingReposSectionProps) {
+export function ContributingReposSection({ repos }: ContributingReposSectionProps) {
   if (repos.length === 0) {
     return null;
   }

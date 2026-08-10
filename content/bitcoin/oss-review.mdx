@@ -4,20 +4,20 @@ description: Review peer pull requests and learn what maintainers expect from co
 difficulty: intermediate
 duration: 5 days
 objectives:
-  - 'Review diffs for correctness, tests, and clarity'
+  - "Review diffs for correctness, tests, and clarity"
   - Leave actionable comments without noise
   - Understand ACK culture and CI expectations
 resources:
   - title: Bitcoin Core CONTRIBUTING
-    url: 'https://github.com/bitcoin/bitcoin/blob/master/CONTRIBUTING.md'
+    url: "https://github.com/bitcoin/bitcoin/blob/master/CONTRIBUTING.md"
     kind: docs
     required: true
   - title: Conventional comments
-    url: 'https://conventionalcomments.org/'
+    url: "https://conventionalcomments.org/"
     kind: article
     required: true
   - title: Bitcoin Optech Newsletter
-    url: 'https://bitcoinops.org/en/newsletters/'
+    url: "https://bitcoinops.org/en/newsletters/"
     kind: article
 reflectionPrompts:
   - >-
@@ -38,6 +38,7 @@ lab:
     - Written review notes (or link to your GitHub comments)
     - One sentence on whether you would ACK, NACK, or request changes — and why
 ---
+
 Reviewing is how Bitcoin stays safe. You will learn more from careful review than from rushing another feature PR.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here.
@@ -53,11 +54,14 @@ What to check:
 3. Are edge cases handled?
 4. Is the diff minimal?
 
-<Mermaid caption="Description → diff → tests → informed ACK or change request." chart="flowchart LR
+<Mermaid
+  caption="Description → diff → tests → informed ACK or change request."
+  chart="flowchart LR
     PR[Open PR] --> Read[Read description]
     Read --> Diff[Inspect diff]
     Diff --> Test[Run tests]
-    Test --> Comment[Comment / ACK]" />
+    Test --> Comment[Comment / ACK]"
+/>
 
 <Callout type="info" title="Be precise">
   Prefer “This breaks reorg handling because X” over “Hmm not sure.”

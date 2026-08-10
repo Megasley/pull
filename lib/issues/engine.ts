@@ -79,7 +79,11 @@ export function recommendIssues(
 
   for (const issue of issues) {
     if (dismissed.has(issue.id)) continue;
-    if (options.category && options.category !== "all" && issue.category !== options.category) {
+    if (
+      options.category &&
+      options.category !== "all" &&
+      issue.category !== options.category
+    ) {
       continue;
     }
 
@@ -91,7 +95,11 @@ export function recommendIssues(
       continue;
     }
 
-    if (options.skill && options.skill !== "all" && !issue.skills.includes(options.skill)) {
+    if (
+      options.skill &&
+      options.skill !== "all" &&
+      !issue.skills.includes(options.skill)
+    ) {
       continue;
     }
 

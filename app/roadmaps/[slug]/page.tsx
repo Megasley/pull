@@ -29,8 +29,7 @@ export async function generateMetadata({ params }: RoadmapPageProps) {
   const base = getSiteUrl() || siteConfig.url;
   const path = `/roadmaps/${slug}`;
   const title = `${roadmap.title} roadmap`;
-  const description =
-    "description" in roadmap ? roadmap.description : undefined;
+  const description = "description" in roadmap ? roadmap.description : undefined;
   const imageUrl = `${base}${path}/opengraph-image`;
 
   return {

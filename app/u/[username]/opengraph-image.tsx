@@ -19,23 +19,21 @@ export default async function OpenGraphImage({ params }: OgProps) {
 
   if (!profile || profile.accountStatus !== "active" || !profile.profilePublic) {
     return new ImageResponse(
-      (
-        <div
-          style={{
-            width: "100%",
-            height: "100%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            background: "#c8f231",
-            color: "#231e1e",
-            fontSize: 48,
-            fontWeight: 700,
-          }}
-        >
-          Pull Builder
-        </div>
-      ),
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "#c8f231",
+          color: "#231e1e",
+          fontSize: 48,
+          fontWeight: 700,
+        }}
+      >
+        Pull Builder
+      </div>,
       { ...size },
     );
   }
@@ -52,73 +50,67 @@ export default async function OpenGraphImage({ params }: OgProps) {
   const skills = profile.skills.slice(0, 4).join(" · ");
 
   return new ImageResponse(
-    (
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        padding: "64px",
+        background: "#c8f231",
+        color: "#231e1e",
+        fontFamily: "ui-sans-serif, system-ui, sans-serif",
+      }}
+    >
       <div
         style={{
-          width: "100%",
-          height: "100%",
           display: "flex",
-          flexDirection: "column",
           justifyContent: "space-between",
-          padding: "64px",
-          background: "#c8f231",
-          color: "#231e1e",
-          fontFamily: "ui-sans-serif, system-ui, sans-serif",
+          alignItems: "center",
+          fontSize: 28,
+          opacity: 0.7,
         }}
       >
+        <span style={{ fontWeight: 700, letterSpacing: "-0.04em" }}>Pull</span>
+        <span style={{ fontSize: 22 }}>pullos.dev/u/{profile.username}</span>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
         <div
           style={{
             display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            fontSize: 28,
-            opacity: 0.7,
+            fontSize: 64,
+            fontWeight: 700,
+            letterSpacing: "-0.04em",
+            lineHeight: 0.95,
           }}
         >
-          <span style={{ fontWeight: 700, letterSpacing: "-0.04em" }}>Pull</span>
-          <span style={{ fontSize: 22 }}>pullos.dev/u/{profile.username}</span>
+          {displayName}
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-          <div
-            style={{
-              display: "flex",
-              fontSize: 64,
-              fontWeight: 700,
-              letterSpacing: "-0.04em",
-              lineHeight: 0.95,
-            }}
-          >
-            {displayName}
-          </div>
-          <div style={{ display: "flex", fontSize: 32, opacity: 0.75 }}>
-            {handle}
-          </div>
-          <div
-            style={{
-              display: "flex",
-              fontSize: 28,
-              opacity: 0.7,
-              maxWidth: 900,
-              lineHeight: 1.25,
-              letterSpacing: "-0.02em",
-            }}
-          >
-            {bio.slice(0, 140)}
-          </div>
-          {skills ? (
-            <div style={{ display: "flex", fontSize: 22, opacity: 0.65 }}>
-              {skills}
-            </div>
-          ) : null}
+        <div style={{ display: "flex", fontSize: 32, opacity: 0.75 }}>{handle}</div>
+        <div
+          style={{
+            display: "flex",
+            fontSize: 28,
+            opacity: 0.7,
+            maxWidth: 900,
+            lineHeight: 1.25,
+            letterSpacing: "-0.02em",
+          }}
+        >
+          {bio.slice(0, 140)}
         </div>
-        <div style={{ display: "flex", gap: 28, fontSize: 24, opacity: 0.85 }}>
-          <span>Score {builderScore.score}</span>
-          <span>Reputation {reputation.score}</span>
-          <span>Level {level.level}</span>
-          {mergedCount > 0 ? <span>{mergedCount} merged PRs</span> : null}
-        </div>
+        {skills ? (
+          <div style={{ display: "flex", fontSize: 22, opacity: 0.65 }}>{skills}</div>
+        ) : null}
       </div>
-    ),
+      <div style={{ display: "flex", gap: 28, fontSize: 24, opacity: 0.85 }}>
+        <span>Score {builderScore.score}</span>
+        <span>Reputation {reputation.score}</span>
+        <span>Level {level.level}</span>
+        {mergedCount > 0 ? <span>{mergedCount} merged PRs</span> : null}
+      </div>
+    </div>,
     { ...size },
   );
 }

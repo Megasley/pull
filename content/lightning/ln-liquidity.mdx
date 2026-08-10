@@ -1,6 +1,6 @@
 ---
 title: Liquidity Operations
-description: 'Manage inbound/outbound balance with loops, swaps, rebalancing, and peer liquidity.'
+description: "Manage inbound/outbound balance with loops, swaps, rebalancing, and peer liquidity."
 difficulty: advanced
 duration: 7 days
 objectives:
@@ -9,15 +9,15 @@ objectives:
   - Understand liquidity ads at a high level
 resources:
   - title: Mastering the Lightning Network
-    url: 'https://github.com/lnbook/lnbook/blob/master/08_routing_htlcs.asciidoc'
+    url: "https://github.com/lnbook/lnbook/blob/master/08_routing_htlcs.asciidoc"
     kind: book
-    chapter: 'Ch. 8: Routing (liquidity context)'
+    chapter: "Ch. 8: Routing (liquidity context)"
     required: true
   - title: Lightning Loop
-    url: 'https://docs.lightning.engineering/lightning-network-tools/loop'
+    url: "https://docs.lightning.engineering/lightning-network-tools/loop"
     kind: docs
   - title: Liquidity advertisements
-    url: 'https://bitcoinops.org/en/topics/liquidity-advertisements/'
+    url: "https://bitcoinops.org/en/topics/liquidity-advertisements/"
     kind: article
 reflectionPrompts:
   - Explain Liquidity to a teammate without jargon - what problem does it solve?
@@ -37,6 +37,7 @@ lab:
     - Chosen tool (rebalance / loop in / loop out / peer liquidity) and why
     - Link to Ch. 8 section you used
 ---
+
 You already understand **inbound vs outbound** from the Channels chapter. This lesson covers **operations**: how to fix imbalances once you diagnose them.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here. This opens **Routing & Liquidity**.
@@ -47,19 +48,23 @@ A node with lots of bitcoin locked but zero inbound capacity still cannot get pa
 
 **Analogy:** A highway with all cars stuck on one side of a toll bridge. You need flows (or trucks repositioning cars) to free lanes in both directions.
 
-<Mermaid caption="Different shortages call for rebalancing, loops, or peer liquidity." chart="flowchart LR
+<Mermaid
+  caption="Different shortages call for rebalancing, loops, or peer liquidity."
+  chart="flowchart LR
     Out[Outbound<br/>liquidity] --> Rebalance[Circular<br/>rebalance]
     In[Inbound<br/>liquidity] --> LoopOut[Loop out /<br/>Splice out]
     NeedIn[Need inbound<br/>liquidity] --> Ads[Liquidity ads /<br/>peer liquidity]
-    NeedIn --> LoopIn[Loop in]" />
+    NeedIn --> LoopIn[Loop in]"
+/>
 
-| Shortage | Typical moves |
-| --- | --- |
-| Need **outbound** | Circular rebalance; receive more; open/fund carefully |
-| Need **inbound** | Loop in; liquidity ads / peer liquidity; dual-fund peers |
+| Shortage          | Typical moves                                            |
+| ----------------- | -------------------------------------------------------- |
+| Need **outbound** | Circular rebalance; receive more; open/fund carefully    |
+| Need **inbound**  | Loop in; liquidity ads / peer liquidity; dual-fund peers |
 
 <Callout type="info" title="Capital has cost">
-  Every sat locked has opportunity cost. Measure routing revenue vs capital before scaling channels.
+  Every sat locked has opportunity cost. Measure routing revenue vs capital before
+  scaling channels.
 </Callout>
 
 **Done when:** You can pick a first tool from a balance screenshot without guessing.

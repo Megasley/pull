@@ -9,14 +9,14 @@ objectives:
   - Document decisions for future reviewers
 resources:
   - title: Bitcoin Core CONTRIBUTING
-    url: 'https://github.com/bitcoin/bitcoin/blob/master/CONTRIBUTING.md'
+    url: "https://github.com/bitcoin/bitcoin/blob/master/CONTRIBUTING.md"
     kind: docs
     required: true
-  - title: 'GitHub: Addressing review feedback'
-    url: 'https://docs.github.com/en/pull-requests'
+  - title: "GitHub: Addressing review feedback"
+    url: "https://docs.github.com/en/pull-requests"
     kind: docs
-  - title: 'Pro Git: Rewriting history'
-    url: 'https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History'
+  - title: "Pro Git: Rewriting history"
+    url: "https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History"
     kind: docs
 reflectionPrompts:
   - >-
@@ -39,20 +39,24 @@ lab:
     - Summary of one review round (what changed, what remains open)
     - Updated rubric self-score after the revision
 ---
+
 Landing a meaningful PR is a communication skill. Expect iterations. Maintainers juggle scarcity of attention and high cost of mistakes.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here.
 
 ## Step 2 — Context: the collaboration loop
 
-<Mermaid caption="Expect multiple rounds; keep commits and responses crisp." chart="sequenceDiagram
+<Mermaid
+  caption="Expect multiple rounds; keep commits and responses crisp."
+  chart="sequenceDiagram
     participant You
     participant Maintainer
     You->>Maintainer: Open PR + tests
     Maintainer->>You: Review comments
     You->>You: Revise + explain
     You->>Maintainer: Push updates
-    Maintainer->>You: ACK / request more" />
+    Maintainer->>You: ACK / request more"
+/>
 
 <Callout type="tip" title="Summarize each push">
   Reply with what changed and what remains open. Save reviewers time.

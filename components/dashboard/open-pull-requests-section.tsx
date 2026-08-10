@@ -44,9 +44,7 @@ export function OpenPullRequestsSection({
             >
               <p className="text-sm font-medium">
                 {pr.title}{" "}
-                <span className="font-mono text-muted-foreground">
-                  #{pr.number}
-                </span>
+                <span className="font-mono text-muted-foreground">#{pr.number}</span>
               </p>
               <p className="mt-0.5 font-mono text-[10px] text-muted-foreground">
                 {pr.repoFullName} · {pr.reviewComments} comment

@@ -62,10 +62,7 @@ export function LessonExperience({
   const [helpOpen, setHelpOpen] = useState(false);
   const readingProgress = useReadingProgress();
   const headingIds = lesson.toc.map((item) => item.id);
-  const { activeId, scrollToHeading } = useActiveHeading(
-    "lesson-content",
-    headingIds,
-  );
+  const { activeId, scrollToHeading } = useActiveHeading("lesson-content", headingIds);
   const { isAuthenticated, userId } = useAuthSession();
   const { isComplete, toggleComplete, roadmapProgress } = useLessonCompletion(
     lesson.roadmap,
@@ -96,10 +93,7 @@ export function LessonExperience({
   const interactiveLabs = resolveInteractiveLabs(lesson);
   const reflectionPrompts = normalizeStringList(lesson.reflectionPrompts);
   const searchQueries = resolveSearchQueries(lesson);
-  const primarySearchQuery = resolveLessonSearchQuery(
-    searchQueries,
-    lesson.title,
-  );
+  const primarySearchQuery = resolveLessonSearchQuery(searchQueries, lesson.title);
   const researchUrl = primarySearchQuery
     ? buildBitcoinSearchUrl(primarySearchQuery)
     : null;
@@ -280,10 +274,7 @@ export function LessonExperience({
                 signInHref={signInHref}
               />
             )}
-            <LessonNavigationBar
-              roadmapSlug={lesson.roadmap}
-              navigation={navigation}
-            />
+            <LessonNavigationBar roadmapSlug={lesson.roadmap} navigation={navigation} />
           </div>
 
           <aside className="hidden xl:block">
@@ -296,17 +287,13 @@ export function LessonExperience({
               <div className="space-y-2 text-xs leading-5 text-muted-foreground">
                 <p>
                   Press{" "}
-                  <kbd className="rounded border px-1 py-0.5 font-mono">
-                    Shift
-                  </kbd>{" "}
-                  +{" "}
-                  <kbd className="rounded border px-1 py-0.5 font-mono">?</kbd>{" "}
-                  for keyboard shortcuts.
+                  <kbd className="rounded border px-1 py-0.5 font-mono">Shift</kbd> +{" "}
+                  <kbd className="rounded border px-1 py-0.5 font-mono">?</kbd> for
+                  keyboard shortcuts.
                 </p>
                 {researchUrl ? (
                   <p>
-                    Press{" "}
-                    <kbd className="rounded border px-1 py-0.5 font-mono">R</kbd>{" "}
+                    Press <kbd className="rounded border px-1 py-0.5 font-mono">R</kbd>{" "}
                     to research on Bitcoin Search.
                   </p>
                 ) : null}

@@ -98,7 +98,9 @@ export default async function AdminUserDetailPage({
           <div className="rounded-none border border-border bg-card p-4">
             <h2 className="text-sm font-semibold">Roadmap progress</h2>
             {roadmaps.length === 0 ? (
-              <p className="mt-2 text-sm text-muted-foreground">No lesson progress yet.</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                No lesson progress yet.
+              </p>
             ) : (
               <ul className="mt-3 space-y-2 text-sm">
                 {roadmaps.map((item) => (
@@ -168,7 +170,9 @@ export default async function AdminUserDetailPage({
           <div className="rounded-none border border-border bg-card p-4">
             <h2 className="text-sm font-semibold">Audit log</h2>
             {auditLog.length === 0 ? (
-              <p className="mt-2 text-sm text-muted-foreground">No admin actions yet.</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                No admin actions yet.
+              </p>
             ) : (
               <ul className="mt-3 space-y-2 text-sm">
                 {auditLog.map((entry) => (

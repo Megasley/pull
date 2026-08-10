@@ -49,9 +49,7 @@ for (const [track, lessonSlugs] of Object.entries(requiredLessonsByTrack)) {
 
   for (const lessonSlug of lessonSlugs) {
     if (!lessonCoverage.has(lessonSlug)) {
-      errors.push(
-        `[${track}] No review club items tagged for lesson: ${lessonSlug}`,
-      );
+      errors.push(`[${track}] No review club items tagged for lesson: ${lessonSlug}`);
     }
   }
 }
@@ -65,9 +63,7 @@ for (const { slug, roadmap } of roadmaps) {
     );
 
     if (!hasSectionCoverage) {
-      errors.push(
-        `[${slug}] No review club items for section: ${section.id}`,
-      );
+      errors.push(`[${slug}] No review club items for section: ${section.id}`);
     }
   }
 }

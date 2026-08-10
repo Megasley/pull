@@ -2,11 +2,7 @@ import { desc, eq } from "drizzle-orm";
 
 import { getDb } from "@/lib/db";
 import { isDatabaseConfigured } from "@/lib/db/env";
-import {
-  projectSubmissions,
-  projects,
-  submissionReviews,
-} from "@/lib/db/schema";
+import { projectSubmissions, projects, submissionReviews } from "@/lib/db/schema";
 import {
   getGithubConnection,
   listGithubContributionDays,
@@ -144,10 +140,7 @@ export async function loadContributingRepos(
     listGithubIssues(userId, { state: "open", limit: 100 }),
   ]);
 
-  const map = new Map<
-    string,
-    { openPullRequests: number; openIssues: number }
-  >();
+  const map = new Map<string, { openPullRequests: number; openIssues: number }>();
 
   for (const pr of openPrs) {
     const entry = map.get(pr.repoFullName) ?? {
@@ -175,10 +168,7 @@ export async function loadContributingRepos(
       href: `https://github.com/${fullName}`,
     }))
     .sort(
-      (a, b) =>
-        b.openPullRequests +
-        b.openIssues -
-        (a.openPullRequests + a.openIssues),
+      (a, b) => b.openPullRequests + b.openIssues - (a.openPullRequests + a.openIssues),
     )
     .slice(0, 8);
 }
@@ -202,9 +192,7 @@ export async function loadOpenPullRequests(
   }));
 }
 
-export async function loadAssignedIssues(
-  userId: string,
-): Promise<AssignedIssueItem[]> {
+export async function loadAssignedIssues(userId: string): Promise<AssignedIssueItem[]> {
   const issues = await listGithubIssues(userId, {
     state: "open",
     relation: "assigned",
@@ -289,9 +277,7 @@ export function computePortfolioCompletion(input: {
       id: "links",
       label: "Add a website or social link",
       done: Boolean(
-        input.profile.website ||
-          input.profile.twitterUrl ||
-          input.profile.linkedinUrl,
+        input.profile.website || input.profile.twitterUrl || input.profile.linkedinUrl,
       ),
       href: "/settings/profile",
     },
@@ -346,10 +332,7 @@ export async function loadSuggestedContributions(
     repository: item.repositoryFullName,
     description: item.reasons[0] ?? item.issue.summary,
     url: item.issue.url,
-    tags: [item.issue.category, item.issue.language, ...item.issue.labels].slice(
-      0,
-      4,
-    ),
+    tags: [item.issue.category, item.issue.language, ...item.issue.labels].slice(0, 4),
   }));
 }
 

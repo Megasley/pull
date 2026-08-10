@@ -8,9 +8,7 @@ export type GroupedTimelineEvent = TimelineEvent & {
  * Collapse consecutive commits with the same title + repo description
  * (matches pull_profile_redesign.html timeline grouping).
  */
-export function groupTimelineEvents(
-  events: TimelineEvent[],
-): GroupedTimelineEvent[] {
+export function groupTimelineEvents(events: TimelineEvent[]): GroupedTimelineEvent[] {
   const grouped: GroupedTimelineEvent[] = [];
 
   for (const event of events) {

@@ -1,6 +1,4 @@
-export {
-  AchievementsSection,
-} from "./achievements-section";
+export { AchievementsSection } from "./achievements-section";
 export { AssignedIssuesSection } from "./assigned-issues-section";
 export { BuilderLevelSection } from "./builder-level-section";
 export { ContinueLearningSection } from "./continue-learning-section";

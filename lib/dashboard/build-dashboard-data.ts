@@ -5,9 +5,7 @@ import {
   resolveNodeStatuses,
 } from "@/lib/roadmap/progress";
 import { isPrerequisiteRoadmapComplete } from "@/lib/roadmap/prerequisites";
-import {
-  buildAllRoadmapProgressSummaries,
-} from "@/lib/progress/summary";
+import { buildAllRoadmapProgressSummaries } from "@/lib/progress/summary";
 import type {
   AchievementItem,
   BuilderLevelInfo,

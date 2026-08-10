@@ -1,6 +1,6 @@
 ---
 title: Bitcoin Core & RPC
-description: 'Operate bitcoind and drive wallets, chain queries, and tests over RPC.'
+description: "Operate bitcoind and drive wallets, chain queries, and tests over RPC."
 difficulty: intermediate
 duration: 5 days
 objectives:
@@ -12,13 +12,13 @@ resources:
     url: >-
       https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch03_bitcoin-core.adoc
     kind: book
-    chapter: 'Ch. 3: Bitcoin Core'
+    chapter: "Ch. 3: Bitcoin Core"
     required: true
   - title: Bitcoin Core RPC reference
-    url: 'https://developer.bitcoin.org/reference/rpc/'
+    url: "https://developer.bitcoin.org/reference/rpc/"
     kind: docs
   - title: bitcoin.conf options
-    url: 'https://github.com/bitcoin/bitcoin/blob/master/share/examples/bitcoin.conf'
+    url: "https://github.com/bitcoin/bitcoin/blob/master/share/examples/bitcoin.conf"
     kind: docs
 reflectionPrompts:
   - >-
@@ -40,6 +40,7 @@ lab:
     - One sentence on how you authenticate RPC (and that it is not public)
     - Link to Mastering Bitcoin Ch. 3 section you used
 ---
+
 **Bitcoin Core** (`bitcoind` + `bitcoin-cli`) is the reference full node. Most serious backends either run it or carefully justify an alternative.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here. You already stood up regtest in Foundations — this lesson deepens RPC habits.
@@ -50,12 +51,15 @@ RPC is how you mine regtest blocks, fund addresses, inspect mempools, and import
 
 **Analogy:** `bitcoind` is the engine; RPC is the instrument cluster and ignition keyed to authorized operators. Never bolt the ignition onto the public internet.
 
-<Mermaid caption="Authenticated RPC controls node and wallet operations." chart="flowchart LR
+<Mermaid
+  caption="Authenticated RPC controls node and wallet operations."
+  chart="flowchart LR
     Cli[bitcoin-cli / app] --> Auth[Cookie or user/pass]
     Auth --> Rpc[JSON-RPC]
     Rpc --> Core[bitcoind]
     Core --> Chain[Chainstate + mempool]
-    Core --> Wallets[Wallet(s)]" />
+    Core --> Wallets[Wallet(s)]"
+/>
 
 Useful call families:
 
@@ -64,7 +68,8 @@ Useful call families:
 - Wallet: `sendtoaddress`, `importdescriptors`, PSBT RPCs
 
 <Callout type="danger" title="RPC exposure">
-  Bind RPC to localhost. Use cookie auth or strong credentials. Never put `rpcallowip=0.0.0.0/0` on a valued node.
+  Bind RPC to localhost. Use cookie auth or strong credentials. Never put
+  `rpcallowip=0.0.0.0/0` on a valued node.
 </Callout>
 
 **Done when:** You can name three RPC families and one hard rule for exposure.

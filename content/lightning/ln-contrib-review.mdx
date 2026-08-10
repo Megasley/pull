@@ -9,14 +9,14 @@ objectives:
   - Separate implementation bugs from spec ambiguities
 resources:
   - title: lightning/bolts PRs
-    url: 'https://github.com/lightning/bolts/pulls'
+    url: "https://github.com/lightning/bolts/pulls"
     kind: bolt
     required: true
   - title: BOLT review process
-    url: 'https://github.com/lightning/bolts'
+    url: "https://github.com/lightning/bolts"
     kind: docs
   - title: Bitcoin Optech Lightning notes
-    url: 'https://bitcoinops.org/en/newsletters/'
+    url: "https://bitcoinops.org/en/newsletters/"
     kind: article
 reflectionPrompts:
   - >-
@@ -39,6 +39,7 @@ lab:
     - Structured review answering the four checklist questions
     - One sentence separating “implementation bug” vs “spec ambiguity” if relevant
 ---
+
 Specification review keeps the network coherent. Practice evaluating proposals for clarity, edge cases, and backward compatibility.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here. This closes the **Lightning** roadmap.
@@ -54,11 +55,14 @@ Review checklist:
 3. What new failure modes appear?
 4. Are test vectors included?
 
-<Mermaid caption="Read, analyze interop, review, discuss." chart="flowchart LR
+<Mermaid
+  caption="Read, analyze interop, review, discuss."
+  chart="flowchart LR
     Prop[Proposal / BOLT PR] --> Read[Read carefully]
     Read --> Impact[Interop impact]
     Impact --> Review[Write review]
-    Review --> Discuss[Discuss with authors]" />
+    Review --> Discuss[Discuss with authors]"
+/>
 
 <Callout type="info" title="Tone matters">
   Spec debates can be intense. Be precise, charitable, and evidence-based.

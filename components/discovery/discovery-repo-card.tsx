@@ -91,9 +91,7 @@ export function DiscoveryRepoCard({
         </p>
         <p className="flex min-w-0 items-start gap-1.5">
           <HeartPulse className="mt-0.5 size-3.5 shrink-0" aria-hidden />
-          <span className="min-w-0 break-words">
-            {HEALTH_LABEL[repository.health]}
-          </span>
+          <span className="min-w-0 break-words">{HEALTH_LABEL[repository.health]}</span>
         </p>
       </div>
 

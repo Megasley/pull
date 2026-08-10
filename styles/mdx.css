@@ -38,7 +38,10 @@
   counter-reset: line;
 }
 
-.mdx-content [data-rehype-pretty-code-figure] [data-line-numbers] > [data-line]::before {
+.mdx-content
+  [data-rehype-pretty-code-figure]
+  [data-line-numbers]
+  > [data-line]::before {
   counter-increment: line;
   content: counter(line);
   display: inline-block;
@@ -145,4 +148,3 @@
     white-space: normal;
   }
 }
-

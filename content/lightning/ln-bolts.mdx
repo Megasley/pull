@@ -9,15 +9,15 @@ objectives:
   - Know where to follow spec discussions
 resources:
   - title: Lightning BOLTs
-    url: 'https://github.com/lightning/bolts/blob/master/00-introduction.md'
+    url: "https://github.com/lightning/bolts/blob/master/00-introduction.md"
     kind: bolt
     required: true
   - title: Mastering the Lightning Network
-    url: 'https://github.com/lnbook/lnbook'
+    url: "https://github.com/lnbook/lnbook"
     kind: book
-    chapter: 'Spec references throughout, keep BOLTs open while reading'
+    chapter: "Spec references throughout, keep BOLTs open while reading"
   - title: Lightning RFC discussions
-    url: 'https://github.com/lightning/bolts/pulls'
+    url: "https://github.com/lightning/bolts/pulls"
     kind: docs
 reflectionPrompts:
   - >-
@@ -41,6 +41,7 @@ searchQueries:
   - BOLT
   - Lightning Network
 ---
+
 **BOLTs** (Basis of Lightning Technology) are the interoperability specs for Lightning. LND, Core Lightning, and LDK aim to speak the same protocol so heterogeneous nodes can route.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here.
@@ -53,25 +54,29 @@ Without shared specs, every implementation would be an island. Builders reading 
 
 You do **not** need to read these cover-to-cover now — each gets a dedicated lesson later:
 
-| BOLT | Focus | Later lesson |
-| --- | --- | --- |
-| 2 | Channel management / HTLCs | Channels & HTLCs |
-| 3 | Transactions | Commitment Transactions |
-| 4 | Onion routing | Onion Routing |
-| 7 | Gossip | Routing & Pathfinding |
-| 11 | Invoices | BOLT11 Invoices |
-| 12 | Offers (evolving) | BOLT12 Offers |
+| BOLT | Focus                      | Later lesson            |
+| ---- | -------------------------- | ----------------------- |
+| 2    | Channel management / HTLCs | Channels & HTLCs        |
+| 3    | Transactions               | Commitment Transactions |
+| 4    | Onion routing              | Onion Routing           |
+| 7    | Gossip                     | Routing & Pathfinding   |
+| 11   | Invoices                   | BOLT11 Invoices         |
+| 12   | Offers (evolving)          | BOLT12 Offers           |
 
-<Mermaid caption="Multiple implementations converge on BOLTs for network compatibility." chart="flowchart TD
+<Mermaid
+  caption="Multiple implementations converge on BOLTs for network compatibility."
+  chart="flowchart TD
     Bolts[BOLTs specs] --> LND[LND]
     Bolts --> CLN[Core Lightning]
     Bolts --> LDK[LDK]
     LND --> Net[Interoperable network]
     CLN --> Net
-    LDK --> Net" />
+    LDK --> Net"
+/>
 
 <Callout type="tip" title="Read with a question, not cover-to-cover">
-  Open a BOLT when a later lesson or a bug points you there. Keep Mastering Lightning nearby for narrative context.
+  Open a BOLT when a later lesson or a bug points you there. Keep Mastering Lightning
+  nearby for narrative context.
 </Callout>
 
 **Done when:** You can name LND, CLN, and LDK as implementations that target the same BOLTs.

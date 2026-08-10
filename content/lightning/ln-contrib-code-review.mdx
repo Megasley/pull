@@ -4,20 +4,20 @@ description: Review peer pull requests on Lightning implementations and learn ma
 difficulty: intermediate
 duration: 5 days
 objectives:
-  - 'Review diffs for correctness, tests, and clarity'
+  - "Review diffs for correctness, tests, and clarity"
   - Leave actionable comments without noise
   - Connect chapter concepts to real implementation changes
 resources:
   - title: LND CONTRIBUTING
-    url: 'https://github.com/lightningnetwork/lnd/blob/master/docs/code_contribution_guidelines.md'
+    url: "https://github.com/lightningnetwork/lnd/blob/master/docs/code_contribution_guidelines.md"
     kind: docs
     required: true
   - title: Conventional comments
-    url: 'https://conventionalcomments.org/'
+    url: "https://conventionalcomments.org/"
     kind: article
     required: true
   - title: Core Lightning CONTRIBUTING
-    url: 'https://github.com/ElementsProject/lightning/blob/master/CONTRIBUTING.md'
+    url: "https://github.com/ElementsProject/lightning/blob/master/CONTRIBUTING.md"
     kind: docs
 reflectionPrompts:
   - >-
@@ -39,6 +39,7 @@ lab:
     - One sentence: ACK / NACK / request-changes — and why
     - Protocol concept named (HTLC, liquidity, onion, etc.)
 ---
+
 Reviewing is how Lightning implementations stay safe. You will learn more from careful review than from rushing another feature PR.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here.
@@ -54,11 +55,14 @@ What to check:
 3. Are edge cases handled?
 4. Is the diff minimal?
 
-<Mermaid caption="Description → diff → tests → informed ACK or change request." chart="flowchart LR
+<Mermaid
+  caption="Description → diff → tests → informed ACK or change request."
+  chart="flowchart LR
     PR[Open PR] --> Read[Read description]
     Read --> Diff[Inspect diff]
     Diff --> Test[Run tests]
-    Test --> Comment[Comment / ACK]" />
+    Test --> Comment[Comment / ACK]"
+/>
 
 When reviewing channel, routing, or BOLT-adjacent changes, name the concept explicitly: inbound capacity, preimage flow, onion privacy, etc.
 

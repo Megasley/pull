@@ -164,9 +164,7 @@ export function TimelineItem({
         href={event.href}
         className={className}
         style={style}
-        {...(external
-          ? { target: "_blank", rel: "noreferrer" }
-          : {})}
+        {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
       >
         {content}
       </a>

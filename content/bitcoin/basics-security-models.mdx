@@ -11,23 +11,23 @@ objectives:
   - Describe AssumeUTXO’s purpose and remaining trust tradeoffs
 resources:
   - title: BIP-157 Compact Block Filters
-    url: 'https://github.com/bitcoin/bips/blob/master/bip-0157.mediawiki'
+    url: "https://github.com/bitcoin/bips/blob/master/bip-0157.mediawiki"
     kind: bip
     required: true
   - title: BIP-158 Compact Block Filter Encoding
-    url: 'https://github.com/bitcoin/bips/blob/master/bip-0158.mediawiki'
+    url: "https://github.com/bitcoin/bips/blob/master/bip-0158.mediawiki"
     kind: bip
     required: true
   - title: Assume UTXO FAQs
-    url: 'https://github.com/bitcoin/bitcoin/blob/master/doc/assumeutxo.md'
+    url: "https://github.com/bitcoin/bitcoin/blob/master/doc/assumeutxo.md"
     kind: docs
     required: true
-  - title: 'Bitcoin’s Security Model: A Deep Dive'
+  - title: "Bitcoin’s Security Model: A Deep Dive"
     url: >-
       https://www.coindesk.com/markets/2016/11/13/bitcoins-security-model-a-deep-dive
     kind: article
 reflectionPrompts:
-  - 'What can an SPV client prove, and what must it assume about miners or peers?'
+  - "What can an SPV client prove, and what must it assume about miners or peers?"
   - >-
     How do compact block filters improve light-client privacy vs BIP37 bloom
     filters, and what remains leaked?
@@ -41,13 +41,14 @@ lab:
     choosing (a) full node, (b) Neutrino-style filters, or (c) third-party
     Electrum/Esplora. Label what each design can detect.
   evidence:
-    - 'Diagram (SVG, Mermaid, or photo of whiteboard)'
+    - "Diagram (SVG, Mermaid, or photo of whiteboard)"
     - One paragraph per option on fraud/censorship risk
     - Your recommended default for a beginner builder and why
 searchQueries:
   - BIP157
   - BIP158
 ---
+
 “Trustless” is relative. Every Bitcoin client chooses a **security model**: what it verifies locally vs what it assumes about peers, miners, or snapshots.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here.
@@ -56,25 +57,29 @@ Complete **Step 1 // Required reading** in the study plan above, then continue h
 
 Product builders who default to third-party APIs without labeling trust boundaries ship wallets that fail silently under eclipse, dishonest servers, or chain forks.
 
-| Model | Verifies locally | Main assumption |
-| --- | --- | --- |
-| **Full node** | PoW, scripts, consensus history (with pruning/assumevalid nuances) | Honest majority of work + your software |
-| **SPV** | Headers + merkle proofs for txs of interest | Miners won’t feed invalid high-work forever without detection |
-| **BIP157/158 filters** | Filters + blocks of interest you download | Peers serve honest filters; better privacy than BIP37 blooms |
-| **Indexer API** | Little on-chain verification | The server is honest and available |
-| **AssumeUTXO** | Background validation after snapshot | Snapshot commitment until validation catches up |
+| Model                  | Verifies locally                                                   | Main assumption                                               |
+| ---------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------- |
+| **Full node**          | PoW, scripts, consensus history (with pruning/assumevalid nuances) | Honest majority of work + your software                       |
+| **SPV**                | Headers + merkle proofs for txs of interest                        | Miners won’t feed invalid high-work forever without detection |
+| **BIP157/158 filters** | Filters + blocks of interest you download                          | Peers serve honest filters; better privacy than BIP37 blooms  |
+| **Indexer API**        | Little on-chain verification                                       | The server is honest and available                            |
+| **AssumeUTXO**         | Background validation after snapshot                               | Snapshot commitment until validation catches up               |
 
-<Mermaid caption="Stronger local verification costs more; lighter clients assume more about peers and servers." chart="flowchart TD
+<Mermaid
+  caption="Stronger local verification costs more; lighter clients assume more about peers and servers."
+  chart="flowchart TD
     Full[Full validating node] --> Filters[Compact block filters]
     Filters --> SPV[Classic SPV]
     SPV --> API[Third-party indexer API]
     Full --> Assume[AssumeUTXO bootstrap]
-    Assume --> Full" />
+    Assume --> Full"
+/>
 
 **AssumeUTXO** helps nodes sync faster by loading a committed UTXO snapshot, then background-validating. It trades bootstrap time for carefully scoped assumptions until validation completes.
 
 <Callout type="info" title="Label the model in your README">
-  Users deserve to know whether your app verifies scripts, trusts an indexer, or uses filters. Silence is a product bug.
+  Users deserve to know whether your app verifies scripts, trusts an indexer, or uses
+  filters. Silence is a product bug.
 </Callout>
 
 **Done when:** You can place a wallet design on the table above and name one failure mode it cannot detect.
@@ -86,7 +91,7 @@ Draw a diagram for (a) full node, (b) Neutrino-style filters, (c) Electrum/Esplo
 ### Common mistakes
 
 - Calling any API-backed wallet “non-custodial and trustless”
-- Ignoring that light clients can be lied to about *absence* of transactions
+- Ignoring that light clients can be lied to about _absence_ of transactions
 - Skipping background validation after snapshot sync in ops runbooks
 
 **Done when:** Lab evidence (diagram + three risk paragraphs + recommendation) is complete.

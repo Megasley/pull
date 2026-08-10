@@ -9,15 +9,15 @@ objectives:
   - Know that interactive funding flows are implementation-sensitive
 resources:
   - title: BOLT2 Peer Protocol (interactive funding & splicing)
-    url: 'https://github.com/lightning/bolts/blob/master/02-peer-protocol.md'
+    url: "https://github.com/lightning/bolts/blob/master/02-peer-protocol.md"
     kind: bolt
     note: Dual-funded opens and splicing are defined in the interactive-tx section.
     required: true
   - title: Core Lightning splicing
-    url: 'https://docs.corelightning.org/'
+    url: "https://docs.corelightning.org/"
     kind: docs
-  - title: 'Bitcoin Optech: Splicing'
-    url: 'https://bitcoinops.org/en/topics/splicing/'
+  - title: "Bitcoin Optech: Splicing"
+    url: "https://bitcoinops.org/en/topics/splicing/"
     kind: article
 reflectionPrompts:
   - >-
@@ -37,8 +37,9 @@ lab:
     - One-paragraph dual-fund vs splice decision guide
     - Implementation support note (LND/CLN/LDK version you checked)
     - Link to BOLT2 interactive-tx or Optech splicing section
-    - 'Optional: lab command/UI output'
+    - "Optional: lab command/UI output"
 ---
+
 Classic channels are often single-funded. **Dual funding** lets both sides contribute at open. **Splicing** adjusts channel capacity later with an on-chain transaction without losing the channel relationship.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here. This closes **Channels & HTLCs**.
@@ -49,14 +50,18 @@ Liquidity needs change. Closing and reopening wastes fees and downtime. Splicing
 
 **Analogy:** Dual funding is both roommates paying the security deposit. Splicing is adding money to the joint jar (or withdrawing some) without ending the lease.
 
-<Mermaid caption="Interactive on-chain transactions reshape channel capacity." chart="flowchart LR
+<Mermaid
+  caption="Interactive on-chain transactions reshape channel capacity."
+  chart="flowchart LR
     Chan[Existing channel] --> Splice[Splice tx on-chain]
     Splice --> More[More capacity]
     Splice --> Less[Less capacity]
-    Dual[Dual-funded open] --> Chan2[Balanced initial capacity]" />
+    Dual[Dual-funded open] --> Chan2[Balanced initial capacity]"
+/>
 
 <Callout type="info" title="Feature availability">
-  Support differs across LND/CLN/LDK versions. Prototype on regtest with the stack you ship.
+  Support differs across LND/CLN/LDK versions. Prototype on regtest with the stack you
+  ship.
 </Callout>
 
 **Done when:** You can say when dual-fund beats single-fund at open, and when splice beats close/reopen.

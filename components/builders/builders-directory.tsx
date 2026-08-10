@@ -97,9 +97,7 @@ export function BuildersDirectory({
       (item) => item.toLowerCase() === skill.toLowerCase(),
     );
     const skills = exists
-      ? activeSkills.filter(
-          (item) => item.toLowerCase() !== skill.toLowerCase(),
-        )
+      ? activeSkills.filter((item) => item.toLowerCase() !== skill.toLowerCase())
       : [...activeSkills, skill];
     pushFilters({
       q: query,
@@ -226,12 +224,7 @@ export function BuildersDirectory({
           Search
         </Button>
         {hasFilters ? (
-          <Button
-            type="button"
-            variant="ghost"
-            disabled={pending}
-            onClick={clearAll}
-          >
+          <Button type="button" variant="ghost" disabled={pending} onClick={clearAll}>
             Clear
           </Button>
         ) : null}
@@ -322,10 +315,7 @@ export function BuildersDirectory({
             >
               <p className="text-sm text-muted-foreground">
                 Page {page} of {totalPages}
-                <span className="text-muted-foreground/70">
-                  {" "}
-                  · {total} builders
-                </span>
+                <span className="text-muted-foreground/70"> · {total} builders</span>
               </p>
               <div className="flex gap-2">
                 <Button

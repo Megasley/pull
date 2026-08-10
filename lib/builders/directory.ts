@@ -78,9 +78,7 @@ function skillsMatchFilter(skills: string[], filters: string[]): boolean {
   const normalized = skills.map((skill) => skill.toLowerCase());
   return filters.some((filter) =>
     normalized.some(
-      (skill) =>
-        skill === filter.toLowerCase() ||
-        skill.includes(filter.toLowerCase()),
+      (skill) => skill === filter.toLowerCase() || skill.includes(filter.toLowerCase()),
     ),
   );
 }
@@ -93,9 +91,7 @@ function lookingForMatchFilter(
   return filters.some((id) => lookingFor.includes(id));
 }
 
-function formatRoadmapStatus(
-  progressByRoadmap: Record<string, string[]>,
-): string {
+function formatRoadmapStatus(progressByRoadmap: Record<string, string[]>): string {
   const summaries = buildAllRoadmapProgressSummaries(progressByRoadmap).filter(
     (item) => item.completed > 0,
   );
@@ -110,16 +106,11 @@ function formatRoadmapStatus(
       : `${completed.length} roadmaps complete`;
   }
 
-  const primary = [...summaries].sort(
-    (a, b) => b.percentage - a.percentage,
-  )[0];
+  const primary = [...summaries].sort((a, b) => b.percentage - a.percentage)[0];
   return `${primary.title} · ${primary.percentage}%`;
 }
 
-function emptyResult(
-  page: number,
-  pageSize: number,
-): BuilderDirectoryResult {
+function emptyResult(page: number, pageSize: number): BuilderDirectoryResult {
   return { builders: [], total: 0, page, pageSize, totalPages: 0 };
 }
 
@@ -167,10 +158,7 @@ function sortBuilders(
 export async function listBuildersForDirectory(
   filters: BuilderDirectoryFilters = {},
 ): Promise<BuilderDirectoryResult> {
-  const pageSize = Math.min(
-    Math.max(filters.pageSize ?? BUILDERS_PAGE_SIZE, 1),
-    48,
-  );
+  const pageSize = Math.min(Math.max(filters.pageSize ?? BUILDERS_PAGE_SIZE, 1), 48);
   const page = Math.max(filters.page ?? 1, 1);
 
   if (!isDatabaseConfigured()) {
@@ -206,8 +194,7 @@ async function listBuildersForDirectoryInner(
     ),
   );
   const lookingFilters = (filters.lookingFor ?? []).filter(
-    (id): id is LookingForId =>
-      isLookingForId(id) && id !== "not_actively_looking",
+    (id): id is LookingForId => isLookingForId(id) && id !== "not_actively_looking",
   );
 
   const conditions = [
@@ -307,10 +294,7 @@ async function listBuildersForDirectoryInner(
   const totalPages =
     resolvedTotal === 0 ? 0 : Math.max(1, Math.ceil(resolvedTotal / pageSize));
   const safePage = totalPages === 0 ? 1 : Math.min(page, totalPages);
-  const pageRows = sorted.slice(
-    (safePage - 1) * pageSize,
-    safePage * pageSize,
-  );
+  const pageRows = sorted.slice((safePage - 1) * pageSize, safePage * pageSize);
 
   if (pageRows.length === 0) {
     return {
@@ -381,9 +365,7 @@ export async function listBuildersToWatch(
   return ranked.slice(0, limit);
 }
 
-export async function listFeaturedBuilders(
-  limit = 6,
-): Promise<BuilderDirectoryCard[]> {
+export async function listFeaturedBuilders(limit = 6): Promise<BuilderDirectoryCard[]> {
   return listBuildersToWatch(limit);
 }
 

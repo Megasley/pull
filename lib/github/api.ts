@@ -113,10 +113,13 @@ export async function fetchAuthenticatedUser(client: GithubClient) {
 }
 
 export async function fetchUserRepositories(client: GithubClient) {
-  return client.requestPaginated<GithubApiRepo>("/user/repos?sort=updated&affiliation=owner,collaborator,organization_member", {
-    maxPages: GITHUB_REPO_MAX_PAGES,
-    perPage: 100,
-  });
+  return client.requestPaginated<GithubApiRepo>(
+    "/user/repos?sort=updated&affiliation=owner,collaborator,organization_member",
+    {
+      maxPages: GITHUB_REPO_MAX_PAGES,
+      perPage: 100,
+    },
+  );
 }
 
 export async function fetchPinnedAndContributions(client: GithubClient) {
@@ -147,9 +150,7 @@ export async function fetchPinnedAndContributions(client: GithubClient) {
   `);
 }
 
-function labelNames(
-  labels: Array<{ name: string } | string> | undefined,
-): string[] {
+function labelNames(labels: Array<{ name: string } | string> | undefined): string[] {
   if (!labels) return [];
   return labels.map((label) => (typeof label === "string" ? label : label.name));
 }
@@ -205,8 +206,7 @@ export async function fetchAuthoredPullRequests(
       item.filesChanged = detail.changed_files ?? 0;
       item.additions = detail.additions ?? 0;
       item.deletions = detail.deletions ?? 0;
-      item.reviewComments =
-        (detail.review_comments ?? 0) + (detail.comments ?? 0);
+      item.reviewComments = (detail.review_comments ?? 0) + (detail.comments ?? 0);
       if (detail.labels?.length) {
         item.labels = detail.labels.map((label) => label.name);
       }
@@ -224,10 +224,7 @@ export async function fetchAuthoredPullRequests(
   return base;
 }
 
-export async function fetchAuthoredIssues(
-  client: GithubClient,
-  login: string,
-) {
+export async function fetchAuthoredIssues(client: GithubClient, login: string) {
   const data = await client.request<SearchResponse>(
     `/search/issues?q=${encodeURIComponent(`author:${login} type:issue`)}&sort=updated&order=desc&per_page=${GITHUB_ACTIVITY_LIMIT}`,
   );
@@ -245,10 +242,7 @@ export async function fetchAuthoredIssues(
   }));
 }
 
-export async function fetchAssignedIssues(
-  client: GithubClient,
-  login: string,
-) {
+export async function fetchAssignedIssues(client: GithubClient, login: string) {
   const data = await client.request<SearchResponse>(
     `/search/issues?q=${encodeURIComponent(`assignee:${login} type:issue state:open`)}&sort=updated&order=desc&per_page=${GITHUB_ACTIVITY_LIMIT}`,
   );
@@ -271,9 +265,7 @@ export async function fetchRecentCommits(
   login: string,
   repos: Array<{ full_name: string; fork: boolean }>,
 ) {
-  const targets = repos
-    .filter((repo) => !repo.fork)
-    .slice(0, GITHUB_COMMIT_REPO_LIMIT);
+  const targets = repos.filter((repo) => !repo.fork).slice(0, GITHUB_COMMIT_REPO_LIMIT);
 
   const results: Array<{
     sha: string;

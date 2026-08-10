@@ -27,7 +27,11 @@ export async function updatePublicProfileAction(formData: FormData) {
   });
 
   if (!validation.ok) {
-    return { ok: false as const, reason: "validation" as const, error: validation.error };
+    return {
+      ok: false as const,
+      reason: "validation" as const,
+      error: validation.error,
+    };
   }
 
   const updated = await updateBuilderProfileFields(user.id, validation.data);

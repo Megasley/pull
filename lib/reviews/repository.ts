@@ -151,10 +151,7 @@ async function enrichSubmission(
   record: ProjectSubmissionRecord,
   viewerId?: string,
 ): Promise<ProjectSubmissionRecord> {
-  const approvalCount = await countApprovalsForRound(
-    record.id,
-    record.reviewRound,
-  );
+  const approvalCount = await countApprovalsForRound(record.id, record.reviewRound);
   const myDecision = viewerId
     ? await getMyDecision(record.id, record.reviewRound, viewerId)
     : null;
@@ -445,9 +442,7 @@ async function finalizeApproved(submission: ProjectSubmissionRecord) {
     prUrl: dbSubmission[0]?.prUrl ?? null,
   });
 
-  const { notifyReviewOutcomeAsync } = await import(
-    "@/lib/notifications/dispatch"
-  );
+  const { notifyReviewOutcomeAsync } = await import("@/lib/notifications/dispatch");
   notifyReviewOutcomeAsync({
     userId: submission.userId,
     projectSlug: submission.projectSlug,
@@ -500,10 +495,7 @@ export async function applyReviewAction(input: {
       body: comment,
     });
 
-    const refreshed = await getSubmissionForReview(
-      submission.id,
-      input.actorUserId,
-    );
+    const refreshed = await getSubmissionForReview(submission.id, input.actorUserId);
     return refreshed
       ? { ok: true, submission: refreshed }
       : { ok: false, reason: "not_found" };
@@ -517,10 +509,7 @@ export async function applyReviewAction(input: {
     return { ok: false, reason: "staff_only" };
   }
 
-  if (
-    (input.action === "reject" || input.action === "request_changes") &&
-    !comment
-  ) {
+  if ((input.action === "reject" || input.action === "request_changes") && !comment) {
     return { ok: false, reason: "comment_required" };
   }
 
@@ -570,10 +559,7 @@ export async function applyReviewAction(input: {
       });
     }
 
-    const refreshed = await getSubmissionForReview(
-      submission.id,
-      input.actorUserId,
-    );
+    const refreshed = await getSubmissionForReview(submission.id, input.actorUserId);
     return refreshed
       ? { ok: true, submission: refreshed }
       : { ok: false, reason: "not_found" };
@@ -618,9 +604,7 @@ export async function applyReviewAction(input: {
       body: comment,
     });
 
-    const { notifyReviewOutcomeAsync } = await import(
-      "@/lib/notifications/dispatch"
-    );
+    const { notifyReviewOutcomeAsync } = await import("@/lib/notifications/dispatch");
     notifyReviewOutcomeAsync({
       userId: submission.userId,
       projectSlug: submission.projectSlug,
@@ -629,10 +613,7 @@ export async function applyReviewAction(input: {
       comment,
     });
 
-    const refreshed = await getSubmissionForReview(
-      submission.id,
-      input.actorUserId,
-    );
+    const refreshed = await getSubmissionForReview(submission.id, input.actorUserId);
     return refreshed
       ? { ok: true, submission: refreshed }
       : { ok: false, reason: "not_found" };
@@ -666,9 +647,7 @@ export async function applyReviewAction(input: {
       body: comment,
     });
 
-    const { notifyReviewOutcomeAsync } = await import(
-      "@/lib/notifications/dispatch"
-    );
+    const { notifyReviewOutcomeAsync } = await import("@/lib/notifications/dispatch");
     notifyReviewOutcomeAsync({
       userId: submission.userId,
       projectSlug: submission.projectSlug,
@@ -677,10 +656,7 @@ export async function applyReviewAction(input: {
       comment,
     });
 
-    const refreshed = await getSubmissionForReview(
-      submission.id,
-      input.actorUserId,
-    );
+    const refreshed = await getSubmissionForReview(submission.id, input.actorUserId);
     return refreshed
       ? { ok: true, submission: refreshed }
       : { ok: false, reason: "not_found" };
@@ -712,9 +688,7 @@ export async function applyReviewAction(input: {
       toStatus: "approved",
       body:
         comment ||
-        (ctx.isStaff
-          ? "Staff approval."
-          : `Reached ${required} peer approvals.`),
+        (ctx.isStaff ? "Staff approval." : `Reached ${required} peer approvals.`),
     });
   } else {
     await db
@@ -729,16 +703,11 @@ export async function applyReviewAction(input: {
       submissionId: submission.id,
       actorUserId: input.actorUserId,
       type: "comment",
-      body:
-        comment ||
-        `Approval recorded (${approvalCount}/${required}).`,
+      body: comment || `Approval recorded (${approvalCount}/${required}).`,
     });
   }
 
-  const refreshed = await getSubmissionForReview(
-    submission.id,
-    input.actorUserId,
-  );
+  const refreshed = await getSubmissionForReview(submission.id, input.actorUserId);
   return refreshed
     ? { ok: true, submission: refreshed }
     : { ok: false, reason: "not_found" };

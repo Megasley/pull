@@ -76,11 +76,7 @@ export function NavigationProgress() {
   );
 }
 
-export function PageLoadingIndicator({
-  label = "Loading page",
-}: {
-  label?: string;
-}) {
+export function PageLoadingIndicator({ label = "Loading page" }: { label?: string }) {
   return (
     <div className="flex flex-1 items-center justify-center px-4 py-16 sm:px-6">
       <div

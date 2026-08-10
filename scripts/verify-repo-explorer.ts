@@ -15,7 +15,8 @@ function assert(condition: boolean, message: string) {
 }
 
 function repo(
-  partial: Partial<GithubRepositoryRecord> & Pick<GithubRepositoryRecord, "id" | "name">,
+  partial: Partial<GithubRepositoryRecord> &
+    Pick<GithubRepositoryRecord, "id" | "name">,
 ): GithubRepositoryRecord {
   return {
     githubId: Number(partial.id) || 1,
@@ -111,7 +112,10 @@ assert(page1.totalPages === 2, "2 pages");
 assert(page1.hasNext, "has next");
 
 assert(getRepoContributionStatus(fixtures[0]!, now) === "pinned", "pinned status");
-assert(getRepoContributionStatus(fixtures[1]!, now) === "maintained", "maintained status");
+assert(
+  getRepoContributionStatus(fixtures[1]!, now) === "maintained",
+  "maintained status",
+);
 assert(getRepoContributionStatus(fixtures[2]!, now) === "fork", "fork status");
 assert(getRepoContributionStatus(fixtures[3]!, now) === "quiet", "quiet status");
 

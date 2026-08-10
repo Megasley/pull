@@ -123,12 +123,8 @@
           "name": "github_commits_user_id_users_id_fk",
           "tableFrom": "github_commits",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -320,12 +316,8 @@
           "name": "github_connections_user_id_users_id_fk",
           "tableFrom": "github_connections",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -423,12 +415,8 @@
           "name": "github_contribution_days_user_id_users_id_fk",
           "tableFrom": "github_contribution_days",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -592,12 +580,8 @@
           "name": "github_issues_user_id_users_id_fk",
           "tableFrom": "github_issues",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -830,12 +814,8 @@
           "name": "github_pull_requests_user_id_users_id_fk",
           "tableFrom": "github_pull_requests",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1074,12 +1054,8 @@
           "name": "github_repositories_user_id_users_id_fk",
           "tableFrom": "github_repositories",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1219,12 +1195,8 @@
           "name": "user_weekly_goals_user_id_users_id_fk",
           "tableFrom": "user_weekly_goals",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1323,9 +1295,7 @@
         "achievements_slug_unique": {
           "name": "achievements_slug_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "slug"
-          ]
+          "columns": ["slug"]
         }
       },
       "policies": {},
@@ -1412,9 +1382,7 @@
         "organizations_slug_unique": {
           "name": "organizations_slug_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "slug"
-          ]
+          "columns": ["slug"]
         }
       },
       "policies": {},
@@ -1603,12 +1571,8 @@
           "name": "project_submissions_user_id_users_id_fk",
           "tableFrom": "project_submissions",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1616,12 +1580,8 @@
           "name": "project_submissions_project_id_projects_id_fk",
           "tableFrom": "project_submissions",
           "tableTo": "projects",
-          "columnsFrom": [
-            "project_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["project_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1629,12 +1589,8 @@
           "name": "project_submissions_claimed_by_users_id_fk",
           "tableFrom": "project_submissions",
           "tableTo": "users",
-          "columnsFrom": [
-            "claimed_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["claimed_by"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -1732,12 +1688,8 @@
           "name": "projects_roadmap_id_roadmaps_id_fk",
           "tableFrom": "projects",
           "tableTo": "roadmaps",
-          "columnsFrom": [
-            "roadmap_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["roadmap_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -1747,9 +1699,7 @@
         "projects_slug_unique": {
           "name": "projects_slug_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "slug"
-          ]
+          "columns": ["slug"]
         }
       },
       "policies": {},
@@ -1852,12 +1802,8 @@
           "name": "resources_node_id_roadmap_nodes_id_fk",
           "tableFrom": "resources",
           "tableTo": "roadmap_nodes",
-          "columnsFrom": [
-            "node_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["node_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -2033,12 +1979,8 @@
           "name": "roadmap_nodes_section_id_roadmap_sections_id_fk",
           "tableFrom": "roadmap_nodes",
           "tableTo": "roadmap_sections",
-          "columnsFrom": [
-            "section_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["section_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -2046,12 +1988,8 @@
           "name": "roadmap_nodes_project_id_projects_id_fk",
           "tableFrom": "roadmap_nodes",
           "tableTo": "projects",
-          "columnsFrom": [
-            "project_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["project_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -2198,12 +2136,8 @@
           "name": "roadmap_sections_roadmap_id_roadmaps_id_fk",
           "tableFrom": "roadmap_sections",
           "tableTo": "roadmaps",
-          "columnsFrom": [
-            "roadmap_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["roadmap_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -2310,9 +2244,7 @@
         "roadmaps_slug_unique": {
           "name": "roadmaps_slug_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "slug"
-          ]
+          "columns": ["slug"]
         }
       },
       "policies": {},
@@ -2430,12 +2362,8 @@
           "name": "submission_review_events_submission_id_project_submissions_id_fk",
           "tableFrom": "submission_review_events",
           "tableTo": "project_submissions",
-          "columnsFrom": [
-            "submission_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["submission_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -2443,12 +2371,8 @@
           "name": "submission_review_events_actor_user_id_users_id_fk",
           "tableFrom": "submission_review_events",
           "tableTo": "users",
-          "columnsFrom": [
-            "actor_user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["actor_user_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -2582,12 +2506,8 @@
           "name": "submission_reviews_submission_id_project_submissions_id_fk",
           "tableFrom": "submission_reviews",
           "tableTo": "project_submissions",
-          "columnsFrom": [
-            "submission_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["submission_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -2595,12 +2515,8 @@
           "name": "submission_reviews_reviewer_id_users_id_fk",
           "tableFrom": "submission_reviews",
           "tableTo": "users",
-          "columnsFrom": [
-            "reviewer_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["reviewer_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -2700,12 +2616,8 @@
           "name": "user_achievements_user_id_users_id_fk",
           "tableFrom": "user_achievements",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -2713,12 +2625,8 @@
           "name": "user_achievements_achievement_id_achievements_id_fk",
           "tableFrom": "user_achievements",
           "tableTo": "achievements",
-          "columnsFrom": [
-            "achievement_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["achievement_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -2857,12 +2765,8 @@
           "name": "user_chapter_quizzes_user_id_users_id_fk",
           "tableFrom": "user_chapter_quizzes",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -2998,12 +2902,8 @@
           "name": "user_progress_user_id_users_id_fk",
           "tableFrom": "user_progress",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -3011,12 +2911,8 @@
           "name": "user_progress_node_id_roadmap_nodes_id_fk",
           "tableFrom": "user_progress",
           "tableTo": "roadmap_nodes",
-          "columnsFrom": [
-            "node_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["node_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -3164,12 +3060,8 @@
           "name": "user_roadmap_progress_user_id_users_id_fk",
           "tableFrom": "user_roadmap_progress",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -3295,12 +3187,8 @@
           "name": "xp_events_user_id_users_id_fk",
           "tableFrom": "xp_events",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -3501,9 +3389,7 @@
         "users_username_unique": {
           "name": "users_username_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "username"
-          ]
+          "columns": ["username"]
         }
       },
       "policies": {},
@@ -3515,86 +3401,47 @@
     "public.chapter_quiz_status": {
       "name": "chapter_quiz_status",
       "schema": "public",
-      "values": [
-        "passed",
-        "skipped"
-      ]
+      "values": ["passed", "skipped"]
     },
     "public.difficulty": {
       "name": "difficulty",
       "schema": "public",
-      "values": [
-        "beginner",
-        "intermediate",
-        "advanced"
-      ]
+      "values": ["beginner", "intermediate", "advanced"]
     },
     "public.github_sync_status": {
       "name": "github_sync_status",
       "schema": "public",
-      "values": [
-        "idle",
-        "syncing",
-        "success",
-        "error"
-      ]
+      "values": ["idle", "syncing", "success", "error"]
     },
     "public.node_status": {
       "name": "node_status",
       "schema": "public",
-      "values": [
-        "default",
-        "active",
-        "completed",
-        "locked"
-      ]
+      "values": ["default", "active", "completed", "locked"]
     },
     "public.progress_status": {
       "name": "progress_status",
       "schema": "public",
-      "values": [
-        "not_started",
-        "in_progress",
-        "completed"
-      ]
+      "values": ["not_started", "in_progress", "completed"]
     },
     "public.resource_type": {
       "name": "resource_type",
       "schema": "public",
-      "values": [
-        "article",
-        "video",
-        "documentation",
-        "repository",
-        "tool",
-        "other"
-      ]
+      "values": ["article", "video", "documentation", "repository", "tool", "other"]
     },
     "public.review_decision": {
       "name": "review_decision",
       "schema": "public",
-      "values": [
-        "approve",
-        "request_changes",
-        "reject"
-      ]
+      "values": ["approve", "request_changes", "reject"]
     },
     "public.review_event_type": {
       "name": "review_event_type",
       "schema": "public",
-      "values": [
-        "status_change",
-        "comment"
-      ]
+      "values": ["status_change", "comment"]
     },
     "public.roadmap_status": {
       "name": "roadmap_status",
       "schema": "public",
-      "values": [
-        "draft",
-        "published",
-        "archived"
-      ]
+      "values": ["draft", "published", "archived"]
     },
     "public.submission_status": {
       "name": "submission_status",
@@ -3611,21 +3458,12 @@
     "public.user_role": {
       "name": "user_role",
       "schema": "public",
-      "values": [
-        "builder",
-        "reviewer",
-        "admin"
-      ]
+      "values": ["builder", "reviewer", "admin"]
     },
     "public.weekly_goal_target_type": {
       "name": "weekly_goal_target_type",
       "schema": "public",
-      "values": [
-        "open_pr",
-        "merge_pr",
-        "complete_lesson",
-        "custom"
-      ]
+      "values": ["open_pr", "merge_pr", "complete_lesson", "custom"]
     },
     "public.xp_source_type": {
       "name": "xp_source_type",

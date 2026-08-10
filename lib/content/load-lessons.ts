@@ -24,8 +24,7 @@ function normalizeLab(value: unknown): LessonLab | null | undefined {
 
   const lab = value as Record<string, unknown>;
   const title = typeof lab.title === "string" ? lab.title : "";
-  const description =
-    typeof lab.description === "string" ? lab.description : "";
+  const description = typeof lab.description === "string" ? lab.description : "";
 
   if (!title) {
     return undefined;

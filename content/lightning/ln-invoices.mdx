@@ -1,23 +1,23 @@
 ---
 title: Invoices
-description: 'Create, decode, and settle BOLT11 invoices on testnet or regtest.'
+description: "Create, decode, and settle BOLT11 invoices on testnet or regtest."
 difficulty: intermediate
 duration: 5 days
 objectives:
   - Decode BOLT11 fields that wallets rely on
   - Create and pay invoices on a local Lightning lab
-  - 'Handle expiry, amounts, and description safely'
+  - "Handle expiry, amounts, and description safely"
 resources:
   - title: BOLT11 Invoice Protocol
-    url: 'https://github.com/lightning/bolts/blob/master/11-payment-encoding.md'
+    url: "https://github.com/lightning/bolts/blob/master/11-payment-encoding.md"
     kind: bolt
     required: true
   - title: Mastering the Lightning Network
-    url: 'https://github.com/lnbook/lnbook/blob/master/15_payment_requests.asciidoc'
+    url: "https://github.com/lnbook/lnbook/blob/master/15_payment_requests.asciidoc"
     kind: book
-    chapter: 'Ch. 15: Payment Requests'
+    chapter: "Ch. 15: Payment Requests"
   - title: Polar
-    url: 'https://lightningpolar.com/'
+    url: "https://lightningpolar.com/"
     kind: tool
 reflectionPrompts:
   - Explain Invoices to a teammate without jargon - what problem does it solve?
@@ -38,6 +38,7 @@ searchQueries:
   - BOLT11
   - Lightning invoice
 ---
+
 A **BOLT11 invoice** is a bech32-encoded payment request. It tells a payer what to pay, where hints might help, and when the request expires.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here.
@@ -56,20 +57,24 @@ Key fields:
 - Description or description hash
 - Routing hints for unannounced channels
 
-<Mermaid caption="Invoice commits to a payment hash; settlement reveals the preimage." chart="sequenceDiagram
+<Mermaid
+  caption="Invoice commits to a payment hash; settlement reveals the preimage."
+  chart="sequenceDiagram
     participant Payee
     participant Payer
     Payee->>Payee: Create invoice (hash of preimage)
     Payee->>Payer: BOLT11 string / QR
     Payer->>Payee: Route HTLCs
-    Payee->>Payer: Reveal preimage on settle" />
+    Payee->>Payer: Reveal preimage on settle"
+/>
 
 Invoices can omit amount (payer chooses) — receivers must still validate paid amounts against app expectations. Long descriptions can be **hashed** into the invoice to keep QRs small; full text travels out of band.
 
 Show countdowns. Disable Pay on expiry. When regenerating, rotate payment hashes — never recycle.
 
 <Callout type="warning" title="Never reuse preimages carelessly">
-  Payment hashes must be unique per payment intent. Reuse can create serious security/privacy issues.
+  Payment hashes must be unique per payment intent. Reuse can create serious
+  security/privacy issues.
 </Callout>
 
 **Done when:** You can list the fields a payer UI must show before Pay is enabled.

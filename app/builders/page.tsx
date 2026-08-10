@@ -52,8 +52,7 @@ export default async function BuildersPage({ searchParams }: BuildersPageProps) 
   );
 
   const activeLooking = asStringList(params.looking).filter(
-    (id): id is LookingForId =>
-      isLookingForId(id) && id !== "not_actively_looking",
+    (id): id is LookingForId => isLookingForId(id) && id !== "not_actively_looking",
   );
 
   const [result, featured] = await Promise.all([

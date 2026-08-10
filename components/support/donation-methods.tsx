@@ -42,12 +42,10 @@ export function DonationMethods({
     <section id="donate" className="scroll-mt-24 space-y-6">
       <div>
         <p className="tech-eyebrow">bitcoin // donate</p>
-        <h2 className="mt-2 text-2xl font-semibold tracking-tight">
-          Donation methods
-        </h2>
+        <h2 className="mt-2 text-2xl font-semibold tracking-tight">Donation methods</h2>
         <p className="mt-2 max-w-2xl font-mono text-sm text-muted-foreground">
-          Support Pull with Lightning for instant settlement, or send on-chain /
-          Silent Payments when you prefer base-layer transfers.
+          Support Pull with Lightning for instant settlement, or send on-chain / Silent
+          Payments when you prefer base-layer transfers.
         </p>
       </div>
 
@@ -82,9 +80,7 @@ export function DonationMethods({
       </div>
 
       <div role="tabpanel" className="min-h-[280px]">
-        {tab === "lightning" ? (
-          <LightningPanel enabled={lightningEnabled} />
-        ) : null}
+        {tab === "lightning" ? <LightningPanel enabled={lightningEnabled} /> : null}
         {tab === "onchain" ? (
           onchainAddress ? (
             <AddressPanel
@@ -242,8 +238,7 @@ function LightningPanel({ enabled }: { enabled: boolean }) {
         <Zap className="mx-auto size-5 text-muted-foreground" aria-hidden />
         <p className="mt-3 text-sm font-medium">Lightning is not configured yet</p>
         <p className="mt-2 font-mono text-xs text-muted-foreground">
-          Use on-chain or Silent Payments, or check back once Blink receive is
-          enabled.
+          Use on-chain or Silent Payments, or check back once Blink receive is enabled.
         </p>
       </div>
     );
@@ -260,11 +255,7 @@ function LightningPanel({ enabled }: { enabled: boolean }) {
           <p className="mt-2 font-mono text-sm text-muted-foreground">
             Thank you for supporting Pull with {formatSats(invoice.amountSats)}.
           </p>
-          <Button
-            type="button"
-            className="mt-6"
-            onClick={() => setConsentOpen(true)}
-          >
+          <Button type="button" className="mt-6" onClick={() => setConsentOpen(true)}>
             Supporters Wall preferences
           </Button>
         </div>
@@ -291,9 +282,7 @@ function LightningPanel({ enabled }: { enabled: boolean }) {
               inputMode="numeric"
               pattern="[0-9]*"
               value={amount}
-              onChange={(event) =>
-                setAmount(event.target.value.replace(/[^\d]/g, ""))
-              }
+              onChange={(event) => setAmount(event.target.value.replace(/[^\d]/g, ""))}
               disabled={pending}
               className={fieldClassName}
               placeholder="10000"
@@ -435,8 +424,7 @@ function ConsentModal({
               Thank you for supporting Pull ❤️
             </h3>
             <p className="mt-2 font-mono text-xs leading-relaxed text-muted-foreground">
-              Would you like your donation to appear publicly on the Supporters
-              Wall?
+              Would you like your donation to appear publicly on the Supporters Wall?
             </p>
 
             <fieldset className="mt-5 space-y-2.5">

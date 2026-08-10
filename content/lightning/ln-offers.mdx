@@ -1,6 +1,6 @@
 ---
 title: BOLT12 Offers
-description: 'Reusable offers, onion messages, and modern Lightning payment UX.'
+description: "Reusable offers, onion messages, and modern Lightning payment UX."
 difficulty: intermediate
 duration: 5 days
 objectives:
@@ -9,16 +9,16 @@ objectives:
   - Know implementation support is uneven and evolving
 resources:
   - title: BOLT12 Offers
-    url: 'https://github.com/lightning/bolts/blob/master/12-offer-encoding.md'
+    url: "https://github.com/lightning/bolts/blob/master/12-offer-encoding.md"
     kind: bolt
     required: true
   - title: Core Lightning offers
-    url: 'https://docs.corelightning.org/'
+    url: "https://docs.corelightning.org/"
     kind: docs
   - title: Mastering the Lightning Network
-    url: 'https://github.com/lnbook/lnbook'
+    url: "https://github.com/lnbook/lnbook"
     kind: book
-    chapter: 'Payment UX chapters, pair with BOLT12 reading'
+    chapter: "Payment UX chapters, pair with BOLT12 reading"
 reflectionPrompts:
   - >-
     Explain BOLT12 Offers to a teammate without jargon - what problem does it
@@ -37,11 +37,12 @@ lab:
     - One-paragraph contrast: BOLT11 one-shot vs offer → fresh invoice
     - Note on implementation support for a wallet/node you care about
     - Link to BOLT12 section you used
-    - 'Optional: offer create/decode output from CLN'
+    - "Optional: offer create/decode output from CLN"
 searchQueries:
   - BOLT12
   - Lightning offers
 ---
+
 **Offers (BOLT12)** aim to replace many awkward invoice flows with reusable, negotiable payment requests delivered over onion messages.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here.
@@ -57,15 +58,19 @@ Static QR codes, refunds, and recurring flows are painful with single-use BOLT11
 3. Payee returns a fresh invoice bound to that request
 4. Payer pays as usual
 
-<Mermaid caption="Offers bootstrap fresh invoices without out-of-band QR churn." chart="sequenceDiagram
+<Mermaid
+  caption="Offers bootstrap fresh invoices without out-of-band QR churn."
+  chart="sequenceDiagram
     participant Payer
     participant Payee
     Payer->>Payee: Fetch invoice for offer
     Payee->>Payer: Invoice
-    Payer->>Payee: Pay invoice" />
+    Payer->>Payee: Pay invoice"
+/>
 
 <Callout type="info" title="Check feature support">
-  Before betting a product on offers, verify your target wallets and node implementations support the flows you need.
+  Before betting a product on offers, verify your target wallets and node
+  implementations support the flows you need.
 </Callout>
 
 **Done when:** You can explain why an offer is not itself the final BOLT11 string.

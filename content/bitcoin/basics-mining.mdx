@@ -1,6 +1,6 @@
 ---
 title: Mining & Consensus
-description: 'Proof-of-work, difficulty adjustment, and mining incentives for builders.'
+description: "Proof-of-work, difficulty adjustment, and mining incentives for builders."
 difficulty: intermediate
 duration: 5 days
 objectives:
@@ -9,15 +9,15 @@ objectives:
   - Connect mining incentives to confirmation UX builders ship
 resources:
   - title: Mastering Bitcoin
-    url: 'https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch12_mining.adoc'
+    url: "https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch12_mining.adoc"
     kind: book
-    chapter: 'Ch. 12: Mining'
+    chapter: "Ch. 12: Mining"
     required: true
   - title: BIP-9 Version bits
-    url: 'https://github.com/bitcoin/bips/blob/master/bip-0009.mediawiki'
+    url: "https://github.com/bitcoin/bips/blob/master/bip-0009.mediawiki"
     kind: bip
-  - title: 'Bitcoin Optech: Soft fork activation'
-    url: 'https://bitcoinops.org/en/topics/soft-fork-activation/'
+  - title: "Bitcoin Optech: Soft fork activation"
+    url: "https://bitcoinops.org/en/topics/soft-fork-activation/"
     kind: article
 reflectionPrompts:
   - >-
@@ -34,16 +34,17 @@ lab:
     getblockchaininfo before/after (height, difficulty), and write one sentence
     on how this differs from mainnet competition.
   evidence:
-    - 'Before/after getblockchaininfo (or getblock) showing height change'
+    - "Before/after getblockchaininfo (or getblock) showing height change"
     - generatetoaddress command output
     - One sentence contrasting regtest mining with mainnet PoW competition
     - Link to Mastering Bitcoin Ch. 12 section you used
 searchQueries:
   - BIP9
 ---
+
 **Mining** is the competitive process of finding a proof-of-work that makes a block header valid under current difficulty. Consensus rules define what blocks and transactions are valid; miners choose among valid templates.
 
-Complete **Step 1 // Required reading** in the study plan above, then continue here. This closes **Protocol Depth**. Soft-fork *activation* was the previous lesson — here focus on PoW and enforcement.
+Complete **Step 1 // Required reading** in the study plan above, then continue here. This closes **Protocol Depth**. Soft-fork _activation_ was the previous lesson — here focus on PoW and enforcement.
 
 ## Step 2 — Core idea: PoW, difficulty, who enforces
 
@@ -51,20 +52,24 @@ You may never run an ASIC, but every confirmation UX, reorg assumption, and fee-
 
 **Analogy:** Difficulty is a treadmill that speeds up or slows down so bags of work arrive roughly every 10 minutes. Blocks too fast → treadmill speeds up; too slow → it eases.
 
-<Mermaid caption="Miners search for a header hash below the target; winners earn rewards." chart="flowchart LR
+<Mermaid
+  caption="Miners search for a header hash below the target; winners earn rewards."
+  chart="flowchart LR
     Template[Block template] --> Hash[Hash header]
     Hash --> Check{Below target?}
     Check -->|no| Nonce[Change nonce / extranonce]
     Nonce --> Hash
     Check -->|yes| Win[Propagate block]
-    Win --> Reward[Subsidy + fees]" />
+    Win --> Reward[Subsidy + fees]"
+/>
 
 Approximately every **2016 blocks**, difficulty adjusts based on recent timestamps to keep average block time near 10 minutes.
 
 Miners **propose** blocks; full nodes **verify**. Economic users running nodes ultimately decide which rules their software accepts. Soft forks (previous lesson) tighten those rules over time — libraries and descriptors must track whether they assume post-fork features (SegWit, Taproot).
 
 <Callout type="info" title="Nodes enforce rules">
-  Hashrate does not rewrite consensus by itself. Invalid blocks are rejected by validating peers even if a miner produced them.
+  Hashrate does not rewrite consensus by itself. Invalid blocks are rejected by
+  validating peers even if a miner produced them.
 </Callout>
 
 **Done when:** You can separate “miner preference among valid templates” from “consensus validity.”

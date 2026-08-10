@@ -132,10 +132,7 @@
     "sectionId": "bitcoin-basics",
     "title": "Bitcoin Basics Check",
     "passingScore": 4,
-    "recommendedProjects": [
-      "utxo-selector",
-      "tx-decoder"
-    ],
+    "recommendedProjects": ["utxo-selector", "tx-decoder"],
     "questions": [
       {
         "id": "bb-q1",
@@ -264,10 +261,7 @@
     "sectionId": "protocol-depth",
     "title": "Protocol Depth Check",
     "passingScore": 4,
-    "recommendedProjects": [
-      "compact-block-lab",
-      "p2p-message-sniffer"
-    ],
+    "recommendedProjects": ["compact-block-lab", "p2p-message-sniffer"],
     "questions": [
       {
         "id": "pd-q1",
@@ -396,10 +390,7 @@
     "sectionId": "development",
     "title": "Development Check",
     "passingScore": 4,
-    "recommendedProjects": [
-      "psbt-multisig-desk",
-      "hd-wallet-backup"
-    ],
+    "recommendedProjects": ["psbt-multisig-desk", "hd-wallet-backup"],
     "questions": [
       {
         "id": "dev-q1",
@@ -528,10 +519,7 @@
     "sectionId": "projects",
     "title": "Projects Check",
     "passingScore": 4,
-    "recommendedProjects": [
-      "mini-wallet",
-      "payment-processor"
-    ],
+    "recommendedProjects": ["mini-wallet", "payment-processor"],
     "questions": [
       {
         "id": "proj-q1",

@@ -40,9 +40,7 @@ export function resolvePortfolioStatus(
   return "closed";
 }
 
-export function toPortfolioItem(
-  pr: GithubPullRequestRecord,
-): PullRequestPortfolioItem {
+export function toPortfolioItem(pr: GithubPullRequestRecord): PullRequestPortfolioItem {
   const labels = pr.labels ?? [];
   const contributionType =
     (pr.contributionType as ContributionType) ||

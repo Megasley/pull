@@ -8,54 +8,46 @@ import type {
   ReputationStrength,
 } from "@/types/reputation";
 
-import {
-  REPUTATION_TARGETS,
-  REPUTATION_VERSION,
-  REPUTATION_WEIGHTS,
-} from "./weights";
+import { REPUTATION_TARGETS, REPUTATION_VERSION, REPUTATION_WEIGHTS } from "./weights";
 
-const FACTOR_COPY: Record<
-  ReputationFactorId,
-  { label: string; description: string }
-> = {
-  merged_pull_requests: {
-    label: "Merged pull requests",
-    description: "PRs accepted into other projects.",
-  },
-  maintainer_reviews: {
-    label: "Maintainer reviews",
-    description: "Review and discussion engagement on your PRs.",
-  },
-  contribution_frequency: {
-    label: "Contribution frequency",
-    description: "Active months across the last year.",
-  },
-  repository_diversity: {
-    label: "Repository diversity",
-    description: "Distinct repositories you've merged into.",
-  },
-  documentation_contributions: {
-    label: "Documentation contributions",
-    description: "Docs-focused pull requests that landed.",
-  },
-  issue_discussions: {
-    label: "Issue discussions",
-    description: "Issues you've opened to move projects forward.",
-  },
-  code_reviews: {
-    label: "Code reviews",
-    description: "Reviews you've given to help other builders.",
-  },
-};
+const FACTOR_COPY: Record<ReputationFactorId, { label: string; description: string }> =
+  {
+    merged_pull_requests: {
+      label: "Merged pull requests",
+      description: "PRs accepted into other projects.",
+    },
+    maintainer_reviews: {
+      label: "Maintainer reviews",
+      description: "Review and discussion engagement on your PRs.",
+    },
+    contribution_frequency: {
+      label: "Contribution frequency",
+      description: "Active months across the last year.",
+    },
+    repository_diversity: {
+      label: "Repository diversity",
+      description: "Distinct repositories you've merged into.",
+    },
+    documentation_contributions: {
+      label: "Documentation contributions",
+      description: "Docs-focused pull requests that landed.",
+    },
+    issue_discussions: {
+      label: "Issue discussions",
+      description: "Issues you've opened to move projects forward.",
+    },
+    code_reviews: {
+      label: "Code reviews",
+      description: "Reviews you've given to help other builders.",
+    },
+  };
 
 export function saturate(raw: number, target: number): number {
   if (raw <= 0 || target <= 0) return 0;
   return 1 - Math.exp(-1.35 * (raw / target));
 }
 
-export function strengthFromNormalized(
-  normalized: number,
-): ReputationStrength {
+export function strengthFromNormalized(normalized: number): ReputationStrength {
   if (normalized >= 0.85) return "exceptional";
   if (normalized >= 0.55) return "strong";
   if (normalized >= 0.25) return "building";
@@ -67,9 +59,7 @@ function clampScore(value: number): number {
 }
 
 function buildSummary(score: number, factors: ReputationFactor[]): string {
-  const top = [...factors].sort(
-    (a, b) => b.strengthPercent - a.strengthPercent,
-  )[0];
+  const top = [...factors].sort((a, b) => b.strengthPercent - a.strengthPercent)[0];
 
   if (score === 0) {
     return "Open Source Reputation grows from merged PRs, reviews, steady contribution months, repo diversity, docs work, issues, and code reviews.";

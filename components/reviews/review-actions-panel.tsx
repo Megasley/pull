@@ -42,11 +42,7 @@ export function ReviewActionsPanel({
     setError(null);
     setMessage(null);
     startTransition(async () => {
-      const result = await applyReviewActionAction(
-        submissionId,
-        action,
-        comment,
-      );
+      const result = await applyReviewActionAction(submissionId, action, comment);
 
       if (!result.ok) {
         if (result.reason === "unauthenticated") {
@@ -63,20 +59,17 @@ export function ReviewActionsPanel({
       }
 
       setMessage(
-        action === "approve" && !isStaff
-          ? "Approval recorded."
-          : "Review updated.",
+        action === "approve" && !isStaff ? "Approval recorded." : "Review updated.",
       );
       setComment("");
       router.refresh();
     });
   }
 
-  const canStart = status === "submitted" || status === "needs_changes" || status === "under_review";
+  const canStart =
+    status === "submitted" || status === "needs_changes" || status === "under_review";
   const canDecide =
-    status === "submitted" ||
-    status === "under_review" ||
-    status === "needs_changes";
+    status === "submitted" || status === "under_review" || status === "needs_changes";
 
   return (
     <div className="space-y-4 rounded-none border border-border bg-card p-5">
@@ -98,8 +91,7 @@ export function ReviewActionsPanel({
 
       {claimLocked ? (
         <p className="rounded-none border border-border px-3 py-2 text-sm text-muted-foreground">
-          Another reviewer holds the claim. Wait for it to expire, or ask
-          staff.
+          Another reviewer holds the claim. Wait for it to expire, or ask staff.
         </p>
       ) : null}
 
@@ -117,8 +109,7 @@ export function ReviewActionsPanel({
           className="mt-1.5 w-full rounded-none border border-border bg-transparent px-3 py-2 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
         />
         <p className="mt-1.5 text-xs text-muted-foreground">
-          Required for request changes / reject. Optional for approve and start
-          review.
+          Required for request changes / reject. Optional for approve and start review.
         </p>
       </div>
 
