@@ -496,45 +496,6 @@ export const developerTools: DeveloperTool[] = [
     ],
   },
   {
-    id: "mempool-api",
-    slug: "mempool-api",
-    name: "Mempool API",
-    description:
-      "Open-source Bitcoin explorer APIs for mempool, fees, and blocks.",
-    overview:
-      "Mempool.space provides a widely used Bitcoin explorer and REST/WebSocket APIs for fee estimates, transactions, blocks, and Lightning data — essential for wallet UX and analytics tools.",
-    whyUse: [
-      "Reliable on-chain and mempool data.",
-      "Open-source stack you can self-host.",
-      "Perfect for fee UX and explorer projects.",
-    ],
-    buildUseCase: "Bitcoin Infrastructure",
-    category: "APIs",
-    tags: ["Bitcoin", "API", "Fees", "Explorer"],
-    openSource: true,
-    difficulty: "Beginner",
-    website: "https://mempool.space",
-    docs: "https://mempool.space/docs/api",
-    github: "https://github.com/mempool/mempool",
-    logo: "MP",
-    featured: false,
-    sponsored: false,
-    featuredPartner: false,
-    clicks: 0,
-    websiteClicks: 0,
-    docsClicks: 0,
-    learningPaths: [
-      { title: "Bitcoin roadmap", href: "/roadmaps/bitcoin" },
-    ],
-    projectIdeas: [
-      {
-        title: "Self Custody Tool",
-        description: "Show fee estimates and confirmation UX with Mempool API.",
-        href: "/projects",
-      },
-    ],
-  },
-  {
     id: "strike-api",
     slug: "strike-api",
     name: "Strike",
