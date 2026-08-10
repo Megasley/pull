@@ -46,10 +46,7 @@ for (const { slug, roadmap, quizzes, minQuestions, maxQuestions } of catalogs) {
       );
     }
 
-    if (
-      quiz.questions.length < minQuestions ||
-      quiz.questions.length > maxQuestions
-    ) {
+    if (quiz.questions.length < minQuestions || quiz.questions.length > maxQuestions) {
       errors.push(
         `[${slug}] ${quiz.id}: expected ${minQuestions}-${maxQuestions} questions, found ${quiz.questions.length}`,
       );
@@ -69,8 +66,7 @@ for (const { slug, roadmap, quizzes, minQuestions, maxQuestions } of catalogs) {
     }
 
     const checkpoint = roadmap.nodes.find(
-      (node) =>
-        node.sectionId === section.id && node.chapterCheckpoint === true,
+      (node) => node.sectionId === section.id && node.chapterCheckpoint === true,
     );
 
     if (!checkpoint) {

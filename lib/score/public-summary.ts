@@ -11,11 +11,8 @@ function topFactor(factors: BuilderScoreFactor[]) {
 const WHAT_IT_MEASURES =
   "Tracks learning and shipping on Pull: roadmaps, projects, approvals, and community reviews.";
 
-const PUBLIC_FACTOR_DESCRIPTIONS: Partial<
-  Record<BuilderScoreFactorId, string>
-> = {
-  projects_completed:
-    "Hands-on project work finished across roadmaps.",
+const PUBLIC_FACTOR_DESCRIPTIONS: Partial<Record<BuilderScoreFactorId, string>> = {
+  projects_completed: "Hands-on project work finished across roadmaps.",
 };
 
 export function withPublicBuilderScoreCopy(
@@ -25,8 +22,7 @@ export function withPublicBuilderScoreCopy(
     ...score,
     factors: score.factors.map((factor) => ({
       ...factor,
-      description:
-        PUBLIC_FACTOR_DESCRIPTIONS[factor.id] ?? factor.description,
+      description: PUBLIC_FACTOR_DESCRIPTIONS[factor.id] ?? factor.description,
     })),
   };
 }

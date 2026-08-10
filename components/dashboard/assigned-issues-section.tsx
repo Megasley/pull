@@ -42,9 +42,7 @@ export function AssignedIssuesSection({ issues }: AssignedIssuesSectionProps) {
             >
               <p className="text-sm font-medium">
                 {issue.title}{" "}
-                <span className="font-mono text-muted-foreground">
-                  #{issue.number}
-                </span>
+                <span className="font-mono text-muted-foreground">#{issue.number}</span>
               </p>
               <p className="mt-0.5 font-mono text-[10px] text-muted-foreground">
                 {issue.repoFullName}

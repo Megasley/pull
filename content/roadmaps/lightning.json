@@ -264,7 +264,11 @@
       "duration": "7 days",
       "difficulty": "advanced",
       "lockedUntil": ["ln-routing-failures"],
-      "resources": ["Congestion discussions", "Channel probing paper", "CVE disclosures"],
+      "resources": [
+        "Congestion discussions",
+        "Channel probing paper",
+        "CVE disclosures"
+      ],
       "chapterCheckpoint": true,
       "position": { "x": 24, "y": 634 }
     },
@@ -309,7 +313,11 @@
       "duration": "5 days",
       "difficulty": "advanced",
       "lockedUntil": ["ln-ldk"],
-      "resources": ["Watchtower Protocol", "LND Watchtower", "Mastering Lightning Security"],
+      "resources": [
+        "Watchtower Protocol",
+        "LND Watchtower",
+        "Mastering Lightning Security"
+      ],
       "chapterCheckpoint": true,
       "position": { "x": 24, "y": 322 }
     },
@@ -434,7 +442,11 @@
     { "id": "le24", "source": "ln-project-pos", "target": "ln-project-dashboard" },
     { "id": "le25", "source": "ln-project-dashboard", "target": "ln-project-router" },
     { "id": "le26", "source": "ln-project-router", "target": "ln-contrib-discovery" },
-    { "id": "le27", "source": "ln-contrib-discovery", "target": "ln-contrib-code-review" },
+    {
+      "id": "le27",
+      "source": "ln-contrib-discovery",
+      "target": "ln-contrib-code-review"
+    },
     { "id": "le28", "source": "ln-contrib-code-review", "target": "ln-contrib-rubric" },
     { "id": "le29", "source": "ln-contrib-rubric", "target": "ln-contrib-pr" },
     { "id": "le30", "source": "ln-contrib-pr", "target": "ln-contrib-review" }

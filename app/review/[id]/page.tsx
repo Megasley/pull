@@ -26,14 +26,10 @@ type ReviewDetailPageProps = {
 
 export async function generateMetadata({ params }: ReviewDetailPageProps) {
   const { id } = await params;
-  const submission = isDatabaseConfigured()
-    ? await getSubmissionForReview(id)
-    : null;
+  const submission = isDatabaseConfigured() ? await getSubmissionForReview(id) : null;
 
   return {
-    title: submission
-      ? `Review · ${submission.projectTitle}`
-      : "Review submission",
+    title: submission ? `Review · ${submission.projectTitle}` : "Review submission",
   };
 }
 
@@ -87,8 +83,8 @@ export default async function ReviewDetailPage({ params }: ReviewDetailPageProps
             {submission.projectTitle}
           </h1>
           <p className="mt-4 max-w-2xl font-mono text-sm leading-relaxed text-muted-foreground">
-            Peer reviews need {required} approvals. One request-changes sends
-            it back. Staff can approve alone or reject.
+            Peer reviews need {required} approvals. One request-changes sends it back.
+            Staff can approve alone or reject.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -96,7 +92,7 @@ export default async function ReviewDetailPage({ params }: ReviewDetailPageProps
             {SUBMISSION_STATUS_LABELS[submission.status]}
           </Badge>
           <Badge variant="outline">
-            {(submission.approvalCount ?? 0)}/{required} approvals
+            {submission.approvalCount ?? 0}/{required} approvals
           </Badge>
           <Badge variant="outline">round {submission.reviewRound}</Badge>
         </div>
@@ -104,8 +100,8 @@ export default async function ReviewDetailPage({ params }: ReviewDetailPageProps
 
       {!eligible ? (
         <div className="mt-8 rounded-none border border-border bg-card px-4 py-3 font-mono text-sm text-muted-foreground">
-          You are not eligible to review this submission. Complete the same
-          project, raise your reputation, or get staff access.
+          You are not eligible to review this submission. Complete the same project,
+          raise your reputation, or get staff access.
         </div>
       ) : null}
 

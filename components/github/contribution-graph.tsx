@@ -43,8 +43,8 @@ export function ContributionGraph({ days, className }: ContributionGraphProps) {
     <div className={cn("space-y-3", className)}>
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between sm:gap-3">
         <p className="text-sm text-muted-foreground">
-          <span className="font-medium text-foreground">{total}</span> contributions
-          in the last year
+          <span className="font-medium text-foreground">{total}</span> contributions in
+          the last year
         </p>
         <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
           <span>Less</span>

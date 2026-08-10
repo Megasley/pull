@@ -95,10 +95,7 @@ export async function listPublicSupporters(limit = 24): Promise<PublicSupporter[
     })
     .from(supportDonations)
     .where(
-      and(
-        eq(supportDonations.showPublicly, true),
-        eq(supportDonations.status, "paid"),
-      ),
+      and(eq(supportDonations.showPublicly, true), eq(supportDonations.status, "paid")),
     )
     .orderBy(desc(supportDonations.paidAt), desc(supportDonations.createdAt))
     .limit(limit);

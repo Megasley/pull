@@ -20,9 +20,7 @@ import { BuilderScorePanel } from "@/components/score/builder-score-panel";
 import { ReputationPanel } from "@/components/reputation/reputation-panel";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import {
-  lookingForLabel,
-} from "@/lib/builders/looking-for";
+import { lookingForLabel } from "@/lib/builders/looking-for";
 import {
   buildPublicReputationSummary,
   withPublicReputationCopy,
@@ -86,9 +84,7 @@ export function PublicBuilderProfile({ data }: PublicBuilderProfileProps) {
             </Avatar>
 
             <div className="min-w-0 flex-1">
-              <p className="profile-eyebrow">
-                Builder // @{profile.username}
-              </p>
+              <p className="profile-eyebrow">Builder // @{profile.username}</p>
               <h1 className="profile-name">{profile.displayName}</h1>
               <p className="profile-handle">@{profile.username}</p>
               <p className="profile-tagline mt-2">
@@ -114,8 +110,8 @@ export function PublicBuilderProfile({ data }: PublicBuilderProfileProps) {
                 ) : null}
               </div>
 
-              {profile.lookingFor.filter((id) => id !== "not_actively_looking")
-                .length > 0 ? (
+              {profile.lookingFor.filter((id) => id !== "not_actively_looking").length >
+              0 ? (
                 <div className="mt-4">
                   <p className="font-mono text-[11px] tracking-[0.12em] text-muted-foreground uppercase">
                     Looking for
@@ -184,11 +180,7 @@ export function PublicBuilderProfile({ data }: PublicBuilderProfileProps) {
               className="w-full sm:w-auto"
             />
             <Button asChild className="w-full sm:w-auto">
-              <a
-                href={githubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a href={githubUrl} target="_blank" rel="noopener noreferrer">
                 GitHub
                 <ExternalLink className="size-3.5" aria-hidden />
               </a>
@@ -221,10 +213,7 @@ export function PublicBuilderProfile({ data }: PublicBuilderProfileProps) {
           profile
         />
 
-        <FeaturedRepositoriesSection
-          repositories={featuredRepositories}
-          profile
-        />
+        <FeaturedRepositoriesSection repositories={featuredRepositories} profile />
 
         <MergedPrHighlightsSection
           items={mergedPrHighlights}

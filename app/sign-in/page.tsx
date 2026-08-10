@@ -34,8 +34,8 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
       <Eyebrow className="mb-4">session // resume</Eyebrow>
       <H1>Authenticate, builder</H1>
       <p className="mt-4 font-mono text-sm leading-relaxed text-muted-foreground sm:text-base">
-        No passwords. No captchas. Just GitHub - because your commit history is
-        already the resume.
+        No passwords. No captchas. Just GitHub - because your commit history is already
+        the resume.
       </p>
 
       {!configured ? (
@@ -57,7 +57,7 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
               ? "Authentication is not configured yet."
               : params.error === "banned"
                 ? "Your account has been banned. Contact support if you think this is a mistake."
-              : decodeURIComponent(params.error)}
+                : decodeURIComponent(params.error)}
           </p>
         </div>
       ) : null}

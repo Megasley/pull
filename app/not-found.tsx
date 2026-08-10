@@ -96,7 +96,10 @@ export default function NotFound() {
         </dl>
 
         <div className="mt-10 flex flex-wrap gap-3">
-          <Button asChild className="h-11 border-ink bg-ink px-5 text-[var(--background)] hover:bg-ink/90">
+          <Button
+            asChild
+            className="h-11 border-ink bg-ink px-5 text-[var(--background)] hover:bg-ink/90"
+          >
             <Link href="/">cd ~</Link>
           </Button>
           <Button

@@ -34,11 +34,7 @@ function usePreferVerticalChart() {
   return preferVertical;
 }
 
-export function MermaidDiagram({
-  chart,
-  caption,
-  className,
-}: MermaidDiagramProps) {
+export function MermaidDiagram({ chart, caption, className }: MermaidDiagramProps) {
   const reactId = useId().replace(/:/g, "");
   const renderSeq = useRef(0);
   const source = chart.trim();
@@ -68,9 +64,7 @@ export function MermaidDiagram({
         }
       } catch (err) {
         if (!cancelled) {
-          setError(
-            err instanceof Error ? err.message : "Failed to render diagram",
-          );
+          setError(err instanceof Error ? err.message : "Failed to render diagram");
           setSvg(null);
         }
       }
@@ -96,9 +90,7 @@ export function MermaidDiagram({
             dangerouslySetInnerHTML={{ __html: svg }}
           />
         ) : (
-          <p className="text-center text-sm text-muted-foreground">
-            Loading diagram…
-          </p>
+          <p className="text-center text-sm text-muted-foreground">Loading diagram…</p>
         )}
       </div>
       {caption ? (

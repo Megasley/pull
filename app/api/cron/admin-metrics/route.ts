@@ -21,11 +21,14 @@ export async function GET(request: Request) {
     const result = await refreshAdminMetricsSnapshot();
     console.info("[admin-metrics-cron]", result);
 
-    return NextResponse.json({
-      ok: result.ok,
-      computedAt: result.computedAt,
-      error: result.error ?? null,
-    }, { status: result.ok ? 200 : 500 });
+    return NextResponse.json(
+      {
+        ok: result.ok,
+        computedAt: result.computedAt,
+        error: result.error ?? null,
+      },
+      { status: result.ok ? 200 : 500 },
+    );
   } catch (error) {
     console.error("[admin-metrics-cron]", error);
     return NextResponse.json(

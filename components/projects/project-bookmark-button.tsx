@@ -24,10 +24,7 @@ function getServerBookmarkSnapshot() {
   return "0";
 }
 
-export function ProjectBookmarkButton({
-  slug,
-  className,
-}: ProjectBookmarkButtonProps) {
+export function ProjectBookmarkButton({ slug, className }: ProjectBookmarkButtonProps) {
   const bookmarked =
     useSyncExternalStore(
       subscribeProjectBookmarks,
@@ -48,10 +45,7 @@ export function ProjectBookmarkButton({
       aria-pressed={bookmarked}
       className={cn(className)}
     >
-      <Bookmark
-        className={cn("size-4", bookmarked && "fill-current")}
-        aria-hidden
-      />
+      <Bookmark className={cn("size-4", bookmarked && "fill-current")} aria-hidden />
       {bookmarked ? "Bookmarked" : "Bookmark"}
     </Button>
   );

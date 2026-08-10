@@ -23,9 +23,7 @@ export function OnboardingWizard({ githubConnected }: OnboardingWizardProps) {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [roadmapSlug, setRoadmapSlug] = useState("bitcoin");
-  const [weeklyGoal, setWeeklyGoal] = useState<string>(
-    WEEKLY_GOAL_PRESETS[0],
-  );
+  const [weeklyGoal, setWeeklyGoal] = useState<string>(WEEKLY_GOAL_PRESETS[0]);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -100,8 +98,8 @@ export function OnboardingWizard({ githubConnected }: OnboardingWizardProps) {
         <section className="mt-10 space-y-4">
           <h2 className="text-lg font-semibold">Connect GitHub</h2>
           <p className="text-sm text-muted-foreground">
-            Sync repos, PRs, and activity for smarter recommendations. You can
-            skip and connect later from settings.
+            Sync repos, PRs, and activity for smarter recommendations. You can skip and
+            connect later from settings.
           </p>
           {githubConnected ? (
             <p className="rounded-none border border-border bg-muted p-4 text-sm">
@@ -128,8 +126,7 @@ export function OnboardingWizard({ githubConnected }: OnboardingWizardProps) {
         <section className="mt-10 space-y-4">
           <h2 className="text-lg font-semibold">Weekly goal</h2>
           <p className="text-sm text-muted-foreground">
-            We seed your dashboard with default goals. Pick what matters most this
-            week.
+            We seed your dashboard with default goals. Pick what matters most this week.
           </p>
           <div className="space-y-2">
             {WEEKLY_GOAL_PRESETS.map((preset) => (

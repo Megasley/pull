@@ -45,9 +45,7 @@ function mapConnectionPublic(
   };
 }
 
-function mapRepo(
-  row: typeof githubRepositories.$inferSelect,
-): GithubRepositoryRecord {
+function mapRepo(row: typeof githubRepositories.$inferSelect): GithubRepositoryRecord {
   return {
     id: row.id,
     githubId: row.githubId,
@@ -161,10 +159,7 @@ export async function upsertGithubConnection(input: {
   return row ?? null;
 }
 
-export async function updateGithubConnectionToken(
-  userId: string,
-  accessToken: string,
-) {
+export async function updateGithubConnectionToken(userId: string, accessToken: string) {
   if (!isDatabaseConfigured()) return;
   const db = getDb();
   await db
@@ -246,9 +241,7 @@ export async function replaceGithubRepositories(
   const db = getDb();
   const stamp = nowIso();
 
-  await db
-    .delete(githubRepositories)
-    .where(eq(githubRepositories.userId, userId));
+  await db.delete(githubRepositories).where(eq(githubRepositories.userId, userId));
 
   if (repos.length === 0) return;
 
@@ -369,9 +362,9 @@ export async function replaceGithubCommits(
   const stamp = nowIso();
   await db.delete(githubCommits).where(eq(githubCommits.userId, userId));
   if (items.length === 0) return;
-  await db.insert(githubCommits).values(
-    items.map((item) => ({ userId, ...item, syncedAt: stamp })),
-  );
+  await db
+    .insert(githubCommits)
+    .values(items.map((item) => ({ userId, ...item, syncedAt: stamp })));
 }
 
 export async function replaceGithubContributionDays(
@@ -389,9 +382,9 @@ export async function replaceGithubContributionDays(
   const chunkSize = 100;
   for (let i = 0; i < days.length; i += chunkSize) {
     const chunk = days.slice(i, i + chunkSize);
-    await db.insert(githubContributionDays).values(
-      chunk.map((day) => ({ userId, ...day, syncedAt: stamp })),
-    );
+    await db
+      .insert(githubContributionDays)
+      .values(chunk.map((day) => ({ userId, ...day, syncedAt: stamp })));
   }
 }
 
@@ -419,9 +412,7 @@ export async function listGithubRepositories(
     );
 
   const rows =
-    options.limit === undefined
-      ? await query
-      : await query.limit(options.limit);
+    options.limit === undefined ? await query : await query.limit(options.limit);
 
   return rows.map(mapRepo);
 }
@@ -507,8 +498,7 @@ export async function listGithubIssues(
   options?: number | { limit?: number; state?: string; relation?: string },
 ): Promise<GithubIssueRecord[]> {
   if (!isDatabaseConfigured()) return [];
-  const normalized =
-    typeof options === "number" ? { limit: options } : (options ?? {});
+  const normalized = typeof options === "number" ? { limit: options } : (options ?? {});
   const limit = normalized.limit ?? 20;
   const db = getDb();
 
@@ -596,19 +586,14 @@ export async function countGithubSyncedEntities(userId: string) {
 }
 
 /** Total merged PRs synced for a user (not capped by list limits). */
-export async function countMergedGithubPullRequests(
-  userId: string,
-): Promise<number> {
+export async function countMergedGithubPullRequests(userId: string): Promise<number> {
   if (!isDatabaseConfigured()) return 0;
   const db = getDb();
   const [row] = await db
     .select({ value: count() })
     .from(githubPullRequests)
     .where(
-      and(
-        eq(githubPullRequests.userId, userId),
-        eq(githubPullRequests.merged, true),
-      ),
+      and(eq(githubPullRequests.userId, userId), eq(githubPullRequests.merged, true)),
     );
   return Number(row?.value ?? 0);
 }

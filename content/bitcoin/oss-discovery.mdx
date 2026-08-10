@@ -11,16 +11,16 @@ objectives:
   - Write a short implementation plan before coding
 resources:
   - title: bitcoin/bitcoin
-    url: 'https://github.com/bitcoin/bitcoin'
+    url: "https://github.com/bitcoin/bitcoin"
     kind: docs
     note: Core repo - steep bar; study issue labels and CONTRIBUTING before picking.
     required: true
   - title: Bitcoin Optech
-    url: 'https://bitcoinops.org/'
+    url: "https://bitcoinops.org/"
     kind: article
     required: true
   - title: rust-bitcoin
-    url: 'https://github.com/rust-bitcoin/rust-bitcoin'
+    url: "https://github.com/rust-bitcoin/rust-bitcoin"
     kind: docs
 reflectionPrompts:
   - >-
@@ -43,6 +43,7 @@ lab:
     - Written approach (problem, files likely touched, how you will test)
     - Self-score against the meaningful-PR rubric (preview is fine; full rubric next lessons)
 ---
+
 Contributing starts with choosing the right battlefield. “Good first issue” labels help, but judgment matters more.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here. This opens **Open Source**.
@@ -57,12 +58,15 @@ Where to look:
 - rust-bitcoin, BDK, bitcoinjs-lib
 - Indexers, explorers, docs sites, Optech
 
-<Mermaid caption="Match skills → repo → issue → plan → communicate → code." chart="flowchart TD
+<Mermaid
+  caption="Match skills → repo → issue → plan → communicate → code."
+  chart="flowchart TD
     Skills[Your skills] --> Pick[Pick repo]
     Pick --> Issues[Scan issues]
     Issues --> Scope[Write approach]
     Scope --> Ask[Comment on issue]
-    Ask --> Code[Implement]" />
+    Ask --> Code[Implement]"
+/>
 
 <Callout type="tip" title="Docs and tests count">
   Clarifying docs or adding a regression test is a legitimate first contribution.

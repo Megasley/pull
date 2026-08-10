@@ -18,7 +18,9 @@ function isRoadmapFullyComplete(roadmapSlug: string, completedIds: Set<string>) 
   return roadmap.nodes.every((node) => completedIds.has(node.id));
 }
 
-function findProjectNodeIds(projectSlug: string): Array<{ roadmap: string; nodeId: string }> {
+function findProjectNodeIds(
+  projectSlug: string,
+): Array<{ roadmap: string; nodeId: string }> {
   const matches: Array<{ roadmap: string; nodeId: string }> = [];
   for (const roadmapSlug of getRoadmapSlugs()) {
     const roadmap = getRoadmap(roadmapSlug);

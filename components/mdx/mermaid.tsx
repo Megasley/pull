@@ -1,8 +1,4 @@
-import {
-  Children,
-  isValidElement,
-  type ReactNode,
-} from "react";
+import { Children, isValidElement, type ReactNode } from "react";
 
 import { MermaidDiagram } from "./mermaid-diagram";
 
@@ -33,7 +29,5 @@ function childrenToText(children: ReactNode): string {
 export function Mermaid({ chart, caption, className, children }: MermaidProps) {
   const source = (chart ?? childrenToText(children)).trim();
 
-  return (
-    <MermaidDiagram chart={source} caption={caption} className={className} />
-  );
+  return <MermaidDiagram chart={source} caption={caption} className={className} />;
 }

@@ -1,10 +1,7 @@
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 
-import {
-  lookingForLabel,
-  type LookingForId,
-} from "@/lib/builders/looking-for";
+import { lookingForLabel, type LookingForId } from "@/lib/builders/looking-for";
 import type { BuilderDirectoryCard } from "@/lib/builders/directory";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -96,9 +93,7 @@ export function BuilderCard({ builder, className, compact }: BuilderCardProps) {
       ) : null}
 
       <div className="mt-3 border border-border px-2 py-1.5 font-mono text-[11px]">
-        <p className="text-muted-foreground uppercase tracking-wide">
-          OSS reputation
-        </p>
+        <p className="text-muted-foreground uppercase tracking-wide">OSS reputation</p>
         <p className="mt-0.5 text-sm font-bold text-foreground">
           {builder.ossReputation}
         </p>

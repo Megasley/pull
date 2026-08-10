@@ -24,8 +24,7 @@ import {
 import type { GithubSyncSummary } from "@/types/github";
 
 export type SyncGithubResult =
-  | { ok: true; summary: GithubSyncSummary }
-  | { ok: false; error: string };
+  { ok: true; summary: GithubSyncSummary } | { ok: false; error: string };
 
 function nextSyncIso(from = new Date()) {
   return new Date(from.getTime() + GITHUB_SYNC_INTERVAL_MS).toISOString();
@@ -44,8 +43,7 @@ export async function syncGithubForUser(
   if (!accessToken) {
     return {
       ok: false,
-      error:
-        "GitHub is not connected. Sign in with GitHub again to grant API access.",
+      error: "GitHub is not connected. Sign in with GitHub again to grant API access.",
     };
   }
 
@@ -119,18 +117,16 @@ export async function syncGithubForUser(
       githubUpdatedAt: repo.updated_at,
     }));
 
-    const totalStars = mappedRepos.reduce(
-      (sum, repo) => sum + repo.stargazersCount,
-      0,
-    );
+    const totalStars = mappedRepos.reduce((sum, repo) => sum + repo.stargazersCount, 0);
 
-    const contributionDays = graph.viewer.contributionsCollection.contributionCalendar.weeks
-      .flatMap((week) => week.contributionDays)
-      .map((day) => ({
-        contributionDate: day.date,
-        count: day.contributionCount,
-        color: day.color,
-      }));
+    const contributionDays =
+      graph.viewer.contributionsCollection.contributionCalendar.weeks
+        .flatMap((week) => week.contributionDays)
+        .map((day) => ({
+          contributionDate: day.date,
+          count: day.contributionCount,
+          color: day.color,
+        }));
 
     const commits = await fetchRecentCommits(
       client,

@@ -62,10 +62,7 @@ export function RepositoryCard({ repository, className }: RepositoryCardProps) {
         </Badge>
         {repository.language ? (
           <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-            <span
-              className="size-2 rounded-full bg-foreground/70"
-              aria-hidden
-            />
+            <span className="size-2 rounded-full bg-foreground/70" aria-hidden />
             {repository.language}
           </span>
         ) : null}

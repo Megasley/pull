@@ -1,6 +1,6 @@
 ---
 title: Multisig & Timelocks
-description: 'Shared custody, CHECKMULTISIG, CSV, CLTV, and MuSig patterns.'
+description: "Shared custody, CHECKMULTISIG, CSV, CLTV, and MuSig patterns."
 difficulty: intermediate
 duration: 5 days
 objectives:
@@ -12,16 +12,16 @@ resources:
     url: >-
       https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch07_authorization-authentication.adoc
     kind: book
-    chapter: 'Ch. 7: Authorization and Authentication'
+    chapter: "Ch. 7: Authorization and Authentication"
     required: true
   - title: BIP-65 CLTV
-    url: 'https://github.com/bitcoin/bips/blob/master/bip-0065.mediawiki'
+    url: "https://github.com/bitcoin/bips/blob/master/bip-0065.mediawiki"
     kind: bip
   - title: BIP-68 Relative lock-time
-    url: 'https://github.com/bitcoin/bips/blob/master/bip-0068.mediawiki'
+    url: "https://github.com/bitcoin/bips/blob/master/bip-0068.mediawiki"
     kind: bip
   - title: BIP-112 CSV
-    url: 'https://github.com/bitcoin/bips/blob/master/bip-0112.mediawiki'
+    url: "https://github.com/bitcoin/bips/blob/master/bip-0112.mediawiki"
     kind: bip
 reflectionPrompts:
   - >-
@@ -40,11 +40,12 @@ lab:
   evidence:
     - One-line policy (e.g. 2-of-3 OR Alice after N blocks) and whether CLTV or CSV fits
     - Link or quote pointer to BIP-65, BIP-68, or BIP-112 you relied on
-    - 'Optional: getdescriptorinfo / getaddressinfo for a multisig or Taproot descriptor'
+    - "Optional: getdescriptorinfo / getaddressinfo for a multisig or Taproot descriptor"
 searchQueries:
   - multisig
   - BIP67
 ---
+
 **Multisig** means multiple keys must cooperate to spend. **Timelocks** add “not before” constraints. Together they power vaults, inheritance designs, and Lightning’s security model.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here.
@@ -61,12 +62,15 @@ Classic Script uses `OP_CHECKMULTISIG` for on-chain m-of-n. Modern approaches of
 Policy example: 2-of-3 keys OR (1 key after 90 days)
 ```
 
-<Mermaid caption="Policies combine thresholds and time for safety and recovery." chart="flowchart TD
+<Mermaid
+  caption="Policies combine thresholds and time for safety and recovery."
+  chart="flowchart TD
     Funds[Funds] --> Coop[2-of-3 cooperative spend]
     Funds --> Rec[Recovery path after timelock]
     Coop --> Done[Spend now]
     Rec --> Wait[Wait for CLTV/CSV]
-    Wait --> Done" />
+    Wait --> Done"
+/>
 
 - **CLTV** (BIP-65): absolute — unlock after a block height or timestamp
 - **CSV** (BIP-112 / BIP-68): relative — unlock after the output has confirmed for a relative period
@@ -74,7 +78,8 @@ Policy example: 2-of-3 keys OR (1 key after 90 days)
 Lightning commitments lean on CSV so old states become punishable after delays.
 
 <Callout type="warning" title="Wall clocks are not consensus">
-  Nodes use block-based rules. Designing “7 days” means encoding that delay in locktime semantics, not trusting a server clock alone.
+  Nodes use block-based rules. Designing “7 days” means encoding that delay in locktime
+  semantics, not trusting a server clock alone.
 </Callout>
 
 **Done when:** You can say when you’d pick CLTV vs CSV for a recovery path.
@@ -83,11 +88,11 @@ Lightning commitments lean on CSV so old states become punishable after delays.
 
 Write one custody policy in plain language, then map it:
 
-| Need | Prefer |
-| --- | --- |
-| Unlock after a calendar/height date | CLTV |
-| Unlock N blocks after this output confirms | CSV |
-| Cooperative spend looks like single-sig | Taproot + MuSig-style |
+| Need                                       | Prefer                |
+| ------------------------------------------ | --------------------- |
+| Unlock after a calendar/height date        | CLTV                  |
+| Unlock N blocks after this output confirms | CSV                   |
+| Cooperative spend looks like single-sig    | Taproot + MuSig-style |
 
 Optionally on regtest:
 

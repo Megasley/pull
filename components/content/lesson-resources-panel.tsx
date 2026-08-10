@@ -32,9 +32,7 @@ export function LessonResourcesPanel({
 
   return (
     <section className={cn("space-y-4", className)}>
-      {heading ? (
-        <h2 className="tech-eyebrow text-foreground">{heading}</h2>
-      ) : null}
+      {heading ? <h2 className="tech-eyebrow text-foreground">{heading}</h2> : null}
       <ul className="space-y-3">
         {resources.map((resource) => (
           <li

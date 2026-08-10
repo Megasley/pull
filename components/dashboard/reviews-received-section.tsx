@@ -35,9 +35,7 @@ function decisionClass(decision: string) {
   }
 }
 
-export function ReviewsReceivedSection({
-  reviews,
-}: ReviewsReceivedSectionProps) {
+export function ReviewsReceivedSection({ reviews }: ReviewsReceivedSectionProps) {
   if (reviews.length === 0) {
     return null;
   }
@@ -69,10 +67,7 @@ export function ReviewsReceivedSection({
             >
               <div className="flex flex-wrap items-center gap-2">
                 <p className="text-sm font-medium">{review.projectTitle}</p>
-                <Badge
-                  variant="outline"
-                  className={decisionClass(review.decision)}
-                >
+                <Badge variant="outline" className={decisionClass(review.decision)}>
                   {decisionLabel(review.decision)}
                 </Badge>
               </div>

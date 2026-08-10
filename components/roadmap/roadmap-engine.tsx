@@ -6,10 +6,7 @@ import { Check, Lock } from "lucide-react";
 
 import { useAuthSession } from "@/hooks/use-auth-session";
 import { useRoadmapProgress, useRoadmapUnlocked } from "@/hooks/use-roadmap-progress";
-import {
-  calculateRoadmapProgress,
-  resolveNodeStatuses,
-} from "@/lib/roadmap/progress";
+import { calculateRoadmapProgress, resolveNodeStatuses } from "@/lib/roadmap/progress";
 import { getRoadmapFromRegistry } from "@/lib/roadmap/prerequisites";
 import { cn } from "@/lib/utils";
 import type { RoadmapJson, RoadmapJsonNode } from "@/types/roadmap";
@@ -115,8 +112,7 @@ export function RoadmapEngine({ data, className }: RoadmapEngineProps) {
     ? getRoadmapFromRegistry(data.prerequisiteRoadmap.slug)
     : null;
 
-  const prerequisiteTitle =
-    prerequisite?.title ?? data.prerequisiteRoadmap?.slug ?? "";
+  const prerequisiteTitle = prerequisite?.title ?? data.prerequisiteRoadmap?.slug ?? "";
 
   return (
     <div className={cn("roadmap-map", className)}>

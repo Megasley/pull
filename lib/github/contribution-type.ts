@@ -1,11 +1,5 @@
 export type GithubContributionType =
-  | "documentation"
-  | "bug_fix"
-  | "feature"
-  | "test"
-  | "refactor"
-  | "chore"
-  | "other";
+  "documentation" | "bug_fix" | "feature" | "test" | "refactor" | "chore" | "other";
 
 export function inferContributionType(
   title: string,

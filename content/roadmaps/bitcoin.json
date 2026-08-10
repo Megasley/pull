@@ -104,7 +104,11 @@
       "duration": "4 days",
       "difficulty": "beginner",
       "lockedUntil": ["foundations-crypto"],
-      "resources": ["Mastering Bitcoin Ch. 1", "Mastering Bitcoin Ch. 2", "Bitcoin Optech Fees"],
+      "resources": [
+        "Mastering Bitcoin Ch. 1",
+        "Mastering Bitcoin Ch. 2",
+        "Bitcoin Optech Fees"
+      ],
       "position": { "x": 24, "y": 400 },
       "chapterCheckpoint": true
     },
@@ -442,7 +446,11 @@
     { "id": "e13", "source": "basics-multisig", "target": "basics-mempool" },
     { "id": "e14", "source": "basics-mempool", "target": "basics-network" },
     { "id": "e15", "source": "basics-network", "target": "basics-p2p-adversarial" },
-    { "id": "e16", "source": "basics-p2p-adversarial", "target": "basics-security-models" },
+    {
+      "id": "e16",
+      "source": "basics-p2p-adversarial",
+      "target": "basics-security-models"
+    },
     { "id": "e17", "source": "basics-security-models", "target": "basics-soft-forks" },
     { "id": "e18", "source": "basics-soft-forks", "target": "basics-mining" },
     { "id": "e19", "source": "basics-mining", "target": "dev-libraries" },

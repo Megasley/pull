@@ -30,9 +30,7 @@ export function getAllDiscoveryRepositories(): DiscoveryRepository[] {
   return repositories;
 }
 
-export function getDiscoveryRepositoryById(
-  id: string,
-): DiscoveryRepository | null {
+export function getDiscoveryRepositoryById(id: string): DiscoveryRepository | null {
   return repositories.find((item) => item.id === id) ?? null;
 }
 
@@ -117,9 +115,7 @@ export function recommendDiscoveryRepositories(
   context: DiscoveryProfileContext,
   limit = 4,
 ): DiscoveryRecommendation[] {
-  const languageSet = new Set(
-    context.languages.map((item) => item.toLowerCase()),
-  );
+  const languageSet = new Set(context.languages.map((item) => item.toLowerCase()));
   const completed = new Set(context.completedRoadmapSlugs);
 
   const scored = repositories.map((repository) => {
@@ -177,7 +173,9 @@ export function recommendDiscoveryRepositories(
   });
 
   return scored
-    .sort((a, b) => b.score - a.score || a.repository.name.localeCompare(b.repository.name))
+    .sort(
+      (a, b) => b.score - a.score || a.repository.name.localeCompare(b.repository.name),
+    )
     .slice(0, limit);
 }
 

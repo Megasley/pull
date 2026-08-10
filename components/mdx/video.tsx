@@ -45,7 +45,12 @@ export function Video({ src, title, className }: VideoProps) {
 
   if (embedUrl.endsWith(".mp4")) {
     return (
-      <div className={cn("my-8 overflow-hidden rounded-none border border-border", className)}>
+      <div
+        className={cn(
+          "my-8 overflow-hidden rounded-none border border-border",
+          className,
+        )}
+      >
         <video controls className="aspect-video w-full bg-black" title={title}>
           <source src={embedUrl} type="video/mp4" />
         </video>

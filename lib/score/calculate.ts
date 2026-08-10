@@ -64,9 +64,7 @@ function clampScore(value: number): number {
 }
 
 function buildSummary(score: number, factors: BuilderScoreFactor[]): string {
-  const top = [...factors].sort(
-    (a, b) => b.strengthPercent - a.strengthPercent,
-  )[0];
+  const top = [...factors].sort((a, b) => b.strengthPercent - a.strengthPercent)[0];
 
   if (score === 0) {
     return "Your Builder Score grows as you complete projects, earn approvals, finish roadmaps, contribute to open source, review community work, and keep a steady cadence.";
@@ -87,9 +85,7 @@ function buildSummary(score: number, factors: BuilderScoreFactor[]): string {
   return `High Builder Score driven by verified building activity.${top ? ` ${top.label} is a standout strength.` : ""} Scores stay dynamic as you keep contributing.`;
 }
 
-export function calculateBuilderScore(
-  inputs: BuilderScoreInputs,
-): BuilderScoreResult {
+export function calculateBuilderScore(inputs: BuilderScoreInputs): BuilderScoreResult {
   const rawByFactor: Record<BuilderScoreFactorId, number> = {
     projects_completed: inputs.projectsCompleted,
     projects_approved: inputs.projectsApproved,

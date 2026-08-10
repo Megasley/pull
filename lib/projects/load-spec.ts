@@ -54,8 +54,7 @@ function parseSpecFile(slug: string): {
     overview: content.trim(),
     frontmatter: {
       objectives: asStringList(raw.objectives),
-      architecture:
-        typeof raw.architecture === "string" ? raw.architecture : "",
+      architecture: typeof raw.architecture === "string" ? raw.architecture : "",
       requirements: asStringList(raw.requirements),
       stretchGoals: asStringList(raw.stretchGoals),
       resources: Array.isArray(raw.resources) ? raw.resources : [],

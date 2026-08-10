@@ -1,14 +1,8 @@
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import {
-  SUBMISSION_STATUS_LABELS,
-  type SubmissionStatus,
-} from "@/types/submission";
+import { SUBMISSION_STATUS_LABELS, type SubmissionStatus } from "@/types/submission";
 
-const statusVariant: Record<
-  SubmissionStatus,
-  "secondary" | "outline" | "default"
-> = {
+const statusVariant: Record<SubmissionStatus, "secondary" | "outline" | "default"> = {
   draft: "outline",
   submitted: "secondary",
   under_review: "secondary",

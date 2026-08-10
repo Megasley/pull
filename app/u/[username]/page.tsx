@@ -40,9 +40,7 @@ export async function generateMetadata({ params }: PublicProfilePageProps) {
   };
 }
 
-export default async function PublicProfilePage({
-  params,
-}: PublicProfilePageProps) {
+export default async function PublicProfilePage({ params }: PublicProfilePageProps) {
   const { username } = await params;
   const viewer = await getCurrentUser();
   const data = await loadPublicBuilderProfile(username, viewer?.id);

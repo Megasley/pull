@@ -104,8 +104,7 @@ export default async function AdminOverviewPage({
       : payload.funnelAll
     : null;
   const dropOff: LessonDropOff[] = payload?.dropOff ?? [];
-  const roleCounts: Record<UserRole, number> | null =
-    payload?.roleCounts ?? null;
+  const roleCounts: Record<UserRole, number> | null = payload?.roleCounts ?? null;
   const userTotal = roleCounts
     ? roleCounts.builder + roleCounts.reviewer + roleCounts.admin
     : null;
@@ -322,7 +321,9 @@ export default async function AdminOverviewPage({
         {snapshotUnavailable || !payload ? (
           <UnavailableBlock label="Lesson drop-off" />
         ) : dropOff.length === 0 ? (
-          <p className="mt-4 text-sm text-muted-foreground">No lesson completions yet.</p>
+          <p className="mt-4 text-sm text-muted-foreground">
+            No lesson completions yet.
+          </p>
         ) : (
           <div className="mt-4 overflow-x-auto">
             <table className="w-full min-w-[560px] border-collapse text-sm">
@@ -433,9 +434,7 @@ function OpenQueueBlock({
           <div className="space-y-1">
             <div className="flex flex-wrap items-center gap-2">
               <p className="font-medium">{item.projectTitle}</p>
-              <Badge variant="secondary">
-                {SUBMISSION_STATUS_LABELS[item.status]}
-              </Badge>
+              <Badge variant="secondary">{SUBMISSION_STATUS_LABELS[item.status]}</Badge>
             </div>
             <p className="font-mono text-[11px] text-muted-foreground">
               {item.builderDisplayName ?? item.builderUsername ?? "Builder"}
@@ -453,19 +452,13 @@ function OpenQueueBlock({
   );
 }
 
-function RecentSubmissionsBlock({
-  load,
-}: {
-  load: LiveLoad<AdminSubmissionRecord[]>;
-}) {
+function RecentSubmissionsBlock({ load }: { load: LiveLoad<AdminSubmissionRecord[]> }) {
   if (load.status !== "ok") {
     return <UnavailableBlock label="Recent submissions" />;
   }
 
   if (load.data.length === 0) {
-    return (
-      <p className="mt-4 text-sm text-muted-foreground">No submissions yet.</p>
-    );
+    return <p className="mt-4 text-sm text-muted-foreground">No submissions yet.</p>;
   }
 
   return (
@@ -478,9 +471,7 @@ function RecentSubmissionsBlock({
           <div className="space-y-1">
             <div className="flex flex-wrap items-center gap-2">
               <p className="font-medium">{item.projectTitle}</p>
-              <Badge variant="secondary">
-                {SUBMISSION_STATUS_LABELS[item.status]}
-              </Badge>
+              <Badge variant="secondary">{SUBMISSION_STATUS_LABELS[item.status]}</Badge>
             </div>
             <p className="font-mono text-[11px] text-muted-foreground">
               {item.builderDisplayName} (@{item.builderUsername})
@@ -499,9 +490,7 @@ function RecentSubmissionsBlock({
               </Button>
             ) : (
               <Button asChild size="sm" variant="outline">
-                <Link href={`/projects/${item.projectSlug}/submit`}>
-                  Submit page
-                </Link>
+                <Link href={`/projects/${item.projectSlug}/submit`}>Submit page</Link>
               </Button>
             )}
           </div>

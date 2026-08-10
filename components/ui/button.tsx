@@ -26,8 +26,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: "border-ink bg-ink text-background hover:bg-ink/90",
-        outline:
-          "border-ink bg-background text-foreground hover:bg-muted/40",
+        outline: "border-ink bg-background text-foreground hover:bg-muted/40",
         secondary:
           "border-ink bg-secondary text-secondary-foreground hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_6%)]",
         ghost:
@@ -57,10 +56,7 @@ const buttonVariants = cva(
 
 function Spinner({ className }: { className?: string }) {
   return (
-    <Loader2
-      className={cn("size-3.5 shrink-0 animate-spin", className)}
-      aria-hidden
-    />
+    <Loader2 className={cn("size-3.5 shrink-0 animate-spin", className)} aria-hidden />
   );
 }
 
@@ -84,9 +80,7 @@ function Button({
   const [clickPending, setClickPending] = React.useState(false);
 
   const isSubmit = type === "submit";
-  const isLoading = Boolean(
-    loading || clickPending || (isSubmit && formPending),
-  );
+  const isLoading = Boolean(loading || clickPending || (isSubmit && formPending));
   const isDisabled = Boolean(disabled || isLoading);
 
   const handleClick = async (event: React.MouseEvent<HTMLButtonElement>) => {

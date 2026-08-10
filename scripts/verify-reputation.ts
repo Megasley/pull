@@ -169,7 +169,10 @@ const milestones = buildReputationMilestones({
   issueDiscussions: 3,
   firstMergedAt: "2026-01-01T00:00:00.000Z",
 });
-assert(milestones.every((m) => m.earned), "all mid milestones earned");
+assert(
+  milestones.every((m) => m.earned),
+  "all mid milestones earned",
+);
 assert(
   milestones.find((m) => m.id === "first-merge")?.earnedAt ===
     "2026-01-01T00:00:00.000Z",
@@ -180,7 +183,10 @@ const locked = buildReputationMilestones({
   ...emptyInputs,
   firstMergedAt: null,
 });
-assert(locked.every((m) => !m.earned), "empty milestones locked");
+assert(
+  locked.every((m) => !m.earned),
+  "empty milestones locked",
+);
 
 // Targets exist for every weight key
 for (const id of Object.keys(REPUTATION_WEIGHTS) as Array<

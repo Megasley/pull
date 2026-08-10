@@ -1,23 +1,23 @@
 ---
 title: Keys & Addresses
-description: 'Private keys, public keys, address encodings from P2PKH through Taproot.'
+description: "Private keys, public keys, address encodings from P2PKH through Taproot."
 difficulty: beginner
 duration: 5 days
 objectives:
   - Derive the mental model from private key to address
-  - 'Recognize legacy, SegWit, and Taproot address formats'
-  - 'Know which encoding standards apply (Base58, Bech32, Bech32m)'
+  - "Recognize legacy, SegWit, and Taproot address formats"
+  - "Know which encoding standards apply (Base58, Bech32, Bech32m)"
 resources:
   - title: Mastering Bitcoin
-    url: 'https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch04_keys.adoc'
+    url: "https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch04_keys.adoc"
     kind: book
-    chapter: 'Ch. 4: Keys and Addresses'
+    chapter: "Ch. 4: Keys and Addresses"
     required: true
   - title: BIP-173 Bech32
-    url: 'https://github.com/bitcoin/bips/blob/master/bip-0173.mediawiki'
+    url: "https://github.com/bitcoin/bips/blob/master/bip-0173.mediawiki"
     kind: bip
   - title: BIP-350 Bech32m
-    url: 'https://github.com/bitcoin/bips/blob/master/bip-0350.mediawiki'
+    url: "https://github.com/bitcoin/bips/blob/master/bip-0350.mediawiki"
     kind: bip
 reflectionPrompts:
   - >-
@@ -33,13 +33,14 @@ lab:
     Complete Steps 2–3. Generate Bech32 and Bech32m addresses on regtest and
     inspect scriptPubKey / descriptor fields with getaddressinfo.
   evidence:
-    - 'getnewaddress output for bech32 and bech32m (or equivalent)'
+    - "getnewaddress output for bech32 and bech32m (or equivalent)"
     - getaddressinfo snippet showing scriptPubKey or desc for one address
     - One sentence linking the address string to the locking condition
 searchQueries:
   - BIP32
   - BIP39
 ---
+
 An address is not a bank account number in a central database. It is a compact encoding of a **locking condition** — usually “prove you control this public key.”
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here.
@@ -50,10 +51,13 @@ Wrong address type, wrong network prefix, or a typo can permanently lose funds. 
 
 **Analogy:** The **private key** is the only key to a mailbox. The **public key** is a lock design others can verify. The **address** is the mailbox label so people can send mail without seeing the lock’s internals.
 
-<Mermaid caption="Derivation is one-way: addresses do not reveal private keys." chart="flowchart LR
+<Mermaid
+  caption="Derivation is one-way: addresses do not reveal private keys."
+  chart="flowchart LR
     Priv[Private key] --> Pub[Public key]
     Pub --> Hash[Hash160 /<br/>tweaked key]
-    Hash --> Addr[Address]" />
+    Hash --> Addr[Address]"
+/>
 
 ```text
 private key  →  public key  →  hashing / tweaking  →  address string
@@ -61,26 +65,30 @@ private key  →  public key  →  hashing / tweaking  →  address string
 
 Never type private keys into random websites. In apps, keep keys in secure modules or hardware wallets.
 
-| Type | Looks like | Notes |
-| --- | --- | --- |
-| P2PKH | starts with `1` | Legacy Base58Check |
-| P2SH | starts with `3` | Script hash wrapper |
-| P2WPKH / P2WSH | `bc1q...` | SegWit v0 Bech32 |
-| P2TR | `bc1p...` | Taproot Bech32m |
+| Type           | Looks like      | Notes               |
+| -------------- | --------------- | ------------------- |
+| P2PKH          | starts with `1` | Legacy Base58Check  |
+| P2SH           | starts with `3` | Script hash wrapper |
+| P2WPKH / P2WSH | `bc1q...`       | SegWit v0 Bech32    |
+| P2TR           | `bc1p...`       | Taproot Bech32m     |
 
 Testnet/regtest use different HRPs (`tb1`, `bcrt1`, etc.). Always check the network.
 
-<Mermaid caption="Different output types encode different locking conditions." chart="flowchart TD
+<Mermaid
+  caption="Different output types encode different locking conditions."
+  chart="flowchart TD
     Priv[Private key] --> Pub[Public key]
     Pub --> P2PKH[P2PKH / P2WPKH]
     Pub --> P2TR[Taproot output key]
     Script[Script] --> P2SH[P2SH / P2WSH]
     P2PKH --> Addr[Address string]
     P2TR --> Addr
-    P2SH --> Addr" />
+    P2SH --> Addr"
+/>
 
 <Callout type="warning" title="Checksums are not enough">
-  Address checksums catch typos, but they do not stop you from sending to the wrong person or the wrong network.
+  Address checksums catch typos, but they do not stop you from sending to the wrong
+  person or the wrong network.
 </Callout>
 
 **Base58Check** (legacy) mixes numbers and letters and appends a checksum. **Bech32** has stronger error detection; **Bech32m** (BIP-350) tweaks the checksum for Taproot (`bc1p`). If a library says “invalid checksum,” regenerate — do not hand-edit the string.

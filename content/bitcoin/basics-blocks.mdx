@@ -1,6 +1,6 @@
 ---
 title: Blocks & Chain
-description: 'Headers, merkle trees, proof-of-work, and chain validation rules.'
+description: "Headers, merkle trees, proof-of-work, and chain validation rules."
 difficulty: beginner
 duration: 5 days
 objectives:
@@ -12,18 +12,18 @@ resources:
     url: >-
       https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch11_blockchain.adoc
     kind: book
-    chapter: 'Ch. 11: Bitcoin Blockchain'
+    chapter: "Ch. 11: Bitcoin Blockchain"
     required: true
-  - title: 'Decoding Bitcoin: Reorg calculator'
-    url: 'https://bitcoindevs.xyz/decoding/reorg-calculator'
+  - title: "Decoding Bitcoin: Reorg calculator"
+    url: "https://bitcoindevs.xyz/decoding/reorg-calculator"
     kind: interactive
     note: Interactive tool - model reorg depth vs attacker hashrate before the lab.
     required: true
   - title: Bitcoin Whitepaper
-    url: 'https://bitcoin.org/bitcoin.pdf'
+    url: "https://bitcoin.org/bitcoin.pdf"
     kind: article
-  - title: 'Bitcoin Optech: Chain reorganizations'
-    url: 'https://bitcoinops.org/en/topics/reorgs/'
+  - title: "Bitcoin Optech: Chain reorganizations"
+    url: "https://bitcoinops.org/en/topics/reorgs/"
     kind: article
 reflectionPrompts:
   - >-
@@ -41,9 +41,10 @@ lab:
     the previous-block hash links the chain.
   evidence:
     - Screenshot or notes from the Decoding Bitcoin reorg calculator with your assumed attacker share
-    - 'getblockheader (or explorer) output for one regtest tip block'
+    - "getblockheader (or explorer) output for one regtest tip block"
     - One-sentence confirmation policy you would ship, tied to the calculator output
 ---
+
 A blockchain is a linked list of **blocks**, each committing to a set of transactions and to the previous block’s hash, secured by proof-of-work.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here.
@@ -61,7 +62,9 @@ A block contains:
 
 The **merkle root** commits to all transactions so light clients can verify inclusion without downloading everything.
 
-<Mermaid caption="Headers commit to transactions and previous history; PoW makes rewriting expensive." chart="flowchart TD
+<Mermaid
+  caption="Headers commit to transactions and previous history; PoW makes rewriting expensive."
+  chart="flowchart TD
     TxA[Tx A] --> M0[Hash]
     TxB[Tx B] --> M1[Hash]
     M0 --> Root[Merkle root]
@@ -69,7 +72,8 @@ The **merkle root** commits to all transactions so light clients can verify incl
     Root --> Hdr[Block header]
     Prev[Prev block hash] --> Hdr
     PoW[Nonce / PoW] --> Hdr
-    Hdr --> Next[Next block links here]" />
+    Hdr --> Next[Next block links here]"
+/>
 
 When your transaction appears in a block, it has **1 confirmation**. Each block buried on top adds another. Deeper confirmations make reorgs that undo your payment less likely.
 
@@ -78,7 +82,8 @@ const confirmations = tipHeight - txBlockHeight + 1;
 ```
 
 <Callout type="info" title="0-conf is a business risk">
-  Accepting unconfirmed transactions can be fine for tiny amounts with controls, but it is not consensus finality.
+  Accepting unconfirmed transactions can be fine for tiny amounts with controls, but it
+  is not consensus finality.
 </Callout>
 
 Sometimes two miners find blocks near the same time. Nodes follow the heaviest valid chain. A short **reorganization** can drop a block you briefly saw — wallets should handle disappearing transactions gracefully.

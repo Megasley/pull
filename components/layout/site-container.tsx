@@ -3,8 +3,7 @@ import type { ComponentPropsWithoutRef, ElementType } from "react";
 import { cn } from "@/lib/utils";
 
 /** Shared max width + horizontal padding for navbar, pages, and marketing sections. */
-export const siteContainerClassName =
-  "mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8";
+export const siteContainerClassName = "mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8";
 
 type SiteContainerProps<T extends ElementType = "div"> = {
   as?: T;

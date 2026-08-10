@@ -9,15 +9,15 @@ objectives:
   - Reason about decreasing timelocks along a route
 resources:
   - title: BOLT2 HTLC handling
-    url: 'https://github.com/lightning/bolts/blob/master/02-peer-protocol.md'
+    url: "https://github.com/lightning/bolts/blob/master/02-peer-protocol.md"
     kind: bolt
     required: true
   - title: Mastering the Lightning Network
-    url: 'https://github.com/lnbook/lnbook/blob/master/08_routing_htlcs.asciidoc'
+    url: "https://github.com/lnbook/lnbook/blob/master/08_routing_htlcs.asciidoc"
     kind: book
-    chapter: 'Ch. 8: Routing on the Lightning Network'
+    chapter: "Ch. 8: Routing on the Lightning Network"
   - title: Lightning Network Paper
-    url: 'https://lightning.network/lightning-network-paper.pdf'
+    url: "https://lightning.network/lightning-network-paper.pdf"
     kind: article
 reflectionPrompts:
   - >-
@@ -41,6 +41,7 @@ lab:
 searchQueries:
   - BOLT2
 ---
+
 **HTLCs** (Hash Time Locked Contracts) are conditional payments: claim with a preimage before timeout, otherwise refund. Chained HTLCs create atomic multi-hop Lightning payments.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here.
@@ -51,19 +52,23 @@ Every routed payment is an HTLC dance. Debugging failures means reading hashes, 
 
 **Analogy:** A locked briefcase opens with a secret word (preimage). Each courier holds a briefcase with the same word requirement but earlier deadlines. When the final person learns the word, it propagates back so everyone can settle.
 
-<Mermaid caption="Same payment hash along the path; timelocks decrease toward the payee." chart="sequenceDiagram
+<Mermaid
+  caption="Same payment hash along the path; timelocks decrease toward the payee."
+  chart="sequenceDiagram
     participant A as Alice
     participant B as Bob
     participant C as Carol
     A->>B: add_htlc H, T=40
     B->>C: add_htlc H, T=20
     C->>B: fulfill preimage R
-    B->>A: fulfill preimage R" />
+    B->>A: fulfill preimage R"
+/>
 
 Each hop needs enough timelock margin. Implementations enforce minimums — do not invent tighter custom deltas without reading BOLTs. Modern invoices include a **payment secret** so intermediaries cannot settle incorrectly. While an HTLC is outstanding, that slice of **outbound** is reserved — ties back to channel liquidity.
 
 <Callout type="info" title="Atomicity">
-  Either the preimage settles the chain, or timeouts refund. Intermediaries should not lose funds if they follow protocol and stay online as required.
+  Either the preimage settles the chain, or timeouts refund. Intermediaries should not
+  lose funds if they follow protocol and stay online as required.
 </Callout>
 
 **Done when:** You can contrast payment hash vs preimage and why CLTV shrinks toward the payee.

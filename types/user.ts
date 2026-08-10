@@ -7,10 +7,7 @@ import {
   normalizeAccountStatus,
   type UserAccountStatus,
 } from "@/lib/auth/account-status";
-import {
-  normalizeLookingFor,
-  type LookingForId,
-} from "@/lib/builders/looking-for";
+import { normalizeLookingFor, type LookingForId } from "@/lib/builders/looking-for";
 
 export type BuilderProfile = {
   id: string;
@@ -48,9 +45,7 @@ export type PublicBuilderProfile = Omit<
   "email" | "emailNotifications" | "moderationReason"
 >;
 
-export function toPublicBuilderProfile(
-  profile: BuilderProfile,
-): PublicBuilderProfile {
+export function toPublicBuilderProfile(profile: BuilderProfile): PublicBuilderProfile {
   return {
     id: profile.id,
     username: profile.username,

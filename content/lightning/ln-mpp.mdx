@@ -9,14 +9,14 @@ objectives:
   - Know invoice/feature bit requirements for split payments
 resources:
   - title: BOLT4 Basic Multi-Part Payments
-    url: 'https://github.com/lightning/bolts/blob/master/04-onion-routing.md#basic-multi-part-payments'
+    url: "https://github.com/lightning/bolts/blob/master/04-onion-routing.md#basic-multi-part-payments"
     kind: bolt
     required: true
   - title: LND multipath payments
-    url: 'https://docs.lightning.engineering/'
+    url: "https://docs.lightning.engineering/"
     kind: docs
-  - title: 'Bitcoin Optech: Multipath payments'
-    url: 'https://bitcoinops.org/en/topics/multipath-payments/'
+  - title: "Bitcoin Optech: Multipath payments"
+    url: "https://bitcoinops.org/en/topics/multipath-payments/"
     kind: article
 reflectionPrompts:
   - >-
@@ -36,8 +36,9 @@ lab:
     - One paragraph: when single-path fails and MPP helps
     - Feature-support note for payer and payee stacks you care about
     - Link to BOLT4 MPP section you used
-    - 'Optional: Polar/CLI multipath pay proof'
+    - "Optional: Polar/CLI multipath pay proof"
 ---
+
 **Multipath payments** split one logical payment across several HTLC paths that share a payment secret/hash scheme so the receiver can reassemble atomically.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here.
@@ -48,13 +49,16 @@ Large payments often cannot fit through one channel’s available balance. MPP r
 
 **Analogy:** Moving a couch through a city — sometimes three smaller vans beat one truck that does not fit the alley.
 
-<Mermaid caption="Several HTLCs settle one logical payment." chart="flowchart TD
+<Mermaid
+  caption="Several HTLCs settle one logical payment."
+  chart="flowchart TD
     Pay[Payment 1_000_000 msat] --> P1[Path A 400k]
     Pay --> P2[Path B 350k]
     Pay --> P3[Path C 250k]
     P1 --> Rec[Receiver combines]
     P2 --> Rec
-    P3 --> Rec" />
+    P3 --> Rec"
+/>
 
 <Callout type="tip" title="Feature negotiation">
   Both ends need compatible features. Test across LND/CLN/LDK combinations you support.

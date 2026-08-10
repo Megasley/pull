@@ -9,9 +9,7 @@ type RecommendedLessonsSectionProps = {
   lessons: RecommendedLessonItem[];
 };
 
-export function RecommendedLessonsSection({
-  lessons,
-}: RecommendedLessonsSectionProps) {
+export function RecommendedLessonsSection({ lessons }: RecommendedLessonsSectionProps) {
   if (lessons.length === 0) {
     return null;
   }

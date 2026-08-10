@@ -7,7 +7,9 @@ import { XP_REWARDS } from "@/lib/xp/config";
 import { levelFromXp } from "@/lib/xp/levels";
 import type { XpAwardResult, XpSourceType } from "@/types/xp";
 
-async function syncUserXpTotals(userId: string): Promise<{ xp: number; level: number }> {
+async function syncUserXpTotals(
+  userId: string,
+): Promise<{ xp: number; level: number }> {
   const db = getDb();
   const totals = await db
     .select({

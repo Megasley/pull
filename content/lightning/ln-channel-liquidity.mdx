@@ -1,6 +1,6 @@
 ---
 title: Channel Liquidity
-description: 'Understand inbound vs outbound balance and why funded channels can still fail to pay or receive.'
+description: "Understand inbound vs outbound balance and why funded channels can still fail to pay or receive."
 difficulty: intermediate
 duration: 4 days
 objectives:
@@ -9,16 +9,16 @@ objectives:
   - Relate channel balance to forwarding constraints
 resources:
   - title: Mastering the Lightning Network
-    url: 'https://github.com/lnbook/lnbook/blob/master/07_payment_channels.asciidoc'
+    url: "https://github.com/lnbook/lnbook/blob/master/07_payment_channels.asciidoc"
     kind: book
-    chapter: 'Ch. 7: Payment Channels'
+    chapter: "Ch. 7: Payment Channels"
     required: true
   - title: Mastering the Lightning Network
-    url: 'https://github.com/lnbook/lnbook/blob/master/08_routing_htlcs.asciidoc'
+    url: "https://github.com/lnbook/lnbook/blob/master/08_routing_htlcs.asciidoc"
     kind: book
-    chapter: 'Ch. 8: Routing (balance context)'
+    chapter: "Ch. 8: Routing (balance context)"
   - title: Amboss
-    url: 'https://amboss.space/'
+    url: "https://amboss.space/"
     kind: tool
 reflectionPrompts:
   - >-
@@ -42,6 +42,7 @@ lab:
 searchQueries:
   - inbound capacity
 ---
+
 Channel **liquidity** is not how much bitcoin you locked — it is **which side of each channel holds that balance**. Lightning is directional: the same channel can send easily in one direction and fail in the other.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here.
@@ -52,27 +53,34 @@ On-chain, a UTXO is yours to spend. In a channel, only your **outbound** balance
 
 Total channel capacity is fixed until you splice, dual-fund, or close. Payments move balance between sides — they do not create new capacity.
 
-| Term | Meaning |
-| --- | --- |
-| **Outbound** | Your side's balance — what you can send or forward |
-| **Inbound** | Counterparty's balance on your channel — what you can receive |
+| Term         | Meaning                                                       |
+| ------------ | ------------------------------------------------------------- |
+| **Outbound** | Your side's balance — what you can send or forward            |
+| **Inbound**  | Counterparty's balance on your channel — what you can receive |
 
 After a typical single-funded open, the funder starts **outbound-heavy** (can send, cannot receive much).
 
-<Mermaid caption="Outbound is your spendable side; inbound is what lets you receive." chart="flowchart LR
+<Mermaid
+  caption="Outbound is your spendable side; inbound is what lets you receive."
+  chart="flowchart LR
     subgraph channel [Fixed channel capacity]
         Out[Your outbound]
         In[Inbound - theirs]
-    end" />
+    end"
+/>
 
-<Mermaid caption="A route fails when any hop lacks outbound on the forward edge." chart="flowchart LR
+<Mermaid
+  caption="A route fails when any hop lacks outbound on the forward edge."
+  chart="flowchart LR
     A[Alice outbound OK] --> B[Bob outbound low]
-    B -->|fail| C[Carol]" />
+    B -->|fail| C[Carol]"
+/>
 
 When your node forwards an HTLC, that slice of outbound is reserved until settle or fail. Busy edges drain outbound — direction matters before pathfinding.
 
 <Callout type="warning" title="Funded does not mean receive-ready">
-  A merchant with 10 BTC locked across channels but zero inbound on the invoice route still cannot get paid.
+  A merchant with 10 BTC locked across channels but zero inbound on the invoice route
+  still cannot get paid.
 </Callout>
 
 **Done when:** You can explain a “funded but cannot receive” failure in inbound/outbound terms.

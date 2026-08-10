@@ -36,14 +36,17 @@ export function parseScreenshotUrls(raw: string | string[] | undefined): string[
 }
 
 export type SubmissionValidationResult =
-  | { ok: true; data: {
-      repoUrl: string | null;
-      prUrl: string | null;
-      liveDemoUrl: string | null;
-      videoDemoUrl: string | null;
-      screenshotUrls: string[];
-      notes: string;
-    } }
+  | {
+      ok: true;
+      data: {
+        repoUrl: string | null;
+        prUrl: string | null;
+        liveDemoUrl: string | null;
+        videoDemoUrl: string | null;
+        screenshotUrls: string[];
+        notes: string;
+      };
+    }
   | { ok: false; error: string };
 
 export function validateSubmissionInput(

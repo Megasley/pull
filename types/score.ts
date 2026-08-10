@@ -6,11 +6,7 @@ export type BuilderScoreFactorId =
   | "community_reviews"
   | "contribution_consistency";
 
-export type BuilderScoreStrength =
-  | "emerging"
-  | "building"
-  | "strong"
-  | "exceptional";
+export type BuilderScoreStrength = "emerging" | "building" | "strong" | "exceptional";
 
 export type BuilderScoreFactor = {
   id: BuilderScoreFactorId;

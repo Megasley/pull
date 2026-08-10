@@ -37,8 +37,7 @@ export function ChapterQuizGate({
     return null;
   }
 
-  const quizComplete =
-    isAuthenticated && (status === "passed" || status === "skipped");
+  const quizComplete = isAuthenticated && (status === "passed" || status === "skipped");
   const showQuiz = !quizComplete;
 
   return (

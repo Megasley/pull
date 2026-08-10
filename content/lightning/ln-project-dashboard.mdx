@@ -1,6 +1,6 @@
 ---
 title: Node Ops Dashboard
-description: 'Monitor channels, peers, balances, and routing revenue in one view.'
+description: "Monitor channels, peers, balances, and routing revenue in one view."
 difficulty: advanced
 duration: 10 days
 project: ln-node-dashboard
@@ -9,21 +9,21 @@ objectives:
   - Surface inbound/outbound imbalances
   - Alert on forced closes and offline peers
 resources:
-  - title: 'Project Spec: Node Ops Dashboard'
-    url: '/projects/ln-node-dashboard'
+  - title: "Project Spec: Node Ops Dashboard"
+    url: "/projects/ln-node-dashboard"
     kind: docs
     note: Pull project page — acceptance criteria and submit flow.
     required: true
   - title: Mastering the Lightning Network
-    url: 'https://github.com/lnbook/lnbook/blob/master/05_node_operations.asciidoc'
+    url: "https://github.com/lnbook/lnbook/blob/master/05_node_operations.asciidoc"
     kind: book
-    chapter: 'Ch. 5: Operating a Lightning Node'
+    chapter: "Ch. 5: Operating a Lightning Node"
     required: true
   - title: LND prometheus metrics
-    url: 'https://docs.lightning.engineering/'
+    url: "https://docs.lightning.engineering/"
     kind: docs
   - title: Amboss
-    url: 'https://amboss.space/'
+    url: "https://amboss.space/"
     kind: tool
 reflectionPrompts:
   - >-
@@ -43,6 +43,7 @@ lab:
     - Screenshot of channel/peer/balance panels
     - Short note of one alert or failure case (peer offline, imbalance)
 ---
+
 Operators need one pane of glass: channels, fees collected, failed HTLCs, and peer health.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here.
@@ -58,21 +59,24 @@ Dashboard widgets:
 
 Never expose node admin credentials to the browser — proxy through your backend.
 
-<Mermaid caption="Collect node metrics, store snapshots, alert on anomalies." chart="flowchart LR
+<Mermaid
+  caption="Collect node metrics, store snapshots, alert on anomalies."
+  chart="flowchart LR
     Node[LN node APIs] --> ETL[Collector]
     ETL --> DB[Metrics store]
     DB --> UI[Ops dashboard]
-    UI --> Alerts[Alerts]" />
+    UI --> Alerts[Alerts]"
+/>
 
 **Done when:** You can list the RPC/API calls behind each widget.
 
 ## Step 3 — Milestones
 
-| Phase | Ship |
-| --- | --- |
+| Phase       | Ship                                                |
+| ----------- | --------------------------------------------------- |
 | Milestone A | Backend collector + channel list with balance ratio |
-| Milestone B | Peers + forwarding / fee snapshot |
-| Milestone C | Alert banner for offline peer or force-close risk |
+| Milestone B | Peers + forwarding / fee snapshot                   |
+| Milestone C | Alert banner for offline peer or force-close risk   |
 
 **Done when:** Milestone A never ships macaroons/RPC secrets to the client.
 

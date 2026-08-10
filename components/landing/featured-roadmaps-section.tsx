@@ -31,8 +31,8 @@ export function FeaturedRoadmapsSection() {
             </Reveal>
             <Reveal variant="fade" delayMs={140}>
               <p className="mt-4 font-mono text-sm leading-relaxed text-muted-foreground sm:text-base">
-                Live roadmaps with lessons, projects, and contribution milestones.
-                More tracks live on the full catalog.
+                Live roadmaps with lessons, projects, and contribution milestones. More
+                tracks live on the full catalog.
               </p>
             </Reveal>
           </div>

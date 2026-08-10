@@ -33,7 +33,11 @@ export function DashboardStatusBar({
         hint={`${level.progressPercentage}% to next`}
         accent
       />
-      <Stat label="XP" value={String(level.xp)} hint={`${level.xpIntoLevel} this level`} />
+      <Stat
+        label="XP"
+        value={String(level.xp)}
+        hint={`${level.xpIntoLevel} this level`}
+      />
       <Stat
         label="Streak"
         value={String(streak.current)}
@@ -60,9 +64,7 @@ export function DashboardStatusBar({
         >
           @{githubUsername}
         </Link>
-        <p className="mt-1 font-mono text-[10px] text-muted-foreground">
-          manage sync
-        </p>
+        <p className="mt-1 font-mono text-[10px] text-muted-foreground">manage sync</p>
       </div>
     </div>
   );

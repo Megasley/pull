@@ -118,12 +118,7 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     criteria: {
       type: "nodes_complete_any",
       roadmap: "bitcoin",
-      nodeIds: [
-        "oss-discovery",
-        "oss-review",
-        "oss-maintainer",
-        "oss-portfolio",
-      ],
+      nodeIds: ["oss-discovery", "oss-review", "oss-maintainer", "oss-portfolio"],
     },
   },
   {

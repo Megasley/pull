@@ -16,9 +16,7 @@ export const metadata = {
 
 export default async function IssuesPage() {
   const profile = await bootstrapCurrentUserProfile();
-  const { context, personalized } = await loadIssueRecommendationsPageData(
-    profile?.id,
-  );
+  const { context, personalized } = await loadIssueRecommendationsPageData(profile?.id);
 
   const metaParts = personalized
     ? [
@@ -29,9 +27,7 @@ export default async function IssuesPage() {
         context.completedProjectSlugs.length > 0
           ? `${context.completedProjectSlugs.length} projects`
           : null,
-        context.languages.length > 0
-          ? context.languages.slice(0, 4).join(", ")
-          : null,
+        context.languages.length > 0 ? context.languages.slice(0, 4).join(", ") : null,
         context.githubActivityCount > 0
           ? `${context.githubActivityCount} synced events`
           : null,
@@ -70,9 +66,7 @@ export default async function IssuesPage() {
       <div className="mt-10">
         <Suspense
           fallback={
-            <p className="text-sm text-muted-foreground">
-              Loading recommendations…
-            </p>
+            <p className="text-sm text-muted-foreground">Loading recommendations…</p>
           }
         >
           <IssueRecommendations context={context} />

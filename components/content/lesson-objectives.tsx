@@ -13,12 +13,7 @@ export function LessonObjectives({ objectives, className }: LessonObjectivesProp
   }
 
   return (
-    <section
-      className={cn(
-        "rounded-none border border-border bg-card p-6",
-        className,
-      )}
-    >
+    <section className={cn("rounded-none border border-border bg-card p-6", className)}>
       <h2 className="text-sm font-medium tracking-wide text-muted-foreground uppercase">
         Learning objectives
       </h2>

@@ -108,9 +108,7 @@
     "sectionId": "channels-htlcs",
     "title": "Channels & HTLCs Check",
     "passingScore": 3,
-    "recommendedProjects": [
-      "ln-node-dashboard"
-    ],
+    "recommendedProjects": ["ln-node-dashboard"],
     "questions": [
       {
         "id": "ch-q1",
@@ -215,9 +213,7 @@
     "sectionId": "routing-liquidity",
     "title": "Routing & Liquidity Check",
     "passingScore": 3,
-    "recommendedProjects": [
-      "custom-router"
-    ],
+    "recommendedProjects": ["custom-router"],
     "questions": [
       {
         "id": "rl-q1",
@@ -322,10 +318,7 @@
     "sectionId": "implementation",
     "title": "Implementation Check",
     "passingScore": 3,
-    "recommendedProjects": [
-      "lightning-pos",
-      "ln-node-dashboard"
-    ],
+    "recommendedProjects": ["lightning-pos", "ln-node-dashboard"],
     "questions": [
       {
         "id": "impl-q1",
@@ -430,11 +423,7 @@
     "sectionId": "projects",
     "title": "Projects Check",
     "passingScore": 3,
-    "recommendedProjects": [
-      "lightning-pos",
-      "ln-node-dashboard",
-      "custom-router"
-    ],
+    "recommendedProjects": ["lightning-pos", "ln-node-dashboard", "custom-router"],
     "questions": [
       {
         "id": "proj-q1",

@@ -12,9 +12,7 @@ export type SupportPublicConfig = {
   lightningEnabled: boolean;
 };
 
-export function getSupportPublicConfig(
-  lightningEnabled: boolean,
-): SupportPublicConfig {
+export function getSupportPublicConfig(lightningEnabled: boolean): SupportPublicConfig {
   return {
     onchainAddress: getOnchainAddress(),
     silentPaymentAddress: getSilentPaymentAddress(),

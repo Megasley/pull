@@ -1,10 +1,7 @@
 import { Zap } from "lucide-react";
 
 import { EmptyState } from "@/components/design-system";
-import {
-  formatDonationRelative,
-  formatSats,
-} from "@/lib/support/format";
+import { formatDonationRelative, formatSats } from "@/lib/support/format";
 import type { PublicSupporter } from "@/lib/support/repository";
 
 type SupportersWallProps = {

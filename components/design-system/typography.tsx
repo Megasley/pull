@@ -32,10 +32,7 @@ export const H3 = ({ className, ...props }: React.ComponentProps<"h3">) => (
 
 export const H4 = ({ className, ...props }: React.ComponentProps<"h4">) => (
   <h4
-    className={cn(
-      "text-lg font-semibold tracking-[-0.02em] sm:text-xl",
-      className,
-    )}
+    className={cn("text-lg font-semibold tracking-[-0.02em] sm:text-xl", className)}
     {...props}
   />
 );

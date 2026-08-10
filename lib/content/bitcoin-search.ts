@@ -10,7 +10,10 @@ export function buildBitcoinSearchUrl(query: string): string {
   return url.toString();
 }
 
-export function resolveLessonSearchQuery(queries: string[], fallbackTitle?: string): string {
+export function resolveLessonSearchQuery(
+  queries: string[],
+  fallbackTitle?: string,
+): string {
   const first = queries.map((item) => item.trim()).find(Boolean);
   if (first) {
     return first;

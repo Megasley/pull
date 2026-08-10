@@ -13,9 +13,7 @@ export function LessonReadingProgress({ progress }: LessonReadingProgressProps) 
       className="pointer-events-none fixed inset-x-0 top-14 z-[60] h-0.5 bg-border/40"
     >
       <div
-        className={cn(
-          "h-full bg-foreground transition-[width] duration-150 ease-out",
-        )}
+        className={cn("h-full bg-foreground transition-[width] duration-150 ease-out")}
         style={{ width: `${progress}%` }}
       />
     </div>

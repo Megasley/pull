@@ -118,8 +118,7 @@ export async function createBlinkLightningInvoice(input: {
   );
 
   const payload = result.data?.lnInvoiceCreate;
-  const apiError =
-    payload?.errors?.[0]?.message || result.errors?.[0]?.message;
+  const apiError = payload?.errors?.[0]?.message || result.errors?.[0]?.message;
   if (apiError) {
     throw new Error(apiError);
   }

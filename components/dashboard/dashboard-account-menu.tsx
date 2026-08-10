@@ -52,9 +52,7 @@ export function DashboardAccountMenu({
       <DropdownMenuContent align="end" className="w-48">
         <DropdownMenuLabel className="font-normal">
           <p className="text-sm font-medium">{displayName}</p>
-          <p className="font-mono text-[11px] text-muted-foreground">
-            @{username}
-          </p>
+          <p className="font-mono text-[11px] text-muted-foreground">@{username}</p>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>

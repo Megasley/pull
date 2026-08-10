@@ -17,9 +17,7 @@ export type NotificationRecipient = {
   prefs: EmailNotificationPrefs;
 };
 
-function mapRecipient(
-  row: typeof users.$inferSelect,
-): NotificationRecipient | null {
+function mapRecipient(row: typeof users.$inferSelect): NotificationRecipient | null {
   const email = row.email?.trim();
   if (!email) {
     return null;
@@ -42,11 +40,7 @@ export async function getNotificationRecipient(
   }
 
   const db = getDb();
-  const rows = await db
-    .select()
-    .from(users)
-    .where(eq(users.id, userId))
-    .limit(1);
+  const rows = await db.select().from(users).where(eq(users.id, userId)).limit(1);
 
   const row = rows[0];
   return row ? mapRecipient(row) : null;

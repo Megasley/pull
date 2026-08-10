@@ -9,15 +9,15 @@ objectives:
   - Configure or integrate a tower in a lab
 resources:
   - title: Mastering the Lightning Network
-    url: 'https://github.com/lnbook/lnbook/blob/master/16_security.asciidoc'
+    url: "https://github.com/lnbook/lnbook/blob/master/16_security.asciidoc"
     kind: book
-    chapter: 'Ch. 16: Security and Privacy'
+    chapter: "Ch. 16: Security and Privacy"
     required: true
   - title: LND watchtower
-    url: 'https://docs.lightning.engineering/'
+    url: "https://docs.lightning.engineering/"
     kind: docs
-  - title: 'Bitcoin Optech: Watchtowers'
-    url: 'https://bitcoinops.org/en/topics/watchtowers/'
+  - title: "Bitcoin Optech: Watchtowers"
+    url: "https://bitcoinops.org/en/topics/watchtowers/"
     kind: article
 reflectionPrompts:
   - >-
@@ -37,8 +37,9 @@ lab:
     - Half-page threat model: offline breach → tower justice
     - Privacy tradeoff note (metadata the tower may learn)
     - Link to Ch. 16 or Optech watchtowers section
-    - 'Optional: lab config/UI proof'
+    - "Optional: lab config/UI proof"
 ---
+
 A **watchtower** monitors the blockchain for revoked commitment broadcasts on your behalf and can publish justice transactions if you are offline.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here. This closes **Implementation**.
@@ -49,14 +50,17 @@ Phones sleep. Laptops close. Lightning’s penalty model needs someone watching.
 
 **Analogy:** A neighborhood security camera that only unlocks the evidence locker if a specific break-in pattern appears — without learning your daily life (ideally).
 
-<Mermaid caption="Towers watch for breaches and act when you cannot." chart="sequenceDiagram
+<Mermaid
+  caption="Towers watch for breaches and act when you cannot."
+  chart="sequenceDiagram
     participant W as Wallet
     participant T as Watchtower
     participant Chain as Bitcoin
     W->>T: Session + encrypted blobs
     Chain->>T: Detect revoked commit
     T->>Chain: Publish justice tx
-    T->>W: Later notify" />
+    T->>W: Later notify"
+/>
 
 <Callout type="info" title="Trust tradeoffs">
   Towers learn some metadata. Design privacy expectations; consider multiple towers.

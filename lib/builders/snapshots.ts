@@ -65,8 +65,7 @@ export function persistScoreSnapshotsAsync(
     } catch (error) {
       console.warn("[builders] score snapshot persist failed", {
         userId,
-        message:
-          error instanceof Error ? error.message.slice(0, 200) : String(error),
+        message: error instanceof Error ? error.message.slice(0, 200) : String(error),
       });
     }
   })();

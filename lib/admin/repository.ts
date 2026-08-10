@@ -1,11 +1,4 @@
-import {
-  count,
-  desc,
-  eq,
-  ilike,
-  or,
-  sql,
-} from "drizzle-orm";
+import { count, desc, eq, ilike, or, sql } from "drizzle-orm";
 
 import { recordAdminAction } from "@/lib/admin/audit-log";
 import {
@@ -63,11 +56,7 @@ export type UpdateUserRoleResult =
   | { ok: true; user: AdminUserRecord }
   | {
       ok: false;
-      reason:
-        | "database_unconfigured"
-        | "not_found"
-        | "last_admin"
-        | "self_demote";
+      reason: "database_unconfigured" | "not_found" | "last_admin" | "self_demote";
     };
 
 function mapAdminUser(row: typeof users.$inferSelect): AdminUserRecord {
@@ -126,9 +115,7 @@ export async function listRecentSubmissionsForAdmin(
     .from(projectSubmissions)
     .innerJoin(projects, eq(projectSubmissions.projectId, projects.id))
     .innerJoin(users, eq(projectSubmissions.userId, users.id))
-    .where(
-      sql`lower(${users.username}) <> 'satoshee'`,
-    )
+    .where(sql`lower(${users.username}) <> 'satoshee'`)
     .orderBy(desc(projectSubmissions.updatedAt))
     .limit(limit);
 
@@ -252,9 +239,7 @@ export async function updateUserRole(input: {
   });
 
   if (input.role === "reviewer" || input.role === "admin") {
-    const { notifyRoleGrantedAsync } = await import(
-      "@/lib/notifications/dispatch"
-    );
+    const { notifyRoleGrantedAsync } = await import("@/lib/notifications/dispatch");
     notifyRoleGrantedAsync({
       userId: input.userId,
       role: input.role,
@@ -339,9 +324,7 @@ export async function countFirstOssViaPull(): Promise<number> {
     return 0;
   }
 
-  const catalogRepos = getAllDiscoveryRepositories().map(
-    (repo) => repo.repository,
-  );
+  const catalogRepos = getAllDiscoveryRepositories().map((repo) => repo.repository);
   if (catalogRepos.length === 0) {
     return 0;
   }
@@ -394,16 +377,11 @@ export async function getPlatformMetrics(): Promise<PlatformMetrics> {
     return empty;
   }
 
-  const thirtyDaysAgo = new Date(
-    Date.now() - 30 * 24 * 60 * 60 * 1000,
-  ).toISOString();
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
   try {
     const [registeredUsers, monthlyActiveUsers] = await withDbRetry(async () =>
-      Promise.all([
-        countRegisteredUsers(),
-        countMonthlyActiveUsers(thirtyDaysAgo),
-      ]),
+      Promise.all([countRegisteredUsers(), countMonthlyActiveUsers(thirtyDaysAgo)]),
     );
 
     return {
@@ -458,7 +436,8 @@ async function applyModeration(input: {
           updatedAt: now,
         }
       : {
-          accountStatus: input.action === "ban" ? ("banned" as const) : ("suspended" as const),
+          accountStatus:
+            input.action === "ban" ? ("banned" as const) : ("suspended" as const),
           moderationReason: input.reason?.trim() || null,
           moderatedAt: now,
           moderatedBy: input.actorUserId,
@@ -504,10 +483,7 @@ export async function banUser(input: {
   return applyModeration({ ...input, action: "ban" });
 }
 
-export async function restoreUser(input: {
-  userId: string;
-  actorUserId: string;
-}) {
+export async function restoreUser(input: { userId: string; actorUserId: string }) {
   return applyModeration({ ...input, action: "restore" });
 }
 
@@ -536,7 +512,9 @@ export async function getCronSyncHealth(): Promise<CronSyncHealth> {
   }
 }
 
-export async function getAdminUserById(userId: string): Promise<AdminUserRecord | null> {
+export async function getAdminUserById(
+  userId: string,
+): Promise<AdminUserRecord | null> {
   if (!isDatabaseConfigured()) {
     return null;
   }
@@ -545,4 +523,3 @@ export async function getAdminUserById(userId: string): Promise<AdminUserRecord 
   const rows = await db.select().from(users).where(eq(users.id, userId)).limit(1);
   return rows[0] ? mapAdminUser(rows[0]) : null;
 }
-

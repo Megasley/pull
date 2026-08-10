@@ -39,10 +39,7 @@ export function Callout({ type = "info", title, children }: CalloutProps) {
 
   return (
     <aside
-      className={cn(
-        "my-6 rounded-none border px-4 py-4 not-prose",
-        config.className,
-      )}
+      className={cn("my-6 rounded-none border px-4 py-4 not-prose", config.className)}
     >
       <div className="flex items-start gap-3">
         <Icon className={cn("mt-0.5 size-5 shrink-0", config.iconClassName)} />

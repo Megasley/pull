@@ -24,8 +24,8 @@ export function ReviewQueueEmail({
     >
       <Text style={{ margin: "0 0 12px" }}>Hey {displayName},</Text>
       <Text style={{ margin: "0 0 12px" }}>
-        <strong>@{submitterUsername}</strong> submitted{" "}
-        <strong>{projectTitle}</strong> for review.
+        <strong>@{submitterUsername}</strong> submitted <strong>{projectTitle}</strong>{" "}
+        for review.
       </Text>
     </EmailLayout>
   );

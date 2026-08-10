@@ -58,10 +58,7 @@ export function SupportQrCode({
   if (!dataUrl) {
     return (
       <div
-        className={cn(
-          "animate-pulse border border-border bg-muted/40",
-          className,
-        )}
+        className={cn("animate-pulse border border-border bg-muted/40", className)}
         style={{ width: size, height: size }}
         aria-hidden
       />

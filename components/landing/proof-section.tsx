@@ -123,9 +123,7 @@ export function ProofSection() {
                 asChild
                 className="h-12 w-full border-white/25 bg-transparent px-6 text-[var(--background)] hover:bg-white/5 hover:text-[var(--background)] sm:w-auto"
               >
-                <Link href={`/u/${DEMO_PROFILE_USERNAME}`}>
-                  ./view-demo-profile
-                </Link>
+                <Link href={`/u/${DEMO_PROFILE_USERNAME}`}>./view-demo-profile</Link>
               </Button>
               <Button
                 size="lg"

@@ -26,10 +26,7 @@ export function ChapterProjectCallout({
 
   return (
     <section
-      className={cn(
-        "rounded-none border border-ink/20 bg-signal/10 p-6",
-        className,
-      )}
+      className={cn("rounded-none border border-ink/20 bg-signal/10 p-6", className)}
     >
       <div className="flex items-start gap-3">
         <Hammer className="mt-0.5 size-5 shrink-0 text-ink" />
@@ -40,8 +37,8 @@ export function ChapterProjectCallout({
               Apply this chapter in a project
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              You have the concepts — ship something small to prove it. These
-              Pull projects connect directly to what you just studied.
+              You have the concepts — ship something small to prove it. These Pull
+              projects connect directly to what you just studied.
             </p>
           </div>
 
@@ -52,9 +49,7 @@ export function ChapterProjectCallout({
                 className="flex flex-wrap items-center justify-between gap-3 border border-border bg-background px-4 py-3"
               >
                 <div className="space-y-1">
-                  <p className="font-mono text-xs text-foreground">
-                    project // {slug}
-                  </p>
+                  <p className="font-mono text-xs text-foreground">project // {slug}</p>
                   {PROJECT_LABELS[slug] ? (
                     <Badge variant="outline" className="text-[10px]">
                       {PROJECT_LABELS[slug]}

@@ -32,8 +32,7 @@ export async function connectGithubFromSession(
   if (!token) {
     return {
       ok: false,
-      error:
-        "No GitHub access token in session. Reconnect GitHub to grant API access.",
+      error: "No GitHub access token in session. Reconnect GitHub to grant API access.",
     };
   }
 
@@ -105,18 +104,16 @@ export async function loadGithubDashboardSnapshot(
     };
   }
 
-  const [pinnedRepos, recentRepos, contributionDays, totals] =
-    await Promise.all([
-      listGithubRepositories(userId, { pinnedOnly: true, limit: 6 }),
-      listGithubRepositories(userId, { limit: 6 }),
-      listGithubContributionDays(userId),
-      countGithubSyncedEntities(userId),
-    ]);
+  const [pinnedRepos, recentRepos, contributionDays, totals] = await Promise.all([
+    listGithubRepositories(userId, { pinnedOnly: true, limit: 6 }),
+    listGithubRepositories(userId, { limit: 6 }),
+    listGithubContributionDays(userId),
+    countGithubSyncedEntities(userId),
+  ]);
 
   return {
     connection,
-    pinnedRepos:
-      pinnedRepos.length > 0 ? pinnedRepos : recentRepos.slice(0, 6),
+    pinnedRepos: pinnedRepos.length > 0 ? pinnedRepos : recentRepos.slice(0, 6),
     recentRepos,
     contributionDays,
     totals,

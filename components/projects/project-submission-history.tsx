@@ -8,10 +8,7 @@ import {
   type SubmissionStatus,
 } from "@/types/submission";
 
-const statusVariant: Record<
-  SubmissionStatus,
-  "secondary" | "outline" | "default"
-> = {
+const statusVariant: Record<SubmissionStatus, "secondary" | "outline" | "default"> = {
   draft: "outline",
   submitted: "secondary",
   under_review: "secondary",
@@ -61,7 +58,10 @@ export function ProjectSubmissionHistory({
                   className="inline-flex items-center gap-1.5 text-sm text-foreground underline-offset-4 hover:underline"
                 >
                   {submission.repoUrl}
-                  <ExternalLink className="size-3.5 text-muted-foreground" aria-hidden />
+                  <ExternalLink
+                    className="size-3.5 text-muted-foreground"
+                    aria-hidden
+                  />
                 </a>
               ) : (
                 <p className="text-sm text-muted-foreground">No repository URL yet</p>

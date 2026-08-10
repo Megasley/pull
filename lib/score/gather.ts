@@ -23,9 +23,7 @@ function weekKey(iso: string): string {
   const dayNum = utc.getUTCDay() || 7;
   utc.setUTCDate(utc.getUTCDate() + 4 - dayNum);
   const yearStart = new Date(Date.UTC(utc.getUTCFullYear(), 0, 1));
-  const week = Math.ceil(
-    ((utc.getTime() - yearStart.getTime()) / 86400000 + 1) / 7,
-  );
+  const week = Math.ceil(((utc.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
   return `${utc.getUTCFullYear()}-W${week}`;
 }
 
@@ -70,9 +68,7 @@ export async function gatherBuilderScoreInputs(
 
   const db = getDb();
   const windowStart = new Date();
-  windowStart.setUTCDate(
-    windowStart.getUTCDate() - CONSISTENCY_WINDOW_WEEKS * 7,
-  );
+  windowStart.setUTCDate(windowStart.getUTCDate() - CONSISTENCY_WINDOW_WEEKS * 7);
   const windowIso = windowStart.toISOString();
 
   const [
@@ -106,9 +102,7 @@ export async function gatherBuilderScoreInputs(
     db
       .select({ value: count() })
       .from(xpEvents)
-      .where(
-        and(eq(xpEvents.userId, userId), eq(xpEvents.sourceType, "merged_pr")),
-      ),
+      .where(and(eq(xpEvents.userId, userId), eq(xpEvents.sourceType, "merged_pr"))),
     db
       .select({ value: count() })
       .from(submissionReviewEvents)

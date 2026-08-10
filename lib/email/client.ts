@@ -20,9 +20,7 @@ export function getResendClient(): Resend | null {
 }
 
 export function getResendFromAddress(): string {
-  return (
-    process.env.RESEND_FROM?.trim() || "Pull <onboarding@resend.dev>"
-  );
+  return process.env.RESEND_FROM?.trim() || "Pull <onboarding@resend.dev>";
 }
 
 /** Always route replies to the public support inbox. */

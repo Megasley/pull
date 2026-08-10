@@ -101,7 +101,10 @@ export function RevealStagger({
       {items.map((child, index) => (
         <div
           key={
-            typeof child === "object" && child !== null && "key" in child && child.key != null
+            typeof child === "object" &&
+            child !== null &&
+            "key" in child &&
+            child.key != null
               ? String(child.key)
               : index
           }

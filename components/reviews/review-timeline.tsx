@@ -6,11 +6,7 @@ type ReviewTimelineProps = {
 
 export function ReviewTimeline({ events }: ReviewTimelineProps) {
   if (events.length === 0) {
-    return (
-      <p className="text-sm text-muted-foreground">
-        No review activity yet.
-      </p>
-    );
+    return <p className="text-sm text-muted-foreground">No review activity yet.</p>;
   }
 
   return (
@@ -38,9 +34,7 @@ export function ReviewTimeline({ events }: ReviewTimelineProps) {
               {event.actorDisplayName ?? event.actorUsername ?? "System"}
               {event.type === "status_change" && event.fromStatus
                 ? ` · ${SUBMISSION_STATUS_LABELS[event.fromStatus]} → ${
-                    event.toStatus
-                      ? SUBMISSION_STATUS_LABELS[event.toStatus]
-                      : "-"
+                    event.toStatus ? SUBMISSION_STATUS_LABELS[event.toStatus] : "-"
                   }`
                 : null}
             </p>

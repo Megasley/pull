@@ -1,13 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
-import {
-  BookOpen,
-  Brain,
-  ChevronDown,
-  FlaskConical,
-  ListOrdered,
-} from "lucide-react";
+import { BookOpen, Brain, ChevronDown, FlaskConical, ListOrdered } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 

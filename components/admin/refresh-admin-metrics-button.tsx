@@ -24,9 +24,7 @@ export function RefreshAdminMetricsButton() {
             const result = await refreshAdminMetricsAction();
             if (!result.ok) {
               setError(
-                "error" in result && result.error
-                  ? result.error
-                  : "Refresh failed",
+                "error" in result && result.error ? result.error : "Refresh failed",
               );
               return;
             }
@@ -36,9 +34,7 @@ export function RefreshAdminMetricsButton() {
       >
         {pending ? "Refreshing…" : "Refresh metrics"}
       </Button>
-      {error ? (
-        <p className="font-mono text-[10px] text-destructive">{error}</p>
-      ) : null}
+      {error ? <p className="font-mono text-[10px] text-destructive">{error}</p> : null}
     </div>
   );
 }

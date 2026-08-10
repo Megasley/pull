@@ -1,4 +1,16 @@
-import { and, count, desc, eq, gt, gte, inArray, isNotNull, lte, ne, sql } from "drizzle-orm";
+import {
+  and,
+  count,
+  desc,
+  eq,
+  gt,
+  gte,
+  inArray,
+  isNotNull,
+  lte,
+  ne,
+  sql,
+} from "drizzle-orm";
 
 import { getDb } from "@/lib/db";
 import {
@@ -39,9 +51,7 @@ export async function countDistinctLessonCompleters(
   return rows[0]?.value ?? 0;
 }
 
-export async function countDistinctQuizPassers(
-  since?: string | null,
-): Promise<number> {
+export async function countDistinctQuizPassers(since?: string | null): Promise<number> {
   const db = getDb();
   const conditions = [eq(userChapterQuizzes.status, "passed")];
   if (since) {
@@ -204,10 +214,8 @@ export async function fetchLessonDropOff(limit = 10) {
   }));
 }
 
-export function filterDemoSubmissions<
-  T extends { builderUsername?: string | null },
->(items: T[]): T[] {
-  return items.filter(
-    (item) => !isAdminDemoUsername(item.builderUsername ?? ""),
-  );
+export function filterDemoSubmissions<T extends { builderUsername?: string | null }>(
+  items: T[],
+): T[] {
+  return items.filter((item) => !isAdminDemoUsername(item.builderUsername ?? ""));
 }

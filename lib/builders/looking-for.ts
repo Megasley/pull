@@ -37,9 +37,7 @@ export const LOOKING_FOR_OPTIONS = [
 
 export type LookingForId = (typeof LOOKING_FOR_OPTIONS)[number]["id"];
 
-const LOOKING_FOR_IDS = new Set<string>(
-  LOOKING_FOR_OPTIONS.map((option) => option.id),
-);
+const LOOKING_FOR_IDS = new Set<string>(LOOKING_FOR_OPTIONS.map((option) => option.id));
 
 export function isLookingForId(value: string): value is LookingForId {
   return LOOKING_FOR_IDS.has(value);
@@ -60,9 +58,7 @@ export function normalizeLookingFor(value: unknown): LookingForId[] {
 }
 
 export function lookingForLabel(id: LookingForId): string {
-  return (
-    LOOKING_FOR_OPTIONS.find((option) => option.id === id)?.label ?? id
-  );
+  return LOOKING_FOR_OPTIONS.find((option) => option.id === id)?.label ?? id;
 }
 
 /** Looking-for chips shown in the builders directory (excludes inactive). */
@@ -82,5 +78,4 @@ export const BUILDER_DIRECTORY_FILTERS = [
   "Protocol Design",
 ] as const;
 
-export type BuilderDirectoryFilter =
-  (typeof BUILDER_DIRECTORY_FILTERS)[number];
+export type BuilderDirectoryFilter = (typeof BUILDER_DIRECTORY_FILTERS)[number];

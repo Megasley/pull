@@ -36,9 +36,7 @@ type PullRequestPortfolioProps = {
   publicView?: boolean;
 };
 
-const CONTRIBUTION_TYPES = Object.keys(
-  CONTRIBUTION_TYPE_LABEL,
-) as ContributionType[];
+const CONTRIBUTION_TYPES = Object.keys(CONTRIBUTION_TYPE_LABEL) as ContributionType[];
 
 export function PullRequestPortfolio({
   items,
@@ -49,9 +47,9 @@ export function PullRequestPortfolio({
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<PullRequestPortfolioStatus | "all">("all");
   const [language, setLanguage] = useState<string | "all">("all");
-  const [contributionType, setContributionType] = useState<
-    ContributionType | "all"
-  >("all");
+  const [contributionType, setContributionType] = useState<ContributionType | "all">(
+    "all",
+  );
   const [mergedOnly, setMergedOnly] = useState(false);
   const [page, setPage] = useState(1);
   const deferredQuery = useDeferredValue(query);
@@ -301,9 +299,7 @@ function Stat({
     <div
       className={cn(
         "rounded-none border px-3 py-3",
-        highlight
-          ? "border-ink/25 bg-signal/15"
-          : "border-border bg-transparent",
+        highlight ? "border-ink/25 bg-signal/15" : "border-border bg-transparent",
       )}
     >
       <p className="text-xs text-muted-foreground">{label}</p>
@@ -312,13 +308,7 @@ function Stat({
   );
 }
 
-function FilterRow({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
+function FilterRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-2">
       <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">

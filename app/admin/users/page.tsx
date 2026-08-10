@@ -20,9 +20,7 @@ type AdminUsersPageProps = {
   searchParams: Promise<{ q?: string }>;
 };
 
-export default async function AdminUsersPage({
-  searchParams,
-}: AdminUsersPageProps) {
+export default async function AdminUsersPage({ searchParams }: AdminUsersPageProps) {
   const profile = await bootstrapCurrentUserProfile();
 
   if (!profile) {
@@ -85,9 +83,7 @@ export default async function AdminUsersPage({
           <EmptyState
             title="No users found"
             description={
-              query
-                ? "Try a different search."
-                : "No users in the database yet."
+              query ? "Try a different search." : "No users in the database yet."
             }
           />
         ) : (
@@ -119,8 +115,8 @@ export default async function AdminUsersPage({
                       <Badge variant="secondary">{user.role}</Badge>
                     </div>
                     <p className="truncate font-mono text-[11px] text-muted-foreground">
-                      @{user.username} · gh:{user.githubUsername} · xp{" "}
-                      {user.xp} · lvl {user.level}
+                      @{user.username} · gh:{user.githubUsername} · xp {user.xp} · lvl{" "}
+                      {user.level}
                     </p>
                   </div>
                 </div>
@@ -129,10 +125,10 @@ export default async function AdminUsersPage({
                     <Link href={`/admin/users/${user.id}`}>View</Link>
                   </Button>
                   <AdminUserRoleSelect
-                  userId={user.id}
-                  currentRole={user.role}
-                  isSelf={user.id === profile.id}
-                />
+                    userId={user.id}
+                    currentRole={user.role}
+                    isSelf={user.id === profile.id}
+                  />
                 </div>
               </div>
             );

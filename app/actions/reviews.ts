@@ -3,10 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { requireActiveAccount } from "@/lib/auth/require-active-account";
-import {
-  isEligiblePeer,
-  loadPeerReviewContext,
-} from "@/lib/reviews/community";
+import { isEligiblePeer, loadPeerReviewContext } from "@/lib/reviews/community";
 import {
   applyReviewAction,
   getSubmissionForReview,
@@ -73,9 +70,7 @@ export async function getReviewDetailAction(submissionId: string) {
   }
 
   const submission = await getSubmissionForReview(submissionId, gate.user.id);
-  const timeline = submission
-    ? await listSubmissionTimeline(submissionId)
-    : [];
+  const timeline = submission ? await listSubmissionTimeline(submissionId) : [];
 
   return { ok: true as const, submission, timeline };
 }

@@ -1,6 +1,6 @@
 ---
 title: Opening Channels
-description: 'Fund channels, configure policies, and monitor inbound capacity.'
+description: "Fund channels, configure policies, and monitor inbound capacity."
 difficulty: intermediate
 duration: 5 days
 objectives:
@@ -9,15 +9,15 @@ objectives:
   - Configure fees and understand inbound vs outbound capacity
 resources:
   - title: Mastering the Lightning Network
-    url: 'https://github.com/lnbook/lnbook/blob/master/07_payment_channels.asciidoc'
+    url: "https://github.com/lnbook/lnbook/blob/master/07_payment_channels.asciidoc"
     kind: book
-    chapter: 'Ch. 7: Payment Channels'
+    chapter: "Ch. 7: Payment Channels"
     required: true
   - title: BOLT2 Peer Protocol
-    url: 'https://github.com/lightning/bolts/blob/master/02-peer-protocol.md'
+    url: "https://github.com/lightning/bolts/blob/master/02-peer-protocol.md"
     kind: bolt
   - title: LND openchannel
-    url: 'https://docs.lightning.engineering/'
+    url: "https://docs.lightning.engineering/"
     kind: docs
 reflectionPrompts:
   - >-
@@ -39,6 +39,7 @@ lab:
 searchQueries:
   - BOLT2
 ---
+
 Opening a channel locks on-chain funds into a collaborative contract so you can send many off-chain payments later.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here. This opens **Channels & HTLCs**.
@@ -49,7 +50,9 @@ Channel opens lock capital on-chain. Whether you can send or receive depends on 
 
 **Analogy:** Stocking a cash drawer between two cashiers. Total cash is fixed until you restock (splice/dual-fund) or close.
 
-<Mermaid caption="Fund on-chain, wait for depth, then activate the channel." chart="sequenceDiagram
+<Mermaid
+  caption="Fund on-chain, wait for depth, then activate the channel."
+  chart="sequenceDiagram
     participant A as Node A
     participant B as Node B
     participant Chain as Bitcoin
@@ -58,7 +61,8 @@ Channel opens lock capital on-chain. Whether you can send or receive depends on 
     Chain->>A: confirmations
     Chain->>B: confirmations
     A->>B: channel_ready
-    Note over A,B: Off-chain updates begin" />
+    Note over A,B: Off-chain updates begin"
+/>
 
 ```bash
 # Illustrative LND-style flow
@@ -69,7 +73,8 @@ lncli openchannel <pubkey> <local_amt>
 Single-funded opens usually leave the funder **outbound-heavy**. Do not route large value before your configured confirmation depth.
 
 <Callout type="tip" title="Confirmations matter">
-  Wait for channel readiness (and your depth policy) before treating the channel as operational.
+  Wait for channel readiness (and your depth policy) before treating the channel as
+  operational.
 </Callout>
 
 **Done when:** You can narrate open → funding tx → confirmations → channel_ready.

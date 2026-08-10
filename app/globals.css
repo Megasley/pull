@@ -199,8 +199,16 @@
 
   .tech-grid {
     background-image:
-      linear-gradient(to right, color-mix(in oklab, var(--ink) 35%, transparent) 1px, transparent 1px),
-      linear-gradient(to bottom, color-mix(in oklab, var(--ink) 35%, transparent) 1px, transparent 1px);
+      linear-gradient(
+        to right,
+        color-mix(in oklab, var(--ink) 35%, transparent) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to bottom,
+        color-mix(in oklab, var(--ink) 35%, transparent) 1px,
+        transparent 1px
+      );
     background-size: 48px 48px;
     mask-image: radial-gradient(ellipse at center, black 20%, transparent 75%);
   }
@@ -544,10 +552,7 @@
   }
   100% {
     opacity: 0;
-    transform: translate(
-        calc(-50% + var(--burst-x)),
-        calc(-50% + var(--burst-y))
-      )
+    transform: translate(calc(-50% + var(--burst-x)), calc(-50% + var(--burst-y)))
       scale(1);
   }
 }

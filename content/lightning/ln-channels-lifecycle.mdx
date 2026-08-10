@@ -1,6 +1,6 @@
 ---
 title: Channel Lifecycle
-description: 'Cooperative close, force close, and penalty transaction scenarios.'
+description: "Cooperative close, force close, and penalty transaction scenarios."
 difficulty: advanced
 duration: 5 days
 objectives:
@@ -9,15 +9,15 @@ objectives:
   - Practice backup and recovery discipline
 resources:
   - title: Mastering the Lightning Network
-    url: 'https://github.com/lnbook/lnbook/blob/master/07_payment_channels.asciidoc'
+    url: "https://github.com/lnbook/lnbook/blob/master/07_payment_channels.asciidoc"
     kind: book
-    chapter: 'Ch. 7: Payment Channels'
+    chapter: "Ch. 7: Payment Channels"
     required: true
   - title: BOLT2 closing
-    url: 'https://github.com/lightning/bolts/blob/master/02-peer-protocol.md'
+    url: "https://github.com/lightning/bolts/blob/master/02-peer-protocol.md"
     kind: bolt
   - title: Static Channel Backups (LND)
-    url: 'https://docs.lightning.engineering/'
+    url: "https://docs.lightning.engineering/"
     kind: docs
 reflectionPrompts:
   - >-
@@ -41,6 +41,7 @@ lab:
 searchQueries:
   - BOLT2
 ---
+
 Channels begin with funding and end with a close. How you close determines fees, delay, and risk.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here.
@@ -49,18 +50,21 @@ Complete **Step 1 // Required reading** in the study plan above, then continue h
 
 Force closes are expensive and slow. Lost channel state without backups can lose funds. Lifecycle literacy is operational safety.
 
-| Close type | What happens |
-| --- | --- |
-| **Cooperative** | Both agree — efficient on-chain settlement |
-| **Force** | Broadcast latest commitment — timelocks may delay funds |
-| **Penalty** | Response to revoked (old) state broadcast |
+| Close type      | What happens                                            |
+| --------------- | ------------------------------------------------------- |
+| **Cooperative** | Both agree — efficient on-chain settlement              |
+| **Force**       | Broadcast latest commitment — timelocks may delay funds |
+| **Penalty**     | Response to revoked (old) state broadcast               |
 
-<Mermaid caption="Prefer cooperative closes; prepare for force closes and breaches." chart="flowchart TD
+<Mermaid
+  caption="Prefer cooperative closes; prepare for force closes and breaches."
+  chart="flowchart TD
     Open[Channel active] --> Coop[Cooperative close]
     Open --> Force[Force close]
     Force --> Wait[CSV delays / anchors]
     Open --> Cheat[Old state broadcast]
-    Cheat --> Justice[Penalty sweep]" />
+    Cheat --> Justice[Penalty sweep]"
+/>
 
 <Callout type="danger" title="Backup before you need it">
   Export static channel backups / recovery data after opens. Test restore on regtest.

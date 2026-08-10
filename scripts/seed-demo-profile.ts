@@ -92,7 +92,8 @@ const DEMO_REPOS = [
     githubId: 910_001,
     name: "bitcoin",
     fullName: "bitcoin/bitcoin",
-    description: "Bitcoin Core integration testing utilities and documentation patches.",
+    description:
+      "Bitcoin Core integration testing utilities and documentation patches.",
     language: "C++",
     stargazersCount: 84_200,
     forksCount: 36_400,
@@ -103,7 +104,8 @@ const DEMO_REPOS = [
     githubId: 910_002,
     name: "lnd",
     fullName: "lightningnetwork/lnd",
-    description: "Lightning Network daemon contributions: routing, invoices, and RPC tooling.",
+    description:
+      "Lightning Network daemon contributions: routing, invoices, and RPC tooling.",
     language: "Go",
     stargazersCount: 7_800,
     forksCount: 2_100,
@@ -114,7 +116,8 @@ const DEMO_REPOS = [
     githubId: 910_003,
     name: "rust-bitcoin",
     fullName: "rust-bitcoin/rust-bitcoin",
-    description: "Rust primitives for transaction parsing, PSBT helpers, and address codecs.",
+    description:
+      "Rust primitives for transaction parsing, PSBT helpers, and address codecs.",
     language: "Rust",
     stargazersCount: 2_100,
     forksCount: 640,
@@ -147,7 +150,8 @@ const DEMO_REPOS = [
     githubId: 910_006,
     name: "ldk-node",
     fullName: "lightningdevkit/ldk-node",
-    description: "LDK sample integrations for wallet builders on the Lightning roadmap.",
+    description:
+      "LDK sample integrations for wallet builders on the Lightning roadmap.",
     language: "Rust",
     stargazersCount: 320,
     forksCount: 88,
@@ -240,10 +244,7 @@ async function removeExistingDemoProfile() {
     .from(users)
     .where(eq(users.username, DEMO_PROFILE_USERNAME));
 
-  const ids = new Set([
-    DEMO_PROFILE_USER_ID,
-    ...existing.map((row) => row.id),
-  ]);
+  const ids = new Set([DEMO_PROFILE_USER_ID, ...existing.map((row) => row.id)]);
 
   for (const id of ids) {
     await db.execute(sql`delete from auth.users where id = ${id}`);
@@ -427,8 +428,11 @@ async function seedGithubPullRequests(now: string) {
     const number = 1000 + index;
     const createdAt = daysAgoIso(360 - index * 10);
     const mergedAt = daysAgoIso(358 - index * 10);
-    const contributionType =
-      title.startsWith("docs:") ? "documentation" : index % 5 === 0 ? "bugfix" : "feature";
+    const contributionType = title.startsWith("docs:")
+      ? "documentation"
+      : index % 5 === 0
+        ? "bugfix"
+        : "feature";
 
     rows.push({
       userId: DEMO_PROFILE_USER_ID,
@@ -442,7 +446,8 @@ async function seedGithubPullRequests(now: string) {
       githubCreatedAt: createdAt,
       githubClosedAt: mergedAt,
       githubMergedAt: mergedAt,
-      labels: contributionType === "documentation" ? ["documentation"] : ["enhancement"],
+      labels:
+        contributionType === "documentation" ? ["documentation"] : ["enhancement"],
       language: repo.language,
       filesChanged: 3 + (index % 9),
       additions: 40 + index * 6,
@@ -665,7 +670,9 @@ async function main() {
   console.log(`  URL:      /u/${DEMO_PROFILE_USERNAME}`);
   console.log(`  Lessons:  ${BITCOIN_NODES.length + LIGHTNING_NODES.length} completed`);
   console.log(`  Projects: ${APPROVED_PROJECTS.length} approved`);
-  console.log(`  PRs:      ${MERGED_PR_TITLES.length} merged, ${OPEN_PR_TITLES.length} open`);
+  console.log(
+    `  PRs:      ${MERGED_PR_TITLES.length} merged, ${OPEN_PR_TITLES.length} open`,
+  );
   console.log(`  XP:       ${totals.xp} (level ${totals.level})`);
   console.log(`  Badges:   ${unlocked.length} achievements synced`);
 }

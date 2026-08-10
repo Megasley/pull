@@ -150,9 +150,7 @@ export const githubPullRequests = pgTable(
     index("github_pull_requests_user_id_idx").on(table.userId),
     index("github_pull_requests_state_idx").on(table.state),
     index("github_pull_requests_merged_idx").on(table.merged),
-    index("github_pull_requests_contribution_type_idx").on(
-      table.contributionType,
-    ),
+    index("github_pull_requests_contribution_type_idx").on(table.contributionType),
   ],
 );
 
@@ -184,10 +182,7 @@ export const githubIssues = pgTable(
       .defaultNow(),
   },
   (table) => [
-    uniqueIndex("github_issues_user_github_id_idx").on(
-      table.userId,
-      table.githubId,
-    ),
+    uniqueIndex("github_issues_user_github_id_idx").on(table.userId, table.githubId),
     index("github_issues_user_id_idx").on(table.userId),
     index("github_issues_state_idx").on(table.state),
     index("github_issues_relation_idx").on(table.relation),
