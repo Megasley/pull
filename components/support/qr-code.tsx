@@ -12,19 +12,24 @@ type SupportQrCodeProps = {
   size?: number;
 };
 
+type QrResult = {
+  key: string;
+  dataUrl?: string;
+  error?: string;
+};
+
 export function SupportQrCode({
   value,
   label,
   className,
   size = 220,
 }: SupportQrCodeProps) {
-  const [dataUrl, setDataUrl] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const requestKey = `${value}:${size}`;
+  const [result, setResult] = useState<QrResult | null>(null);
+  const active = result?.key === requestKey ? result : null;
 
   useEffect(() => {
     let cancelled = false;
-    setDataUrl(null);
-    setError(null);
 
     void QRCode.toDataURL(value, {
       errorCorrectionLevel: "M",
@@ -36,26 +41,28 @@ export function SupportQrCode({
       },
     })
       .then((url) => {
-        if (!cancelled) setDataUrl(url);
+        if (!cancelled) setResult({ key: requestKey, dataUrl: url });
       })
       .catch(() => {
-        if (!cancelled) setError("Could not generate QR code.");
+        if (!cancelled) {
+          setResult({ key: requestKey, error: "Could not generate QR code." });
+        }
       });
 
     return () => {
       cancelled = true;
     };
-  }, [value, size]);
+  }, [value, size, requestKey]);
 
-  if (error) {
+  if (active?.error) {
     return (
       <p className="font-mono text-xs text-destructive" role="alert">
-        {error}
+        {active.error}
       </p>
     );
   }
 
-  if (!dataUrl) {
+  if (!active?.dataUrl) {
     return (
       <div
         className={cn("animate-pulse border border-border bg-muted/40", className)}
@@ -68,7 +75,7 @@ export function SupportQrCode({
   return (
     // eslint-disable-next-line @next/next/no-img-element -- dynamic data URL QR
     <img
-      src={dataUrl}
+      src={active.dataUrl}
       alt={label}
       width={size}
       height={size}
