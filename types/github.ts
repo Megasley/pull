@@ -17,9 +17,7 @@ export type GithubConnectionPublic = {
   connected: true;
 };
 
-export type GithubConnectionState =
-  | { connected: false }
-  | GithubConnectionPublic;
+export type GithubConnectionState = { connected: false } | GithubConnectionPublic;
 
 export type GithubRepositoryRecord = {
   id: string;

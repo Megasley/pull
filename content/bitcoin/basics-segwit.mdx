@@ -1,6 +1,6 @@
 ---
 title: SegWit & Bech32
-description: 'Witness data, weight units, and modern address formats.'
+description: "Witness data, weight units, and modern address formats."
 difficulty: intermediate
 duration: 5 days
 objectives:
@@ -12,14 +12,14 @@ resources:
     url: >-
       https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch06_transactions.adoc
     kind: book
-    chapter: 'Ch. 6: Transactions'
+    chapter: "Ch. 6: Transactions"
     note: Read SegWit / witness structure sections.
     required: true
   - title: BIP-141 Segregated Witness
-    url: 'https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki'
+    url: "https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki"
     kind: bip
   - title: BIP-173 Bech32
-    url: 'https://github.com/bitcoin/bips/blob/master/bip-0173.mediawiki'
+    url: "https://github.com/bitcoin/bips/blob/master/bip-0173.mediawiki"
     kind: bip
 reflectionPrompts:
   - >-
@@ -42,6 +42,7 @@ searchQueries:
   - BIP141
   - SegWit
 ---
+
 **Segregated Witness (SegWit)** moved signature data out of the legacy transaction identifier path. That fixed transaction malleability for modern outputs and changed how block capacity and fees are measured.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here.
@@ -69,19 +70,23 @@ Weight units:
 - Witness byte: 1 weight unit
 - Block weight limit: 4,000,000 units
 
-<Mermaid caption="SegWit stabilizes txids for protocols and introduces weight-based fees." chart="flowchart TD
+<Mermaid
+  caption="SegWit stabilizes txids for protocols and introduces weight-based fees."
+  chart="flowchart TD
     Legacy[Legacy tx + scripts] --> Malleable[txid malleability risk]
     SegWit[SegWit tx] --> Witness[Witness signatures]
     SegWit --> Base[Base tx without witness]
     Base --> Txid[txid stable for contracts]
-    Witness --> Weight[Weighted size for fees]" />
+    Witness --> Weight[Weighted size for fees]"
+/>
 
 Before SegWit, third parties could tweak signatures and change txids in some cases. Second-layer protocols that pre-signed dependent transactions suffered. SegWit removed witness data from txid calculation, enabling safer Lightning-style designs.
 
 Native SegWit v0 addresses use **Bech32** (`bc1q...`). **Nested SegWit** wraps witness programs inside P2SH (`3...`) for old wallet compatibility. New systems should default to native SegWit or Taproot.
 
 <Callout type="tip" title="Prefer native SegWit for new single-sig">
-  Nested SegWit exists for compatibility, but native Bech32 usually saves fees and complexity.
+  Nested SegWit exists for compatibility, but native Bech32 usually saves fees and
+  complexity.
 </Callout>
 
 **Done when:** You can explain why txid is stable under SegWit and compute fee from sat/vB × vbytes.

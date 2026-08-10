@@ -1,7 +1,4 @@
-import type {
-  IssueCategory,
-  IssueRecommendationContext,
-} from "@/types/issues";
+import type { IssueCategory, IssueRecommendationContext } from "@/types/issues";
 import type { RoadmapDifficulty } from "@/types";
 
 import { recommendIssues } from "./engine";

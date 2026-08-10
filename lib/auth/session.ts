@@ -3,10 +3,7 @@ import type { User } from "@supabase/supabase-js";
 
 import { createClientIfConfigured } from "@/lib/supabase/server";
 
-import {
-  ensureBuilderProfile,
-  getBuilderProfile,
-} from "./ensure-builder-profile";
+import { ensureBuilderProfile, getBuilderProfile } from "./ensure-builder-profile";
 
 /**
  * Request-scoped auth lookup. Navbar, AuthControls, and pages often call this

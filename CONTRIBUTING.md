@@ -27,14 +27,14 @@ This project follows the [Contributor Covenant](./CODE_OF_CONDUCT.md). By partic
 
 You do not need to write application code to help.
 
-| Area | Examples |
-| --- | --- |
-| **Lessons** | Fix typos, add diagrams, improve explanations, add `searchQueries` or interactive lab links |
-| **Roadmaps** | Adjust node order, prerequisites, or section descriptions in `content/roadmaps/*.json` |
-| **Docs** | README, ROADMAP, self-hosting guides, screenshots |
-| **UI/UX** | Dashboard, lesson reader, accessibility, mobile layout |
-| **Platform** | Auth, progress sync, GitHub integration, notifications |
-| **Issues** | Repro steps, feature proposals, roadmap discussions |
+| Area         | Examples                                                                                    |
+| ------------ | ------------------------------------------------------------------------------------------- |
+| **Lessons**  | Fix typos, add diagrams, improve explanations, add `searchQueries` or interactive lab links |
+| **Roadmaps** | Adjust node order, prerequisites, or section descriptions in `content/roadmaps/*.json`      |
+| **Docs**     | README, ROADMAP, self-hosting guides, screenshots                                           |
+| **UI/UX**    | Dashboard, lesson reader, accessibility, mobile layout                                      |
+| **Platform** | Auth, progress sync, GitHub integration, notifications                                      |
+| **Issues**   | Repro steps, feature proposals, roadmap discussions                                         |
 
 Check [ROADMAP.md](./ROADMAP.md) for planned work and open a discussion before large features.
 
@@ -62,21 +62,21 @@ cp .env.example .env.local
 
 Edit `.env.local`. Required for a full local experience:
 
-| Variable | Purpose |
-| --- | --- |
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key |
-| `DATABASE_URL` | Postgres connection string (pooler URI) |
-| `NEXT_PUBLIC_SITE_URL` | `http://localhost:3000` locally |
+| Variable                        | Purpose                                 |
+| ------------------------------- | --------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Supabase project URL                    |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key                       |
+| `DATABASE_URL`                  | Postgres connection string (pooler URI) |
+| `NEXT_PUBLIC_SITE_URL`          | `http://localhost:3000` locally         |
 
 Optional:
 
-| Variable | Purpose |
-| --- | --- |
-| `CRON_SECRET` | Protects `/api/cron/github-sync` |
+| Variable                         | Purpose                                  |
+| -------------------------------- | ---------------------------------------- |
+| `CRON_SECRET`                    | Protects `/api/cron/github-sync`         |
 | `RESEND_API_KEY` / `RESEND_FROM` | Transactional email (no-ops without key) |
-| `PULL_REVIEWER_GITHUB_USERNAMES` | Comma-separated staff reviewers |
-| `PULL_ADMIN_GITHUB_USERNAMES` | Comma-separated platform admins |
+| `PULL_REVIEWER_GITHUB_USERNAMES` | Comma-separated staff reviewers          |
+| `PULL_ADMIN_GITHUB_USERNAMES`    | Comma-separated platform admins          |
 
 **Never commit `.env`, `.env.local`, or real secrets.** See [Security](#reporting-bugs-and-security-issues).
 
@@ -182,12 +182,12 @@ Lessons should read like an **easy-to-follow guide**: numbered steps, clear goal
 
 **Step count is flexible.** Use as many or as few steps as the content needs (often 3–7). There is no requirement to hit exactly five.
 
-| Type | Typical flow (expand or shrink) |
-| --- | --- |
-| **Setup / how-to** | Study-plan Step 1 (required reading) → Terms → Setup & verify → Lab → Next lesson |
-| **Concept** | Study-plan Step 1 → Core idea → Try it → Lab / mistakes → Next lesson |
-| **Project** | Study-plan Step 1 → Goal → Milestones → Build / evidence → Next lesson |
-| **OSS / soft skill** | Study-plan Step 1 → Context → Practice → Checklist → Next lesson |
+| Type                 | Typical flow (expand or shrink)                                                   |
+| -------------------- | --------------------------------------------------------------------------------- |
+| **Setup / how-to**   | Study-plan Step 1 (required reading) → Terms → Setup & verify → Lab → Next lesson |
+| **Concept**          | Study-plan Step 1 → Core idea → Try it → Lab / mistakes → Next lesson             |
+| **Project**          | Study-plan Step 1 → Goal → Milestones → Build / evidence → Next lesson            |
+| **OSS / soft skill** | Study-plan Step 1 → Context → Practice → Checklist → Next lesson                  |
 
 **Rules**
 
@@ -288,14 +288,14 @@ Third-party works are **linked, never copied**:
 
 ### Common tasks
 
-| Task | Where to look |
-| --- | --- |
-| Auth / protected routes | `lib/auth/routes.ts`, `lib/supabase/middleware.ts` |
-| Lesson rendering | `components/content/`, `lib/content/compile-mdx.ts` |
-| Roadmap UI | `components/roadmap/` |
-| Progress sync | `app/actions/progress.ts`, `hooks/use-roadmap-progress.ts` |
-| GitHub sync | `lib/github/` |
-| Dashboard sections | `components/dashboard/` |
+| Task                    | Where to look                                              |
+| ----------------------- | ---------------------------------------------------------- |
+| Auth / protected routes | `lib/auth/routes.ts`, `lib/supabase/middleware.ts`         |
+| Lesson rendering        | `components/content/`, `lib/content/compile-mdx.ts`        |
+| Roadmap UI              | `components/roadmap/`                                      |
+| Progress sync           | `app/actions/progress.ts`, `hooks/use-roadmap-progress.ts` |
+| GitHub sync             | `lib/github/`                                              |
+| Dashboard sections      | `components/dashboard/`                                    |
 
 ### Database changes
 

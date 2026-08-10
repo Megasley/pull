@@ -1,16 +1,16 @@
 ---
 title: Node Dashboard
-description: 'Monitor peers, chain sync, wallet balance, and fee estimates in real time.'
+description: "Monitor peers, chain sync, wallet balance, and fee estimates in real time."
 difficulty: advanced
 duration: 10 days
 project: node-dashboard
 objectives:
   - Poll or stream Bitcoin Core status metrics
-  - 'Visualize sync progress, peer counts, and mempool size'
+  - "Visualize sync progress, peer counts, and mempool size"
   - Alert on stalled IBD or RPC failures
 resources:
-  - title: 'Project Spec: Node Dashboard'
-    url: '/projects/node-dashboard'
+  - title: "Project Spec: Node Dashboard"
+    url: "/projects/node-dashboard"
     kind: docs
     note: Pull project page — acceptance criteria and submit flow.
     required: true
@@ -18,13 +18,13 @@ resources:
     url: >-
       https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch03_bitcoin-core.adoc
     kind: book
-    chapter: 'Ch. 3: Bitcoin Core'
+    chapter: "Ch. 3: Bitcoin Core"
     required: true
   - title: Bitcoin Core RPC reference
-    url: 'https://developer.bitcoin.org/reference/rpc/'
+    url: "https://developer.bitcoin.org/reference/rpc/"
     kind: docs
   - title: getblockchaininfo
-    url: 'https://developer.bitcoin.org/reference/rpc/getblockchaininfo.html'
+    url: "https://developer.bitcoin.org/reference/rpc/getblockchaininfo.html"
     kind: docs
 reflectionPrompts:
   - >-
@@ -44,6 +44,7 @@ lab:
     - Screenshot showing height/peers/mempool (or equivalent panels)
     - Short note of one failure case (RPC down, stalled sync)
 ---
+
 Operators need situational awareness. A node dashboard turns RPC into signals: are we synced, connected, and estimating fees sanely?
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here.
@@ -57,21 +58,24 @@ Dashboard panels:
 - Mempool size + feerate estimates
 - Optional wallet balances for a monitoring wallet
 
-<Mermaid caption="Poll Core safely and render snapshots; never expose RPC to browsers." chart="flowchart LR
+<Mermaid
+  caption="Poll Core safely and render snapshots; never expose RPC to browsers."
+  chart="flowchart LR
     Dash[Dashboard] --> Poller[Status poller]
     Poller --> RPC[bitcoind RPC]
     Poller --> Store[Snapshot store]
-    Store --> UI[Charts / status]" />
+    Store --> UI[Charts / status]"
+/>
 
 **Done when:** You can list the RPC calls behind each panel.
 
 ## Step 3 — Milestones
 
-| Phase | Ship |
-| --- | --- |
+| Phase       | Ship                                                |
+| ----------- | --------------------------------------------------- |
 | Milestone A | Backend proxy + `getblockchaininfo` / peer snapshot |
-| Milestone B | Mempool + fee estimate panels with refresh |
-| Milestone C | Alert or banner for RPC failure / stalled IBD |
+| Milestone B | Mempool + fee estimate panels with refresh          |
+| Milestone C | Alert or banner for RPC failure / stalled IBD       |
 
 <Callout type="danger" title="Proxy RPC">
   Browser clients must hit your backend, not `bitcoind` directly.

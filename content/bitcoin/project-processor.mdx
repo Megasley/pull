@@ -1,6 +1,6 @@
 ---
 title: Payment Processor API
-description: 'Accept invoices, track confirmations, and handle payment webhooks.'
+description: "Accept invoices, track confirmations, and handle payment webhooks."
 difficulty: advanced
 duration: 2 weeks
 project: payment-processor
@@ -9,22 +9,22 @@ objectives:
   - Detect payments and confirmation thresholds
   - Emit signed webhooks to merchants
 resources:
-  - title: 'Project Spec: Payment Processor'
-    url: '/projects/payment-processor'
+  - title: "Project Spec: Payment Processor"
+    url: "/projects/payment-processor"
     kind: docs
     note: Pull project page — acceptance criteria and submit flow.
     required: true
   - title: BIP-21 URI scheme
-    url: 'https://github.com/bitcoin/bips/blob/master/bip-0021.mediawiki'
+    url: "https://github.com/bitcoin/bips/blob/master/bip-0021.mediawiki"
     kind: bip
     required: true
   - title: Mastering Bitcoin
     url: >-
       https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch06_transactions.adoc
     kind: book
-    chapter: 'Ch. 6: Transactions'
-  - title: 'Bitcoin Optech'
-    url: 'https://bitcoinops.org/'
+    chapter: "Ch. 6: Transactions"
+  - title: "Bitcoin Optech"
+    url: "https://bitcoinops.org/"
     kind: article
 reflectionPrompts:
   - >-
@@ -46,6 +46,7 @@ lab:
 searchQueries:
   - BIP21
 ---
+
 Merchants need idempotent invoices, confirmation policies, and reliable callbacks. This project is the on-chain cousin of a Lightning POS.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here. This closes **Projects**.
@@ -61,7 +62,9 @@ API endpoints to:
 
 Return a BIP-21 URI with the invoice details.
 
-<Mermaid caption="Invoice creation, detection, confirmation, webhook." chart="sequenceDiagram
+<Mermaid
+  caption="Invoice creation, detection, confirmation, webhook."
+  chart="sequenceDiagram
     participant M as Merchant
     participant P as Processor
     participant N as Node
@@ -69,16 +72,17 @@ Return a BIP-21 URI with the invoice details.
     P->>M: address + BIP21 URI
     N->>P: Detect payment
     P->>P: Wait confirmations
-    P->>M: Webhook paid" />
+    P->>M: Webhook paid"
+/>
 
 **Done when:** You can explain idempotency for “create invoice” retries.
 
 ## Step 3 — Milestones
 
-| Phase | Ship |
-| --- | --- |
-| Milestone A | Create + get invoice with unique address / BIP-21 |
-| Milestone B | Detect payment and confirmation threshold on regtest |
+| Phase       | Ship                                                  |
+| ----------- | ----------------------------------------------------- |
+| Milestone A | Create + get invoice with unique address / BIP-21     |
+| Milestone B | Detect payment and confirmation threshold on regtest  |
 | Milestone C | Signed webhook + under/over-payment policy documented |
 
 <Callout type="warning" title="Under/over payment">

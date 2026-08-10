@@ -37,11 +37,7 @@ export function useChapterQuizGate(
         return;
       }
 
-      const cached = readStoredChapterQuizStatus(
-        userId,
-        roadmapSlug,
-        activeQuiz.id,
-      );
+      const cached = readStoredChapterQuizStatus(userId, roadmapSlug, activeQuiz.id);
       if (cached) {
         setStatus(cached);
       }
@@ -49,12 +45,7 @@ export function useChapterQuizGate(
       const result = await fetchChapterQuizStatusAction(roadmapSlug, activeQuiz.id);
       if (!cancelled && result.authenticated && result.status) {
         setStatus(result.status);
-        writeStoredChapterQuizStatus(
-          userId,
-          roadmapSlug,
-          activeQuiz.id,
-          result.status,
-        );
+        writeStoredChapterQuizStatus(userId, roadmapSlug, activeQuiz.id, result.status);
       }
 
       if (!cancelled) {

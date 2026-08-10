@@ -73,8 +73,8 @@ export function NotificationSettingsForm({
         </p>
         {!email ? (
           <p className="font-mono text-xs text-muted-foreground">
-            Emails cannot be delivered until GitHub provides an address on the
-            next sign-in.
+            Emails cannot be delivered until GitHub provides an address on the next
+            sign-in.
           </p>
         ) : null}
       </div>

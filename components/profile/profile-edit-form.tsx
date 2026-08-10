@@ -97,8 +97,8 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
       <fieldset className="space-y-3">
         <legend className="text-sm font-medium">Looking For</legend>
         <p className="text-xs text-muted-foreground">
-          Optional. Shown on your profile and in the Builders Directory so
-          maintainers know how to engage you.
+          Optional. Shown on your profile and in the Builders Directory so maintainers
+          know how to engage you.
         </p>
         <div className="grid gap-2 sm:grid-cols-2">
           {LOOKING_FOR_OPTIONS.map((option) => (
@@ -123,8 +123,8 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
       <fieldset className="space-y-3 border border-border p-4">
         <legend className="px-1 text-sm font-medium">Visibility</legend>
         <p className="text-xs text-muted-foreground">
-          Control who can view your portfolio and whether you appear in the
-          public Builders Directory.
+          Control who can view your portfolio and whether you appear in the public
+          Builders Directory.
         </p>
         <label className="flex cursor-pointer items-start gap-2.5 text-sm">
           <input
@@ -154,8 +154,8 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
           <span>
             <span className="font-medium">List me in Builders Directory</span>
             <span className="mt-0.5 block text-xs text-muted-foreground">
-              Appear on <span className="font-mono">/builders</span> and the
-              homepage. Requires a public profile.
+              Appear on <span className="font-mono">/builders</span> and the homepage.
+              Requires a public profile.
             </span>
           </span>
         </label>
@@ -207,9 +207,8 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
       </div>
 
       <p className="text-xs text-muted-foreground">
-        Username and GitHub come from your Pull / GitHub account and can’t
-        be edited here. Public portfolio:{" "}
-        <span className="font-mono">/u/{profile.username}</span>
+        Username and GitHub come from your Pull / GitHub account and can’t be edited
+        here. Public portfolio: <span className="font-mono">/u/{profile.username}</span>
       </p>
 
       {error ? (

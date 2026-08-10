@@ -16,10 +16,7 @@ export function SegmentBar({ percent, className }: SegmentBarProps) {
       aria-label={`${percent} percent strength`}
     >
       {Array.from({ length: 5 }, (_, index) => (
-        <span
-          key={index}
-          className={cn(index < filled && "profile-segbar-on")}
-        />
+        <span key={index} className={cn(index < filled && "profile-segbar-on")} />
       ))}
     </div>
   );

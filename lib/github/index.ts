@@ -26,8 +26,4 @@ export {
   CONTRIBUTION_STATUS_LABEL,
   formatRelativeUpdated,
 } from "./explorer";
-export type {
-  RepoSort,
-  RepoExplorerFilters,
-  RepoContributionStatus,
-} from "./explorer";
+export type { RepoSort, RepoExplorerFilters, RepoContributionStatus } from "./explorer";

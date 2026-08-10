@@ -28,10 +28,7 @@ export function LessonBuildChallenge({
 
   return (
     <section
-      className={cn(
-        "rounded-none border border-ink/20 bg-signal/10 p-6",
-        className,
-      )}
+      className={cn("rounded-none border border-ink/20 bg-signal/10 p-6", className)}
     >
       <div className="flex items-start gap-3">
         <Hammer className="mt-0.5 size-5 shrink-0 text-ink" />
@@ -57,9 +54,8 @@ export function LessonBuildChallenge({
             <p className="text-sm leading-7 text-muted-foreground">{challenge}</p>
           ) : projects.length > 0 ? (
             <p className="text-sm leading-7 text-muted-foreground">
-              Apply what you learned in a focused build session. Ship something
-              small, test it on regtest, and document your approach before moving
-              on.
+              Apply what you learned in a focused build session. Ship something small,
+              test it on regtest, and document your approach before moving on.
             </p>
           ) : null}
         </div>

@@ -10,10 +10,7 @@ function assert(condition: boolean, message: string) {
   }
 }
 
-function scenario(
-  name: string,
-  inputs: Parameters<typeof calculateBuilderScore>[0],
-) {
+function scenario(name: string, inputs: Parameters<typeof calculateBuilderScore>[0]) {
   const result = calculateBuilderScore(inputs);
   console.log(
     `${name.padEnd(28)} score=${String(result.score).padStart(3)}  factors=${result.factors

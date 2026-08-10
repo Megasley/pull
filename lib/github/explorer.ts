@@ -5,11 +5,7 @@ export const REPO_PAGE_SIZE = 12;
 export type RepoSort = "recent" | "stars" | "name";
 
 export type RepoContributionStatus =
-  | "pinned"
-  | "active"
-  | "maintained"
-  | "quiet"
-  | "fork";
+  "pinned" | "active" | "maintained" | "quiet" | "fork";
 
 export type RepoExplorerFilters = {
   query: string;

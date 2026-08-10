@@ -5,20 +5,20 @@ difficulty: advanced
 duration: 5 days
 objectives:
   - Model the Lightning graph as a weighted search problem
-  - 'Incorporate fees, CLTV, and uncertainty into heuristics'
+  - "Incorporate fees, CLTV, and uncertainty into heuristics"
   - Know why first attempts fail and retries matter
 resources:
   - title: Mastering the Lightning Network
-    url: 'https://github.com/lnbook/lnbook/blob/master/12_path_finding.asciidoc'
+    url: "https://github.com/lnbook/lnbook/blob/master/12_path_finding.asciidoc"
     kind: book
-    chapter: 'Ch. 12: Pathfinding'
+    chapter: "Ch. 12: Pathfinding"
     required: true
   - title: Mastering the Lightning Network
-    url: 'https://github.com/lnbook/lnbook/blob/master/11_channel_graph.asciidoc'
+    url: "https://github.com/lnbook/lnbook/blob/master/11_channel_graph.asciidoc"
     kind: book
-    chapter: 'Ch. 11: The Channel Graph'
+    chapter: "Ch. 11: The Channel Graph"
   - title: Amboss
-    url: 'https://amboss.space/'
+    url: "https://amboss.space/"
     kind: tool
 reflectionPrompts:
   - >-
@@ -39,6 +39,7 @@ lab:
     - One sentence on learn → retry after a transient failure
     - Link to Ch. 12 section you used
 ---
+
 **Pathfinding** searches the gossip graph (plus hints) for a path that can deliver an amount under fee and timelock constraints, even with incomplete liquidity knowledge.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here.
@@ -49,14 +50,17 @@ Dijkstra-with-fees is only the start. Production routers track historical failur
 
 **Analogy:** GPS with imperfect live traffic. You pick a route, hit a jam (insufficient balance), then reroute using what you learned.
 
-<Mermaid caption="Search, attempt, learn, retry. Liquidity is uncertain." chart="flowchart TD
+<Mermaid
+  caption="Search, attempt, learn, retry. Liquidity is uncertain."
+  chart="flowchart TD
     Graph[Gossip graph] --> Weight[Weight edges by fee/risk]
     Weight --> Search[Shortest path search]
     Search --> Attempt[Send onion]
     Attempt --> Ok[Success]
     Attempt --> Fail[Failure]
     Fail --> Learn[Update scores]
-    Learn --> Search" />
+    Learn --> Search"
+/>
 
 ```typescript
 type Edge = { from: string; to: string; feeBase: number; feeProportional: number };

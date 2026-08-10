@@ -74,8 +74,8 @@ export function LessonCompletionButton({
           <div>
             <p className="tech-eyebrow text-ink">progress // sign in</p>
             <p className="mt-1 font-mono text-xs text-muted-foreground">
-              Reading is public. Sign in to mark lessons complete, sync across
-              devices, and unlock your roadmap.
+              Reading is public. Sign in to mark lessons complete, sync across devices,
+              and unlock your roadmap.
             </p>
           </div>
           <Button asChild className="shrink-0">

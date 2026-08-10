@@ -11,11 +11,8 @@ function topFactor(factors: ReputationFactor[]) {
 const WHAT_IT_MEASURES =
   "Tracks open source impact on GitHub: merged PRs, reviews, repo diversity, and active months.";
 
-const PUBLIC_FACTOR_DESCRIPTIONS: Partial<
-  Record<ReputationFactorId, string>
-> = {
-  maintainer_reviews:
-    "Review and discussion engagement on merged pull requests.",
+const PUBLIC_FACTOR_DESCRIPTIONS: Partial<Record<ReputationFactorId, string>> = {
+  maintainer_reviews: "Review and discussion engagement on merged pull requests.",
   repository_diversity: "Distinct repositories merged into.",
   issue_discussions: "Issues opened to move projects forward.",
   code_reviews: "Reviews given to help other builders.",
@@ -28,8 +25,7 @@ export function withPublicReputationCopy(
     ...reputation,
     factors: reputation.factors.map((factor) => ({
       ...factor,
-      description:
-        PUBLIC_FACTOR_DESCRIPTIONS[factor.id] ?? factor.description,
+      description: PUBLIC_FACTOR_DESCRIPTIONS[factor.id] ?? factor.description,
     })),
   };
 }

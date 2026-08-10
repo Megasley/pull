@@ -45,35 +45,26 @@ export const usersRelations = relations(users, ({ many, one }) => ({
   githubContributionDays: many(githubContributionDays),
 }));
 
-export const githubConnectionsRelations = relations(
-  githubConnections,
-  ({ one }) => ({
-    user: one(users, {
-      fields: [githubConnections.userId],
-      references: [users.id],
-    }),
+export const githubConnectionsRelations = relations(githubConnections, ({ one }) => ({
+  user: one(users, {
+    fields: [githubConnections.userId],
+    references: [users.id],
   }),
-);
+}));
 
-export const githubRepositoriesRelations = relations(
-  githubRepositories,
-  ({ one }) => ({
-    user: one(users, {
-      fields: [githubRepositories.userId],
-      references: [users.id],
-    }),
+export const githubRepositoriesRelations = relations(githubRepositories, ({ one }) => ({
+  user: one(users, {
+    fields: [githubRepositories.userId],
+    references: [users.id],
   }),
-);
+}));
 
-export const githubPullRequestsRelations = relations(
-  githubPullRequests,
-  ({ one }) => ({
-    user: one(users, {
-      fields: [githubPullRequests.userId],
-      references: [users.id],
-    }),
+export const githubPullRequestsRelations = relations(githubPullRequests, ({ one }) => ({
+  user: one(users, {
+    fields: [githubPullRequests.userId],
+    references: [users.id],
   }),
-);
+}));
 
 export const githubIssuesRelations = relations(githubIssues, ({ one }) => ({
   user: one(users, {
@@ -112,16 +103,13 @@ export const roadmapsRelations = relations(roadmaps, ({ one, many }) => ({
   projects: many(projects),
 }));
 
-export const roadmapSectionsRelations = relations(
-  roadmapSections,
-  ({ one, many }) => ({
-    roadmap: one(roadmaps, {
-      fields: [roadmapSections.roadmapId],
-      references: [roadmaps.id],
-    }),
-    nodes: many(roadmapNodes),
+export const roadmapSectionsRelations = relations(roadmapSections, ({ one, many }) => ({
+  roadmap: one(roadmaps, {
+    fields: [roadmapSections.roadmapId],
+    references: [roadmaps.id],
   }),
-);
+  nodes: many(roadmapNodes),
+}));
 
 export const projectsRelations = relations(projects, ({ one, many }) => ({
   roadmap: one(roadmaps, {
@@ -132,21 +120,18 @@ export const projectsRelations = relations(projects, ({ one, many }) => ({
   submissions: many(projectSubmissions),
 }));
 
-export const roadmapNodesRelations = relations(
-  roadmapNodes,
-  ({ one, many }) => ({
-    section: one(roadmapSections, {
-      fields: [roadmapNodes.sectionId],
-      references: [roadmapSections.id],
-    }),
-    project: one(projects, {
-      fields: [roadmapNodes.projectId],
-      references: [projects.id],
-    }),
-    resources: many(resources),
-    progress: many(userProgress),
+export const roadmapNodesRelations = relations(roadmapNodes, ({ one, many }) => ({
+  section: one(roadmapSections, {
+    fields: [roadmapNodes.sectionId],
+    references: [roadmapSections.id],
   }),
-);
+  project: one(projects, {
+    fields: [roadmapNodes.projectId],
+    references: [projects.id],
+  }),
+  resources: many(resources),
+  progress: many(userProgress),
+}));
 
 export const resourcesRelations = relations(resources, ({ one }) => ({
   node: one(roadmapNodes, {
@@ -197,19 +182,16 @@ export const projectSubmissionsRelations = relations(
   }),
 );
 
-export const submissionReviewsRelations = relations(
-  submissionReviews,
-  ({ one }) => ({
-    submission: one(projectSubmissions, {
-      fields: [submissionReviews.submissionId],
-      references: [projectSubmissions.id],
-    }),
-    reviewer: one(users, {
-      fields: [submissionReviews.reviewerId],
-      references: [users.id],
-    }),
+export const submissionReviewsRelations = relations(submissionReviews, ({ one }) => ({
+  submission: one(projectSubmissions, {
+    fields: [submissionReviews.submissionId],
+    references: [projectSubmissions.id],
   }),
-);
+  reviewer: one(users, {
+    fields: [submissionReviews.reviewerId],
+    references: [users.id],
+  }),
+}));
 
 export const submissionReviewEventsRelations = relations(
   submissionReviewEvents,
@@ -229,19 +211,16 @@ export const achievementsRelations = relations(achievements, ({ many }) => ({
   userAchievements: many(userAchievements),
 }));
 
-export const userAchievementsRelations = relations(
-  userAchievements,
-  ({ one }) => ({
-    user: one(users, {
-      fields: [userAchievements.userId],
-      references: [users.id],
-    }),
-    achievement: one(achievements, {
-      fields: [userAchievements.achievementId],
-      references: [achievements.id],
-    }),
+export const userAchievementsRelations = relations(userAchievements, ({ one }) => ({
+  user: one(users, {
+    fields: [userAchievements.userId],
+    references: [users.id],
   }),
-);
+  achievement: one(achievements, {
+    fields: [userAchievements.achievementId],
+    references: [achievements.id],
+  }),
+}));
 
 export const organizationsRelations = relations(organizations, () => ({}));
 

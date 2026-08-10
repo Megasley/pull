@@ -1,6 +1,6 @@
 ---
 title: Bitcoin Libraries
-description: 'Use modern libraries for keys, addresses, and transaction construction.'
+description: "Use modern libraries for keys, addresses, and transaction construction."
 difficulty: intermediate
 duration: 6 days
 objectives:
@@ -9,17 +9,17 @@ objectives:
   - Avoid common footguns when wrapping consensus logic
 resources:
   - title: bitcoinjs-lib
-    url: 'https://github.com/bitcoinjs/bitcoinjs-lib'
+    url: "https://github.com/bitcoinjs/bitcoinjs-lib"
     kind: docs
     note: JS stack - keys, addresses, and transaction construction.
     required: true
   - title: rust-bitcoin
-    url: 'https://github.com/rust-bitcoin/rust-bitcoin'
+    url: "https://github.com/rust-bitcoin/rust-bitcoin"
     kind: docs
     note: Rust stack - consensus types and serialization primitives.
     required: true
   - title: BDK documentation
-    url: 'https://bitcoindevkit.org/'
+    url: "https://bitcoindevkit.org/"
     kind: docs
     note: Wallet engine on top of rust-bitcoin - optional depth this lesson.
 reflectionPrompts:
@@ -41,6 +41,7 @@ lab:
     - Which library and version you used
     - One sentence on why you would not hand-roll Bech32 / sighash
 ---
+
 You should not hand-roll Base58, Bech32, or sighash code. Use maintained libraries that track consensus and address standards.
 
 Complete **Step 1 // Required reading** in the study plan above (skim both READMEs; go deep on the stack you will use). This opens **Development**.
@@ -51,19 +52,22 @@ A one-character encoding bug can burn funds. Libraries encapsulate years of edge
 
 **Analogy:** Power tools with safety guards. You still need skill, but you should not forge your own circular saw blade from scrap metal.
 
-| Need | JavaScript | Rust |
-| --- | --- | --- |
-| Primitives | bitcoinjs-lib, @scure/btc-signer | rust-bitcoin |
-| Wallet engine | often custom + indexers | BDK |
-| secp256k1 | noble / bitcoin-secp… | secp256k1 / libsecp |
+| Need          | JavaScript                       | Rust                |
+| ------------- | -------------------------------- | ------------------- |
+| Primitives    | bitcoinjs-lib, @scure/btc-signer | rust-bitcoin        |
+| Wallet engine | often custom + indexers          | BDK                 |
+| secp256k1     | noble / bitcoin-secp…            | secp256k1 / libsecp |
 
-<Mermaid caption="Apps compose libraries for keys, tx building, and signing workflows." chart="flowchart TD
+<Mermaid
+  caption="Apps compose libraries for keys, tx building, and signing workflows."
+  chart="flowchart TD
     App[Your app] --> Lib[bitcoin library]
     Lib --> Keys[Keys / addresses]
     Lib --> Tx[Transaction builder]
     Lib --> Psbt[PSBT]
     Tx --> Node[Bitcoin Core / indexer]
-    Psbt --> HW[Hardware signer]" />
+    Psbt --> HW[Hardware signer]"
+/>
 
 ```typescript
 // Prefer well-reviewed packages; pin versions; read changelogs on upgrades
@@ -77,7 +81,8 @@ cargo add bitcoin
 ```
 
 <Callout type="warning" title="Pin and audit upgrades">
-  Consensus-adjacent upgrades can change defaults. Pin versions, read release notes, and run vectors/tests before production deploys.
+  Consensus-adjacent upgrades can change defaults. Pin versions, read release notes, and
+  run vectors/tests before production deploys.
 </Callout>
 
 **Done when:** You can name your primary library and what you still should not DIY.

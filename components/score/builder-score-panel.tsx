@@ -50,11 +50,7 @@ export function BuilderScorePanel({
                   : "text-sm text-muted-foreground",
               )}
             >
-              {isProfile ? (
-                <>Builder Score — {score.score}/100</>
-              ) : (
-                "Builder Score"
-              )}
+              {isProfile ? <>Builder Score — {score.score}/100</> : "Builder Score"}
             </p>
             {!isProfile ? (
               <p className="text-3xl font-semibold tracking-tight sm:text-4xl">
@@ -94,8 +90,8 @@ export function BuilderScorePanel({
         <p className="mt-5 text-xs text-muted-foreground">
           Builder Score measures what you build and verify - completed projects,
           approvals, roadmaps, open source work, community reviews, and recent
-          consistency. Weighting can evolve as Pull grows; your score stays
-          comparable over time within each scoring era.
+          consistency. Weighting can evolve as Pull grows; your score stays comparable
+          over time within each scoring era.
         </p>
       ) : null}
     </div>
@@ -185,7 +181,9 @@ function FactorRow({
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className={cn(isProfile ? "text-[13px] font-bold" : "text-sm font-medium")}>
+          <p
+            className={cn(isProfile ? "text-[13px] font-bold" : "text-sm font-medium")}
+          >
             {factor.label}
           </p>
           <p

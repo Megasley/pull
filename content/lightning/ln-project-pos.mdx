@@ -9,22 +9,22 @@ objectives:
   - Subscribe to invoice settlement events
   - Design a cashier UX for pending vs paid
 resources:
-  - title: 'Project Spec: Lightning POS'
-    url: '/projects/lightning-pos'
+  - title: "Project Spec: Lightning POS"
+    url: "/projects/lightning-pos"
     kind: docs
     note: Pull project page — acceptance criteria and submit flow.
     required: true
   - title: BOLT11
-    url: 'https://github.com/lightning/bolts/blob/master/11-payment-encoding.md'
+    url: "https://github.com/lightning/bolts/blob/master/11-payment-encoding.md"
     kind: bolt
     required: true
   - title: LND invoices API
-    url: 'https://docs.lightning.engineering/'
+    url: "https://docs.lightning.engineering/"
     kind: docs
   - title: Mastering the Lightning Network
-    url: 'https://github.com/lnbook/lnbook/blob/master/15_payment_requests.asciidoc'
+    url: "https://github.com/lnbook/lnbook/blob/master/15_payment_requests.asciidoc"
     kind: book
-    chapter: 'Ch. 15: Payment Requests'
+    chapter: "Ch. 15: Payment Requests"
 reflectionPrompts:
   - >-
     Explain Lightning POS to a teammate without jargon - what problem does it
@@ -45,6 +45,7 @@ lab:
 searchQueries:
   - BOLT11
 ---
+
 A Lightning POS turns protocol knowledge into a merchant tool: show QR, wait for payment, print/mark paid.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here. This opens **Lightning Projects**.
@@ -56,7 +57,9 @@ Complete **Step 1 // Required reading** in the study plan above, then continue h
 3. Detect settlement via websocket/webhook/RPC subscribe
 4. Handle expiry and cancel
 
-<Mermaid caption="POS mints invoices and listens until settled or expired." chart="sequenceDiagram
+<Mermaid
+  caption="POS mints invoices and listens until settled or expired."
+  chart="sequenceDiagram
     participant Cashier
     participant POS
     participant LN as Lightning node
@@ -65,20 +68,22 @@ Complete **Step 1 // Required reading** in the study plan above, then continue h
     LN->>POS: bolt11
     POS->>Cashier: Show QR
     LN->>POS: Settled
-    POS->>Cashier: Paid" />
+    POS->>Cashier: Paid"
+/>
 
 **Done when:** You can narrate pending vs paid vs expired without opening the code.
 
 ## Step 3 — Milestones
 
-| Phase | Ship |
-| --- | --- |
-| Milestone A | Backend mint invoice + return bolt11 |
-| Milestone B | Cashier UI: QR + pending/paid states |
+| Phase       | Ship                                                       |
+| ----------- | ---------------------------------------------------------- |
+| Milestone A | Backend mint invoice + return bolt11                       |
+| Milestone B | Cashier UI: QR + pending/paid states                       |
 | Milestone C | Subscribe to settle; expiry/cancel; idempotent charge keys |
 
 <Callout type="tip" title="Idempotent tickets">
-  Bind each charge to an idempotency key so refreshes do not create duplicate invoices accidentally.
+  Bind each charge to an idempotency key so refreshes do not create duplicate invoices
+  accidentally.
 </Callout>
 
 **Done when:** Milestone A works before you polish UI chrome.

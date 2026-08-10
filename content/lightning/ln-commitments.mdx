@@ -1,6 +1,6 @@
 ---
 title: Commitment Transactions
-description: 'Revocation keys, to_local/to_remote outputs, and penalty security.'
+description: "Revocation keys, to_local/to_remote outputs, and penalty security."
 difficulty: advanced
 duration: 6 days
 objectives:
@@ -9,15 +9,15 @@ objectives:
   - Relate anchors and modern fee bumping to force closes
 resources:
   - title: Mastering the Lightning Network
-    url: 'https://github.com/lnbook/lnbook/blob/master/07_payment_channels.asciidoc'
+    url: "https://github.com/lnbook/lnbook/blob/master/07_payment_channels.asciidoc"
     kind: book
-    chapter: 'Ch. 7: Payment Channels'
+    chapter: "Ch. 7: Payment Channels"
     required: true
   - title: BOLT3 Transactions
-    url: 'https://github.com/lightning/bolts/blob/master/03-transactions.md'
+    url: "https://github.com/lightning/bolts/blob/master/03-transactions.md"
     kind: bolt
-  - title: 'Bitcoin Optech: Anchor outputs'
-    url: 'https://bitcoinops.org/en/topics/anchor-outputs/'
+  - title: "Bitcoin Optech: Anchor outputs"
+    url: "https://bitcoinops.org/en/topics/anchor-outputs/"
     kind: article
 reflectionPrompts:
   - >-
@@ -37,10 +37,11 @@ lab:
     - Half-page brief covering commitment, revocation, penalty
     - One sentence on why offline nodes need watchtowers
     - Link to Ch. 7 or BOLT3 section you used
-    - 'Optional: Polar/CLI channel state after an update'
+    - "Optional: Polar/CLI channel state after an update"
 searchQueries:
   - BOLT3
 ---
+
 Each Lightning channel state is backed by a pair of **commitment transactions** — pre-signed on-chain settlements either party can broadcast if cooperation fails.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here.
@@ -53,7 +54,9 @@ If commitments are wrong, someone can steal funds or deadlock value. This is the
 
 When state advances to `n`, state `n-1` is revoked. Publishing a revoked commitment lets the peer sweep funds via a **penalty** (justice) transaction.
 
-<Mermaid caption="Old commitments are toxic; broadcasting them can forfeit the channel." chart="flowchart TD
+<Mermaid
+  caption="Old commitments are toxic; broadcasting them can forfeit the channel."
+  chart="flowchart TD
     subgraph honest [Honest path]
         StateN[Commitment n] --> Coop[Cooperative<br/>updates]
         Coop --> StateN1[Commitment<br/>n+1]
@@ -63,7 +66,8 @@ When state advances to `n`, state `n-1` is revoked. Publishing a revoked commitm
         Old[Commitment n-1<br/>revoked] --> Broadcast[Broadcast old n?]
         Broadcast --> Justice[Peer justice tx]
         Justice --> Lost[Broadcaster<br/>loses funds]
-    end" />
+    end"
+/>
 
 Commitment outputs typically pay each side with different conditions. The local party's output often includes a revocation path and a delayed CSV path. Modern channels use **anchor** outputs so fee bumping a force-close is more reliable under mempool pressure.
 

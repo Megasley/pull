@@ -1,6 +1,6 @@
 ---
 title: Core Lightning
-description: 'Extend CLN with plugins, hooks, and custom RPC commands.'
+description: "Extend CLN with plugins, hooks, and custom RPC commands."
 difficulty: advanced
 duration: 2 weeks
 objectives:
@@ -9,16 +9,16 @@ objectives:
   - Know where CLN often leads on protocol features
 resources:
   - title: Mastering the Lightning Network
-    url: 'https://github.com/lnbook/lnbook/blob/master/04_node_client.asciidoc'
+    url: "https://github.com/lnbook/lnbook/blob/master/04_node_client.asciidoc"
     kind: book
-    chapter: 'Ch. 4: Lightning Node Software'
+    chapter: "Ch. 4: Lightning Node Software"
     required: true
   - title: Core Lightning docs
-    url: 'https://docs.corelightning.org/'
+    url: "https://docs.corelightning.org/"
     kind: docs
     required: true
   - title: CLN plugins
-    url: 'https://docs.corelightning.org/docs/plugins'
+    url: "https://docs.corelightning.org/docs/plugins"
     kind: docs
 reflectionPrompts:
   - >-
@@ -39,6 +39,7 @@ lab:
     - One plugin/hook you would extend and why
     - Link to CLN docs or plugin guide section you used
 ---
+
 **Core Lightning (CLN)** emphasizes modularity: a lean daemon extended by plugins. It frequently ships cutting-edge protocol features early.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here.
@@ -47,11 +48,14 @@ Complete **Step 1 // Required reading** in the study plan above, then continue h
 
 If you need custom RPC behavior or want to experiment with offers/splicing, CLN’s plugin system is a powerful builder surface.
 
-<Mermaid caption="Plugins extend CLN without forking the daemon." chart="flowchart TD
+<Mermaid
+  caption="Plugins extend CLN without forking the daemon."
+  chart="flowchart TD
     CLN[lightningd] --> Plugin[Plugins]
     Plugin --> Hooks[Hooks / events]
     Plugin --> Rpc[Custom RPC methods]
-    CLN --> Bitcoin[Bitcoin backend]" />
+    CLN --> Bitcoin[Bitcoin backend]"
+/>
 
 ```bash
 lightning-cli getinfo
@@ -59,7 +63,8 @@ lightning-cli invoice 100000 "label" "desc"
 ```
 
 <Callout type="tip" title="Start with existing plugins">
-  Read maintained plugins before writing your own — patterns around JSON-RPC and notifications save weeks.
+  Read maintained plugins before writing your own — patterns around JSON-RPC and
+  notifications save weeks.
 </Callout>
 
 **Done when:** You can contrast CLN’s plugin model with LND’s gRPC app integration style in one sentence.

@@ -1,6 +1,6 @@
 ---
 title: Failure Handling
-description: 'Handle payment failures, retries, and error propagation safely.'
+description: "Handle payment failures, retries, and error propagation safely."
 difficulty: advanced
 duration: 5 days
 objectives:
@@ -9,15 +9,15 @@ objectives:
   - Avoid unsafe refund UX mistakes
 resources:
   - title: BOLT4 failure messages
-    url: 'https://github.com/lightning/bolts/blob/master/04-onion-routing.md'
+    url: "https://github.com/lightning/bolts/blob/master/04-onion-routing.md"
     kind: bolt
     required: true
   - title: Mastering the Lightning Network
-    url: 'https://github.com/lnbook/lnbook/blob/master/08_routing_htlcs.asciidoc'
+    url: "https://github.com/lnbook/lnbook/blob/master/08_routing_htlcs.asciidoc"
     kind: book
-    chapter: 'Ch. 8: Routing failures context'
-  - title: 'Bitcoin Optech: Payment reliability'
-    url: 'https://bitcoinops.org/'
+    chapter: "Ch. 8: Routing failures context"
+  - title: "Bitcoin Optech: Payment reliability"
+    url: "https://bitcoinops.org/"
     kind: article
 reflectionPrompts:
   - >-
@@ -41,6 +41,7 @@ lab:
 searchQueries:
   - BOLT4
 ---
+
 Most Lightning payments fail at least once before succeeding. Good software treats failure as information, not as a dead end.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here.
@@ -49,21 +50,25 @@ Complete **Step 1 // Required reading** in the study plan above, then continue h
 
 Naive “try once and show error” UX makes Lightning feel broken. Smart retries with fee budgets make it feel instant.
 
-| Class | Examples | Action |
-| --- | --- | --- |
-| **Transient** | Imbalance, unknown liquidity, tight fees | Update scores / route; retry within budget |
-| **Permanent** | Invalid invoice, unknown peer, exhausted expiry | Stop; surface clear error |
+| Class         | Examples                                        | Action                                     |
+| ------------- | ----------------------------------------------- | ------------------------------------------ |
+| **Transient** | Imbalance, unknown liquidity, tight fees        | Update scores / route; retry within budget |
+| **Permanent** | Invalid invoice, unknown peer, exhausted expiry | Stop; surface clear error                  |
 
-<Mermaid caption="Parse errors, retry when sensible, stop when permanent." chart="flowchart TD
+<Mermaid
+  caption="Parse errors, retry when sensible, stop when permanent."
+  chart="flowchart TD
     Attempt[Pay attempt] --> Fail[Onion error]
     Fail --> Parse[Interpret failure]
     Parse --> Transient{Transient?}
     Transient -->|yes| Update[Update scores / route]
     Update --> Attempt
-    Transient -->|no| Stop[Surface error to user]" />
+    Transient -->|no| Stop[Surface error to user]"
+/>
 
 <Callout type="warning" title="Idempotency">
-  Never double-charge a merchant because a retry raced a slow success. Key payments by payment hash / idempotency keys.
+  Never double-charge a merchant because a retry raced a slow success. Key payments by
+  payment hash / idempotency keys.
 </Callout>
 
 **Done when:** You can triage one failure into transient vs permanent without guessing.

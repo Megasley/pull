@@ -110,8 +110,7 @@ export function ContributionDiscovery({
               Recommended for you
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Ranked from your completed roadmaps, GitHub languages, and builder
-              level.
+              Ranked from your completed roadmaps, GitHub languages, and builder level.
             </p>
           </div>
           <ul className="grid gap-4 md:grid-cols-2">
@@ -130,12 +129,10 @@ export function ContributionDiscovery({
 
       <section className="space-y-6">
         <div>
-          <h2 className="text-lg font-semibold tracking-tight">
-            Browse repositories
-          </h2>
+          <h2 className="text-lg font-semibold tracking-tight">Browse repositories</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Filter by language, topic, difficulty, and size. Bookmark targets to
-            revisit later.
+            Filter by language, topic, difficulty, and size. Bookmark targets to revisit
+            later.
           </p>
         </div>
 
@@ -322,13 +319,7 @@ export function ContributionDiscovery({
   );
 }
 
-function FilterRow({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
+function FilterRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-2">
       <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">

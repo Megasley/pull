@@ -43,8 +43,8 @@ export async function DiscoverBuildersSection() {
         </Reveal>
         <Reveal variant="fade" delayMs={140}>
           <p className="mt-4 max-w-2xl font-mono text-sm leading-relaxed text-muted-foreground sm:text-base">
-            Meet builders learning, shipping projects, and contributing upstream —
-            with reputation and activity you can verify.
+            Meet builders learning, shipping projects, and contributing upstream — with
+            reputation and activity you can verify.
           </p>
         </Reveal>
 

@@ -1,10 +1,5 @@
 export type SubmissionStatus =
-  | "draft"
-  | "submitted"
-  | "under_review"
-  | "needs_changes"
-  | "approved"
-  | "rejected";
+  "draft" | "submitted" | "under_review" | "needs_changes" | "approved" | "rejected";
 
 export type UserRole = "builder" | "reviewer" | "admin";
 
@@ -12,7 +7,8 @@ export type ReviewEventType = "status_change" | "comment";
 
 export type ReviewDecision = "approve" | "request_changes" | "reject";
 
-export type ReviewAction = "start_review" | "approve" | "reject" | "request_changes" | "comment";
+export type ReviewAction =
+  "start_review" | "approve" | "reject" | "request_changes" | "comment";
 
 export type SubmissionInput = {
   repoUrl: string | null;

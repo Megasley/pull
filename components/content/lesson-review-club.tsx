@@ -90,7 +90,11 @@ export function LessonReviewClub({
 
             <div className="flex flex-wrap gap-2">
               {item.reviewFocus.map((focus) => (
-                <Badge key={focus} variant="secondary" className="font-mono text-[10px]">
+                <Badge
+                  key={focus}
+                  variant="secondary"
+                  className="font-mono text-[10px]"
+                >
                   {focus}
                 </Badge>
               ))}

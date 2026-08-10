@@ -22,17 +22,13 @@ export function AchievementEmail({
     <EmailLayout
       preview={preview}
       title={
-        achievements.length === 1
-          ? "Achievement unlocked"
-          : "Achievements unlocked"
+        achievements.length === 1 ? "Achievement unlocked" : "Achievements unlocked"
       }
       ctaLabel="View achievements"
       ctaHref={href}
     >
       <Text style={{ margin: "0 0 12px" }}>Hey {displayName},</Text>
-      <Text style={{ margin: "0 0 12px" }}>
-        You just unlocked:
-      </Text>
+      <Text style={{ margin: "0 0 12px" }}>You just unlocked:</Text>
       {achievements.map((item) => (
         <Text key={item.title} style={{ margin: "0 0 8px" }}>
           • <strong>{item.title}</strong>

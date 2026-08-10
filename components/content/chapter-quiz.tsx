@@ -92,7 +92,10 @@ export function ChapterQuiz({
             aria-hidden
             className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,color-mix(in_oklab,var(--signal)_45%,transparent),transparent_72%)]"
           />
-          <div aria-hidden className="tech-scanline absolute inset-x-0 top-0 h-px bg-ink/25" />
+          <div
+            aria-hidden
+            className="tech-scanline absolute inset-x-0 top-0 h-px bg-ink/25"
+          />
 
           <div className="relative flex flex-wrap items-start justify-between gap-4 pt-0.5">
             <div className="flex items-start gap-3">
@@ -116,8 +119,7 @@ export function ChapterQuiz({
               </Badge>
               {persistResults ? (
                 <Badge className="rounded-none border border-ink/20 bg-signal/30 font-mono text-[10px] text-ink uppercase tracking-wider">
-                  <Zap className="mr-1 size-3" aria-hidden />
-                  +{xpReward} XP
+                  <Zap className="mr-1 size-3" aria-hidden />+{xpReward} XP
                 </Badge>
               ) : null}
             </div>
@@ -132,8 +134,8 @@ export function ChapterQuiz({
             </>
           ) : (
             <>
-              Try the chapter check for free. Sign in to save your score, earn XP,
-              and track roadmap progress.
+              Try the chapter check for free. Sign in to save your score, earn XP, and
+              track roadmap progress.
             </>
           )}
         </p>
@@ -163,36 +165,36 @@ export function ChapterQuiz({
           </div>
         </div>
         <div className="mt-4 flex flex-wrap gap-1.5">
-            {quiz.questions.map((question, index) => {
-              const answered = Boolean(answers[question.id]);
-              const isCorrect =
-                submitted && answers[question.id] === question.correctOptionId;
-              const isWrong =
-                submitted &&
-                answers[question.id] &&
-                answers[question.id] !== question.correctOptionId;
+          {quiz.questions.map((question, index) => {
+            const answered = Boolean(answers[question.id]);
+            const isCorrect =
+              submitted && answers[question.id] === question.correctOptionId;
+            const isWrong =
+              submitted &&
+              answers[question.id] &&
+              answers[question.id] !== question.correctOptionId;
 
-              return (
-                <span
-                  key={question.id}
-                  title={`Question ${index + 1}`}
-                  className={cn(
-                    "flex size-6 items-center justify-center border font-mono text-[10px] transition-colors",
-                    isCorrect && "border-ink bg-signal text-ink",
-                    isWrong && "border-destructive/50 bg-destructive/15 text-destructive",
-                    !submitted &&
-                      answered &&
-                      "border-ink/40 bg-signal/25 text-ink",
-                    !submitted &&
-                      !answered &&
-                      "border-border bg-muted/40 text-muted-foreground",
-                    submitted && !answered && "border-border bg-muted/30 text-muted-foreground",
-                  )}
-                >
-                  {index + 1}
-                </span>
-              );
-            })}
+            return (
+              <span
+                key={question.id}
+                title={`Question ${index + 1}`}
+                className={cn(
+                  "flex size-6 items-center justify-center border font-mono text-[10px] transition-colors",
+                  isCorrect && "border-ink bg-signal text-ink",
+                  isWrong && "border-destructive/50 bg-destructive/15 text-destructive",
+                  !submitted && answered && "border-ink/40 bg-signal/25 text-ink",
+                  !submitted &&
+                    !answered &&
+                    "border-border bg-muted/40 text-muted-foreground",
+                  submitted &&
+                    !answered &&
+                    "border-border bg-muted/30 text-muted-foreground",
+                )}
+              >
+                {index + 1}
+              </span>
+            );
+          })}
         </div>
       </header>
 
@@ -257,13 +259,16 @@ export function ChapterQuiz({
                         "disabled:cursor-default",
                         !submitted &&
                           "hover:-translate-y-px hover:border-ink/40 hover:shadow-[var(--shadow-off-sm)]",
-                        active && !submitted && "border-ink bg-signal/20 text-foreground",
+                        active &&
+                          !submitted &&
+                          "border-ink bg-signal/20 text-foreground",
                         !active &&
                           !submitted &&
                           "border-border bg-card text-muted-foreground",
                         showAsCorrect &&
                           "border-ink/40 bg-signal/25 text-foreground shadow-[var(--shadow-off-sm)]",
-                        showAsWrong && "border-destructive/40 bg-destructive/10 text-foreground",
+                        showAsWrong &&
+                          "border-destructive/40 bg-destructive/10 text-foreground",
                         submitted && !active && "opacity-70",
                       )}
                     >
@@ -349,8 +354,8 @@ export function ChapterQuiz({
               {passed && persistResults ? (
                 <p className="mt-2 text-sm text-muted-foreground">
                   Mark-complete unlocked.{" "}
-                  <span className="font-mono text-ink">+{xpReward} XP</span> on
-                  your profile.
+                  <span className="font-mono text-ink">+{xpReward} XP</span> on your
+                  profile.
                 </p>
               ) : null}
               {!passed ? (
@@ -382,9 +387,7 @@ export function ChapterQuiz({
             type="button"
             onClick={handleSubmit}
             disabled={
-              disabled ||
-              answeredCount < totalQuestions ||
-              (submitted && passed)
+              disabled || answeredCount < totalQuestions || (submitted && passed)
             }
             className="shadow-[var(--shadow-off-sm)]"
           >

@@ -15,10 +15,9 @@ export const GUEST_ISSUE_CONTEXT: IssueRecommendationContext = {
   languages: [],
   level: 1,
   githubActivityCount: 0,
-  recommendedRepoIds: recommendDiscoveryRepositories(
-    GUEST_DISCOVERY_CONTEXT,
-    6,
-  ).map((item) => item.repository.id),
+  recommendedRepoIds: recommendDiscoveryRepositories(GUEST_DISCOVERY_CONTEXT, 6).map(
+    (item) => item.repository.id,
+  ),
 };
 
 export async function loadIssueRecommendationContext(
@@ -44,15 +43,12 @@ export async function loadIssueRecommendationContext(
     completedProjectSlugs,
     languages: base.languages,
     level: base.level,
-    githubActivityCount:
-      activity.commits + activity.pullRequests + activity.issues,
+    githubActivityCount: activity.commits + activity.pullRequests + activity.issues,
     recommendedRepoIds,
   };
 }
 
-export async function loadIssueRecommendationsPageData(
-  userId?: string | null,
-) {
+export async function loadIssueRecommendationsPageData(userId?: string | null) {
   const context = userId
     ? await loadIssueRecommendationContext(userId)
     : GUEST_ISSUE_CONTEXT;

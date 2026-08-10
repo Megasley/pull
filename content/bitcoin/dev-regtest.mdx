@@ -1,6 +1,6 @@
 ---
 title: Regtest Development
-description: 'Run a private chain, mine blocks, and automate integration tests.'
+description: "Run a private chain, mine blocks, and automate integration tests."
 difficulty: beginner
 duration: 5 days
 objectives:
@@ -9,15 +9,15 @@ objectives:
   - Encode integration tests around deterministic scenarios
 resources:
   - title: Bitcoin Core regtest mode
-    url: 'https://developer.bitcoin.org/examples/testing.html'
+    url: "https://developer.bitcoin.org/examples/testing.html"
     kind: docs
     required: true
-  - title: 'Bitcoin Optech: Testing'
-    url: 'https://bitcoinops.org/en/topics/testing/'
+  - title: "Bitcoin Optech: Testing"
+    url: "https://bitcoinops.org/en/topics/testing/"
     kind: article
     required: true
   - title: Polar (Lightning regtest UI)
-    url: 'https://lightningpolar.com/'
+    url: "https://lightningpolar.com/"
     kind: tool
     note: Useful once you reach Lightning roadmaps.
 reflectionPrompts:
@@ -38,20 +38,21 @@ lab:
     - One sentence on what you observed vs expected
     - Note whether you used native bitcoind, Docker, or Polar
 ---
+
 **Regtest** is a private Bitcoin network you control. Difficulty is trivial, so you can mine blocks instantly without testnet faucets.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here. Prefer local `bitcoind -regtest` or Docker; Polar is optional under **further reading**.
 
 ## Step 2 — Key terms
 
-| Term | What it means | Where you use it |
-| --- | --- | --- |
-| **Regtest** | Private chain; you mine on demand | Local labs |
-| **Testnet / signet** | Shared public test networks | Occasional interop |
-| **Mainnet** | Real value | Not for learning loops |
-| **`bitcoind` / `bitcoin-cli`** | Core daemon + RPC client | Run and drive the node |
-| **Coinbase maturity** | Coinbase needs **100** confirmations | Why first mine uses `101` blocks |
-| **Datadir** | Chain state on disk | Wipe between experiments |
+| Term                           | What it means                        | Where you use it                 |
+| ------------------------------ | ------------------------------------ | -------------------------------- |
+| **Regtest**                    | Private chain; you mine on demand    | Local labs                       |
+| **Testnet / signet**           | Shared public test networks          | Occasional interop               |
+| **Mainnet**                    | Real value                           | Not for learning loops           |
+| **`bitcoind` / `bitcoin-cli`** | Core daemon + RPC client             | Run and drive the node           |
+| **Coinbase maturity**          | Coinbase needs **100** confirmations | Why first mine uses `101` blocks |
+| **Datadir**                    | Chain state on disk                  | Wipe between experiments         |
 
 **Analogy:** Regtest is a flight simulator. Crashes are free.
 
@@ -72,7 +73,8 @@ bitcoin-cli -regtest getblockchaininfo
 **Option C — Polar:** UI for a local network — same ideas apply.
 
 <Callout type="tip" title="Automate resets">
-  CI should use fresh datadirs. Leftover wallets and conflicting ports cause flaky tests.
+  CI should use fresh datadirs. Leftover wallets and conflicting ports cause flaky
+  tests.
 </Callout>
 
 **Done when:** RPC (or Polar) answers on a live regtest node.
@@ -87,19 +89,22 @@ bitcoin-cli -regtest sendtoaddress <bob> 10
 bitcoin-cli -regtest generatetoaddress 1 "$ADDR"
 ```
 
-<Mermaid caption="Deterministic setup → act → confirm → assert → wipe." chart="flowchart TD
+<Mermaid
+  caption="Deterministic setup → act → confirm → assert → wipe."
+  chart="flowchart TD
     Start[Start bitcoind regtest] --> Wallet[Create wallets]
     Wallet --> Mine[Mine maturity blocks]
     Mine --> Act[Send / contract actions]
     Act --> Confirm[Mine confirmations]
     Confirm --> Assert[Assert balances / txs]
-    Assert --> Tear[Reset datadir]" />
+    Assert --> Tear[Reset datadir]"
+/>
 
 ### Common mistakes
 
-- Not mining 100+ blocks before spending coinbase  
-- Shared nodes without isolation  
-- Hard-coding txids from a previous run  
+- Not mining 100+ blocks before spending coinbase
+- Shared nodes without isolation
+- Hard-coding txids from a previous run
 
 Capture **Regtest check** lab evidence (commands, observation, native/Docker/Polar).
 

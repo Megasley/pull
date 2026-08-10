@@ -32,9 +32,7 @@ function writeSeen(ids: string[]) {
   writePullSessionStorage(SEEN_SUFFIX, JSON.stringify([...new Set(ids)]));
 }
 
-export function AchievementUnlockToast({
-  achievements,
-}: AchievementUnlockToastProps) {
+export function AchievementUnlockToast({ achievements }: AchievementUnlockToastProps) {
   const recent = useMemo(
     () => achievements.filter((item) => item.earned && item.recentlyUnlocked),
     [achievements],
@@ -79,9 +77,7 @@ export function AchievementUnlockToast({
               Achievement unlocked
             </p>
             <p className="mt-0.5 font-medium text-foreground">{current.title}</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {current.description}
-            </p>
+            <p className="mt-1 text-sm text-muted-foreground">{current.description}</p>
             {current.xpReward ? (
               <p className="mt-2 font-mono text-xs text-muted-foreground">
                 +{current.xpReward} XP

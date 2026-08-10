@@ -37,10 +37,7 @@ export function RepositoryExplorer({
   const [page, setPage] = useState(1);
   const deferredQuery = useDeferredValue(query);
 
-  const languages = useMemo(
-    () => getRepositoryLanguages(repositories),
-    [repositories],
-  );
+  const languages = useMemo(() => getRepositoryLanguages(repositories), [repositories]);
 
   const filtered = useMemo(
     () =>
@@ -149,11 +146,8 @@ export function RepositoryExplorer({
       <div className="flex items-center justify-between gap-3 text-sm text-muted-foreground">
         <p>
           Showing{" "}
-          <span className="font-medium text-foreground">
-            {paginated.items.length}
-          </span>{" "}
-          of{" "}
-          <span className="font-medium text-foreground">{paginated.total}</span>{" "}
+          <span className="font-medium text-foreground">{paginated.items.length}</span>{" "}
+          of <span className="font-medium text-foreground">{paginated.total}</span>{" "}
           repositories
         </p>
         <p>
@@ -242,13 +236,7 @@ export function RepositoryExplorer({
   );
 }
 
-function FilterRow({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
+function FilterRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-2">
       <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">

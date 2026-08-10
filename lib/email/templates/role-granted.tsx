@@ -9,11 +9,7 @@ type RoleGrantedEmailProps = {
   href: string;
 };
 
-export function RoleGrantedEmail({
-  displayName,
-  role,
-  href,
-}: RoleGrantedEmailProps) {
+export function RoleGrantedEmail({ displayName, role, href }: RoleGrantedEmailProps) {
   const isAdmin = role === "admin";
 
   return (

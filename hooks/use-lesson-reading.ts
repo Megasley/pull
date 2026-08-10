@@ -58,8 +58,7 @@ export function useActiveHeading(containerId: string, headingIds: string[]) {
         const visible = entries
           .filter((entry) => entry.isIntersecting)
           .sort(
-            (left, right) =>
-              left.boundingClientRect.top - right.boundingClientRect.top,
+            (left, right) => left.boundingClientRect.top - right.boundingClientRect.top,
           );
 
         if (visible[0]?.target.id) {

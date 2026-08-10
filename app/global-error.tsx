@@ -21,7 +21,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
           background: "#c8f231",
           color: "#231e1e",
           fontFamily:
-            'ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif',
+            "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif",
         }}
       >
         <main
@@ -56,8 +56,8 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
             The app shell crashed
           </p>
           <p style={{ marginTop: "0.75rem", opacity: 0.8, lineHeight: 1.5 }}>
-            A top-level error stopped the page from rendering. Retry, or reload
-            from home.
+            A top-level error stopped the page from rendering. Retry, or reload from
+            home.
           </p>
           <div style={{ display: "flex", gap: "0.75rem", marginTop: "2rem" }}>
             <button

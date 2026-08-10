@@ -48,7 +48,11 @@ export function AchievementGallery({
           <p className="text-sm text-muted-foreground">
             {earnedCount} of {achievements.length} unlocked
           </p>
-          <div className="flex flex-wrap gap-2" role="group" aria-label="Filter achievements">
+          <div
+            className="flex flex-wrap gap-2"
+            role="group"
+            aria-label="Filter achievements"
+          >
             {FILTERS.map((item) => (
               <button
                 key={item}

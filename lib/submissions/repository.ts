@@ -102,9 +102,7 @@ export async function getActiveSubmission(
 ): Promise<ProjectSubmissionRecord | null> {
   const submissions = await listUserSubmissionsForProject(userId, projectSlug);
   return (
-    submissions.find((item) =>
-      ACTIVE_SUBMISSION_STATUSES.includes(item.status),
-    ) ?? null
+    submissions.find((item) => ACTIVE_SUBMISSION_STATUSES.includes(item.status)) ?? null
   );
 }
 
@@ -189,16 +187,13 @@ async function writeSubmissionFields(
         videoDemoUrl: input.videoDemoUrl ?? null,
         screenshotUrls: input.screenshotUrls,
         notes: input.notes ?? "",
-        submittedAt:
-          statusToSet === "submitted" ? timestamp : active.submittedAt,
+        submittedAt: statusToSet === "submitted" ? timestamp : active.submittedAt,
         reviewRound:
           statusToSet === "submitted" && active.status === "needs_changes"
             ? active.reviewRound + 1
             : active.reviewRound,
-        claimedBy:
-          statusToSet === "submitted" ? null : active.claimedBy,
-        claimExpiresAt:
-          statusToSet === "submitted" ? null : active.claimExpiresAt,
+        claimedBy: statusToSet === "submitted" ? null : active.claimedBy,
+        claimExpiresAt: statusToSet === "submitted" ? null : active.claimExpiresAt,
         updatedAt: timestamp,
       })
       .where(eq(projectSubmissions.id, active.id))
@@ -215,8 +210,7 @@ async function writeSubmissionFields(
         type: "status_change",
         fromStatus: active.status,
         toStatus: statusToSet,
-        body:
-          statusToSet === "submitted" ? "Builder submitted for review." : "",
+        body: statusToSet === "submitted" ? "Builder submitted for review." : "",
       });
     }
 

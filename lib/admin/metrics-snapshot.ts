@@ -130,9 +130,7 @@ async function buildRoleCounts(): Promise<Record<UserRole, number>> {
 
 /** Compute the full overview payload (runs on cron / manual refresh). */
 export async function computeAdminMetricsSnapshotPayload(): Promise<AdminMetricsSnapshotPayload> {
-  const thirtyDaysAgo = new Date(
-    Date.now() - 30 * 24 * 60 * 60 * 1000,
-  ).toISOString();
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
   const registeredUsers = await settledNumber("registeredUsers", () =>
     countRegisteredUsers(),
@@ -224,7 +222,11 @@ export async function refreshAdminMetricsSnapshot(): Promise<{
   error?: string;
 }> {
   if (!isDatabaseConfigured()) {
-    return { ok: false, computedAt: new Date().toISOString(), error: "database_unconfigured" };
+    return {
+      ok: false,
+      computedAt: new Date().toISOString(),
+      error: "database_unconfigured",
+    };
   }
 
   try {

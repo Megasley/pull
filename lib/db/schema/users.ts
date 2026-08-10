@@ -42,9 +42,7 @@ export const users = pgTable(
       .notNull()
       .default(DEFAULT_EMAIL_NOTIFICATION_PREFS),
     role: userRoleEnum("role").notNull().default("builder"),
-    accountStatus: userAccountStatusEnum("account_status")
-      .notNull()
-      .default("active"),
+    accountStatus: userAccountStatusEnum("account_status").notNull().default("active"),
     moderationReason: text("moderation_reason"),
     moderatedAt: timestamp("moderated_at", { withTimezone: true, mode: "string" }),
     moderatedBy: uuid("moderated_by"),

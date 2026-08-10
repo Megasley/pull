@@ -14,9 +14,7 @@ import {
   selectMergedPrHighlights,
   toPublicTimelineEvents,
 } from "@/lib/profile/portfolio";
-import {
-  listUserAchievements,
-} from "@/lib/xp/achievements";
+import { listUserAchievements } from "@/lib/xp/achievements";
 import { buildLevelInfo } from "@/lib/xp/levels";
 import { loadBuilderScore } from "@/lib/score";
 import { loadOpenSourceReputation } from "@/lib/reputation";
@@ -29,10 +27,7 @@ import {
 } from "@/lib/github/store";
 import { toPortfolioItem } from "@/lib/portfolio/filter";
 import { loadContributionTimeline } from "@/lib/timeline";
-import type {
-  PublicBuilderProfileData,
-  PublicCompletedProject,
-} from "@/types/profile";
+import type { PublicBuilderProfileData, PublicCompletedProject } from "@/types/profile";
 import { toPublicBuilderProfile } from "@/types/user";
 
 function buildFeaturedProjects(

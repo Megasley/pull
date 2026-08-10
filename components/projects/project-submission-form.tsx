@@ -3,10 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
-import {
-  saveProjectDraftAction,
-  submitProjectAction,
-} from "@/app/actions/submissions";
+import { saveProjectDraftAction, submitProjectAction } from "@/app/actions/submissions";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { ProjectSubmissionRecord } from "@/types/submission";
@@ -34,13 +31,9 @@ export function ProjectSubmissionForm({
   const [pending, startTransition] = useTransition();
 
   const isLocked =
-    locked ||
-    (initial ? LOCKED_SUBMISSION_STATUSES.includes(initial.status) : false);
+    locked || (initial ? LOCKED_SUBMISSION_STATUSES.includes(initial.status) : false);
 
-  function run(
-    action: typeof saveProjectDraftAction,
-    successMessage: string,
-  ) {
+  function run(action: typeof saveProjectDraftAction, successMessage: string) {
     return (formData: FormData) => {
       setError(null);
       setMessage(null);
@@ -117,9 +110,7 @@ export function ProjectSubmissionForm({
           disabled={isLocked || pending}
           className={fieldClassName}
         />
-        <p className="mt-1.5 text-xs text-muted-foreground">
-          One image URL per line.
-        </p>
+        <p className="mt-1.5 text-xs text-muted-foreground">One image URL per line.</p>
       </div>
 
       <div>
@@ -138,22 +129,27 @@ export function ProjectSubmissionForm({
       </div>
 
       {error ? (
-        <p className="rounded-none border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
+        <p
+          className="rounded-none border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+          role="alert"
+        >
           {error}
         </p>
       ) : null}
 
       {message ? (
-        <p className="rounded-none border border-border bg-transparent px-3 py-2 text-sm text-foreground" role="status">
+        <p
+          className="rounded-none border border-border bg-transparent px-3 py-2 text-sm text-foreground"
+          role="status"
+        >
           {message}
         </p>
       ) : null}
 
       {isLocked ? (
         <p className="text-sm text-muted-foreground">
-          This submission is locked while it is under review. You can revise it
-          after a reviewer requests changes, or start a new one once it is
-          approved or rejected.
+          This submission is locked while it is under review. You can revise it after a
+          reviewer requests changes, or start a new one once it is approved or rejected.
         </p>
       ) : (
         <div className="flex flex-wrap gap-2">

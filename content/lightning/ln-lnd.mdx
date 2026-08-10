@@ -1,20 +1,20 @@
 ---
 title: LND
-description: 'Build integrations with LND gRPC, REST, and macaroon authentication.'
+description: "Build integrations with LND gRPC, REST, and macaroon authentication."
 difficulty: advanced
 duration: 2 weeks
 objectives:
   - Run LND against bitcoind in a lab
   - Authenticate with macaroons safely
-  - 'Call key RPCs for invoices, payments, and channels'
+  - "Call key RPCs for invoices, payments, and channels"
 resources:
   - title: Mastering the Lightning Network
-    url: 'https://github.com/lnbook/lnbook/blob/master/04_node_client.asciidoc'
+    url: "https://github.com/lnbook/lnbook/blob/master/04_node_client.asciidoc"
     kind: book
-    chapter: 'Ch. 4: Lightning Node Software'
+    chapter: "Ch. 4: Lightning Node Software"
     required: true
   - title: LND documentation
-    url: 'https://docs.lightning.engineering/'
+    url: "https://docs.lightning.engineering/"
     kind: docs
     required: true
   - title: Lightning Terminal / Loop
@@ -37,6 +37,7 @@ lab:
     - One sentence on macaroon scope (admin vs readonly) for your app
     - Link to LND docs or Ch. 4 section you used
 ---
+
 **LND** is a widely deployed Lightning implementation with gRPC/REST APIs and macaroon-based auth. Many apps integrate here first.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here. This opens **Implementation**.
@@ -47,11 +48,14 @@ Production integrations live or die on auth scoping, idempotent payment calls, a
 
 **Analogy:** Macaroons are VIP wristbands with permissions printed on them. Anyone holding an admin wristband is you — guard them like passwords.
 
-<Mermaid caption="Apps authenticate to LND; LND talks to Bitcoin and peers." chart="flowchart LR
+<Mermaid
+  caption="Apps authenticate to LND; LND talks to Bitcoin and peers."
+  chart="flowchart LR
     App[Your app] --> Mac[Macaroon + TLS]
     Mac --> LND[LND]
     LND --> Bitcoind[bitcoind]
-    LND --> Peers[LN peers]" />
+    LND --> Peers[LN peers]"
+/>
 
 ```bash
 lncli getinfo

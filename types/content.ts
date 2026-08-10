@@ -1,14 +1,7 @@
 export type LessonDifficulty = "beginner" | "intermediate" | "advanced";
 
 export type LessonResourceKind =
-  | "book"
-  | "bip"
-  | "bolt"
-  | "docs"
-  | "article"
-  | "video"
-  | "tool"
-  | "interactive";
+  "book" | "bip" | "bolt" | "docs" | "article" | "video" | "tool" | "interactive";
 
 export type LessonResource = {
   title: string;
@@ -159,8 +152,7 @@ export function resolveInteractiveLabs(
   );
 }
 
-const BIP_OR_BOLT =
-  /\b(?:BIP[-\s]?(\d{1,4})|BOLT[-\s]?(\d{1,2}))\b/gi;
+const BIP_OR_BOLT = /\b(?:BIP[-\s]?(\d{1,4})|BOLT[-\s]?(\d{1,2}))\b/gi;
 
 /** Prefer explicit searchQueries; else harvest BIP/BOLT ids from resources; else title. */
 export function resolveSearchQueries(

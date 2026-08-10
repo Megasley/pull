@@ -21,12 +21,11 @@ assert(err.status === 403, "status should be 403");
 
 assert(isGithubSyncStale(null), "null last sync is stale");
 assert(
-  isGithubSyncStale(new Date(Date.now() - GITHUB_SYNC_INTERVAL_MS - 1000).toISOString()),
+  isGithubSyncStale(
+    new Date(Date.now() - GITHUB_SYNC_INTERVAL_MS - 1000).toISOString(),
+  ),
   "old sync should be stale",
 );
-assert(
-  !isGithubSyncStale(new Date().toISOString()),
-  "fresh sync should not be stale",
-);
+assert(!isGithubSyncStale(new Date().toISOString()), "fresh sync should not be stale");
 
 console.log("GitHub client helper checks passed.");

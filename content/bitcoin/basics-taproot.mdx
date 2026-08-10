@@ -1,6 +1,6 @@
 ---
 title: Taproot & Tapscript
-description: 'Key-path and script-path spends, MAST, and Schnorr signatures.'
+description: "Key-path and script-path spends, MAST, and Schnorr signatures."
 difficulty: intermediate
 duration: 6 days
 objectives:
@@ -12,33 +12,33 @@ resources:
     url: >-
       https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch07_authorization-authentication.adoc
     kind: book
-    chapter: 'Ch. 7: Authorization and Authentication'
+    chapter: "Ch. 7: Authorization and Authentication"
     required: true
   - title: Mastering Bitcoin
     url: >-
       https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch08_signatures.adoc
     kind: book
-    chapter: 'Ch. 8: Signatures'
-  - title: 'Decoding Bitcoin: Introduction to Taproot'
-    url: 'https://bitcoindevs.xyz/decoding/introduction-taproot'
+    chapter: "Ch. 8: Signatures"
+  - title: "Decoding Bitcoin: Introduction to Taproot"
+    url: "https://bitcoindevs.xyz/decoding/introduction-taproot"
     kind: interactive
     note: Interactive Taproot on-ramp before BIP-341 deep reading.
     required: true
-  - title: 'Decoding Bitcoin: Schnorr signatures'
-    url: 'https://bitcoindevs.xyz/decoding/schnorr-signature'
+  - title: "Decoding Bitcoin: Schnorr signatures"
+    url: "https://bitcoindevs.xyz/decoding/schnorr-signature"
     kind: interactive
     note: Pair with tagged hashes - why Taproot prefers Schnorr.
-  - title: 'Decoding Bitcoin: Tagged hashes'
-    url: 'https://bitcoindevs.xyz/decoding/tagged-hashes'
+  - title: "Decoding Bitcoin: Tagged hashes"
+    url: "https://bitcoindevs.xyz/decoding/tagged-hashes"
     kind: interactive
-  - title: 'Decoding Bitcoin: Taproot roadmap'
-    url: 'https://bitcoindevs.xyz/decoding/taproot-roadmap'
+  - title: "Decoding Bitcoin: Taproot roadmap"
+    url: "https://bitcoindevs.xyz/decoding/taproot-roadmap"
     kind: interactive
   - title: BIP-341 Taproot
-    url: 'https://github.com/bitcoin/bips/blob/master/bip-0341.mediawiki'
+    url: "https://github.com/bitcoin/bips/blob/master/bip-0341.mediawiki"
     kind: bip
   - title: BIP-340 Schnorr
-    url: 'https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki'
+    url: "https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki"
     kind: bip
 reflectionPrompts:
   - >-
@@ -57,13 +57,14 @@ lab:
     stays hidden.
   evidence:
     - Screenshot or notes from Decoding Bitcoin Introduction to Taproot
-    - 'Regtest address or tx showing a bc1p / witness v1 output (or descriptor)'
+    - "Regtest address or tx showing a bc1p / witness v1 output (or descriptor)"
     - One sentence contrasting key-path vs script-path privacy
 searchQueries:
   - BIP341
   - BIP340
   - Taproot
 ---
+
 **Taproot** (SegWit v1) lets coins be spent with a single Schnorr signature in the common case, while still allowing complex scripts as hidden alternatives. Addresses look like `bc1p...` (Bech32m).
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here.
@@ -79,23 +80,30 @@ Two ways to spend:
 1. **Key-path**: sign with the tweaked output key — cheapest and most private
 2. **Script-path**: reveal a script leaf + merkle proof + satisfy that script
 
-<Mermaid caption="Key-path spends look like simple single-sig; script-path reveals only the used leaf." chart="flowchart TD
+<Mermaid
+  caption="Key-path spends look like simple single-sig; script-path reveals only the used leaf."
+  chart="flowchart TD
     Out[P2TR output] --> KeyPath[Key-path spend<br/>Schnorr signature]
-    Out --> ScriptPath[Script-path spend<br/>reveal one leaf + proof]" />
+    Out --> ScriptPath[Script-path spend<br/>reveal one leaf + proof]"
+/>
 
-<Mermaid caption="The output key commits to an optional script tree without revealing it upfront." chart="flowchart TD
+<Mermaid
+  caption="The output key commits to an optional script tree without revealing it upfront."
+  chart="flowchart TD
     Internal[Internal key] --> Tweak[TapTweak with merkle root]
     Tree[Script tree MAST] --> Tweak
     Tweak --> Out[P2TR output key]
     Out --> KeyPath[Key-path Schnorr spend]
-    Out --> ScriptPath[Script-path leaf spend]" />
+    Out --> ScriptPath[Script-path leaf spend]"
+/>
 
 Script-path leaves use **Tapscript** — Script with Taproot-specific rules and Schnorr CHECKSIG behavior. Multisig and timelock policies can live in leaves while cooperative spends stay on the key path (especially with MuSig-style aggregation).
 
 Taproot output keys commit to an internal key tweaked by a merkle root of scripts (or a nothing-up-my-sleeve tweak when no scripts). Unused leaves remain hidden — a privacy win versus revealing a full redeem script every time (as with many P2SH spends).
 
 <Callout type="info" title="Privacy wins when you cooperate">
-  If parties always cooperate, they can prefer key-path spends so onlookers cannot tell a complex policy was involved.
+  If parties always cooperate, they can prefer key-path spends so onlookers cannot tell
+  a complex policy was involved.
 </Callout>
 
 If you support Taproot script trees, backups must include enough data to reconstruct spends for every leaf you might need — not only the key path.

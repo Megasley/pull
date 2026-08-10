@@ -19,9 +19,7 @@ export function BuilderLevelSection({ level, displayName }: BuilderLevelSectionP
             <p className="font-mono text-[11px] tracking-wide text-muted-foreground uppercase">
               Current level
             </p>
-            <p className="text-4xl font-semibold tracking-tight">
-              Level {level.level}
-            </p>
+            <p className="text-4xl font-semibold tracking-tight">Level {level.level}</p>
           </div>
           <p className="rounded-none border border-ink/20 bg-signal/20 px-2 py-1 text-sm font-medium text-ink">
             {level.xp} XP total
@@ -47,8 +45,8 @@ export function BuilderLevelSection({ level, displayName }: BuilderLevelSectionP
             />
           </div>
           <p className="text-xs text-muted-foreground">
-            Earn XP by completing lessons, submitting projects, getting
-            approvals, and finishing roadmaps.
+            Earn XP by completing lessons, submitting projects, getting approvals, and
+            finishing roadmaps.
           </p>
         </div>
       </div>

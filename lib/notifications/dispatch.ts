@@ -89,9 +89,7 @@ export async function notifyReviewQueue(input: {
   );
 }
 
-export function notifyReviewQueueAsync(
-  input: Parameters<typeof notifyReviewQueue>[0],
-) {
+export function notifyReviewQueueAsync(input: Parameters<typeof notifyReviewQueue>[0]) {
   fireAndForget(notifyReviewQueue(input), "review-queue");
 }
 
@@ -110,9 +108,7 @@ export async function notifyAchievementsUnlocked(input: {
 
   const achievements = input.slugs
     .map((slug) => ACHIEVEMENT_DEFINITIONS.find((item) => item.id === slug))
-    .filter((item): item is (typeof ACHIEVEMENT_DEFINITIONS)[number] =>
-      Boolean(item),
-    )
+    .filter((item): item is (typeof ACHIEVEMENT_DEFINITIONS)[number] => Boolean(item))
     .map((item) => ({ title: item.title, xpReward: item.xpReward }));
 
   if (achievements.length === 0) {
@@ -180,9 +176,7 @@ export async function notifyRoleGranted(input: {
   await sendEmail({
     to: recipient.email,
     subject:
-      input.role === "admin"
-        ? "You're an admin on Pull"
-        : "You're a reviewer on Pull",
+      input.role === "admin" ? "You're an admin on Pull" : "You're a reviewer on Pull",
     react: RoleGrantedEmail({
       displayName: recipient.displayName,
       role: input.role,
@@ -191,8 +185,6 @@ export async function notifyRoleGranted(input: {
   });
 }
 
-export function notifyRoleGrantedAsync(
-  input: Parameters<typeof notifyRoleGranted>[0],
-) {
+export function notifyRoleGrantedAsync(input: Parameters<typeof notifyRoleGranted>[0]) {
   fireAndForget(notifyRoleGranted(input), "role-granted");
 }

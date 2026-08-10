@@ -1,51 +1,51 @@
 ---
 title: Bitcoin Script
-description: 'Learn script puzzles, locking conditions, and standard output types.'
+description: "Learn script puzzles, locking conditions, and standard output types."
 difficulty: intermediate
 duration: 7 days
 objectives:
   - Explain locking vs unlocking scripts
   - Walk the standard output ladder (P2PK → P2PKH → P2SH → P2MS → SegWit/Taproot)
-  - 'Reason about Script as a predicate, not a general programming language'
+  - "Reason about Script as a predicate, not a general programming language"
 resources:
   - title: Mastering Bitcoin
     url: >-
       https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch07_authorization-authentication.adoc
     kind: book
-    chapter: 'Ch. 7: Authorization and Authentication'
+    chapter: "Ch. 7: Authorization and Authentication"
     required: true
-  - title: 'Decoding Bitcoin: Locking & unlocking'
-    url: 'https://bitcoindevs.xyz/decoding/locking-unlocking'
+  - title: "Decoding Bitcoin: Locking & unlocking"
+    url: "https://bitcoindevs.xyz/decoding/locking-unlocking"
     kind: interactive
     note: Start here - scriptPubKey vs scriptSig/witness mental model.
     required: true
-  - title: 'Decoding Bitcoin: P2PK'
-    url: 'https://bitcoindevs.xyz/decoding/p2pk'
+  - title: "Decoding Bitcoin: P2PK"
+    url: "https://bitcoindevs.xyz/decoding/p2pk"
     kind: interactive
-    note: 'Ladder step 1 - pay to public key (and why wallets moved on).'
+    note: "Ladder step 1 - pay to public key (and why wallets moved on)."
     required: true
-  - title: 'Decoding Bitcoin: P2PKH'
-    url: 'https://bitcoindevs.xyz/decoding/p2pkh'
+  - title: "Decoding Bitcoin: P2PKH"
+    url: "https://bitcoindevs.xyz/decoding/p2pkh"
     kind: interactive
-    note: 'Ladder step 2 - hash the key; complete at least one P2PKH exercise.'
+    note: "Ladder step 2 - hash the key; complete at least one P2PKH exercise."
     required: true
-  - title: 'Decoding Bitcoin: P2SH'
-    url: 'https://bitcoindevs.xyz/decoding/p2sh'
+  - title: "Decoding Bitcoin: P2SH"
+    url: "https://bitcoindevs.xyz/decoding/p2sh"
     kind: interactive
-    note: 'Ladder step 3 - hide redeem scripts until spend (BIP16).'
-  - title: 'Decoding Bitcoin: P2MS'
-    url: 'https://bitcoindevs.xyz/decoding/p2ms'
+    note: "Ladder step 3 - hide redeem scripts until spend (BIP16)."
+  - title: "Decoding Bitcoin: P2MS"
+    url: "https://bitcoindevs.xyz/decoding/p2ms"
     kind: interactive
-    note: 'Ladder step 4 - bare multisig vs P2SH-wrapped policy.'
-  - title: 'Decoding Bitcoin: Build a Bitcoin stack'
-    url: 'https://bitcoindevs.xyz/decoding/project'
+    note: "Ladder step 4 - bare multisig vs P2SH-wrapped policy."
+  - title: "Decoding Bitcoin: Build a Bitcoin stack"
+    url: "https://bitcoindevs.xyz/decoding/project"
     kind: interactive
     note: Capstone mini-project - stack execution before descriptors/Miniscript.
   - title: Script opcodes reference
-    url: 'https://en.bitcoin.it/wiki/Script'
+    url: "https://en.bitcoin.it/wiki/Script"
     kind: docs
   - title: Miniscript
-    url: 'https://bitcoin.sipa.be/miniscript/'
+    url: "https://bitcoin.sipa.be/miniscript/"
     kind: docs
 reflectionPrompts:
   - >-
@@ -65,8 +65,9 @@ lab:
     - Link or screenshot from a completed Decoding Bitcoin P2PKH exercise
     - Evidence from one further ladder step (P2SH, P2MS, or stack project)
     - One-paragraph comparison of locking vs unlocking for the template you studied
-    - 'Optional: decodescript / descriptor output from regtest matching that template'
+    - "Optional: decodescript / descriptor output from regtest matching that template"
 ---
+
 **Bitcoin Script** is the stack-based language that defines spending conditions. It is intentionally limited — not Turing-complete — so validation stays predictable and safe for nodes.
 
 Complete **Step 1 // Required reading** in the study plan above (locking/unlocking + P2PK + P2PKH), then continue here.
@@ -83,15 +84,19 @@ When spending:
 2. Provide `scriptSig` / witness (unlock)
 3. Execute according to consensus rules
 
-<Mermaid caption="Spends succeed only when the unlocking data satisfies the lock." chart="flowchart LR
+<Mermaid
+  caption="Spends succeed only when the unlocking data satisfies the lock."
+  chart="flowchart LR
     Lock[scriptPubKey lock] --> Combine[Combine with unlock]
     Unlock[scriptSig / witness] --> Combine
     Combine --> Exec[Script execution]
     Exec --> Yes[Valid spend]
-    Exec --> No[Invalid]" />
+    Exec --> No[Invalid]"
+/>
 
 <Callout type="info" title="Script is a predicate">
-  Think “does this satisfy the condition?”, not “run an app on-chain.” Loops and unbounded complexity are restricted for a reason.
+  Think “does this satisfy the condition?”, not “run an app on-chain.” Loops and
+  unbounded complexity are restricted for a reason.
 </Callout>
 
 Script pushes and pops values on a stack. `OP_DUP`, `OP_HASH160`, `OP_EQUALVERIFY`, and `OP_CHECKSIG` appear often in P2PKH-style templates. You rarely write these by hand today — descriptors and Miniscript generate them — but reading them debugs explorers and policy bugs.

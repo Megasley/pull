@@ -17,5 +17,9 @@ export default async function StartPage() {
     redirect("/onboarding");
   }
 
-  redirect(profile.preferredRoadmapSlug ? `/roadmaps/${profile.preferredRoadmapSlug}` : "/roadmaps");
+  redirect(
+    profile.preferredRoadmapSlug
+      ? `/roadmaps/${profile.preferredRoadmapSlug}`
+      : "/roadmaps",
+  );
 }

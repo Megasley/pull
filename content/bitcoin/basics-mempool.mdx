@@ -1,6 +1,6 @@
 ---
 title: Mempool & Fees
-description: 'Follow unconfirmed transactions, fee estimation, RBF, and CPFP.'
+description: "Follow unconfirmed transactions, fee estimation, RBF, and CPFP."
 difficulty: intermediate
 duration: 4 days
 objectives:
@@ -9,15 +9,15 @@ objectives:
   - Apply RBF and CPFP fee-bumping strategies
 resources:
   - title: Mastering Bitcoin
-    url: 'https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch09_fees.adoc'
+    url: "https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch09_fees.adoc"
     kind: book
-    chapter: 'Ch. 9: Transaction Fees'
+    chapter: "Ch. 9: Transaction Fees"
     required: true
   - title: BIP-125 RBF
-    url: 'https://github.com/bitcoin/bips/blob/master/bip-0125.mediawiki'
+    url: "https://github.com/bitcoin/bips/blob/master/bip-0125.mediawiki"
     kind: bip
-  - title: 'Bitcoin Optech: Fee bumping'
-    url: 'https://bitcoinops.org/en/topics/fee-bumping/'
+  - title: "Bitcoin Optech: Fee bumping"
+    url: "https://bitcoinops.org/en/topics/fee-bumping/"
     kind: article
 reflectionPrompts:
   - >-
@@ -34,13 +34,14 @@ lab:
     sat/vB example and write which bump tool you would use if the tx stalled —
     RBF or CPFP — and why.
   evidence:
-    - 'Fee rate calculation (feeSats / vsize) or estimatesmartfee output'
+    - "Fee rate calculation (feeSats / vsize) or estimatesmartfee output"
     - One sentence choosing RBF vs CPFP for a stuck payment scenario
     - Link to Mastering Bitcoin Ch. 9 or Optech fee-bumping section you used
 searchQueries:
   - mempool
   - BIP125
 ---
+
 The **mempool** is each node’s holding area for valid unconfirmed transactions. Miners (and other nodes) choose what to relay and mine based on **policy** and fees — not every consensus-valid transaction is welcome under default policy.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here. This lesson closes the **Bitcoin Basics** chapter.
@@ -57,7 +58,9 @@ const feeRateSatVb = feeSats / vsize;
 
 Estimate using node RPCs (`estimatesmartfee`) or public observers, then expose slow/medium/fast targets in UX.
 
-<Mermaid caption="Stuck transactions need fee bumping via RBF or CPFP." chart="flowchart LR
+<Mermaid
+  caption="Stuck transactions need fee bumping via RBF or CPFP."
+  chart="flowchart LR
     Tx[Broadcast tx] --> Mempool[Node mempools]
     Mempool --> Low{Fee high enough?}
     Low -->|yes| Mine[Likely next blocks]
@@ -65,13 +68,15 @@ Estimate using node RPCs (`estimatesmartfee`) or public observers, then expose s
     Stuck --> RBF[Replace-by-fee]
     Stuck --> CPFP[Child-pays-for-parent]
     RBF --> Mine
-    CPFP --> Mine" />
+    CPFP --> Mine"
+/>
 
 - **RBF (BIP-125)**: replace an unconfirmed tx with a higher-fee variant (signals required)
 - **CPFP**: spend an unconfirmed output with a high-fee child that incentivizes mining both
 
 <Callout type="info" title="Policy ≠ consensus">
-  A transaction can be consensus-valid yet non-standard under default mempool policy. Test relay behavior, not only block validity on regtest miner shortcuts.
+  A transaction can be consensus-valid yet non-standard under default mempool policy.
+  Test relay behavior, not only block validity on regtest miner shortcuts.
 </Callout>
 
 **Done when:** You can explain when RBF vs CPFP is the right bump tool.

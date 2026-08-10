@@ -9,9 +9,7 @@ export function PlatformStatusBanner() {
 
   return (
     <div className="border-b border-destructive/30 bg-destructive/10 px-4 py-2.5 text-center text-sm text-destructive">
-      <p>
-        Database is not configured — progress and submissions may not save.
-      </p>
+      <p>Database is not configured — progress and submissions may not save.</p>
     </div>
   );
 }

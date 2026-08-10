@@ -1,6 +1,6 @@
 ---
 title: Onion Routing
-description: 'Sphinx packets, hop payloads, and payment privacy on Lightning.'
+description: "Sphinx packets, hop payloads, and payment privacy on Lightning."
 difficulty: advanced
 duration: 5 days
 objectives:
@@ -9,15 +9,15 @@ objectives:
   - Connect BOLT4 to real payment privacy expectations
 resources:
   - title: Mastering the Lightning Network
-    url: 'https://github.com/lnbook/lnbook/blob/master/10_onion_routing.asciidoc'
+    url: "https://github.com/lnbook/lnbook/blob/master/10_onion_routing.asciidoc"
     kind: book
-    chapter: 'Ch. 10: Onion Routing'
+    chapter: "Ch. 10: Onion Routing"
     required: true
   - title: BOLT4 Onion Routing
-    url: 'https://github.com/lightning/bolts/blob/master/04-onion-routing.md'
+    url: "https://github.com/lightning/bolts/blob/master/04-onion-routing.md"
     kind: bolt
   - title: Sphinx mix format (background)
-    url: 'https://www.cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf'
+    url: "https://www.cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf"
     kind: article
 reflectionPrompts:
   - >-
@@ -41,6 +41,7 @@ searchQueries:
   - BOLT4
   - onion routing
 ---
+
 Lightning payments travel in **onion packets**: each hop peels one layer, learns only the next peer and its instructions, then forwards.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here.
@@ -51,18 +52,22 @@ Without onions, intermediate nodes would see the full route and payload. Privacy
 
 **Analogy:** Nested envelopes. Each post office opens only its envelope, stamps the next address, and cannot read the inner letters.
 
-<Mermaid caption="Each hop peels one layer; the full path stays hidden." chart="flowchart LR
+<Mermaid
+  caption="Each hop peels one layer; the full path stays hidden."
+  chart="flowchart LR
     Payer[Payer] --> H1[Hop 1 peels<br/>outer layer]
     H1 --> H2[Hop 2 peels<br/>middle layer]
     H2 --> H3[Hop 3 peels<br/>inner layer]
-    H3 --> Payee[Payee]" />
+    H3 --> Payee[Payee]"
+/>
 
 Each peeled layer yields instructions: next node, amounts, outgoing CLTV, maybe custom records. Failures return encrypted **error onions** the payer can interpret for retries.
 
 Builder habits: do not log decrypted onion internals; treat timing correlation as a leak vector; lengthen routes only within fee/latency budgets.
 
 <Callout type="info" title="Privacy is not absolute">
-  Amounts, timing, and graph structure can still leak information. Design threat models honestly.
+  Amounts, timing, and graph structure can still leak information. Design threat models
+  honestly.
 </Callout>
 
 **Done when:** You can state what a middle hop must not learn about the final destination.

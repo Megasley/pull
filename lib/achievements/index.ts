@@ -3,7 +3,4 @@ export {
   ACHIEVEMENT_DEFINITIONS,
   type AchievementDefinition,
 } from "./definitions";
-export {
-  evaluateEarnedAchievementSlugs,
-  isAchievementEarned,
-} from "./evaluate";
+export { evaluateEarnedAchievementSlugs, isAchievementEarned } from "./evaluate";

@@ -1,6 +1,6 @@
 ---
 title: Contribution Discovery
-description: 'Find beginner-friendly issues across LND, CLN, and LDK repositories.'
+description: "Find beginner-friendly issues across LND, CLN, and LDK repositories."
 difficulty: intermediate
 duration: 5 days
 objectives:
@@ -9,15 +9,15 @@ objectives:
   - Engage maintainers with a clear plan
 resources:
   - title: lightningnetwork/lnd
-    url: 'https://github.com/lightningnetwork/lnd'
+    url: "https://github.com/lightningnetwork/lnd"
     kind: docs
     required: true
   - title: ElementsProject/lightning
-    url: 'https://github.com/ElementsProject/lightning'
+    url: "https://github.com/ElementsProject/lightning"
     kind: docs
     required: true
   - title: lightningdevkit
-    url: 'https://github.com/lightningdevkit'
+    url: "https://github.com/lightningdevkit"
     kind: docs
 reflectionPrompts:
   - >-
@@ -38,6 +38,7 @@ lab:
     - Written approach (problem, files likely touched, how you will test)
     - Draft self-score against the meaningful-PR rubric
 ---
+
 Lightning OSS spans Go, C, Rust, and many app repos. Pick a lane that matches your stack.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here. This opens **Contribution**.
@@ -46,18 +47,21 @@ Complete **Step 1 // Required reading** in the study plan above, then continue h
 
 Pull curates Lightning repositories and GFIs on **[Contribution Discovery](/discover)** and **[Issue recommendations](/issues)** — start there before manually searching GitHub.
 
-| Stack | Typical homes |
-| --- | --- |
-| Go | LND and tools |
-| C | Core Lightning |
-| Rust | LDK and related crates |
+| Stack     | Typical homes           |
+| --------- | ----------------------- |
+| Go        | LND and tools           |
+| C         | Core Lightning          |
+| Rust      | LDK and related crates  |
 | TS / apps | Wallets, POS, explorers |
 
-<Mermaid caption="Match language skills to repos, then scope an issue." chart="flowchart TD
+<Mermaid
+  caption="Match language skills to repos, then scope an issue."
+  chart="flowchart TD
     Skills[Go / C / Rust / TS] --> Repo[Pick implementation]
     Repo --> Issues[Label scan]
     Issues --> Plan[Write approach]
-    Plan --> PR[Contribute]" />
+    Plan --> PR[Contribute]"
+/>
 
 <Callout type="tip" title="Docs & examples">
   Improving docs or sample apps is a high-leverage first PR.

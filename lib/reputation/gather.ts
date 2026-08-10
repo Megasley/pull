@@ -2,14 +2,8 @@ import { and, desc, eq, ne } from "drizzle-orm";
 
 import { getDb } from "@/lib/db";
 import { isDatabaseConfigured } from "@/lib/db/env";
-import {
-  projectSubmissions,
-  submissionReviewEvents,
-} from "@/lib/db/schema";
-import {
-  listGithubIssues,
-  listGithubPullRequests,
-} from "@/lib/github/store";
+import { projectSubmissions, submissionReviewEvents } from "@/lib/db/schema";
+import { listGithubIssues, listGithubPullRequests } from "@/lib/github/store";
 import { toPortfolioItem } from "@/lib/portfolio/filter";
 import type { ReputationInputs } from "@/types/reputation";
 

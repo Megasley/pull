@@ -1,6 +1,6 @@
 ---
 title: Wallet Architecture
-description: 'Design secure key management, HD wallets, and signing workflows.'
+description: "Design secure key management, HD wallets, and signing workflows."
 difficulty: intermediate
 duration: 8 days
 objectives:
@@ -9,15 +9,15 @@ objectives:
   - Plan backups for seeds and descriptors
 resources:
   - title: Mastering Bitcoin
-    url: 'https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch05_wallets.adoc'
+    url: "https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch05_wallets.adoc"
     kind: book
-    chapter: 'Ch. 5: Wallets'
+    chapter: "Ch. 5: Wallets"
     required: true
   - title: BIP-32 HD wallets
-    url: 'https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki'
+    url: "https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki"
     kind: bip
   - title: BIP-39 Mnemonics
-    url: 'https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki'
+    url: "https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki"
     kind: bip
 reflectionPrompts:
   - >-
@@ -37,11 +37,12 @@ lab:
     - One example derivation path with network and address type labeled
     - Backup checklist (seed / mnemonic, descriptor or account info, what not to store)
     - Link to Mastering Bitcoin Ch. 5 or BIP-32 section you used
-    - 'Optional: getnewaddress / getaddressinfo showing a matching type'
+    - "Optional: getnewaddress / getaddressinfo showing a matching type"
 searchQueries:
   - BIP32
   - BIP39
 ---
+
 A wallet is not “an address.” It is software that manages keys, tracks UTXOs, builds transactions, and coordinates signing — often across devices.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here.
@@ -54,13 +55,16 @@ Most catastrophic losses are operational: bad backups, leaked seeds, wrong deriv
 
 BIP-32 defines hierarchical deterministic keys. BIP-39 encodes seeds as mnemonics. Account standards (BIP-44/84/86 families) organize receiving and change chains.
 
-<Mermaid caption="One backup can regenerate many addresses if derivation is known." chart="flowchart TD
+<Mermaid
+  caption="One backup can regenerate many addresses if derivation is known."
+  chart="flowchart TD
     Seed[Mnemonic seed] --> Master[Master key]
     Master --> Acc[Account]
     Acc --> Rec[Receiving chain]
     Acc --> Chg[Change chain]
     Rec --> A0[Address 0..n]
-    Chg --> C0[Change 0..n]" />
+    Chg --> C0[Change 0..n]"
+/>
 
 ```text
 Example (illustrative): m/84'/1'/0'/0/5  # regtest native SegWit receive index 5
@@ -74,7 +78,8 @@ Production designs often split:
 PSBTs move unsigned transactions between these roles safely.
 
 <Callout type="danger" title="Seed handling">
-  Never log seeds, never put them in git, never screenshot them into cloud photos. Test restore on regtest before storing real value.
+  Never log seeds, never put them in git, never screenshot them into cloud photos. Test
+  restore on regtest before storing real value.
 </Callout>
 
 **Done when:** You can explain why seed-only backup can fail for Taproot/multisig without descriptor records.

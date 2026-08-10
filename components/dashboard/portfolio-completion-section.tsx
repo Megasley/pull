@@ -23,9 +23,7 @@ export function PortfolioCompletionSection({
       <div
         className={cn(
           "rounded-none border p-4",
-          strong
-            ? "border-ink/25 bg-signal/15"
-            : "border-border bg-card",
+          strong ? "border-ink/25 bg-signal/15" : "border-border bg-card",
         )}
       >
         <div className="flex items-end justify-between gap-3">

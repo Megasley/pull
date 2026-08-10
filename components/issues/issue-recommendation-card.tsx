@@ -1,9 +1,6 @@
 import { Clock3, ExternalLink } from "lucide-react";
 
-import {
-  IssueDismissButton,
-  IssueSaveButton,
-} from "@/components/issues/issue-actions";
+import { IssueDismissButton, IssueSaveButton } from "@/components/issues/issue-actions";
 import { Badge } from "@/components/ui/badge";
 import { ISSUE_CATEGORY_SINGULAR } from "@/lib/issues/engine";
 import { cn } from "@/lib/utils";
@@ -32,9 +29,7 @@ export function IssueRecommendationCard({
       style={{ animationDelay: `${Math.min(index, 12) * 40}ms` }}
     >
       <div className="flex flex-wrap items-center gap-2">
-        <Badge variant="secondary">
-          {ISSUE_CATEGORY_SINGULAR[issue.category]}
-        </Badge>
+        <Badge variant="secondary">{ISSUE_CATEGORY_SINGULAR[issue.category]}</Badge>
         <Badge variant="outline">{issue.difficulty}</Badge>
         <Badge variant="outline">{issue.language}</Badge>
         <span className="font-mono text-[11px] text-muted-foreground">
@@ -55,9 +50,7 @@ export function IssueRecommendationCard({
           {repositoryName}
         </a>
         <span className="mx-1.5">·</span>
-        <span className="block truncate font-mono sm:inline">
-          {repositoryFullName}
-        </span>
+        <span className="block truncate font-mono sm:inline">{repositoryFullName}</span>
       </p>
 
       <p className="mt-3 flex-1 text-sm break-words text-muted-foreground">
@@ -65,8 +58,7 @@ export function IssueRecommendationCard({
       </p>
 
       <p className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
-        <Clock3 className="size-3.5" aria-hidden />
-        ~{issue.estimatedHours}h estimated
+        <Clock3 className="size-3.5" aria-hidden />~{issue.estimatedHours}h estimated
       </p>
 
       {issue.labels.length > 0 ? (

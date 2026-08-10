@@ -5,10 +5,7 @@ import { AchievementUnlockToast } from "@/components/achievements/achievement-un
 import { PageHeader } from "@/components/design-system";
 import { bootstrapCurrentUserProfile } from "@/lib/auth/session";
 import { getAllCompletedNodeSlugs } from "@/lib/progress/repository";
-import {
-  listUserAchievements,
-  syncAchievementsForUser,
-} from "@/lib/xp/achievements";
+import { listUserAchievements, syncAchievementsForUser } from "@/lib/xp/achievements";
 
 export const metadata = {
   title: "Achievements",

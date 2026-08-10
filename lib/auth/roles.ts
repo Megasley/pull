@@ -8,15 +8,11 @@ function parseGithubAllowlist(raw: string): string[] {
 }
 
 export function getReviewerGithubAllowlist(): string[] {
-  return parseGithubAllowlist(
-    process.env.PULL_REVIEWER_GITHUB_USERNAMES ?? "",
-  );
+  return parseGithubAllowlist(process.env.PULL_REVIEWER_GITHUB_USERNAMES ?? "");
 }
 
 export function getAdminGithubAllowlist(): string[] {
-  return parseGithubAllowlist(
-    process.env.PULL_ADMIN_GITHUB_USERNAMES ?? "",
-  );
+  return parseGithubAllowlist(process.env.PULL_ADMIN_GITHUB_USERNAMES ?? "");
 }
 
 export function resolveUserRole(

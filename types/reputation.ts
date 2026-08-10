@@ -7,11 +7,7 @@ export type ReputationFactorId =
   | "issue_discussions"
   | "code_reviews";
 
-export type ReputationStrength =
-  | "emerging"
-  | "building"
-  | "strong"
-  | "exceptional";
+export type ReputationStrength = "emerging" | "building" | "strong" | "exceptional";
 
 export type ReputationFactor = {
   id: ReputationFactorId;

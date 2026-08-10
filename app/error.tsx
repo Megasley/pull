@@ -40,13 +40,13 @@ export default function Error({ error, reset }: ErrorPageProps) {
           Uncaught exception in the working tree
         </p>
         <p className="mt-3 max-w-xl text-base leading-snug tracking-[-0.01em] text-ink/75">
-          Something blew up while rendering this route. The failure was logged.
-          You can retry, or head back to safer ground.
+          Something blew up while rendering this route. The failure was logged. You can
+          retry, or head back to safer ground.
           {isDatabaseIssue ? (
             <>
               {" "}
-              The database may be misconfigured — check your environment and
-              restart the dev server.
+              The database may be misconfigured — check your environment and restart the
+              dev server.
             </>
           ) : null}
           {isGithubIssue ? (

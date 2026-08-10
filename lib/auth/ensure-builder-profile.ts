@@ -10,10 +10,7 @@ import { notifyWelcomeAsync } from "@/lib/notifications/dispatch";
 import { createClient } from "@/lib/supabase/server";
 import { mapBuilderProfile, type BuilderProfile } from "@/types/user";
 
-import {
-  normalizeAccountStatus,
-  type UserAccountStatus,
-} from "./account-status";
+import { normalizeAccountStatus, type UserAccountStatus } from "./account-status";
 
 /** Throttle DB writes — enough for MAU, light on write load. */
 const ACTIVITY_TOUCH_MS = 60 * 60 * 1000;
@@ -139,14 +136,11 @@ export async function ensureBuilderProfile(user: User): Promise<BuilderProfile |
       existing.role,
     );
 
-    const existingEmail =
-      typeof existing.email === "string" ? existing.email : null;
+    const existingEmail = typeof existing.email === "string" ? existing.email : null;
     const shouldUpdateRole = nextRole !== (existing.role ?? "builder");
     const shouldSyncEmail = Boolean(email) && email !== existingEmail;
     const lastActiveRaw =
-      typeof existing.last_active_at === "string"
-        ? existing.last_active_at
-        : null;
+      typeof existing.last_active_at === "string" ? existing.last_active_at : null;
     const shouldTouch = shouldTouchActivity(lastActiveRaw);
 
     if (shouldUpdateRole || shouldSyncEmail || shouldTouch) {

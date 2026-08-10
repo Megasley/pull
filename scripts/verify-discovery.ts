@@ -14,7 +14,10 @@ function assert(condition: boolean, message: string) {
 
 const all = getAllDiscoveryRepositories();
 assert(all.length >= 8, "catalog should have curated repos");
-assert(all.every((repo) => repo.url.startsWith("https://github.com/")), "repo links");
+assert(
+  all.every((repo) => repo.url.startsWith("https://github.com/")),
+  "repo links",
+);
 
 const rust = filterDiscoveryRepositories(all, {
   query: "",
@@ -23,7 +26,10 @@ const rust = filterDiscoveryRepositories(all, {
   difficulty: "all",
   size: "all",
 });
-assert(rust.every((repo) => repo.language === "Rust"), "language filter");
+assert(
+  rust.every((repo) => repo.language === "Rust"),
+  "language filter",
+);
 assert(rust.length >= 2, "multiple rust targets");
 
 const search = filterDiscoveryRepositories(all, {

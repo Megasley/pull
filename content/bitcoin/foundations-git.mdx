@@ -1,6 +1,6 @@
 ---
 title: Git & Open Source Workflow
-description: 'Learn branching, pull requests, and how maintainers review contributions.'
+description: "Learn branching, pull requests, and how maintainers review contributions."
 difficulty: beginner
 duration: 4 days
 objectives:
@@ -9,15 +9,15 @@ objectives:
   - Understand ACK / NACK culture in Bitcoin projects
 resources:
   - title: GitHub Flow
-    url: 'https://docs.github.com/en/get-started/using-github/github-flow'
+    url: "https://docs.github.com/en/get-started/using-github/github-flow"
     kind: docs
     required: true
   - title: Conventional Commits
-    url: 'https://www.conventionalcommits.org/'
+    url: "https://www.conventionalcommits.org/"
     kind: article
     required: true
   - title: Bitcoin Core contributing
-    url: 'https://github.com/bitcoin/bitcoin/blob/master/CONTRIBUTING.md'
+    url: "https://github.com/bitcoin/bitcoin/blob/master/CONTRIBUTING.md"
     kind: docs
     required: true
 reflectionPrompts:
@@ -41,18 +41,19 @@ lab:
     - PR description answering problem / how tested / what to watch
     - Link to the CONTRIBUTING or GitHub Flow section you followed
 ---
+
 Open source Bitcoin work is collaboration under a microscope. Your code is not “done” when it runs on your laptop — it is done when reviewers can understand, test, and trust it.
 
 Complete **Step 1 // Required reading** in the study plan above, then continue here.
 
 ## Step 2 — Key terms and why this matters
 
-| Term | Meaning | Where you use it |
-| --- | --- | --- |
-| **Feature branch** | Short-lived branch for one change | Every contribution |
-| **Pull request (PR)** | Proposal to merge your branch | Review and CI |
-| **ACK** | “I support this after review” | Bitcoin Core–style review |
-| **NACK** | “I object,” with reasons | Same — silence is not approval |
+| Term                  | Meaning                           | Where you use it               |
+| --------------------- | --------------------------------- | ------------------------------ |
+| **Feature branch**    | Short-lived branch for one change | Every contribution             |
+| **Pull request (PR)** | Proposal to merge your branch     | Review and CI                  |
+| **ACK**               | “I support this after review”     | Bitcoin Core–style review      |
+| **NACK**              | “I object,” with reasons          | Same — silence is not approval |
 
 **Analogy:** A pull request is a work order: what changed, why it is safe, and how to verify it. Maintainers are inspectors protecting users’ money.
 
@@ -62,13 +63,16 @@ Bitcoin repositories move carefully. A confusing history or a PR that mixes five
 
 ## Step 3 — The daily loop (setup and practice)
 
-<Mermaid caption="Most contributions follow a short cycle from branch to reviewed merge." chart="flowchart LR
+<Mermaid
+  caption="Most contributions follow a short cycle from branch to reviewed merge."
+  chart="flowchart LR
     Issue[Issue or idea] --> Branch[Feature branch]
     Branch --> Commits[Small commits]
     Commits --> PR[Pull request]
     PR --> Review[Review + tests]
     Review --> Merge[Merge]
-    Review --> Revise[Address feedback]" />
+    Review --> Revise[Address feedback]"
+/>
 
 ```bash
 git checkout -b fix/clarify-fee-docs
@@ -80,7 +84,7 @@ git push -u origin HEAD
 
 **Expected:** A new remote branch exists; `git log -1 --oneline` shows a clear message.
 
-Prefer messages that explain *why*:
+Prefer messages that explain _why_:
 
 - Good: `wallet: avoid double-counting change in balance`
 - Weak: `fix stuff`
@@ -93,18 +97,18 @@ A strong PR description answers: (1) What problem? (2) How did you test? (3) Wha
 
 ### Common mistakes
 
-- Opening a PR from `main` with dozens of unrelated commits  
-- Force-pushing during active review without warning  
-- Ignoring CI failures and asking for review anyway  
+- Opening a PR from `main` with dozens of unrelated commits
+- Force-pushing during active review without warning
+- Ignoring CI failures and asking for review anyway
 
 **Done when:** You have created at least one focused branch with a clear commit on a machine you control.
 
 ## Step 4 — Hands-on check (lab)
 
-1. Fork or clone a small Bitcoin-adjacent repo (or use your own).  
-2. Fix a typo or docs issue on a **feature branch**.  
-3. Commit with a conventional-style message.  
-4. Open a PR **or** paste a full PR description as lab evidence.  
+1. Fork or clone a small Bitcoin-adjacent repo (or use your own).
+2. Fix a typo or docs issue on a **feature branch**.
+3. Commit with a conventional-style message.
+4. Open a PR **or** paste a full PR description as lab evidence.
 
 **Done when:** Lab evidence includes branch/commit + PR text + which required guide you followed.
 

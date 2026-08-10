@@ -51,9 +51,9 @@ export function LessonStudyPlan({
         <div>
           <p className="tech-eyebrow text-foreground">study // plan</p>
           <p className="mt-2 max-w-2xl font-mono text-xs leading-relaxed text-muted-foreground">
-            Lessons are primers. Start with Step 1 (required reading) when
-            present, then follow the numbered steps in the article. Depth comes
-            from primary sources, labs, reflection, and evidence.
+            Lessons are primers. Start with Step 1 (required reading) when present, then
+            follow the numbered steps in the article. Depth comes from primary sources,
+            labs, reflection, and evidence.
           </p>
         </div>
 
@@ -95,8 +95,8 @@ export function LessonStudyPlan({
             Step 1 // Required reading
           </h3>
           <p className="font-mono text-xs leading-relaxed text-muted-foreground">
-            Complete these before the numbered steps in the lesson body. Links
-            are listed here once — not repeated below.
+            Complete these before the numbered steps in the lesson body. Links are
+            listed here once — not repeated below.
           </p>
           <LessonResourcesPanel resources={requiredReading} heading="" />
         </div>
@@ -109,9 +109,9 @@ export function LessonStudyPlan({
             Interactive lab // Decoding Bitcoin
           </h3>
           <p className="font-mono text-xs leading-relaxed text-muted-foreground">
-            Open these Bitcoin Dev Project modules and tools before (or alongside)
-            the graded lab. Capture evidence from the interactive path — do not
-            only skim Pull.
+            Open these Bitcoin Dev Project modules and tools before (or alongside) the
+            graded lab. Capture evidence from the interactive path — do not only skim
+            Pull.
           </p>
           <ul className="mt-2 space-y-3">
             {interactiveLabs.map((item) => (

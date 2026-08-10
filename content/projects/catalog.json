@@ -20,7 +20,11 @@
       "difficulty": "beginner",
       "estimatedTime": "4 days",
       "categories": ["Bitcoin"],
-      "requiredSkills": ["Hex decoding", "Transaction serialization", "TypeScript or Rust"],
+      "requiredSkills": [
+        "Hex decoding",
+        "Transaction serialization",
+        "TypeScript or Rust"
+      ],
       "roadmapSlug": "bitcoin",
       "lessonSlug": "basics-transactions",
       "prerequisites": ["Transactions", "UTXO Model"],
@@ -137,7 +141,12 @@
       "difficulty": "intermediate",
       "estimatedTime": "2 weeks",
       "categories": ["Bitcoin", "Wallets"],
-      "requiredSkills": ["Descriptors", "Bitcoin Core RPC", "PSBT basics", "TypeScript or Rust"],
+      "requiredSkills": [
+        "Descriptors",
+        "Bitcoin Core RPC",
+        "PSBT basics",
+        "TypeScript or Rust"
+      ],
       "roadmapSlug": "bitcoin",
       "lessonSlug": "project-wallet",
       "prerequisites": ["PSBT Workflows", "Regtest Development", "Wallet Architecture"],
@@ -319,7 +328,12 @@
       "difficulty": "advanced",
       "estimatedTime": "2 weeks",
       "categories": ["Bitcoin", "Infrastructure"],
-      "requiredSkills": ["API design", "Watch-only descriptors", "Webhook security", "BIP-21"],
+      "requiredSkills": [
+        "API design",
+        "Watch-only descriptors",
+        "Webhook security",
+        "BIP-21"
+      ],
       "roadmapSlug": "bitcoin",
       "lessonSlug": "project-processor",
       "prerequisites": ["bitcoind Ops Console", "Transactions", "Mempool & Fees"],
@@ -335,7 +349,11 @@
       "requiredSkills": ["Taproot", "CSV timelocks", "Descriptors", "PSBT"],
       "roadmapSlug": "bitcoin",
       "lessonSlug": "basics-taproot",
-      "prerequisites": ["Taproot & Tapscript", "Multisig & Timelocks", "PSBT Workflows"],
+      "prerequisites": [
+        "Taproot & Tapscript",
+        "Multisig & Timelocks",
+        "PSBT Workflows"
+      ],
       "completionRate": 11
     },
     {
@@ -452,7 +470,11 @@
       "requiredSkills": ["C++", "Core build system", "Functional tests"],
       "roadmapSlug": "bitcoin",
       "lessonSlug": "oss-maintainer",
-      "prerequisites": ["Code Review Practice", "Maintainer Collaboration", "Bitcoin Core & RPC"],
+      "prerequisites": [
+        "Code Review Practice",
+        "Maintainer Collaboration",
+        "Bitcoin Core & RPC"
+      ],
       "completionRate": 5
     }
   ]

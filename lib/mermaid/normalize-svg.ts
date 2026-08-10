@@ -40,10 +40,7 @@ export function normalizeMermaidSvg(svg: string): string {
     .replace(/height\s*:[^;]+;?/gi, "")
     .trim();
 
-  root.setAttribute(
-    "style",
-    [style, "overflow: visible"].filter(Boolean).join("; "),
-  );
+  root.setAttribute("style", [style, "overflow: visible"].filter(Boolean).join("; "));
 
   return new XMLSerializer().serializeToString(root);
 }

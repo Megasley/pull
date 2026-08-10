@@ -29,10 +29,7 @@ export function ReputationPanel({
   summaryText,
 }: ReputationPanelProps) {
   const isProfile = variant === "profile";
-  const maxMonth = Math.max(
-    1,
-    ...reputation.monthly.map((month) => month.total),
-  );
+  const maxMonth = Math.max(1, ...reputation.monthly.map((month) => month.total));
 
   return (
     <div
@@ -105,10 +102,7 @@ export function ReputationPanel({
             <h3 className="text-sm font-medium">Monthly progress</h3>
             <div className="flex h-28 items-end gap-1.5 rounded-none border border-border bg-transparent p-3">
               {reputation.monthly.map((month) => {
-                const height = Math.max(
-                  4,
-                  Math.round((month.total / maxMonth) * 100),
-                );
+                const height = Math.max(4, Math.round((month.total / maxMonth) * 100));
                 return (
                   <div
                     key={month.key}
@@ -158,8 +152,8 @@ export function ReputationPanel({
 
           <p className="mt-5 text-xs text-muted-foreground">
             Reputation measures open source impact - merges, reviews, cadence,
-            diversity, docs, issues, and code reviews. Weighting can evolve;
-            scores stay comparable within each scoring era.
+            diversity, docs, issues, and code reviews. Weighting can evolve; scores stay
+            comparable within each scoring era.
           </p>
         </>
       ) : null}
@@ -245,7 +239,9 @@ function FactorRow({
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className={cn(isProfile ? "text-[13px] font-bold" : "text-sm font-medium")}>
+          <p
+            className={cn(isProfile ? "text-[13px] font-bold" : "text-sm font-medium")}
+          >
             {factor.label}
           </p>
           <p

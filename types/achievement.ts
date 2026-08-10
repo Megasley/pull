@@ -1,8 +1,5 @@
 export type AchievementCategory =
-  | "learning"
-  | "projects"
-  | "open-source"
-  | "milestones";
+  "learning" | "projects" | "open-source" | "milestones";
 
 export type AchievementCriteria =
   | { type: "lessons_completed"; min: number }

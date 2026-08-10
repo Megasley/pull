@@ -25,9 +25,7 @@ export function ProjectSection({
         className,
       )}
     >
-      <h2 className="text-lg font-semibold tracking-tight text-foreground">
-        {title}
-      </h2>
+      <h2 className="text-lg font-semibold tracking-tight text-foreground">{title}</h2>
       {children}
     </section>
   );
@@ -52,11 +50,7 @@ export function ProjectBulletList({ items }: { items: string[] }) {
   );
 }
 
-export function ProjectResourceList({
-  resources,
-}: {
-  resources: ProjectResource[];
-}) {
+export function ProjectResourceList({ resources }: { resources: ProjectResource[] }) {
   return (
     <ul className="space-y-2">
       {resources.map((resource) => (
@@ -80,11 +74,7 @@ export function ProjectResourceList({
   );
 }
 
-export function ProjectExampleRepoList({
-  repos,
-}: {
-  repos: ProjectExampleRepo[];
-}) {
+export function ProjectExampleRepoList({ repos }: { repos: ProjectExampleRepo[] }) {
   return (
     <ul className="space-y-3">
       {repos.map((repo) => (

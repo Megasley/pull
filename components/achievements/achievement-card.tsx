@@ -101,9 +101,7 @@ export function AchievementCard({
             {achievement.description}
           </p>
           <div className="flex flex-wrap gap-2 pt-1 text-[11px] text-muted-foreground">
-            {category ? (
-              <span>{ACHIEVEMENT_CATEGORY_LABELS[category]}</span>
-            ) : null}
+            {category ? <span>{ACHIEVEMENT_CATEGORY_LABELS[category]}</span> : null}
             {typeof achievement.xpReward === "number" && achievement.xpReward > 0 ? (
               <span className="font-mono">+{achievement.xpReward} XP</span>
             ) : null}

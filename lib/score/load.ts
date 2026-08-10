@@ -9,8 +9,7 @@ export async function loadBuilderScore(
   userId: string,
   progressByRoadmap?: Record<string, string[]>,
 ): Promise<BuilderScoreResult> {
-  const progress =
-    progressByRoadmap ?? (await getAllCompletedNodeSlugs(userId));
+  const progress = progressByRoadmap ?? (await getAllCompletedNodeSlugs(userId));
   const roadmaps = buildAllRoadmapProgressSummaries(progress);
 
   const projectsCompleted = roadmaps.reduce(

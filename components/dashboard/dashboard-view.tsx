@@ -65,10 +65,7 @@ function buildSetupItems(
     });
   }
 
-  if (
-    data.projectsInProgress.length === 0 &&
-    data.projectsBuilt.length === 0
-  ) {
+  if (data.projectsInProgress.length === 0 && data.projectsBuilt.length === 0) {
     items.push({
       id: "build",
       title: "Ship a project",
@@ -127,8 +124,7 @@ export function DashboardView({ data, github, signOutAction }: DashboardViewProp
     data.openSourceOpportunities.length > 0;
 
   const hasSkills =
-    profile.skills.length > 0 ||
-    data.achievements.some((item) => item.earned);
+    profile.skills.length > 0 || data.achievements.some((item) => item.earned);
 
   return (
     <SiteContainer className="py-10 pt-12 sm:py-12">
@@ -245,10 +241,7 @@ export function DashboardView({ data, github, signOutAction }: DashboardViewProp
           ) : (
             <p className="font-mono text-xs text-muted-foreground">
               No contribution activity yet —{" "}
-              <Link
-                href="/settings/github"
-                className="underline underline-offset-4"
-              >
+              <Link href="/settings/github" className="underline underline-offset-4">
                 sync GitHub
               </Link>{" "}
               or{" "}

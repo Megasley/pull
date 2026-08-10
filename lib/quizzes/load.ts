@@ -7,9 +7,7 @@ const quizCatalog: Record<string, LessonChapterQuiz[]> = {
   lightning: lightningQuizzes as LessonChapterQuiz[],
 };
 
-export function getChapterQuizzesForRoadmap(
-  roadmapSlug: string,
-): LessonChapterQuiz[] {
+export function getChapterQuizzesForRoadmap(roadmapSlug: string): LessonChapterQuiz[] {
   return quizCatalog[roadmapSlug] ?? [];
 }
 

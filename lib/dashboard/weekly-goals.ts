@@ -108,9 +108,7 @@ async function computeAutoProgress(
   return null;
 }
 
-export async function ensureWeeklyGoals(
-  userId: string,
-): Promise<WeeklyGoalItem[]> {
+export async function ensureWeeklyGoals(userId: string): Promise<WeeklyGoalItem[]> {
   if (!isDatabaseConfigured()) return [];
 
   const db = getDb();
@@ -119,10 +117,7 @@ export async function ensureWeeklyGoals(
     .select()
     .from(userWeeklyGoals)
     .where(
-      and(
-        eq(userWeeklyGoals.userId, userId),
-        eq(userWeeklyGoals.weekStart, weekStart),
-      ),
+      and(eq(userWeeklyGoals.userId, userId), eq(userWeeklyGoals.weekStart, weekStart)),
     );
 
   if (existing.length === 0) {
@@ -145,10 +140,7 @@ export async function ensureWeeklyGoals(
     .select()
     .from(userWeeklyGoals)
     .where(
-      and(
-        eq(userWeeklyGoals.userId, userId),
-        eq(userWeeklyGoals.weekStart, weekStart),
-      ),
+      and(eq(userWeeklyGoals.userId, userId), eq(userWeeklyGoals.weekStart, weekStart)),
     );
 
   const updated: WeeklyGoalItem[] = [];
@@ -184,9 +176,7 @@ export async function incrementCustomWeeklyGoal(
   const rows = await db
     .select()
     .from(userWeeklyGoals)
-    .where(
-      and(eq(userWeeklyGoals.id, goalId), eq(userWeeklyGoals.userId, userId)),
-    )
+    .where(and(eq(userWeeklyGoals.id, goalId), eq(userWeeklyGoals.userId, userId)))
     .limit(1);
 
   const existing = rows[0];

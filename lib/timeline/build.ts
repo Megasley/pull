@@ -15,10 +15,7 @@ import {
   listGithubPullRequests,
 } from "@/lib/github/store";
 import { listRecentUserSubmissions } from "@/lib/submissions/repository";
-import type {
-  ContributionTimelineData,
-  TimelineEvent,
-} from "@/types/timeline";
+import type { ContributionTimelineData, TimelineEvent } from "@/types/timeline";
 
 import { countByType, sortTimelineEvents } from "./filter";
 
@@ -82,10 +79,7 @@ async function listRoadmapCompletions(userId: string): Promise<TimelineEvent[]> 
     })
     .from(xpEvents)
     .where(
-      and(
-        eq(xpEvents.userId, userId),
-        eq(xpEvents.sourceType, "roadmap_complete"),
-      ),
+      and(eq(xpEvents.userId, userId), eq(xpEvents.sourceType, "roadmap_complete")),
     )
     .orderBy(desc(xpEvents.createdAt))
     .limit(50);
@@ -97,8 +91,7 @@ async function listRoadmapCompletions(userId: string): Promise<TimelineEvent[]> 
       type: "roadmap_completion" as const,
       title: `Completed ${roadmap?.title ?? row.sourceKey} roadmap`,
       description:
-        roadmap?.description ??
-        "Finished every lesson on this Pull roadmap.",
+        roadmap?.description ?? "Finished every lesson on this Pull roadmap.",
       occurredAt: row.createdAt,
       href: `/roadmaps/${row.sourceKey}`,
       meta: row.sourceKey,
@@ -122,9 +115,7 @@ export async function loadContributionTimeline(
       preload?.pullRequests
         ? Promise.resolve(preload.pullRequests)
         : listGithubPullRequests(userId, 100),
-      preload?.issues
-        ? Promise.resolve(preload.issues)
-        : listGithubIssues(userId, 100),
+      preload?.issues ? Promise.resolve(preload.issues) : listGithubIssues(userId, 100),
       listReviewEventsForUser(userId),
       listRecentUserSubmissions(userId, 50),
       listRoadmapCompletions(userId),

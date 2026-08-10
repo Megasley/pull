@@ -148,9 +148,7 @@ export function ContributionTimeline({ data }: ContributionTimelineProps) {
           groups.map((group) => (
             <section key={group.key} className="relative pl-2 sm:pl-4">
               <div className="mb-3 flex items-center gap-3">
-                <h2 className="text-sm font-semibold tracking-tight">
-                  {group.label}
-                </h2>
+                <h2 className="text-sm font-semibold tracking-tight">{group.label}</h2>
                 <div className="h-px flex-1 bg-border/60" />
                 <span className="text-xs text-muted-foreground">
                   {group.events.length}

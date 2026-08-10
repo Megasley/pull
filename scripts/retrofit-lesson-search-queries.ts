@@ -60,8 +60,7 @@ function main() {
     // or when curated is set.
     const title =
       typeof data.title === "string" ? data.title : lesson.replace(/-/g, " ");
-    const isTitleOnly =
-      resolved.length === 1 && resolved[0] === title && !curated;
+    const isTitleOnly = resolved.length === 1 && resolved[0] === title && !curated;
 
     if (isTitleOnly || resolved.length === 0) {
       skipped += 1;
@@ -70,10 +69,9 @@ function main() {
 
     // Normalize BIP### zero-padding if re-running over existing values
     data.searchQueries = resolved.map((q) =>
-      q.replace(/^BIP0+(\d+)$/i, (_, n) => `BIP${Number.parseInt(n, 10)}`).replace(
-        /^BOLT0+(\d+)$/i,
-        (_, n) => `BOLT${Number.parseInt(n, 10)}`,
-      ),
+      q
+        .replace(/^BIP0+(\d+)$/i, (_, n) => `BIP${Number.parseInt(n, 10)}`)
+        .replace(/^BOLT0+(\d+)$/i, (_, n) => `BOLT${Number.parseInt(n, 10)}`),
     );
     const next = matter.stringify(parsed.content, data);
     writeFileSync(filePath, next.endsWith("\n") ? next : `${next}\n`);

@@ -1,8 +1,5 @@
 import { parseSkillsInput } from "@/lib/profile/portfolio";
-import {
-  normalizeLookingFor,
-  type LookingForId,
-} from "@/lib/builders/looking-for";
+import { normalizeLookingFor, type LookingForId } from "@/lib/builders/looking-for";
 
 function isHttpUrl(value: string): boolean {
   try {

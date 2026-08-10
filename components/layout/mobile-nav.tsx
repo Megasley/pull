@@ -26,13 +26,7 @@ type MobileNavProps = {
 };
 
 type SectionTone =
-  | "learn"
-  | "build"
-  | "contribute"
-  | "builders"
-  | "workspace"
-  | "profile"
-  | "account";
+  "learn" | "build" | "contribute" | "builders" | "workspace" | "profile" | "account";
 
 const sectionToneClass: Record<SectionTone, string> = {
   learn: "border-l-signal bg-signal/15",
@@ -83,6 +77,7 @@ function NavSection({
     <section
       className={cn("border border-border border-l-4", sectionToneClass[tone])}
     >
+    <section className={cn("border border-border border-l-4", sectionToneClass[tone])}>
       <p
         className={cn(
           "border-b border-border/70 px-3 py-2 font-mono text-[10px] font-medium tracking-[0.14em] uppercase",
@@ -233,9 +228,7 @@ export function MobileNav({
           {isAuthenticated ? (
             <div className="flex items-center gap-3 border border-border bg-card px-3 py-3">
               <Avatar className="size-10 shrink-0 rounded-none border border-border">
-                {avatarUrl ? (
-                  <AvatarImage src={avatarUrl} alt={displayName} />
-                ) : null}
+                {avatarUrl ? <AvatarImage src={avatarUrl} alt={displayName} /> : null}
                 <AvatarFallback className="rounded-none font-mono text-xs">
                   {initials}
                 </AvatarFallback>
@@ -261,11 +254,7 @@ export function MobileNav({
                   title={item.title}
                   tone={toneForNavGroup(item.title)}
                 >
-                  <MobileLink
-                    href={item.href}
-                    pathname={pathname}
-                    onClick={close}
-                  >
+                  <MobileLink href={item.href} pathname={pathname} onClick={close}>
                     {item.title}
                   </MobileLink>
                 </NavSection>
@@ -339,19 +328,11 @@ export function MobileNav({
                     ))}
                     {section.title === "Workspace" ? (
                       <>
-                        <MobileLink
-                          href="/review"
-                          pathname={pathname}
-                          onClick={close}
-                        >
+                        <MobileLink href="/review" pathname={pathname} onClick={close}>
                           Review
                         </MobileLink>
                         {profile?.role === "admin" ? (
-                          <MobileLink
-                            href="/admin"
-                            pathname={pathname}
-                            onClick={close}
-                          >
+                          <MobileLink href="/admin" pathname={pathname} onClick={close}>
                             Admin
                           </MobileLink>
                         ) : null}

@@ -12,10 +12,7 @@ type LessonRendererProps = {
   navigation: LessonNavigation;
 };
 
-export async function LessonRenderer({
-  lesson,
-  navigation,
-}: LessonRendererProps) {
+export async function LessonRenderer({ lesson, navigation }: LessonRendererProps) {
   const roadmap = getRoadmap(lesson.roadmap);
 
   if (!roadmap) {

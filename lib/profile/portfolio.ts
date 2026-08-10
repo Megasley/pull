@@ -73,9 +73,10 @@ export function deriveTechnologies(
 }
 
 /** Make timeline links safe for anonymous public viewers. */
-export function toPublicTimelineEvents<
-  T extends { href: string | null; type: string },
->(events: T[], limit = 12): T[] {
+export function toPublicTimelineEvents<T extends { href: string | null; type: string }>(
+  events: T[],
+  limit = 12,
+): T[] {
   return events.slice(0, limit).map((event) => {
     if (!event.href) return event;
     if (event.href.startsWith("http")) return event;

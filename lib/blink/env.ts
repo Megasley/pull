@@ -1,9 +1,7 @@
 /** Blink receive-only env (API key never exposed to the client). */
 
 export function getBlinkApiUrl(): string {
-  return (
-    process.env.BLINK_API_URL?.trim() || "https://api.blink.sv/graphql"
-  );
+  return process.env.BLINK_API_URL?.trim() || "https://api.blink.sv/graphql";
 }
 
 export function getBlinkApiKey(): string | null {

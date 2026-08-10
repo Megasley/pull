@@ -2,10 +2,7 @@
  * Smoke checks for smart issue recommendations.
  * Run: npx tsx scripts/verify-issue-recommendations.ts
  */
-import {
-  getAllCuratedIssues,
-  recommendIssues,
-} from "../lib/issues/engine";
+import { getAllCuratedIssues, recommendIssues } from "../lib/issues/engine";
 
 function assert(condition: boolean, message: string) {
   if (!condition) throw new Error(message);

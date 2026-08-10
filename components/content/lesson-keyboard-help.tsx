@@ -33,7 +33,8 @@ export function LessonKeyboardHelp({
   }
 
   const shortcuts = baseShortcuts.filter(
-    (shortcut) => !("requiresAuth" in shortcut && shortcut.requiresAuth) || canToggleComplete,
+    (shortcut) =>
+      !("requiresAuth" in shortcut && shortcut.requiresAuth) || canToggleComplete,
   );
 
   return (

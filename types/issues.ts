@@ -2,11 +2,7 @@ import type { RoadmapDifficulty } from "@/types";
 import type { DiscoveryTrack } from "@/types/discovery";
 
 export type IssueCategory =
-  | "good_first_issue"
-  | "help_wanted"
-  | "documentation"
-  | "bug_fix"
-  | "feature_request";
+  "good_first_issue" | "help_wanted" | "documentation" | "bug_fix" | "feature_request";
 
 export type CuratedIssue = {
   id: string;

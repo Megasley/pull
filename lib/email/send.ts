@@ -19,9 +19,7 @@ export type SendEmailResult =
   | { ok: true; id: string | null }
   | { ok: false; reason: "not_configured" | "send_failed"; error?: unknown };
 
-export async function sendEmail(
-  input: SendEmailInput,
-): Promise<SendEmailResult> {
+export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult> {
   if (!isEmailConfigured()) {
     return { ok: false, reason: "not_configured" };
   }
