@@ -4,6 +4,9 @@ const GITHUB_REPO_PATTERN =
 const GITHUB_PR_PATTERN =
   /^https:\/\/(www\.)?github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+\/pull\/\d+\/?$/;
 
+export const MAX_SCREENSHOTS = 8;
+export const MAX_URL_LENGTH = 2048;
+
 function isHttpUrl(value: string): boolean {
   try {
     const url = new URL(value);
@@ -25,14 +28,17 @@ export function parseScreenshotUrls(raw: string | string[] | undefined): string[
 
   const lines = Array.isArray(raw) ? raw : raw.split(/\r?\n/);
 
-  return [
-    ...new Set(
-      lines
-        .map((line) => line.trim())
-        .filter(Boolean)
-        .map((line) => line.replace(/\/$/, "")),
-    ),
-  ];
+  const unique = new Set<string>();
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    if (!line) continue;
+    const normalized = line.replace(/\/$/, "");
+    if (normalized.length > MAX_URL_LENGTH) continue;
+    unique.add(normalized);
+    if (unique.size >= MAX_SCREENSHOTS) break;
+  }
+
+  return [...unique];
 }
 
 export type SubmissionValidationResult =
@@ -64,8 +70,32 @@ export function validateSubmissionInput(
   const prUrl = normalizeOptionalUrl(input.prUrl);
   const liveDemoUrl = normalizeOptionalUrl(input.liveDemoUrl);
   const videoDemoUrl = normalizeOptionalUrl(input.videoDemoUrl);
-  const screenshotUrls = parseScreenshotUrls(input.screenshotUrls);
   const notes = input.notes?.trim() ?? "";
+
+  const rawLines: string[] = !input.screenshotUrls
+    ? []
+    : Array.isArray(input.screenshotUrls)
+      ? input.screenshotUrls
+      : input.screenshotUrls.split(/\r?\n/);
+  const trimmedLines = rawLines.map((l) => l.trim()).filter(Boolean);
+
+  if (trimmedLines.length > MAX_SCREENSHOTS) {
+    return {
+      ok: false,
+      error: `Too many screenshots. At most ${MAX_SCREENSHOTS} screenshot URLs may be provided.`,
+    };
+  }
+
+  for (const line of trimmedLines) {
+    if (line.length > MAX_URL_LENGTH) {
+      return {
+        ok: false,
+        error: `Screenshot URL exceeds ${MAX_URL_LENGTH} characters: ${line.slice(0, 80)}…`,
+      };
+    }
+  }
+
+  const screenshotUrls = parseScreenshotUrls(input.screenshotUrls);
 
   if (options.requireRepo && !repoUrl) {
     return { ok: false, error: "A GitHub repository URL is required to submit." };

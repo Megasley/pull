@@ -7,6 +7,13 @@ import type {
 } from "@/types/score";
 
 import {
+  buildScoreSummary,
+  clampScore,
+  saturate as saturateBase,
+  strengthFromNormalized as strengthFromNormalizedBase,
+} from "@/lib/scoring/normalize";
+
+import {
   BUILDER_SCORE_TARGETS,
   BUILDER_SCORE_VERSION,
   BUILDER_SCORE_WEIGHTS,
@@ -47,42 +54,25 @@ const FACTOR_COPY: Record<
  * Keeps early progress meaningful without hard cliffs.
  */
 export function saturate(raw: number, target: number): number {
-  if (raw <= 0 || target <= 0) return 0;
-  const ratio = raw / target;
-  return 1 - Math.exp(-1.4 * ratio);
+  return saturateBase(raw, target, 1.4);
 }
 
 export function strengthFromNormalized(normalized: number): BuilderScoreStrength {
-  if (normalized >= 0.85) return "exceptional";
-  if (normalized >= 0.55) return "strong";
-  if (normalized >= 0.25) return "building";
-  return "emerging";
-}
-
-function clampScore(value: number): number {
-  return Math.max(0, Math.min(100, Math.round(value)));
+  return strengthFromNormalizedBase(normalized) as BuilderScoreStrength;
 }
 
 function buildSummary(score: number, factors: BuilderScoreFactor[]): string {
-  const top = [...factors].sort((a, b) => b.strengthPercent - a.strengthPercent)[0];
-
-  if (score === 0) {
-    return "Your Builder Score grows as you complete projects, earn approvals, finish roadmaps, contribute to open source, review community work, and keep a steady cadence.";
-  }
-
-  if (score < 25) {
-    return `You're getting started. Focus on finishing projects and shipping reviewed work to raise your score.${top ? ` ${top.label} is already moving.` : ""}`;
-  }
-
-  if (score < 50) {
-    return `Solid foundation. Approvals and consistent weekly building will lift this further.${top ? ` Strongest signal today: ${top.label.toLowerCase()}.` : ""}`;
-  }
-
-  if (score < 75) {
-    return `You're building real credibility through verified work.${top ? ` ${top.label} stands out.` : ""} Keep shipping and reviewing to push higher.`;
-  }
-
-  return `High Builder Score driven by verified building activity.${top ? ` ${top.label} is a standout strength.` : ""} Scores stay dynamic as you keep contributing.`;
+  return buildScoreSummary(score, factors, {
+    zero: "Your Builder Score grows as you complete projects, earn approvals, finish roadmaps, contribute to open source, review community work, and keep a steady cadence.",
+    early: (top) =>
+      `You're getting started. Focus on finishing projects and shipping reviewed work to raise your score.${top ? ` ${top} is already moving.` : ""}`,
+    solid: (top) =>
+      `Solid foundation. Approvals and consistent weekly building will lift this further.${top ? ` Strongest signal today: ${top.toLowerCase()}.` : ""}`,
+    meaningful: (top) =>
+      `You're building real credibility through verified work.${top ? ` ${top} stands out.` : ""} Keep shipping and reviewing to push higher.`,
+    high: (top) =>
+      `High Builder Score driven by verified building activity.${top ? ` ${top} is a standout strength.` : ""} Scores stay dynamic as you keep contributing.`,
+  });
 }
 
 export function calculateBuilderScore(inputs: BuilderScoreInputs): BuilderScoreResult {
