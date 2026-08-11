@@ -67,8 +67,8 @@ export const developerTools: DeveloperTool[] = [
     tags: ["Lightning", "Bitcoin", "API", "Payments", "LNURL"],
     openSource: false,
     difficulty: "Intermediate",
-    website: "https://ibexmercado.com",
-    docs: "https://docs.ibexmercado.com",
+    website: "https://www.poweredbyibex.io",
+    docs: "https://docs.poweredbyibex.io",
     logo: "IX",
     featured: true,
     sponsored: false,
@@ -93,7 +93,58 @@ export const developerTools: DeveloperTool[] = [
       },
     ],
     tutorials: [
-      { title: "IBEX Hub API reference", href: "https://docs.ibexmercado.com" },
+      { title: "IBEX Hub API reference", href: "https://docs.poweredbyibex.io" },
+    ],
+  },
+  {
+    id: "mavapay",
+    slug: "mavapay",
+    name: "Mavapay",
+    description:
+      "Payment APIs for Bitcoin Lightning, fiat rails, and payouts across African markets.",
+    overview:
+      "Mavapay provides REST APIs to buy and sell Bitcoin via Lightning or on-chain, accept local-currency payments, verify customers, and run bank or mobile-money payouts — with staging on Signet for safe integration testing.",
+    whyUse: [
+      "Quote-based flows for fiat ↔ Bitcoin with Lightning autopayout.",
+      "Staging and production environments with webhook support.",
+      "Strong fit for remittance, payroll, and commerce in Africa.",
+    ],
+    buildUseCase: "Payment Apps",
+    category: "APIs",
+    tags: ["Lightning", "Bitcoin", "API", "Payments", "Remittance"],
+    openSource: false,
+    difficulty: "Intermediate",
+    website: "https://mavapay.co",
+    docs: "https://docs.mavapay.co",
+    logo: "MV",
+    featured: true,
+    sponsored: false,
+    featuredPartner: false,
+    clicks: 0,
+    websiteClicks: 0,
+    docsClicks: 0,
+    learningPaths: [
+      { title: "Lightning roadmap", href: "/roadmaps/lightning" },
+      { title: "Bitcoin roadmap", href: "/roadmaps/bitcoin" },
+    ],
+    projectIdeas: [
+      {
+        title: "Payment Apps",
+        description: "Build fiat-to-Lightning remittance flows with Mavapay quotes and autopayout.",
+        href: "/projects",
+      },
+      {
+        title: "Merchant Checkout",
+        description: "Accept local currency and settle Bitcoin to Lightning invoices.",
+        href: "/projects",
+      },
+    ],
+    tutorials: [
+      { title: "Mavapay developer docs", href: "https://docs.mavapay.co" },
+      {
+        title: "Buy Bitcoin via Lightning",
+        href: "https://docs.mavapay.co/guides/buying-bitcoin",
+      },
     ],
   },
   {
