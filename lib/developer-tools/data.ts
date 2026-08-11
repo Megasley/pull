@@ -50,26 +50,26 @@ export const developerTools: DeveloperTool[] = [
     ],
   },
   {
-    id: "lightspark",
-    slug: "lightspark",
-    name: "Lightspark",
+    id: "ibex",
+    slug: "ibex",
+    name: "IBEX",
     description:
-      "Enterprise Lightning infrastructure and APIs for global Bitcoin payments.",
+      "Bitcoin and Lightning APIs for invoices, on-chain, and LNURL without running your own node.",
     overview:
-      "Lightspark provides Lightning network infrastructure and developer APIs aimed at companies that need reliable, scalable Lightning connectivity without operating every node themselves.",
+      "IBEX Hub is a hosted API for Lightning invoices, on-chain payments, LNURL, and webhooks — with managed node and liquidity so fintech and merchant apps can ship Bitcoin rails without operating infrastructure.",
     whyUse: [
-      "Enterprise-oriented Lightning infrastructure.",
-      "APIs designed for payment products at scale.",
-      "Useful when exploring production Lightning architecture.",
+      "Sandbox and production environments for safe integration testing.",
+      "Lightning, on-chain, and LNURL in one API surface.",
+      "Managed liquidity and node ops for payment products.",
     ],
     buildUseCase: "Payment Apps",
     category: "APIs",
-    tags: ["Lightning", "API", "Payments", "Enterprise"],
+    tags: ["Lightning", "Bitcoin", "API", "Payments", "LNURL"],
     openSource: false,
-    difficulty: "Advanced",
-    website: "https://www.lightspark.com",
-    docs: "https://docs.lightspark.com",
-    logo: "LS",
+    difficulty: "Intermediate",
+    website: "https://ibexmercado.com",
+    docs: "https://docs.ibexmercado.com",
+    logo: "IX",
     featured: true,
     sponsored: false,
     featuredPartner: false,
@@ -78,12 +78,22 @@ export const developerTools: DeveloperTool[] = [
     docsClicks: 0,
     learningPaths: [
       { title: "Lightning roadmap", href: "/roadmaps/lightning" },
+      { title: "Bitcoin roadmap", href: "/roadmaps/bitcoin" },
     ],
     projectIdeas: [
       {
         title: "Merchant Checkout",
-        description: "Prototype Lightning checkout with Lightspark APIs.",
+        description: "Accept Lightning and on-chain payments with IBEX Hub.",
+        href: "/projects",
       },
+      {
+        title: "Payment Apps",
+        description: "Prototype remittance or wallet flows with IBEX accounts and webhooks.",
+        href: "/projects",
+      },
+    ],
+    tutorials: [
+      { title: "IBEX Hub API reference", href: "https://docs.ibexmercado.com" },
     ],
   },
   {

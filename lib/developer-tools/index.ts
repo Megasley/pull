@@ -26,7 +26,7 @@ export function listDeveloperTools(): DeveloperTool[] {
 }
 
 export function listFeaturedPartners(): DeveloperTool[] {
-  const preferredOrder = ["blink-api", "breez-sdk", "voltage", "lightspark"];
+  const preferredOrder = ["blink-api", "breez-sdk", "voltage", "ibex"];
   return publishedTools
     .filter((tool) => tool.featuredPartner)
     .sort((a, b) => {
