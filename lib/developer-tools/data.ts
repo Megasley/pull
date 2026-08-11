@@ -97,6 +97,53 @@ export const developerTools: DeveloperTool[] = [
     ],
   },
   {
+    id: "bitnob",
+    slug: "bitnob",
+    name: "Bitnob",
+    description:
+      "Bitcoin and Lightning APIs for African merchants, payouts, and payment apps.",
+    overview:
+      "Bitnob provides hosted REST APIs for Lightning invoices, on-chain Bitcoin, LNURL payouts, and webhook-driven workflows with sandbox Signet and production environments — tailored for merchants, fintechs, and remittance flows building in African markets.",
+    whyUse: [
+      "Sandbox Signet and production environments for safe integration testing.",
+      "Lightning, on-chain, and LNURL payouts in one API surface with webhooks.",
+      "Strong fit for commerce, remittance, and payout workflows in Africa.",
+    ],
+    buildUseCase: "Payment Apps",
+    category: "APIs",
+    tags: ["Lightning", "Bitcoin", "API", "Payments", "LNURL", "Africa"],
+    openSource: false,
+    difficulty: "Intermediate",
+    website: "https://bitnob.com",
+    docs: "https://bitnob.dev/",
+    logo: "BN",
+    featured: true,
+    sponsored: false,
+    featuredPartner: false,
+    clicks: 0,
+    websiteClicks: 0,
+    docsClicks: 0,
+    learningPaths: [
+      { title: "Lightning roadmap", href: "/roadmaps/lightning" },
+      { title: "Bitcoin roadmap", href: "/roadmaps/bitcoin" },
+    ],
+    projectIdeas: [
+      {
+        title: "Merchant Checkout",
+        description: "Accept Lightning and on-chain payments with the Bitnob Checkout API.",
+        href: "/projects",
+      },
+      {
+        title: "Payment Apps",
+        description: "Prototype remittance or payroll flows with LNURL payouts and webhooks.",
+        href: "/projects",
+      },
+    ],
+    tutorials: [
+      { title: "Bitnob API docs", href: "https://bitnob.dev/" },
+    ],
+  },
+  {
     id: "mavapay",
     slug: "mavapay",
     name: "Mavapay",

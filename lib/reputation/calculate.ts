@@ -8,7 +8,16 @@ import type {
   ReputationStrength,
 } from "@/types/reputation";
 
+import {
+  buildScoreSummary,
+  clampScore,
+  saturate as saturateBase,
+  strengthFromNormalized as strengthFromNormalizedBase,
+} from "@/lib/scoring/normalize";
+
 import { REPUTATION_TARGETS, REPUTATION_VERSION, REPUTATION_WEIGHTS } from "./weights";
+
+const REPUTATION_SATURATION_COEFFICIENT = 1.35;
 
 const FACTOR_COPY: Record<ReputationFactorId, { label: string; description: string }> =
   {
@@ -43,37 +52,25 @@ const FACTOR_COPY: Record<ReputationFactorId, { label: string; description: stri
   };
 
 export function saturate(raw: number, target: number): number {
-  if (raw <= 0 || target <= 0) return 0;
-  return 1 - Math.exp(-1.35 * (raw / target));
+  return saturateBase(raw, target, REPUTATION_SATURATION_COEFFICIENT);
 }
 
 export function strengthFromNormalized(normalized: number): ReputationStrength {
-  if (normalized >= 0.85) return "exceptional";
-  if (normalized >= 0.55) return "strong";
-  if (normalized >= 0.25) return "building";
-  return "emerging";
-}
-
-function clampScore(value: number): number {
-  return Math.max(0, Math.min(100, Math.round(value)));
+  return strengthFromNormalizedBase(normalized) as ReputationStrength;
 }
 
 function buildSummary(score: number, factors: ReputationFactor[]): string {
-  const top = [...factors].sort((a, b) => b.strengthPercent - a.strengthPercent)[0];
-
-  if (score === 0) {
-    return "Open Source Reputation grows from merged PRs, reviews, steady contribution months, repo diversity, docs work, issues, and code reviews.";
-  }
-  if (score < 25) {
-    return `Early OSS signal. Land merged PRs and stay active month to month.${top ? ` ${top.label} is leading.` : ""}`;
-  }
-  if (score < 50) {
-    return `Solid open source footprint. Diversifying repos and reviewing others will lift this.${top ? ` Strongest area: ${top.label.toLowerCase()}.` : ""}`;
-  }
-  if (score < 75) {
-    return `Meaningful open source impact. Keep merging and mentoring through reviews.${top ? ` ${top.label} stands out.` : ""}`;
-  }
-  return `High open source reputation driven by sustained, verified contribution.${top ? ` ${top.label} is a signature strength.` : ""}`;
+  return buildScoreSummary(score, factors, {
+    zero: "Open Source Reputation grows from merged PRs, reviews, steady contribution months, repo diversity, docs work, issues, and code reviews.",
+    early: (top) =>
+      `Early OSS signal. Land merged PRs and stay active month to month.${top ? ` ${top} is leading.` : ""}`,
+    solid: (top) =>
+      `Solid open source footprint. Diversifying repos and reviewing others will lift this.${top ? ` Strongest area: ${top.toLowerCase()}.` : ""}`,
+    meaningful: (top) =>
+      `Meaningful open source impact. Keep merging and mentoring through reviews.${top ? ` ${top} stands out.` : ""}`,
+    high: (top) =>
+      `High open source reputation driven by sustained, verified contribution.${top ? ` ${top} is a signature strength.` : ""}`,
+  });
 }
 
 export function calculateReputation(

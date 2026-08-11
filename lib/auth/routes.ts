@@ -13,54 +13,66 @@ export const protectedRoutes = [
   "/admin",
 ] as const;
 
+type ProtectedPattern = (typeof protectedRoutes)[number];
+
+function patternToRegExp(pattern: string): RegExp {
+  const escape = (value: string): string =>
+    value.replace(/[.+^${}()|[\]\\]/g, "\\$&");
+  const parts: string[] = [];
+  let remaining = pattern;
+  while (remaining.length > 0) {
+    const starIdx = remaining.indexOf("*");
+    if (starIdx === -1) {
+      parts.push(escape(remaining));
+      break;
+    }
+    const before = remaining.slice(0, starIdx);
+    parts.push(escape(before));
+    parts.push("[^/]+");
+    remaining = remaining.slice(starIdx + 1);
+  }
+  return new RegExp(`^${parts.join("")}/?$`);
+}
+
+const EXACT_PATH_ROUTES: string[] = [];
+const PREFIX_PATH_ROUTES: string[] = [];
+const WILDCARD_ROUTES: RegExp[] = [];
+
+for (const pattern of protectedRoutes as readonly string[]) {
+  if (pattern.includes("*")) {
+    WILDCARD_ROUTES.push(patternToRegExp(pattern));
+  } else {
+    EXACT_PATH_ROUTES.push(pattern);
+    PREFIX_PATH_ROUTES.push(`${pattern}/`);
+  }
+}
+
+const PROJECTS_SUBMIT_REGEXP = /^\/projects\/[^/]+\/submit\/?$/;
+
 export function isProtectedRoute(pathname: string): boolean {
-  if (pathname === "/start" || pathname.startsWith("/start/")) {
+  if (PROJECTS_SUBMIT_REGEXP.test(pathname)) {
     return true;
   }
 
-  if (pathname === "/onboarding" || pathname.startsWith("/onboarding/")) {
-    return true;
+  for (let i = 0; i < EXACT_PATH_ROUTES.length; i += 1) {
+    if (pathname === EXACT_PATH_ROUTES[i]) {
+      return true;
+    }
   }
 
-  if (pathname === "/dashboard" || pathname.startsWith("/dashboard/")) {
-    return true;
+  for (let i = 0; i < PREFIX_PATH_ROUTES.length; i += 1) {
+    if (pathname.startsWith(PREFIX_PATH_ROUTES[i])) {
+      return true;
+    }
   }
 
-  if (pathname === "/review" || pathname.startsWith("/review/")) {
-    return true;
+  for (let i = 0; i < WILDCARD_ROUTES.length; i += 1) {
+    if (WILDCARD_ROUTES[i].test(pathname)) {
+      return true;
+    }
   }
 
-  if (pathname === "/admin" || pathname.startsWith("/admin/")) {
-    return true;
-  }
-
-  if (pathname === "/achievements" || pathname.startsWith("/achievements/")) {
-    return true;
-  }
-
-  if (pathname === "/settings" || pathname.startsWith("/settings/")) {
-    return true;
-  }
-
-  if (pathname === "/repositories" || pathname.startsWith("/repositories/")) {
-    return true;
-  }
-
-  if (pathname === "/activity" || pathname.startsWith("/activity/")) {
-    return true;
-  }
-
-  if (pathname === "/portfolio" || pathname.startsWith("/portfolio/")) {
-    return true;
-  }
-
-  if (pathname === "/reputation" || pathname.startsWith("/reputation/")) {
-    return true;
-  }
-
-  // Roadmaps + lessons + discover/issues are public to browse;
-  // progress actions and personalization require auth in-app.
-  return /^\/projects\/[^/]+\/submit\/?$/.test(pathname);
+  return false;
 }
 
 /** Routes that need middleware to inspect the session (redirects). */
@@ -72,10 +84,48 @@ export function isAuthMiddlewareRoute(pathname: string): boolean {
   return isProtectedRoute(pathname);
 }
 
+export function isProtectedRoutePattern(pattern: ProtectedPattern, pathname: string): boolean {
+  if (pattern.includes("*")) {
+    return patternToRegExp(pattern).test(pathname);
+  }
+  return pathname === pattern || pathname.startsWith(`${pattern}/`);
+}
+
 export function sanitizeRedirectPath(path: string | null | undefined): string {
-  if (!path || !path.startsWith("/") || path.startsWith("//")) {
+  if (!path) {
     return "/dashboard";
   }
 
-  return path;
+  const normalized = String(path).trim();
+
+  if (!normalized || !normalized.startsWith("/")) {
+    return "/dashboard";
+  }
+
+  if (/\\/.test(normalized)) {
+    return "/dashboard";
+  }
+
+  if (/^\/[\/\\]/.test(normalized)) {
+    return "/dashboard";
+  }
+
+  if (normalized.includes("/..") || normalized.includes("/.")) {
+    return "/dashboard";
+  }
+
+  try {
+    const url = new URL(normalized, "https://placeholder.invalid");
+    if (url.hostname && url.hostname !== "placeholder.invalid") {
+      return "/dashboard";
+    }
+    if (url.protocol !== "https:") {
+      return "/dashboard";
+    }
+    const trimmedPathname = url.pathname.replace(/\/$/, "") || "/";
+    const cleanPath = trimmedPathname + url.search + url.hash;
+    return cleanPath || "/dashboard";
+  } catch {
+    return "/dashboard";
+  }
 }

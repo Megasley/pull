@@ -7,30 +7,52 @@ import { XP_REWARDS } from "@/lib/xp/config";
 import { levelFromXp } from "@/lib/xp/levels";
 import type { XpAwardResult, XpSourceType } from "@/types/xp";
 
-async function syncUserXpTotals(
+async function readUserTotals(userId: string): Promise<{ xp: number; level: number }> {
+  const db = getDb();
+  const rows = await db
+    .select({ xp: users.xp, level: users.level })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+
+  const row = rows[0];
+  if (!row) {
+    return { xp: 0, level: 1 };
+  }
+
+  const xp = Math.max(0, Number(row.xp) || 0);
+  const level = row.level && row.level > 0 ? row.level : levelFromXp(xp);
+  return { xp, level };
+}
+
+export async function reconcileUserXpTotals(
   userId: string,
 ): Promise<{ xp: number; level: number }> {
   const db = getDb();
-  const totals = await db
-    .select({
-      xp: sql<number>`coalesce(sum(${xpEvents.amount}), 0)`,
-    })
-    .from(xpEvents)
-    .where(eq(xpEvents.userId, userId));
 
-  const xp = Number(totals[0]?.xp ?? 0);
-  const level = levelFromXp(xp);
+  return db.transaction(async (tx) => {
+    const [{ xp }] = await tx
+      .select({
+        xp: sql<number>`coalesce(sum(${xpEvents.amount}), 0)`,
+      })
+      .from(xpEvents)
+      .where(eq(xpEvents.userId, userId))
+      .for("update");
 
-  await db
-    .update(users)
-    .set({
-      xp,
-      level,
-      updatedAt: new Date().toISOString(),
-    })
-    .where(eq(users.id, userId));
+    const safeXp = Math.max(0, Number(xp) || 0);
+    const level = levelFromXp(safeXp);
 
-  return { xp, level };
+    await tx
+      .update(users)
+      .set({
+        xp: safeXp,
+        level,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(users.id, userId));
+
+    return { xp: safeXp, level };
+  });
 }
 
 export async function awardXp(input: {
@@ -48,34 +70,61 @@ export async function awardXp(input: {
     input.amount ??
     (input.sourceType === "achievement" ? 0 : XP_REWARDS[input.sourceType]);
 
-  if (amount <= 0) {
-    const totals = await syncUserXpTotals(input.userId);
-    return { awarded: false, amount: 0, totalXp: totals.xp, level: totals.level };
-  }
-
   const db = getDb();
-  const inserted = await db
-    .insert(xpEvents)
-    .values({
-      userId: input.userId,
-      sourceType: input.sourceType,
-      sourceKey: input.sourceKey,
-      amount,
-      metadata: input.metadata ?? {},
-    })
-    .onConflictDoNothing({
-      target: [xpEvents.userId, xpEvents.sourceType, xpEvents.sourceKey],
-    })
-    .returning({ id: xpEvents.id });
 
-  const totals = await syncUserXpTotals(input.userId);
+  return db.transaction(async (tx) => {
+    const [locked] = await tx
+      .select({ xp: users.xp })
+      .from(users)
+      .where(eq(users.id, input.userId))
+      .for("update");
 
-  return {
-    awarded: inserted.length > 0,
-    amount: inserted.length > 0 ? amount : 0,
-    totalXp: totals.xp,
-    level: totals.level,
-  };
+    if (!locked && amount <= 0) {
+      return { awarded: false, amount: 0, totalXp: 0, level: 1 };
+    }
+
+    if (amount <= 0) {
+      const xp = Math.max(0, Number(locked?.xp) || 0);
+      return { awarded: false, amount: 0, totalXp: xp, level: levelFromXp(xp) };
+    }
+
+    const inserted = await tx
+      .insert(xpEvents)
+      .values({
+        userId: input.userId,
+        sourceType: input.sourceType,
+        sourceKey: input.sourceKey,
+        amount,
+        metadata: input.metadata ?? {},
+      })
+      .onConflictDoNothing({
+        target: [xpEvents.userId, xpEvents.sourceType, xpEvents.sourceKey],
+      })
+      .returning({ id: xpEvents.id });
+
+    const wasAwarded = inserted.length > 0;
+    const currentXp = Math.max(0, Number(locked?.xp) || 0);
+    const nextXp = wasAwarded ? currentXp + amount : currentXp;
+    const nextLevel = levelFromXp(nextXp);
+
+    if (wasAwarded) {
+      await tx
+        .update(users)
+        .set({
+          xp: nextXp,
+          level: nextLevel,
+          updatedAt: new Date().toISOString(),
+        })
+        .where(eq(users.id, input.userId));
+    }
+
+    return {
+      awarded: wasAwarded,
+      amount: wasAwarded ? amount : 0,
+      totalXp: nextXp,
+      level: nextLevel,
+    };
+  });
 }
 
 export async function revokeXp(input: {
@@ -88,23 +137,52 @@ export async function revokeXp(input: {
   }
 
   const db = getDb();
-  await db
-    .delete(xpEvents)
-    .where(
-      and(
-        eq(xpEvents.userId, input.userId),
-        eq(xpEvents.sourceType, input.sourceType),
-        eq(xpEvents.sourceKey, input.sourceKey),
-      ),
-    );
 
-  const totals = await syncUserXpTotals(input.userId);
-  return {
-    awarded: true,
-    amount: 0,
-    totalXp: totals.xp,
-    level: totals.level,
-  };
+  return db.transaction(async (tx) => {
+    const [locked] = await tx
+      .select({ xp: users.xp })
+      .from(users)
+      .where(eq(users.id, input.userId))
+      .for("update");
+
+    const currentXp = Math.max(0, Number(locked?.xp) || 0);
+
+    const deleted = await tx
+      .delete(xpEvents)
+      .where(
+        and(
+          eq(xpEvents.userId, input.userId),
+          eq(xpEvents.sourceType, input.sourceType),
+          eq(xpEvents.sourceKey, input.sourceKey),
+        ),
+      )
+      .returning({ amount: xpEvents.amount });
+
+    const revokedAmount = deleted.reduce(
+      (sum, row) => sum + Math.max(0, Number(row.amount) || 0),
+      0,
+    );
+    const nextXp = Math.max(0, currentXp - revokedAmount);
+    const nextLevel = levelFromXp(nextXp);
+
+    if (revokedAmount > 0) {
+      await tx
+        .update(users)
+        .set({
+          xp: nextXp,
+          level: nextLevel,
+          updatedAt: new Date().toISOString(),
+        })
+        .where(eq(users.id, input.userId));
+    }
+
+    return {
+      awarded: true,
+      amount: 0,
+      totalXp: nextXp,
+      level: nextLevel,
+    };
+  });
 }
 
 export async function getUserXpTotals(userId: string) {
@@ -112,5 +190,5 @@ export async function getUserXpTotals(userId: string) {
     return { xp: 0, level: 1 };
   }
 
-  return syncUserXpTotals(userId);
+  return readUserTotals(userId);
 }

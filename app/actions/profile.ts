@@ -3,15 +3,23 @@
 import { revalidatePath } from "next/cache";
 
 import { getCurrentUser } from "@/lib/auth/session";
+import {
+  moderationBlockedMessage,
+  requireActiveAccount,
+} from "@/lib/auth/require-active-account";
 import { updateBuilderProfileFields } from "@/lib/profile/repository";
 import { validateProfileEditInput } from "@/lib/profile/validate";
 import { getBuilderProfile } from "@/lib/auth/ensure-builder-profile";
 
 export async function updatePublicProfileAction(formData: FormData) {
-  const user = await getCurrentUser();
+  const gate = await requireActiveAccount();
 
-  if (!user) {
-    return { ok: false as const, reason: "unauthenticated" as const };
+  if (!gate.ok) {
+    return {
+      ok: false as const,
+      reason: gate.reason,
+      error: moderationBlockedMessage(gate.reason),
+    };
   }
 
   const validation = validateProfileEditInput({
@@ -34,7 +42,7 @@ export async function updatePublicProfileAction(formData: FormData) {
     };
   }
 
-  const updated = await updateBuilderProfileFields(user.id, validation.data);
+  const updated = await updateBuilderProfileFields(gate.profile.id, validation.data);
 
   if (!updated) {
     return {

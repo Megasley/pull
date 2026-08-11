@@ -2,7 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 
-import { getCurrentUser } from "@/lib/auth/session";
+import {
+  moderationBlockedMessage,
+  requireActiveAccount,
+} from "@/lib/auth/require-active-account";
 import { updateEmailNotificationPrefs } from "@/lib/notifications/recipients";
 import {
   normalizeEmailNotificationPrefs,
@@ -10,10 +13,14 @@ import {
 } from "@/types/notifications";
 
 export async function updateEmailNotificationPrefsAction(formData: FormData) {
-  const user = await getCurrentUser();
+  const gate = await requireActiveAccount();
 
-  if (!user) {
-    return { ok: false as const, reason: "unauthenticated" as const };
+  if (!gate.ok) {
+    return {
+      ok: false as const,
+      reason: gate.reason,
+      error: moderationBlockedMessage(gate.reason),
+    };
   }
 
   const prefs = normalizeEmailNotificationPrefs({
@@ -23,7 +30,7 @@ export async function updateEmailNotificationPrefsAction(formData: FormData) {
     product: formData.get("product") === "on",
   } satisfies EmailNotificationPrefs);
 
-  const updated = await updateEmailNotificationPrefs(user.id, prefs);
+  const updated = await updateEmailNotificationPrefs(gate.profile.id, prefs);
 
   if (!updated) {
     return {
