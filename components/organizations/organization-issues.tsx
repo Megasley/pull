@@ -37,9 +37,7 @@ export function OrganizationIssues({ organization }: OrganizationIssuesProps) {
               className="flex h-full flex-col border border-border bg-background p-4"
             >
               <div className="flex flex-wrap items-center gap-2">
-                <Badge
-                  className={difficultyClassName[issue.difficulty]}
-                >
+                <Badge className={difficultyClassName[issue.difficulty]}>
                   {difficultyLabel[issue.difficulty]}
                 </Badge>
                 <span className="font-mono text-[10px] text-muted-foreground">

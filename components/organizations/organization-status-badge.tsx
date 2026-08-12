@@ -14,12 +14,7 @@ export function OrganizationStatusBadge({
 }: OrganizationStatusBadgeProps) {
   if (claimed) {
     return (
-      <Badge
-        className={cn(
-          "border-ink/20 bg-signal/40 text-ink",
-          className,
-        )}
-      >
+      <Badge className={cn("border-ink/20 bg-signal/40 text-ink", className)}>
         Claimed Profile
       </Badge>
     );
@@ -28,10 +23,7 @@ export function OrganizationStatusBadge({
   return (
     <Badge
       variant="outline"
-      className={cn(
-        "gap-1.5 border-ink/20 bg-background text-foreground",
-        className,
-      )}
+      className={cn("gap-1.5 border-ink/20 bg-background text-foreground", className)}
     >
       <span
         className="size-2 shrink-0 rounded-full bg-[oklch(0.84_0.16_95)]"

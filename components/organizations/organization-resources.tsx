@@ -9,9 +9,7 @@ type OrganizationResourcesProps = {
   organization: OrganizationProfile;
 };
 
-export function OrganizationResources({
-  organization,
-}: OrganizationResourcesProps) {
+export function OrganizationResources({ organization }: OrganizationResourcesProps) {
   return (
     <OrganizationSection
       id="learn"

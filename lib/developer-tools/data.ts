@@ -45,9 +45,7 @@ export const developerTools: DeveloperTool[] = [
         href: "/projects",
       },
     ],
-    tutorials: [
-      { title: "Blink developer docs", href: "https://dev.blink.sv" },
-    ],
+    tutorials: [{ title: "Blink developer docs", href: "https://dev.blink.sv" }],
   },
   {
     id: "ibex",
@@ -88,7 +86,8 @@ export const developerTools: DeveloperTool[] = [
       },
       {
         title: "Payment Apps",
-        description: "Prototype remittance or wallet flows with IBEX accounts and webhooks.",
+        description:
+          "Prototype remittance or wallet flows with IBEX accounts and webhooks.",
         href: "/projects",
       },
     ],
@@ -130,18 +129,18 @@ export const developerTools: DeveloperTool[] = [
     projectIdeas: [
       {
         title: "Merchant Checkout",
-        description: "Accept Lightning and on-chain payments with the Bitnob Checkout API.",
+        description:
+          "Accept Lightning and on-chain payments with the Bitnob Checkout API.",
         href: "/projects",
       },
       {
         title: "Payment Apps",
-        description: "Prototype remittance or payroll flows with LNURL payouts and webhooks.",
+        description:
+          "Prototype remittance or payroll flows with LNURL payouts and webhooks.",
         href: "/projects",
       },
     ],
-    tutorials: [
-      { title: "Bitnob API docs", href: "https://bitnob.dev/" },
-    ],
+    tutorials: [{ title: "Bitnob API docs", href: "https://bitnob.dev/" }],
   },
   {
     id: "mavapay",
@@ -177,7 +176,8 @@ export const developerTools: DeveloperTool[] = [
     projectIdeas: [
       {
         title: "Payment Apps",
-        description: "Build fiat-to-Lightning remittance flows with Mavapay quotes and autopayout.",
+        description:
+          "Build fiat-to-Lightning remittance flows with Mavapay quotes and autopayout.",
         href: "/projects",
       },
       {
@@ -198,8 +198,7 @@ export const developerTools: DeveloperTool[] = [
     id: "breez-sdk",
     slug: "breez-sdk",
     name: "Breez",
-    description:
-      "Embed non-custodial Lightning into apps with a multi-platform SDK.",
+    description: "Embed non-custodial Lightning into apps with a multi-platform SDK.",
     overview:
       "The Breez SDK helps developers add Lightning payments to mobile and desktop apps, abstracting node connectivity and common wallet flows so you can focus on product UX.",
     whyUse: [
@@ -222,9 +221,7 @@ export const developerTools: DeveloperTool[] = [
     clicks: 0,
     websiteClicks: 0,
     docsClicks: 0,
-    learningPaths: [
-      { title: "Lightning roadmap", href: "/roadmaps/lightning" },
-    ],
+    learningPaths: [{ title: "Lightning roadmap", href: "/roadmaps/lightning" }],
     projectIdeas: [
       {
         title: "Lightning Wallet",
@@ -266,9 +263,7 @@ export const developerTools: DeveloperTool[] = [
     clicks: 0,
     websiteClicks: 0,
     docsClicks: 0,
-    learningPaths: [
-      { title: "Lightning roadmap", href: "/roadmaps/lightning" },
-    ],
+    learningPaths: [{ title: "Lightning roadmap", href: "/roadmaps/lightning" }],
     projectIdeas: [
       {
         title: "Lightning Wallet",
@@ -311,9 +306,7 @@ export const developerTools: DeveloperTool[] = [
     clicks: 0,
     websiteClicks: 0,
     docsClicks: 0,
-    learningPaths: [
-      { title: "Bitcoin roadmap", href: "/roadmaps/bitcoin" },
-    ],
+    learningPaths: [{ title: "Bitcoin roadmap", href: "/roadmaps/bitcoin" }],
     projectIdeas: [
       {
         title: "Self Custody Tool",
@@ -326,8 +319,7 @@ export const developerTools: DeveloperTool[] = [
     id: "nostr-tools",
     slug: "nostr-tools",
     name: "nostr-tools",
-    description:
-      "Low-level TypeScript toolkit for Nostr clients, relays, and events.",
+    description: "Low-level TypeScript toolkit for Nostr clients, relays, and events.",
     overview:
       "nostr-tools provides primitives for Nostr keys, events, filters, and relay communication — a common foundation for building clients and Lightning-zap enabled social apps.",
     whyUse: [
@@ -350,9 +342,7 @@ export const developerTools: DeveloperTool[] = [
     clicks: 0,
     websiteClicks: 0,
     docsClicks: 0,
-    learningPaths: [
-      { title: "Bitcoin roadmap", href: "/roadmaps/bitcoin" },
-    ],
+    learningPaths: [{ title: "Bitcoin roadmap", href: "/roadmaps/bitcoin" }],
     projectIdeas: [
       {
         title: "Nostr Client",
@@ -365,8 +355,7 @@ export const developerTools: DeveloperTool[] = [
     id: "voltage",
     slug: "voltage",
     name: "Voltage",
-    description:
-      "Managed Lightning and Bitcoin node infrastructure for builders.",
+    description: "Managed Lightning and Bitcoin node infrastructure for builders.",
     overview:
       "Voltage provides hosted Lightning and Bitcoin infrastructure so teams can spin up nodes and services without running hardware ops from scratch.",
     whyUse: [
@@ -388,9 +377,7 @@ export const developerTools: DeveloperTool[] = [
     clicks: 0,
     websiteClicks: 0,
     docsClicks: 0,
-    learningPaths: [
-      { title: "Lightning roadmap", href: "/roadmaps/lightning" },
-    ],
+    learningPaths: [{ title: "Lightning roadmap", href: "/roadmaps/lightning" }],
     projectIdeas: [
       {
         title: "Lightning Wallet",
@@ -402,8 +389,7 @@ export const developerTools: DeveloperTool[] = [
     id: "alby",
     slug: "alby",
     name: "Alby",
-    description:
-      "Browser extension wallet and Lightning tools for the web.",
+    description: "Browser extension wallet and Lightning tools for the web.",
     overview:
       "Alby brings Lightning to the browser with an extension wallet, Nostr support, and APIs that help web apps request payments and identity-related flows.",
     whyUse: [
@@ -426,9 +412,7 @@ export const developerTools: DeveloperTool[] = [
     clicks: 0,
     websiteClicks: 0,
     docsClicks: 0,
-    learningPaths: [
-      { title: "Lightning roadmap", href: "/roadmaps/lightning" },
-    ],
+    learningPaths: [{ title: "Lightning roadmap", href: "/roadmaps/lightning" }],
     projectIdeas: [
       {
         title: "Lightning Wallet",
@@ -446,8 +430,7 @@ export const developerTools: DeveloperTool[] = [
     id: "fedimint",
     slug: "fedimint",
     name: "Fedimint",
-    description:
-      "Federated mint protocol for community Bitcoin custody and e-cash.",
+    description: "Federated mint protocol for community Bitcoin custody and e-cash.",
     overview:
       "Fedimint enables communities to custody Bitcoin collaboratively through federated mints, exposing modules for peg-ins, e-cash notes, and Lightning gateways.",
     whyUse: [
@@ -485,8 +468,7 @@ export const developerTools: DeveloperTool[] = [
     id: "cashu",
     slug: "cashu",
     name: "Cashu",
-    description:
-      "Chaumian e-cash protocol for Bitcoin Lightning mints.",
+    description: "Chaumian e-cash protocol for Bitcoin Lightning mints.",
     overview:
       "Cashu is a free and open-source Chaumian ecash system for Bitcoin. Mints issue blinded tokens that users can hold and transfer with strong privacy properties.",
     whyUse: [
@@ -509,9 +491,7 @@ export const developerTools: DeveloperTool[] = [
     clicks: 0,
     websiteClicks: 0,
     docsClicks: 0,
-    learningPaths: [
-      { title: "Lightning roadmap", href: "/roadmaps/lightning" },
-    ],
+    learningPaths: [{ title: "Lightning roadmap", href: "/roadmaps/lightning" }],
     projectIdeas: [
       {
         title: "Bitcoin Payment App",
@@ -523,8 +503,7 @@ export const developerTools: DeveloperTool[] = [
     id: "lnbits",
     slug: "lnbits",
     name: "LNbits",
-    description:
-      "Extensible Lightning accounts system with apps and APIs.",
+    description: "Extensible Lightning accounts system with apps and APIs.",
     overview:
       "LNbits sits on top of Lightning funding sources and provides multi-account wallets, extensions, and APIs — popular for experiments, faucets, and small Lightning products.",
     whyUse: [
@@ -547,9 +526,7 @@ export const developerTools: DeveloperTool[] = [
     clicks: 0,
     websiteClicks: 0,
     docsClicks: 0,
-    learningPaths: [
-      { title: "Lightning roadmap", href: "/roadmaps/lightning" },
-    ],
+    learningPaths: [{ title: "Lightning roadmap", href: "/roadmaps/lightning" }],
     projectIdeas: [
       {
         title: "Lightning Wallet",
@@ -567,8 +544,7 @@ export const developerTools: DeveloperTool[] = [
     id: "btcpayserver",
     slug: "btcpayserver",
     name: "BTCPay Server",
-    description:
-      "Self-hosted Bitcoin payment processor for merchants and communities.",
+    description: "Self-hosted Bitcoin payment processor for merchants and communities.",
     overview:
       "BTCPay Server is a free, open-source, self-hosted payment processor. Accept Bitcoin and Lightning without fees or intermediaries, with plugins and a strong contributor community.",
     whyUse: [
@@ -678,9 +654,7 @@ export const developerTools: DeveloperTool[] = [
     clicks: 0,
     websiteClicks: 0,
     docsClicks: 0,
-    learningPaths: [
-      { title: "Lightning roadmap", href: "/roadmaps/lightning" },
-    ],
+    learningPaths: [{ title: "Lightning roadmap", href: "/roadmaps/lightning" }],
     projectIdeas: [
       {
         title: "Merchant Checkout",
@@ -716,9 +690,7 @@ export const developerTools: DeveloperTool[] = [
     clicks: 0,
     websiteClicks: 0,
     docsClicks: 0,
-    learningPaths: [
-      { title: "Lightning roadmap", href: "/roadmaps/lightning" },
-    ],
+    learningPaths: [{ title: "Lightning roadmap", href: "/roadmaps/lightning" }],
     projectIdeas: [
       {
         title: "Bitcoin Payment App",
@@ -755,9 +727,7 @@ export const developerTools: DeveloperTool[] = [
     clicks: 0,
     websiteClicks: 0,
     docsClicks: 0,
-    learningPaths: [
-      { title: "Bitcoin roadmap", href: "/roadmaps/bitcoin" },
-    ],
+    learningPaths: [{ title: "Bitcoin roadmap", href: "/roadmaps/bitcoin" }],
     projectIdeas: [
       {
         title: "Self Custody Tool",
@@ -770,8 +740,7 @@ export const developerTools: DeveloperTool[] = [
     id: "nostr",
     slug: "nostr",
     name: "Nostr",
-    description:
-      "Decentralized protocol for notes, identity, and social apps.",
+    description: "Decentralized protocol for notes, identity, and social apps.",
     overview:
       "Nostr is a simple, open protocol for decentralized social networking and signed events. Relays store messages; clients are interchangeable — a major freedom-tech surface for builders.",
     whyUse: [
@@ -794,9 +763,7 @@ export const developerTools: DeveloperTool[] = [
     clicks: 0,
     websiteClicks: 0,
     docsClicks: 0,
-    learningPaths: [
-      { title: "Bitcoin roadmap", href: "/roadmaps/bitcoin" },
-    ],
+    learningPaths: [{ title: "Bitcoin roadmap", href: "/roadmaps/bitcoin" }],
     projectIdeas: [
       {
         title: "Nostr Client",
@@ -814,8 +781,7 @@ export const developerTools: DeveloperTool[] = [
     id: "spark",
     slug: "spark",
     name: "Spark",
-    description:
-      "Bitcoin statechain / Lightning-adjacent toolkit for fast transfers.",
+    description: "Bitcoin statechain / Lightning-adjacent toolkit for fast transfers.",
     overview:
       "Spark is an emerging Bitcoin scaling approach focused on fast off-chain transfers with Bitcoin-backed state. It is useful to track as builders explore L2 and statechain designs.",
     whyUse: [
@@ -876,9 +842,7 @@ export const developerTools: DeveloperTool[] = [
     clicks: 0,
     websiteClicks: 0,
     docsClicks: 0,
-    learningPaths: [
-      { title: "Lightning roadmap", href: "/roadmaps/lightning" },
-    ],
+    learningPaths: [{ title: "Lightning roadmap", href: "/roadmaps/lightning" }],
     projectIdeas: [
       {
         title: "Self Custody Tool",

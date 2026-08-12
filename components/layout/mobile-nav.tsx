@@ -74,9 +74,7 @@ function NavSection({
   children: React.ReactNode;
 }) {
   return (
-    <section
-      className={cn("border border-border border-l-4", sectionToneClass[tone])}
-    >
+    <section className={cn("border border-border border-l-4", sectionToneClass[tone])}>
       <p
         className={cn(
           "border-b border-border/70 px-3 py-2 font-mono text-[10px] font-medium tracking-[0.14em] uppercase",
@@ -301,11 +299,7 @@ export function MobileNav({
                   section.title === "Workspace" ? "workspace" : "profile";
 
                 return (
-                  <NavSection
-                    key={section.title}
-                    title={section.title}
-                    tone={tone}
-                  >
+                  <NavSection key={section.title} title={section.title} tone={tone}>
                     {section.title === "Profile" && profile ? (
                       <MobileLink
                         href={`/u/${profile.username}`}

@@ -31,11 +31,7 @@ export function DeveloperToolBadge({
   );
 }
 
-export function DeveloperToolOpenSourceBadge({
-  openSource,
-}: {
-  openSource: boolean;
-}) {
+export function DeveloperToolOpenSourceBadge({ openSource }: { openSource: boolean }) {
   return (
     <DeveloperToolBadge variant={openSource ? "signal" : "muted"}>
       {openSource ? "Open Source" : "Proprietary"}
@@ -48,9 +44,7 @@ export function DeveloperToolDifficultyBadge({
 }: {
   difficulty: DeveloperToolDifficulty;
 }) {
-  return (
-    <Badge className={difficultyClassName[difficulty]}>{difficulty}</Badge>
-  );
+  return <Badge className={difficultyClassName[difficulty]}>{difficulty}</Badge>;
 }
 
 export function DeveloperToolSponsoredBadge() {

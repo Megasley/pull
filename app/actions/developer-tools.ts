@@ -8,9 +8,7 @@ import {
 } from "@/lib/developer-tools";
 import { siteConfig } from "@/lib/site-config";
 
-export type SuggestDeveloperToolResult =
-  | { ok: true }
-  | { ok: false; error: string };
+export type SuggestDeveloperToolResult = { ok: true } | { ok: false; error: string };
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_SHORT = 120;
@@ -80,7 +78,11 @@ export async function suggestDeveloperToolAction(
   if (submitterName.length > MAX_SHORT) {
     return { ok: false, error: "Name must be 120 characters or fewer." };
   }
-  if (!submitterEmail || !EMAIL_RE.test(submitterEmail) || submitterEmail.length > 254) {
+  if (
+    !submitterEmail ||
+    !EMAIL_RE.test(submitterEmail) ||
+    submitterEmail.length > 254
+  ) {
     return { ok: false, error: "Enter a valid email so we can follow up." };
   }
 
@@ -105,7 +107,8 @@ export async function suggestDeveloperToolAction(
     if (result.reason === "not_configured") {
       return {
         ok: false,
-        error: "Email is not configured yet. Try again later or email hello@pullos.dev.",
+        error:
+          "Email is not configured yet. Try again later or email hello@pullos.dev.",
       };
     }
     return {

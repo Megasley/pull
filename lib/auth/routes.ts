@@ -16,8 +16,7 @@ export const protectedRoutes = [
 type ProtectedPattern = (typeof protectedRoutes)[number];
 
 function patternToRegExp(pattern: string): RegExp {
-  const escape = (value: string): string =>
-    value.replace(/[.+^${}()|[\]\\]/g, "\\$&");
+  const escape = (value: string): string => value.replace(/[.+^${}()|[\]\\]/g, "\\$&");
   const parts: string[] = [];
   let remaining = pattern;
   while (remaining.length > 0) {
@@ -84,7 +83,10 @@ export function isAuthMiddlewareRoute(pathname: string): boolean {
   return isProtectedRoute(pathname);
 }
 
-export function isProtectedRoutePattern(pattern: ProtectedPattern, pathname: string): boolean {
+export function isProtectedRoutePattern(
+  pattern: ProtectedPattern,
+  pathname: string,
+): boolean {
   if (pattern.includes("*")) {
     return patternToRegExp(pattern).test(pathname);
   }

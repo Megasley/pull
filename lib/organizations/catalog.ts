@@ -21,9 +21,7 @@ export function listOrganizationSlugs(): string[] {
   return organizations.map((organization) => organization.slug);
 }
 
-export function getOrganizationBySlug(
-  slug: string,
-): OrganizationProfile | null {
+export function getOrganizationBySlug(slug: string): OrganizationProfile | null {
   return bySlug.get(slug) ?? null;
 }
 

@@ -44,8 +44,7 @@ export function DeveloperToolDetail({ tool }: DeveloperToolDetailProps) {
               {tool.description}
             </p>
             <p className="mt-3 font-mono text-xs text-muted-foreground">
-              <span className="text-foreground/70">Build:</span>{" "}
-              {tool.buildUseCase}
+              <span className="text-foreground/70">Build:</span> {tool.buildUseCase}
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               <Badge variant="outline">{tool.category}</Badge>
@@ -85,10 +84,7 @@ export function DeveloperToolDetail({ tool }: DeveloperToolDetailProps) {
 
       <section aria-labelledby="overview-heading" className="space-y-4">
         <p className="tech-eyebrow">overview</p>
-        <h2
-          id="overview-heading"
-          className="text-2xl font-bold tracking-[-0.03em]"
-        >
+        <h2 id="overview-heading" className="text-2xl font-bold tracking-[-0.03em]">
           Overview
         </h2>
         <p className="max-w-3xl font-mono text-sm leading-relaxed text-muted-foreground sm:text-base">
@@ -117,15 +113,11 @@ export function DeveloperToolDetail({ tool }: DeveloperToolDetailProps) {
       <section aria-labelledby="build-heading" className="space-y-6">
         <div>
           <p className="tech-eyebrow">build // with this tool</p>
-          <h2
-            id="build-heading"
-            className="mt-2 text-2xl font-bold tracking-[-0.03em]"
-          >
+          <h2 id="build-heading" className="mt-2 text-2xl font-bold tracking-[-0.03em]">
             Build with this tool
           </h2>
           <p className="mt-2 max-w-2xl font-mono text-sm text-muted-foreground">
-            Move from discovery into Pull’s Learn → Build → Contribute → Prove
-            loop.
+            Move from discovery into Pull’s Learn → Build → Contribute → Prove loop.
           </p>
         </div>
 
@@ -150,31 +142,18 @@ export function DeveloperToolDetail({ tool }: DeveloperToolDetailProps) {
       {tool.projectIdeas.length > 0 ? (
         <section aria-labelledby="projects-heading" className="space-y-4">
           <p className="tech-eyebrow">projects // suggested</p>
-          <h2
-            id="projects-heading"
-            className="text-2xl font-bold tracking-[-0.03em]"
-          >
+          <h2 id="projects-heading" className="text-2xl font-bold tracking-[-0.03em]">
             Suggested projects
           </h2>
           <ul className="grid gap-3 sm:grid-cols-2">
             {tool.projectIdeas.map((idea) => (
-              <li
-                key={idea.title}
-                className="border border-border bg-background p-4"
-              >
-                <h3 className="text-sm font-semibold tracking-tight">
-                  {idea.title}
-                </h3>
+              <li key={idea.title} className="border border-border bg-background p-4">
+                <h3 className="text-sm font-semibold tracking-tight">{idea.title}</h3>
                 <p className="mt-2 font-mono text-xs leading-relaxed text-muted-foreground">
                   {idea.description}
                 </p>
                 {idea.href ? (
-                  <Button
-                    asChild
-                    variant="ghost"
-                    size="sm"
-                    className="mt-3 -ml-2"
-                  >
+                  <Button asChild variant="ghost" size="sm" className="mt-3 -ml-2">
                     <Link href={idea.href}>Explore projects</Link>
                   </Button>
                 ) : null}
@@ -186,18 +165,13 @@ export function DeveloperToolDetail({ tool }: DeveloperToolDetailProps) {
 
       <section aria-labelledby="resources-heading" className="space-y-4">
         <p className="tech-eyebrow">resources</p>
-        <h2
-          id="resources-heading"
-          className="text-2xl font-bold tracking-[-0.03em]"
-        >
+        <h2 id="resources-heading" className="text-2xl font-bold tracking-[-0.03em]">
           Resources
         </h2>
         <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <ResourceLink title="Documentation" href={tool.docs} />
           <ResourceLink title="Website" href={tool.website} />
-          {tool.github ? (
-            <ResourceLink title="GitHub" href={tool.github} />
-          ) : null}
+          {tool.github ? <ResourceLink title="GitHub" href={tool.github} /> : null}
           {(tool.tutorials ?? []).map((tutorial) => (
             <ResourceLink
               key={tutorial.href}

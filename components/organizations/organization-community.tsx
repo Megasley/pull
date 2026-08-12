@@ -8,9 +8,7 @@ type OrganizationCommunityProps = {
   organization: OrganizationProfile;
 };
 
-export function OrganizationCommunity({
-  organization,
-}: OrganizationCommunityProps) {
+export function OrganizationCommunity({ organization }: OrganizationCommunityProps) {
   return (
     <OrganizationSection
       id="community"

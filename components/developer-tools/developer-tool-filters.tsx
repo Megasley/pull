@@ -1,10 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import type {
-  DeveloperToolCategory,
-  DeveloperToolFilter,
-} from "@/lib/developer-tools";
+import type { DeveloperToolCategory, DeveloperToolFilter } from "@/lib/developer-tools";
 
 type DeveloperToolFiltersProps = {
   value: DeveloperToolFilter;
