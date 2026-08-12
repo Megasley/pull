@@ -74,11 +74,7 @@ const nextConfig: NextConfig = {
     ],
   },
   experimental: {
-    optimizePackageImports: [
-      "lucide-react",
-      "drizzle-orm",
-      "@supabase/supabase-js",
-    ],
+    optimizePackageImports: ["lucide-react", "drizzle-orm", "@supabase/supabase-js"],
   },
 };
 

@@ -3,10 +3,7 @@ import { notFound } from "next/navigation";
 
 import { DeveloperToolDetail } from "@/components/developer-tools/developer-tool-detail";
 import { SiteContainer } from "@/components/layout/site-container";
-import {
-  getDeveloperToolBySlug,
-  listDeveloperToolSlugs,
-} from "@/lib/developer-tools";
+import { getDeveloperToolBySlug, listDeveloperToolSlugs } from "@/lib/developer-tools";
 import { siteConfig } from "@/lib/site-config";
 
 type DeveloperToolPageProps = {
@@ -37,9 +34,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function DeveloperToolPage({
-  params,
-}: DeveloperToolPageProps) {
+export default async function DeveloperToolPage({ params }: DeveloperToolPageProps) {
   const { slug } = await params;
   const tool = getDeveloperToolBySlug(slug);
   if (!tool) notFound();

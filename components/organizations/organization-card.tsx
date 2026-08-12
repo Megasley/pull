@@ -8,9 +8,7 @@ type OrganizationDirectoryCardProps = {
   organization: OrganizationDirectoryCard;
 };
 
-export function OrganizationCard({
-  organization,
-}: OrganizationDirectoryCardProps) {
+export function OrganizationCard({ organization }: OrganizationDirectoryCardProps) {
   return (
     <article className="flex h-full flex-col border border-border bg-background p-4 transition-colors hover:bg-muted/20">
       <div className="flex items-start gap-3">
@@ -35,9 +33,7 @@ export function OrganizationCard({
 
       <dl className="mt-4 grid grid-cols-2 gap-2 font-mono text-[11px]">
         <div className="border border-border px-2 py-1.5">
-          <dt className="text-muted-foreground uppercase tracking-wide">
-            Projects
-          </dt>
+          <dt className="text-muted-foreground uppercase tracking-wide">Projects</dt>
           <dd className="mt-0.5 text-sm font-bold text-foreground">
             {organization.projectCount}
           </dd>

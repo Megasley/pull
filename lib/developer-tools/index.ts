@@ -73,12 +73,7 @@ export function filterDeveloperTools(input: {
       return false;
     }
     if (!q) return true;
-    const haystack = [
-      tool.name,
-      tool.description,
-      tool.category,
-      ...tool.tags,
-    ]
+    const haystack = [tool.name, tool.description, tool.category, ...tool.tags]
       .join(" ")
       .toLowerCase();
     return haystack.includes(q);

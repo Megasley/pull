@@ -148,15 +148,24 @@ describe("lib/reputation/calculate — numeric invariants", () => {
         maintainerReviewComments: Math.round(
           (REPUTATION_TARGETS.maintainer_reviews ?? 10) * multiplier,
         ),
-        activeMonths: Math.round((REPUTATION_TARGETS.contribution_frequency ?? 6) * multiplier),
-        uniqueRepos: Math.round((REPUTATION_TARGETS.repository_diversity ?? 5) * multiplier),
+        activeMonths: Math.round(
+          (REPUTATION_TARGETS.contribution_frequency ?? 6) * multiplier,
+        ),
+        uniqueRepos: Math.round(
+          (REPUTATION_TARGETS.repository_diversity ?? 5) * multiplier,
+        ),
         documentationContributions: Math.round(
           (REPUTATION_TARGETS.documentation_contributions ?? 5) * multiplier,
         ),
-        issueDiscussions: Math.round((REPUTATION_TARGETS.issue_discussions ?? 5) * multiplier),
+        issueDiscussions: Math.round(
+          (REPUTATION_TARGETS.issue_discussions ?? 5) * multiplier,
+        ),
         codeReviews: Math.round((REPUTATION_TARGETS.code_reviews ?? 5) * multiplier),
       };
-      const { score, factors } = calculateReputation(inputs, { monthly: [], milestones: [] });
+      const { score, factors } = calculateReputation(inputs, {
+        monthly: [],
+        milestones: [],
+      });
       expect(Number.isInteger(score)).toBe(true);
       expect(score).toBeGreaterThanOrEqual(0);
       expect(score).toBeLessThanOrEqual(100);
@@ -177,7 +186,10 @@ describe("lib/reputation/calculate — numeric invariants", () => {
       issueDiscussions: 8,
       codeReviews: 12,
     };
-    const { score, factors } = calculateReputation(inputs, { monthly: [], milestones: [] });
+    const { score, factors } = calculateReputation(inputs, {
+      monthly: [],
+      milestones: [],
+    });
     const expectedRaw = factors.reduce(
       (sum, f) => sum + REPUTATION_WEIGHTS[f.id] * (f.strengthPercent / 100),
       0,
@@ -212,14 +224,24 @@ describe("lib/score/calculate — numeric invariants", () => {
     for (let i = 0; i < 20; i += 1) {
       const m = 0.1 + i * 0.5;
       const inputs: BuilderScoreInputs = {
-        projectsCompleted: Math.round((BUILDER_SCORE_TARGETS.projects_completed ?? 5) * m),
-        projectsApproved: Math.round((BUILDER_SCORE_TARGETS.projects_approved ?? 5) * m),
-        roadmapsCompleted: Math.round((BUILDER_SCORE_TARGETS.roadmaps_completed ?? 2) * m),
+        projectsCompleted: Math.round(
+          (BUILDER_SCORE_TARGETS.projects_completed ?? 5) * m,
+        ),
+        projectsApproved: Math.round(
+          (BUILDER_SCORE_TARGETS.projects_approved ?? 5) * m,
+        ),
+        roadmapsCompleted: Math.round(
+          (BUILDER_SCORE_TARGETS.roadmaps_completed ?? 2) * m,
+        ),
         openSourceContributions: Math.round(
           (BUILDER_SCORE_TARGETS.open_source_contributions ?? 5) * m,
         ),
-        communityReviews: Math.round((BUILDER_SCORE_TARGETS.community_reviews ?? 5) * m),
-        activeWeeks: Math.round((BUILDER_SCORE_TARGETS.contribution_consistency ?? 12) * m),
+        communityReviews: Math.round(
+          (BUILDER_SCORE_TARGETS.community_reviews ?? 5) * m,
+        ),
+        activeWeeks: Math.round(
+          (BUILDER_SCORE_TARGETS.contribution_consistency ?? 12) * m,
+        ),
       };
       const { score, factors } = calculateBuilderScore(inputs);
       expect(Number.isInteger(score)).toBe(true);
@@ -352,12 +374,21 @@ describe("lib/auth/routes — isProtectedRoute matches every protectedRoutes tup
     expect(isProtectedRoute("/sign-in")).toBe(false);
   });
 
-  it.each(["/start", "/onboarding", "/dashboard", "/achievements", "/settings", "/repositories", "/activity", "/portfolio", "/reputation", "/review", "/admin"])(
-    "exact protected route %s is detected",
-    (route) => {
-      expect(isProtectedRoute(route)).toBe(true);
-    },
-  );
+  it.each([
+    "/start",
+    "/onboarding",
+    "/dashboard",
+    "/achievements",
+    "/settings",
+    "/repositories",
+    "/activity",
+    "/portfolio",
+    "/reputation",
+    "/review",
+    "/admin",
+  ])("exact protected route %s is detected", (route) => {
+    expect(isProtectedRoute(route)).toBe(true);
+  });
 
   it.each([
     ["/start/something", true],
@@ -412,7 +443,10 @@ describe("lib/submissions/validate", () => {
   });
 
   it("rejects when requireRepo=true and repoUrl is missing", () => {
-    const r = validateSubmissionInput({ ...VALID_BASE, repoUrl: "" }, { requireRepo: true });
+    const r = validateSubmissionInput(
+      { ...VALID_BASE, repoUrl: "" },
+      { requireRepo: true },
+    );
     expect(r.ok).toBe(false);
   });
 
@@ -474,7 +508,8 @@ describe("lib/submissions/validate", () => {
     const r = validateSubmissionInput(
       {
         ...VALID_BASE,
-        screenshotUrls: "https://a.com/1.png\nhttps://a.com/1.png/\nhttps://a.com/2.png",
+        screenshotUrls:
+          "https://a.com/1.png\nhttps://a.com/1.png/\nhttps://a.com/2.png",
       },
       { requireRepo: false },
     );
@@ -504,7 +539,9 @@ describe("lib/profile/validate", () => {
   it("rejects displayName < 2 or > 80", () => {
     expect(validateProfileEditInput({ ...BASE, displayName: "A" }).ok).toBe(false);
     expect(validateProfileEditInput({ ...BASE, displayName: "" }).ok).toBe(false);
-    expect(validateProfileEditInput({ ...BASE, displayName: "A".repeat(81) }).ok).toBe(false);
+    expect(validateProfileEditInput({ ...BASE, displayName: "A".repeat(81) }).ok).toBe(
+      false,
+    );
   });
 
   it("rejects bio > 500 chars", () => {
@@ -513,7 +550,9 @@ describe("lib/profile/validate", () => {
 
   it("rejects invalid http URLs for website/twitter/linkedin", () => {
     expect(validateProfileEditInput({ ...BASE, website: "ftp://x.y" }).ok).toBe(false);
-    expect(validateProfileEditInput({ ...BASE, twitterUrl: "not a url" }).ok).toBe(false);
+    expect(validateProfileEditInput({ ...BASE, twitterUrl: "not a url" }).ok).toBe(
+      false,
+    );
   });
 
   it("force-lists listedInDirectory=false when profilePublic=false", () => {
@@ -551,7 +590,9 @@ describe("lib/reviews/community", () => {
   it("isClaimActive returns false with missing fields", () => {
     expect(isClaimActive({ claimedBy: null, claimExpiresAt: null })).toBe(false);
     expect(isClaimActive({ claimedBy: "u1", claimExpiresAt: null })).toBe(false);
-    expect(isClaimActive({ claimedBy: null, claimExpiresAt: "2099-01-01T00:00:00Z" })).toBe(false);
+    expect(
+      isClaimActive({ claimedBy: null, claimExpiresAt: "2099-01-01T00:00:00Z" }),
+    ).toBe(false);
   });
 
   it("isClaimActive: future expiry → active; past expiry → inactive", () => {
@@ -561,7 +602,13 @@ describe("lib/reviews/community", () => {
     expect(isClaimActive({ claimedBy: "u", claimExpiresAt: past })).toBe(false);
     const pinnedNow = new Date();
     const justAfter = new Date(pinnedNow.getTime() + 1000);
-    expect(isClaimActive({ claimedBy: "u", claimExpiresAt: justAfter.toISOString(), now: pinnedNow })).toBe(true);
+    expect(
+      isClaimActive({
+        claimedBy: "u",
+        claimExpiresAt: justAfter.toISOString(),
+        now: pinnedNow,
+      }),
+    ).toBe(true);
   });
 
   it("claimExpiresAtIso is in the future by >= claim minutes - 1 second margin", () => {
@@ -575,12 +622,16 @@ describe("lib/reviews/community", () => {
 
   it("isEligiblePeer blocks reviewing own submission", () => {
     const peerCtx = ctx({ userId: "same-user" });
-    expect(isEligiblePeer(peerCtx, { userId: "same-user", projectId: "p" })).toBe(false);
+    expect(isEligiblePeer(peerCtx, { userId: "same-user", projectId: "p" })).toBe(
+      false,
+    );
   });
 
   it("isEligiblePeer: staff reviewers are always eligible", () => {
     const staffCtx = ctx({ role: "reviewer", isStaff: true, reputation: 0 });
-    expect(isEligiblePeer(staffCtx, { userId: "submitter", projectId: "p" })).toBe(true);
+    expect(isEligiblePeer(staffCtx, { userId: "submitter", projectId: "p" })).toBe(
+      true,
+    );
   });
 
   it("isEligiblePeer: non-staff user who completed same project is eligible", () => {

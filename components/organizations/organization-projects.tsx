@@ -14,9 +14,7 @@ type OrganizationProjectsProps = {
   organization: OrganizationProfile;
 };
 
-export function OrganizationProjects({
-  organization,
-}: OrganizationProjectsProps) {
+export function OrganizationProjects({ organization }: OrganizationProjectsProps) {
   return (
     <OrganizationSection
       id="projects"
