@@ -7,8 +7,7 @@ export const DEVELOPER_TOOL_CATEGORIES = [
   "Protocols",
 ] as const;
 
-export type DeveloperToolCategory =
-  (typeof DEVELOPER_TOOL_CATEGORIES)[number];
+export type DeveloperToolCategory = (typeof DEVELOPER_TOOL_CATEGORIES)[number];
 
 export const DEVELOPER_TOOL_DIFFICULTIES = [
   "Beginner",
@@ -16,8 +15,7 @@ export const DEVELOPER_TOOL_DIFFICULTIES = [
   "Advanced",
 ] as const;
 
-export type DeveloperToolDifficulty =
-  (typeof DEVELOPER_TOOL_DIFFICULTIES)[number];
+export type DeveloperToolDifficulty = (typeof DEVELOPER_TOOL_DIFFICULTIES)[number];
 
 export type DeveloperToolProjectIdea = {
   title: string;

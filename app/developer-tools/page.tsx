@@ -40,9 +40,7 @@ export default async function DeveloperToolsPage({
   const category: DeveloperToolFilter =
     params.category === "All" ||
     (params.category !== undefined &&
-      categories.includes(
-        params.category as (typeof categories)[number],
-      ))
+      categories.includes(params.category as (typeof categories)[number]))
       ? (params.category as DeveloperToolFilter)
       : "All";
 
@@ -101,9 +99,8 @@ export default async function DeveloperToolsPage({
               Suggest a tool
             </h2>
             <p className="mt-2 font-mono text-sm leading-relaxed text-muted-foreground">
-              Know an API, SDK, or infrastructure project builders should
-              discover? Send it our way — we review every suggestion before it
-              goes live.
+              Know an API, SDK, or infrastructure project builders should discover? Send
+              it our way — we review every suggestion before it goes live.
             </p>
           </div>
           <div className="max-w-2xl">

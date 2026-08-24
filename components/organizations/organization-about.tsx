@@ -21,9 +21,7 @@ export function OrganizationAbout({ organization }: OrganizationAboutProps) {
           </p>
         </div>
         <div className="border border-border bg-background p-5">
-          <h3 className="text-sm font-semibold tracking-tight">
-            Why contribute
-          </h3>
+          <h3 className="text-sm font-semibold tracking-tight">Why contribute</h3>
           <ul className="mt-3 space-y-2.5">
             {organization.whyContribute.map((reason) => (
               <li

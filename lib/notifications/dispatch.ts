@@ -34,18 +34,17 @@ function isRetriableSendFailure(result: SendEmailResult): boolean {
   if (result.reason === "not_configured") return false;
 
   const err = result.error as
-    | { statusCode?: number; status?: number }
-    | null
-    | undefined;
+    { statusCode?: number; status?: number } | null | undefined;
 
   const status = err?.statusCode ?? err?.status;
   if (typeof status === "number") {
     if (status === 429 || status >= 500) return true;
   }
 
-  const msg = err && typeof err === "object" && "message" in err
-    ? String((err as { message?: unknown }).message ?? "")
-    : "";
+  const msg =
+    err && typeof err === "object" && "message" in err
+      ? String((err as { message?: unknown }).message ?? "")
+      : "";
 
   return /rate.?limit|too many requests|timeout|socket|econn|5\d\d/i.test(msg);
 }
@@ -91,7 +90,10 @@ async function sendEmailInBatches(
   for (let i = 0; i < items.length; i += batchSize) {
     const batch = items.slice(i, i + batchSize);
     const results = await Promise.all(
-      batch.map(async (item) => ({ to: item.to, result: await sendEmailWithRetry(item) })),
+      batch.map(async (item) => ({
+        to: item.to,
+        result: await sendEmailWithRetry(item),
+      })),
     );
 
     for (const { to, result } of results) {

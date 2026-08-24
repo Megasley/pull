@@ -13,8 +13,7 @@
   <a href="./CONTRIBUTING.md">Contributing</a> ·
   <a href="./LICENSE">License (MIT)</a> ·
   <a href="./docs/ATTRIBUTIONS.md">Attributions</a> ·
-  <a href="./docs/TECHNICAL_OVERVIEW.md">Technical overview</a> ·
-  <a href="./docs/TECHNICAL_OVERVIEW.pdf">PDF</a>
+  <a href="./ROADMAP.md">Technical overview</a>
 </p>
 
 ---
@@ -83,11 +82,11 @@ Screenshots belong in [`docs/screenshots/`](./docs/screenshots/). Suggested capt
 
 ### For maintainers & contributors
 
-| Feature                | Description                                        |
-| ---------------------- | -------------------------------------------------- |
-| **Content validation** | `validate:roadmaps` and `validate:content` scripts |
-| **Drizzle migrations** | Versioned schema through `0013_user_weekly_goals`  |
-| **SEO**                | Sitemap, Open Graph, canonical URLs on lessons     |
+| Feature                | Description                                               |
+| ---------------------- | --------------------------------------------------------- |
+| **Content validation** | `validate:roadmaps` and `validate:content` scripts        |
+| **Drizzle migrations** | Versioned schema through `0020_builder_visibility_scores` |
+| **SEO**                | Sitemap, Open Graph, canonical URLs on lessons            |
 
 ---
 
@@ -172,7 +171,7 @@ npm run db:migrate
 npm run db:validate
 ```
 
-Schema lives in `lib/db/schema/`. Migrations are in `drizzle/migrations/` (tags `0000`–`0013`).
+Schema lives in `lib/db/schema/`. Migrations are in `drizzle/migrations/` (tags `0000`–`0020`).
 
 <details>
 <summary>Legacy Supabase SQL migrations</summary>

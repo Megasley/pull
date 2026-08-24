@@ -2,10 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { OrganizationProfileView } from "@/components/organizations/organization-profile";
-import {
-  getOrganizationBySlug,
-  listOrganizationSlugs,
-} from "@/lib/organizations";
+import { getOrganizationBySlug, listOrganizationSlugs } from "@/lib/organizations";
 import { siteConfig } from "@/lib/site-config";
 
 type OrganizationPageProps = {
@@ -43,9 +40,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function OrganizationPage({
-  params,
-}: OrganizationPageProps) {
+export default async function OrganizationPage({ params }: OrganizationPageProps) {
   const { slug } = await params;
   const organization = getOrganizationBySlug(slug);
 

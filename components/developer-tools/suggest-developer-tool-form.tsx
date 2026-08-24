@@ -29,9 +29,7 @@ export function SuggestDeveloperToolForm() {
             setError(result.error);
             return;
           }
-          setMessage(
-            "Thanks — we received your suggestion and will review it soon.",
-          );
+          setMessage("Thanks — we received your suggestion and will review it soon.");
           formRef.current?.reset();
         });
       }}
@@ -132,8 +130,7 @@ export function SuggestDeveloperToolForm() {
 
         <div className="sm:col-span-2">
           <label htmlFor="buildUseCase" className="text-sm font-medium">
-            Build use case{" "}
-            <span className="text-muted-foreground">(optional)</span>
+            Build use case <span className="text-muted-foreground">(optional)</span>
           </label>
           <input
             id="buildUseCase"
@@ -163,8 +160,7 @@ export function SuggestDeveloperToolForm() {
 
         <div>
           <label htmlFor="submitterName" className="text-sm font-medium">
-            Your name{" "}
-            <span className="text-muted-foreground">(optional)</span>
+            Your name <span className="text-muted-foreground">(optional)</span>
           </label>
           <input
             id="submitterName"

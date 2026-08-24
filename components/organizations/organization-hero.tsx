@@ -53,11 +53,7 @@ export function OrganizationHero({ organization }: OrganizationHeroProps) {
               </a>
             </Button>
             <Button asChild variant="outline">
-              <a
-                href={organization.communityInvite}
-                target="_blank"
-                rel="noreferrer"
-              >
+              <a href={organization.communityInvite} target="_blank" rel="noreferrer">
                 Join Community
               </a>
             </Button>

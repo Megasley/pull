@@ -18,8 +18,8 @@ export function DeveloperToolsWhySection() {
           The best way to learn is to build.
         </p>
         <p className="font-mono text-sm leading-relaxed text-muted-foreground sm:text-base">
-          These tools help developers move from learning to building,
-          contributing, and proving their skills through real-world projects.
+          These tools help developers move from learning to building, contributing, and
+          proving their skills through real-world projects.
         </p>
       </div>
 

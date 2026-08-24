@@ -6,9 +6,7 @@ type OrganizationsDirectoryProps = {
   organizations: OrganizationDirectoryCard[];
 };
 
-export function OrganizationsDirectory({
-  organizations,
-}: OrganizationsDirectoryProps) {
+export function OrganizationsDirectory({ organizations }: OrganizationsDirectoryProps) {
   if (organizations.length === 0) {
     return (
       <EmptyState

@@ -132,12 +132,10 @@ export default function CreditsPage() {
       </section>
 
       <section className="mt-12 space-y-4">
-        <h2 className="text-xl font-semibold tracking-tight">
-          Curriculum reviewers
-        </h2>
+        <h2 className="text-xl font-semibold tracking-tight">Curriculum reviewers</h2>
         <p className="text-sm leading-7 text-muted-foreground">
-          People who helped review Pull curriculum so builders get clearer,
-          more accurate lessons. Thank you.
+          People who helped review Pull curriculum so builders get clearer, more
+          accurate lessons. Thank you.
         </p>
         <ul className="mt-2">
           {curriculumReviewers.map((reviewer) => (

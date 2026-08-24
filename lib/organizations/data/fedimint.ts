@@ -36,26 +36,31 @@ export const fedimintOrganization: OrganizationProfile = {
     {
       id: "beginner",
       label: "Beginner",
-      summary: "Build the Bitcoin and Lightning foundations, then orient to Fedimint’s docs and community.",
+      summary:
+        "Build the Bitcoin and Lightning foundations, then orient to Fedimint’s docs and community.",
       steps: [
         {
           title: "Learn Bitcoin Basics",
-          description: "UTXOs, keys, and transaction lifecycle — start with Pull’s Bitcoin roadmap.",
+          description:
+            "UTXOs, keys, and transaction lifecycle — start with Pull’s Bitcoin roadmap.",
           href: "/roadmaps/bitcoin",
         },
         {
           title: "Learn Lightning Basics",
-          description: "Channels, invoices, and routing — prepare for gateway and payment flows.",
+          description:
+            "Channels, invoices, and routing — prepare for gateway and payment flows.",
           href: "/roadmaps/lightning",
         },
         {
           title: "Read Fedimint Documentation",
-          description: "Understand federations, guardians, e-cash notes, and the client model.",
+          description:
+            "Understand federations, guardians, e-cash notes, and the client model.",
           href: "https://fedimint.org/docs/",
         },
         {
           title: "Join Community",
-          description: "Introduce yourself on Telegram or Matrix and ask about good first issues.",
+          description:
+            "Introduce yourself on Telegram or Matrix and ask about good first issues.",
           href: "https://t.me/fedimint",
         },
       ],
@@ -63,26 +68,31 @@ export const fedimintOrganization: OrganizationProfile = {
     {
       id: "intermediate",
       label: "Intermediate",
-      summary: "Set up the stack, explore repos, and land a first meaningful contribution.",
+      summary:
+        "Set up the stack, explore repos, and land a first meaningful contribution.",
       steps: [
         {
           title: "Set Up Local Development Environment",
-          description: "Clone fedimint/fedimint, install Rust tooling, and run the developer Nix/shell workflow.",
+          description:
+            "Clone fedimint/fedimint, install Rust tooling, and run the developer Nix/shell workflow.",
           href: "https://github.com/fedimint/fedimint#development",
         },
         {
           title: "Explore Repositories",
-          description: "Map core, gateway, UI, and docs — pick a surface that matches your skills.",
+          description:
+            "Map core, gateway, UI, and docs — pick a surface that matches your skills.",
           href: "https://github.com/fedimint",
         },
         {
           title: "Review Good First Issues",
-          description: "Filter labeled issues and comment to claim one with a short plan.",
+          description:
+            "Filter labeled issues and comment to claim one with a short plan.",
           href: "https://github.com/fedimint/fedimint/labels/good%20first%20issue",
         },
         {
           title: "Submit First Pull Request",
-          description: "Start small — tests, docs, or a scoped bugfix — and iterate with review.",
+          description:
+            "Start small — tests, docs, or a scoped bugfix — and iterate with review.",
           href: "https://github.com/fedimint/fedimint/pulls",
         },
       ],
@@ -104,11 +114,13 @@ export const fedimintOrganization: OrganizationProfile = {
         },
         {
           title: "Security Reviews",
-          description: "Threat models, guardian ops hardening, and careful change review.",
+          description:
+            "Threat models, guardian ops hardening, and careful change review.",
         },
         {
           title: "Community Leadership",
-          description: "Mentor newcomers, triage issues, and shape contributor onboarding.",
+          description:
+            "Mentor newcomers, triage issues, and shape contributor onboarding.",
           href: "https://t.me/fedimint",
         },
       ],
@@ -215,7 +227,8 @@ export const fedimintOrganization: OrganizationProfile = {
     {
       id: "docs",
       title: "Documentation",
-      description: "Official Fedimint docs spanning concepts, operators, and developers.",
+      description:
+        "Official Fedimint docs spanning concepts, operators, and developers.",
       type: "Docs",
       href: "https://fedimint.org/docs/",
     },

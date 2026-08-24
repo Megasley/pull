@@ -52,7 +52,7 @@ Pull is the operating system for open source builders: **learn → ship → cont
 - [ ] **Screenshot gallery** in README (`docs/screenshots/`)
 - [ ] **Self-host documentation** — production checklist for Vercel + Supabase deployers
 - [ ] **Good first issue** labels + content contribution triage
-- [ ] **P0 curriculum accuracy pass** — see [docs/pre-launch-checklist.md](./docs/pre-launch-checklist.md)
+- [ ] **P0 curriculum accuracy pass** — tracked in `docs/` (placeholder pending)
 
 ---
 

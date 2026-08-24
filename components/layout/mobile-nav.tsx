@@ -80,12 +80,7 @@ function NavSection({
   children: React.ReactNode;
 }) {
   return (
-    <section
-      className={cn(
-        "overflow-hidden rounded-none border border-border border-l-4",
-        sectionToneClass[tone],
-      )}
-    >
+    <section className={cn("border border-border border-l-4", sectionToneClass[tone])}>
       <p
         className={cn(
           "border-b border-border/70 px-4 py-2.5 font-mono text-[11px] font-bold uppercase tracking-[0.22em]",
@@ -372,25 +367,31 @@ export function MobileNav({
                   const tone: SectionTone =
                     section.title === "Workspace" ? "workspace" : "profile";
 
-                  return (
-                    <NavSection key={section.title} title={section.title} tone={tone}>
-                      {section.title === "Profile" && profile ? (
-                        <MobileLink
-                          href={`/u/${profile.username}`}
-                          pathname={pathname}
-                          onClick={close}
-                        >
-                          Builder portfolio
-                        </MobileLink>
-                      ) : null}
-                      {section.items.map((navItem) => (
-                        <MobileLink
-                          key={navItem.href}
-                          href={navItem.href}
-                          pathname={pathname}
-                          onClick={close}
-                        >
-                          {navItem.title}
+                return (
+                  <NavSection key={section.title} title={section.title} tone={tone}>
+                    {section.title === "Profile" && profile ? (
+                      <MobileLink
+                        href={`/u/${profile.username}`}
+                        pathname={pathname}
+                        onClick={close}
+                      >
+                        Builder portfolio
+                      </MobileLink>
+                    ) : null}
+                    {section.items.map((navItem) => (
+                      <MobileLink
+                        key={navItem.href}
+                        href={navItem.href}
+                        pathname={pathname}
+                        onClick={close}
+                      >
+                        {navItem.title}
+                      </MobileLink>
+                    ))}
+                    {section.title === "Workspace" ? (
+                      <>
+                        <MobileLink href="/review" pathname={pathname} onClick={close}>
+                          Review
                         </MobileLink>
                       ))}
                       {section.title === "Workspace" ? (
