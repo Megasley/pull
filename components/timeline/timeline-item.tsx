@@ -1,14 +1,14 @@
 import {
-  CheckCircle2,
-  CircleDot,
-  ExternalLink,
-  FileCode2,
-  GitCommitHorizontal,
-  GitMerge,
-  GitPullRequest,
-  Map,
-  MessageSquare,
-} from "lucide-react";
+  CheckCircleIcon,
+  CircleDotIcon,
+  ExternalLinkIcon,
+  FileCodeIcon,
+  GitCommitIcon,
+  GitMergeIcon,
+  GitPullRequestIcon,
+  MapIcon,
+  MessageSquareIcon,
+} from "@/components/icons/outline-icons";
 
 import { Badge } from "@/components/ui/badge";
 import { TIMELINE_TYPE_SINGULAR } from "@/lib/timeline/filter";
@@ -19,13 +19,13 @@ const TYPE_ICON: Record<
   TimelineEventType,
   React.ComponentType<{ className?: string }>
 > = {
-  commit: GitCommitHorizontal,
-  pull_request: GitPullRequest,
-  issue: CircleDot,
-  review: MessageSquare,
-  merged: GitMerge,
-  project_submission: FileCode2,
-  roadmap_completion: Map,
+  commit: GitCommitIcon,
+  pull_request: GitPullRequestIcon,
+  issue: CircleDotIcon,
+  review: MessageSquareIcon,
+  merged: GitMergeIcon,
+  project_submission: FileCodeIcon,
+  roadmap_completion: MapIcon,
 };
 
 const TYPE_TONE: Record<TimelineEventType, string> = {
@@ -82,10 +82,7 @@ export function TimelineItem({
           <p className="text-xs text-muted-foreground">{event.description}</p>
         </div>
         {event.href ? (
-          <ExternalLink
-            className="size-3.5 shrink-0 text-muted-foreground opacity-50"
-            aria-hidden
-          />
+          <ExternalLinkIcon className="size-3.5 shrink-0 text-muted-foreground opacity-50" />
         ) : null}
       </>
     );
@@ -131,7 +128,7 @@ export function TimelineItem({
             <span className="text-[11px] text-muted-foreground">{time}</span>
           ) : null}
           {event.type === "merged" ? (
-            <CheckCircle2 className="size-3.5 text-ink" aria-hidden />
+            <CheckCircleIcon className="size-3.5 text-ink" />
           ) : null}
         </div>
         <p className="mt-1 truncate text-sm font-medium">{event.title}</p>
@@ -141,10 +138,7 @@ export function TimelineItem({
       </div>
 
       {event.href ? (
-        <ExternalLink
-          className="size-3.5 shrink-0 text-muted-foreground opacity-50 transition-opacity group-hover:opacity-100"
-          aria-hidden
-        />
+        <ExternalLinkIcon className="size-3.5 shrink-0 text-muted-foreground opacity-50 transition-opacity group-hover:opacity-100" />
       ) : null}
     </>
   );

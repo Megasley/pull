@@ -1,5 +1,4 @@
-import { Inbox } from "lucide-react";
-
+import { InboxIcon } from "@/components/icons/outline-icons";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -32,7 +31,7 @@ export function EmptyState({
       )}
     >
       <div className="mb-4 flex size-12 items-center justify-center rounded-none border border-border bg-muted/40 text-muted-foreground">
-        {icon ?? <Inbox className="size-5" aria-hidden />}
+        {icon ?? <InboxIcon className="size-5" />}
       </div>
       <H4 className="text-balance">{title}</H4>
       {description ? (

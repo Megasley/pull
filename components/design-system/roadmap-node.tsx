@@ -1,5 +1,8 @@
-import { Check, Lock, Sparkles } from "lucide-react";
-
+import {
+  CheckIcon,
+  LockIcon,
+  SparklesIcon,
+} from "@/components/icons/outline-icons";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import type { RoadmapDifficulty, RoadmapNodeStatus } from "@/types";
@@ -21,17 +24,17 @@ const statusStyles: Record<
   active: {
     container: "border-ink bg-ink/5 hover:bg-ink/10",
     indicator: "border-ink bg-ink text-[var(--background)]",
-    icon: <Sparkles className="size-3.5" aria-hidden />,
+    icon: <SparklesIcon className="size-3.5" />,
   },
   completed: {
     container: "border-ink/30 bg-signal/15 hover:border-ink/50 hover:bg-signal/25",
     indicator: "border-ink bg-signal text-ink",
-    icon: <Check className="size-3.5" aria-hidden />,
+    icon: <CheckIcon className="size-3.5" />,
   },
   locked: {
     container: "border-border bg-muted/20 opacity-70",
     indicator: "border-border bg-muted/40 text-muted-foreground",
-    icon: <Lock className="size-3.5" aria-hidden />,
+    icon: <LockIcon className="size-3.5" />,
   },
 };
 

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { ExternalLink } from "lucide-react";
 
 import { lookingForLabel, type LookingForId } from "@/lib/builders/looking-for";
 import type { BuilderDirectoryCard } from "@/lib/builders/directory";
@@ -99,15 +98,9 @@ export function BuilderCard({ builder, className, compact }: BuilderCardProps) {
         </p>
       </div>
 
-      {!compact ? (
-        <p className="mt-3 font-mono text-[11px] text-muted-foreground">
-          {builder.mergedPullRequests} merged PRs · {builder.roadmapStatus}
-        </p>
-      ) : (
-        <p className="mt-3 font-mono text-[11px] text-muted-foreground">
-          {builder.mergedPullRequests} merged PRs
-        </p>
-      )}
+      <p className="mt-3 font-mono text-[11px] text-muted-foreground">
+        {builder.mergedPullRequests} merged PRs
+      </p>
 
       {builder.skills.length > 0 ? (
         <div className="mt-3 flex flex-wrap gap-1.5">
@@ -134,7 +127,18 @@ export function BuilderCard({ builder, className, compact }: BuilderCardProps) {
             className="inline-flex items-center justify-center gap-1.5 font-mono text-[11px] text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
           >
             GitHub
-            <ExternalLink className="size-3" aria-hidden />
+            <svg
+              viewBox="0 0 24 24"
+              className="size-3"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              aria-hidden
+            >
+              <path d="M15 3h6v6" />
+              <path d="M10 14 21 3" />
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+            </svg>
           </a>
         ) : null}
       </div>

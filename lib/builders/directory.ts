@@ -1,4 +1,4 @@
-import { and, desc, eq, ilike, inArray, ne, or, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, ne, or, sql } from "drizzle-orm";
 
 import {
   BUILDER_DIRECTORY_FILTERS,
@@ -8,10 +8,9 @@ import {
 } from "@/lib/builders/looking-for";
 import { getDb, withDbRetry } from "@/lib/db";
 import { isDatabaseConfigured } from "@/lib/db/env";
-import { userRoadmapProgress, users } from "@/lib/db/schema";
+import { users } from "@/lib/db/schema";
 import { DEMO_PROFILE_USER_ID } from "@/lib/demo/constants";
 import { countMergedGithubPullRequestsByUserIds } from "@/lib/github/store";
-import { buildAllRoadmapProgressSummaries } from "@/lib/progress/summary";
 
 export const BUILDERS_PAGE_SIZE = 12;
 export const BUILDERS_TO_WATCH_LIMIT = 3;
@@ -44,7 +43,6 @@ export type BuilderDirectoryCard = {
   builderScore: number;
   ossReputation: number;
   mergedPullRequests: number;
-  roadmapStatus: string;
   lastActiveAt: string | null;
   activeRecently: boolean;
 };
@@ -89,25 +87,6 @@ function lookingForMatchFilter(
 ): boolean {
   if (filters.length === 0) return true;
   return filters.some((id) => lookingFor.includes(id));
-}
-
-function formatRoadmapStatus(progressByRoadmap: Record<string, string[]>): string {
-  const summaries = buildAllRoadmapProgressSummaries(progressByRoadmap).filter(
-    (item) => item.completed > 0,
-  );
-  if (summaries.length === 0) return "Not started";
-
-  const completed = summaries.filter(
-    (item) => item.total > 0 && item.completed === item.total,
-  );
-  if (completed.length > 0) {
-    return completed.length === 1
-      ? `${completed[0].title} complete`
-      : `${completed.length} roadmaps complete`;
-  }
-
-  const primary = [...summaries].sort((a, b) => b.percentage - a.percentage)[0];
-  return `${primary.title} · ${primary.percentage}%`;
 }
 
 function emptyResult(page: number, pageSize: number): BuilderDirectoryResult {
@@ -270,7 +249,6 @@ async function listBuildersForDirectoryInner(
         builderScore: row.builderScore ?? 0,
         ossReputation: row.ossReputation ?? 0,
         mergedPullRequests: 0,
-        roadmapStatus: "Not started",
         lastActiveAt: row.lastActiveAt,
         activeRecently: isActiveRecently(row.lastActiveAt),
       } satisfies BuilderDirectoryCard;
@@ -306,35 +284,8 @@ async function listBuildersForDirectoryInner(
     };
   }
 
-  const ids = pageRows.map((row) => row.id);
-  const progressRows = await db
-    .select({
-      userId: userRoadmapProgress.userId,
-      roadmapSlug: userRoadmapProgress.roadmapSlug,
-      nodeSlug: userRoadmapProgress.nodeSlug,
-    })
-    .from(userRoadmapProgress)
-    .where(
-      and(
-        inArray(userRoadmapProgress.userId, ids),
-        eq(userRoadmapProgress.status, "completed"),
-      ),
-    );
-
-  const progressByUser = new Map<string, Record<string, string[]>>();
-  for (const row of progressRows) {
-    const current = progressByUser.get(row.userId) ?? {};
-    const nodes = current[row.roadmapSlug] ?? [];
-    nodes.push(row.nodeSlug);
-    current[row.roadmapSlug] = nodes;
-    progressByUser.set(row.userId, current);
-  }
-
   return {
-    builders: pageRows.map((row) => ({
-      ...row,
-      roadmapStatus: formatRoadmapStatus(progressByUser.get(row.id) ?? {}),
-    })),
+    builders: pageRows,
     total: resolvedTotal,
     page: safePage,
     pageSize,

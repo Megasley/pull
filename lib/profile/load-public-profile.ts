@@ -6,6 +6,7 @@ import { getAllCompletedNodeSlugs } from "@/lib/progress/repository";
 import {
   getApprovedSubmissionCount,
   getUserByUsername,
+  getUserLastActiveAt,
   listApprovedSubmissionsForUser,
 } from "@/lib/profile/repository";
 import {
@@ -14,10 +15,18 @@ import {
   selectMergedPrHighlights,
   toPublicTimelineEvents,
 } from "@/lib/profile/portfolio";
+import {
+  buildCollaborationCtas,
+  buildContributionMix,
+  buildProfileStrengthLine,
+  buildPublicProfileActivity,
+  deriveLastContributionAt,
+} from "@/lib/profile/public-insights";
 import { listUserAchievements } from "@/lib/xp/achievements";
 import { buildLevelInfo } from "@/lib/xp/levels";
 import { loadBuilderScore } from "@/lib/score";
 import { loadOpenSourceReputation } from "@/lib/reputation";
+import { loadContributionStreak } from "@/lib/dashboard/workspace";
 import {
   countMergedGithubPullRequests,
   listGithubCommits,
@@ -98,6 +107,8 @@ async function loadPublicBuilderProfileData(
     commits,
     issues,
     mergedPullRequestCount,
+    lastActiveAt,
+    contributionStreak,
   ] = await Promise.all([
     listUserAchievements(profile.id, progressByRoadmap),
     getApprovedSubmissionCount(profile.id),
@@ -108,6 +119,8 @@ async function loadPublicBuilderProfileData(
     listGithubCommits(profile.id, 100),
     listGithubIssues(profile.id, 100),
     countMergedGithubPullRequests(profile.id),
+    getUserLastActiveAt(profile.id),
+    loadContributionStreak(profile.id),
   ]);
 
   const [reputation, timelineData] = await Promise.all([
@@ -140,9 +153,25 @@ async function loadPublicBuilderProfileData(
     (sum, item) => sum + item.completedProjects.length,
     0,
   );
+  const publicProfile = toPublicBuilderProfile(profile);
+  const timelineEvents = toPublicTimelineEvents(timelineData.events);
+  const strengthLine = buildProfileStrengthLine(builderScore, reputation);
+  const activity = buildPublicProfileActivity({
+    createdAt: profile.createdAt,
+    lastActiveAt,
+    lastContributionAt: deriveLastContributionAt(timelineEvents),
+    streak: contributionStreak,
+  });
+  const contributionMix = buildContributionMix(mergedPrs, timelineData.totals);
+  const collaborationCtas = buildCollaborationCtas({
+    lookingFor: profile.lookingFor,
+    username: profile.username,
+    website: profile.website,
+    linkedinUrl: profile.linkedinUrl,
+  });
 
   return {
-    profile: toPublicBuilderProfile(profile),
+    profile: publicProfile,
     level: buildLevelInfo(profile.xp, profile.level),
     builderScore,
     reputation,
@@ -163,10 +192,13 @@ async function loadPublicBuilderProfileData(
     featuredRepositories: selectFeaturedRepositories(repositories),
     featuredProjects,
     mergedPrHighlights: selectMergedPrHighlights(portfolioItems),
-    timeline: toPublicTimelineEvents(timelineData.events),
-    roadmaps,
+    timeline: timelineEvents,
     achievements: achievements.filter((item) => item.earned),
     recentProjects: featuredProjects,
+    strengthLine,
+    activity,
+    contributionMix,
+    collaborationCtas,
   };
 }
 

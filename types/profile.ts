@@ -1,6 +1,6 @@
-import type { AchievementItem } from "@/types/dashboard";
+import type { AchievementItem, ContributionStreak } from "@/types/dashboard";
+import type { LookingForId } from "@/lib/builders/looking-for";
 import type { PublicBuilderProfile } from "@/types/user";
-import type { RoadmapProgressSummary } from "@/types/progress";
 import type { BuilderScoreResult } from "@/types/score";
 import type { ReputationResult } from "@/types/reputation";
 import type { GithubRepositoryRecord } from "@/types/github";
@@ -35,6 +35,34 @@ export type PortfolioTechnology = {
   count: number;
 };
 
+export type PublicProfileActivity = {
+  memberSince: string;
+  lastActiveAt: string | null;
+  lastContributionAt: string | null;
+  activeRecently: boolean;
+  streak: ContributionStreak;
+};
+
+export type ContributionMixItem = {
+  label: string;
+  count: number;
+  percent: number;
+};
+
+export type PublicContributionMix = {
+  prTypes: ContributionMixItem[];
+  activityTypes: ContributionMixItem[];
+};
+
+export type ProfileCollaborationCta = {
+  id: LookingForId;
+  label: string;
+  message: string;
+  actionLabel: string;
+  href: string;
+  external?: boolean;
+};
+
 export type PublicBuilderProfileData = {
   profile: PublicBuilderProfile;
   level: {
@@ -53,9 +81,12 @@ export type PublicBuilderProfileData = {
   featuredProjects: PublicCompletedProject[];
   mergedPrHighlights: PullRequestPortfolioItem[];
   timeline: TimelineEvent[];
-  roadmaps: RoadmapProgressSummary[];
   achievements: AchievementItem[];
   /** @deprecated use featuredProjects */
   recentProjects: PublicCompletedProject[];
+  strengthLine: string | null;
+  activity: PublicProfileActivity;
+  contributionMix: PublicContributionMix;
+  collaborationCtas: ProfileCollaborationCta[];
   isOwner: boolean;
 };

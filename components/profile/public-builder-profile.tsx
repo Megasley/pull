@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { ExternalLink } from "lucide-react";
 
 import { AchievementCard } from "@/components/achievements/achievement-card";
+import { ExternalLinkIcon } from "@/components/icons/outline-icons";
 import {
   ContributionStatsGrid,
   FeaturedProjectsSection,
@@ -13,6 +13,11 @@ import {
   SocialChip,
   WebsiteChip,
 } from "@/components/profile/portfolio-sections";
+import {
+  ProfileActivityStrip,
+  ProfileCollaborationCtas,
+  ProfileContributionMixSection,
+} from "@/components/profile/profile-value-sections";
 import { ProfileEmptyState } from "@/components/profile/profile-empty-state";
 import { ShareProfileButton } from "@/components/profile/share-profile-button";
 import { SiteContainer } from "@/components/layout/site-container";
@@ -30,7 +35,6 @@ import {
   withPublicBuilderScoreCopy,
 } from "@/lib/score";
 import { siteConfig } from "@/lib/site-config";
-import { cn } from "@/lib/utils";
 import type { PublicBuilderProfileData } from "@/types/profile";
 
 type PublicBuilderProfileProps = {
@@ -50,8 +54,11 @@ export function PublicBuilderProfile({ data }: PublicBuilderProfileProps) {
     featuredProjects,
     mergedPrHighlights,
     timeline,
-    roadmaps,
     achievements,
+    strengthLine,
+    activity,
+    contributionMix,
+    collaborationCtas,
     isOwner,
   } = data;
 
@@ -91,6 +98,12 @@ export function PublicBuilderProfile({ data }: PublicBuilderProfileProps) {
                 {profile.bio.trim() ||
                   "Open source builder on Pull - learning, shipping, and contributing."}
               </p>
+
+              {strengthLine ? (
+                <p className="profile-strength-line">{strengthLine}</p>
+              ) : null}
+
+              <ProfileActivityStrip activity={activity} />
 
               <div className="mt-4 flex flex-wrap gap-2">
                 <span className="profile-badge profile-badge-accent">
@@ -135,11 +148,13 @@ export function PublicBuilderProfile({ data }: PublicBuilderProfileProps) {
                 </p>
               ) : null}
 
+              <ProfileCollaborationCtas ctas={collaborationCtas} />
+
               <div className="mt-4 flex flex-wrap gap-4">
                 <SocialChip
                   href={githubUrl}
                   label={`@${profile.githubUsername}`}
-                  icon={<ExternalLink className="size-3.5" />}
+                  icon={<ExternalLinkIcon className="size-3.5" />}
                   profile
                 />
                 {profile.website ? (
@@ -149,7 +164,7 @@ export function PublicBuilderProfile({ data }: PublicBuilderProfileProps) {
                   <SocialChip
                     href={profile.twitterUrl}
                     label="X / Twitter"
-                    icon={<ExternalLink className="size-3.5" />}
+                    icon={<ExternalLinkIcon className="size-3.5" />}
                     profile
                   />
                 ) : null}
@@ -157,7 +172,7 @@ export function PublicBuilderProfile({ data }: PublicBuilderProfileProps) {
                   <SocialChip
                     href={profile.linkedinUrl}
                     label="LinkedIn"
-                    icon={<ExternalLink className="size-3.5" />}
+                    icon={<ExternalLinkIcon className="size-3.5" />}
                     profile
                   />
                 ) : null}
@@ -182,13 +197,15 @@ export function PublicBuilderProfile({ data }: PublicBuilderProfileProps) {
             <Button asChild className="w-full sm:w-auto">
               <a href={githubUrl} target="_blank" rel="noopener noreferrer">
                 GitHub
-                <ExternalLink className="size-3.5" aria-hidden />
+                <ExternalLinkIcon className="size-3.5" />
               </a>
             </Button>
           </div>
         </header>
 
         <ContributionStatsGrid stats={stats} profile />
+
+        <ProfileContributionMixSection mix={contributionMix} />
 
         <div className="profile-section">
           <div className="grid gap-5 lg:grid-cols-2">
@@ -222,52 +239,6 @@ export function PublicBuilderProfile({ data }: PublicBuilderProfileProps) {
         />
 
         <PublicTimelineSection events={timeline} profile />
-
-        <PortfolioSection title="Roadmaps" profile>
-          {roadmaps.length === 0 ? (
-            <ProfileEmptyState
-              title="No roadmap progress yet"
-              description="Complete lessons on a roadmap to show progress here."
-              ctaLabel="Browse roadmaps →"
-              ctaHref="/roadmaps"
-            />
-          ) : (
-            <ul className="grid gap-5 md:grid-cols-2">
-              {roadmaps.map((roadmap) => (
-                <li key={roadmap.roadmapSlug} className="profile-rm-card">
-                  <div className="flex items-baseline justify-between gap-3">
-                    <p className="text-[15px] font-bold">{roadmap.title}</p>
-                    <span
-                      className={cn(
-                        roadmap.percentage > 0
-                          ? "profile-rm-pct-active"
-                          : "profile-rm-pct-zero",
-                      )}
-                    >
-                      {roadmap.percentage}%
-                    </span>
-                  </div>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {roadmap.completed}/{roadmap.total} lessons
-                  </p>
-                  <div className="profile-rm-bar mt-2.5">
-                    <div
-                      className="profile-rm-bar-fill"
-                      style={{ width: `${roadmap.percentage}%` }}
-                    />
-                  </div>
-                  <div className="mt-3">
-                    <Button asChild variant="outline" size="sm">
-                      <Link href={`/roadmaps/${roadmap.roadmapSlug}`}>
-                        View roadmap
-                      </Link>
-                    </Button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </PortfolioSection>
 
         <PortfolioSection title="Achievements" profile>
           {achievements.length === 0 ? (

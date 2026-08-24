@@ -633,6 +633,133 @@
   max-width: 42rem;
 }
 
+.profile-page .profile-strength-line {
+  margin-top: 0.75rem;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--profile-accent-deep);
+  line-height: 1.45;
+  max-width: 42rem;
+}
+
+.profile-page .profile-activity-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 1rem;
+}
+
+.profile-page .profile-activity-item {
+  border: 1px solid var(--profile-line-soft);
+  background: var(--profile-surface);
+  padding: 8px 11px;
+  min-width: 118px;
+}
+
+.profile-page .profile-activity-label {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--profile-ink-faint);
+  margin-bottom: 4px;
+}
+
+.profile-page .profile-activity-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.profile-page .profile-activity-value-accent {
+  color: var(--profile-accent-deep);
+}
+
+.profile-page .profile-collab-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--profile-line-soft);
+  background: var(--profile-surface);
+  padding: 12px 14px;
+}
+
+.profile-page .profile-collab-label {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--profile-accent-deep);
+  margin-bottom: 4px;
+}
+
+.profile-page .profile-collab-message {
+  font-size: 13px;
+  color: var(--profile-ink-soft);
+  line-height: 1.45;
+}
+
+.profile-page .profile-collab-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid var(--ink);
+  padding: 7px 10px;
+  background: var(--background);
+  transition: background-color 0.15s ease;
+}
+
+.profile-page .profile-collab-action:hover {
+  background: var(--muted);
+}
+
+.profile-page .profile-mix-panel {
+  border: 1px solid var(--profile-line-soft);
+  background: var(--profile-surface);
+  padding: 16px;
+}
+
+.profile-page .profile-mix-heading {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--profile-ink-faint);
+  margin-bottom: 14px;
+}
+
+.profile-page .profile-mix-label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.profile-page .profile-mix-meta {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 10.5px;
+  color: var(--profile-ink-faint);
+}
+
+.profile-page .profile-mix-track {
+  margin-top: 8px;
+  height: 6px;
+  background: var(--profile-line-soft);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.profile-page .profile-mix-fill {
+  height: 100%;
+  background: var(--signal);
+  border-radius: 1px;
+}
+
 .profile-page .profile-badge {
   font-family: var(--font-geist-mono), ui-monospace, monospace;
   font-size: 11.5px;
@@ -712,7 +839,7 @@
 
 @media (min-width: 1024px) {
   .profile-page .profile-stat-grid {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
