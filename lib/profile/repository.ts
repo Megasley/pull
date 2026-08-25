@@ -55,6 +55,22 @@ export async function getUserByUsername(
   return rows[0] ? mapDrizzleUser(rows[0]) : null;
 }
 
+export async function getUserLastActiveAt(userId: string): Promise<string | null> {
+  if (!isDatabaseConfigured()) {
+    return null;
+  }
+
+  const db = getDb();
+  const rows = await db
+    .select({ lastActiveAt: users.lastActiveAt })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+
+  const value = rows[0]?.lastActiveAt;
+  return value ?? null;
+}
+
 export async function getApprovedSubmissionCount(userId: string) {
   if (!isDatabaseConfigured()) {
     return 0;

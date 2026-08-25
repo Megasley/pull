@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 
-import { PageHeader } from "@/components/design-system";
+import { PageHeader } from "@/components/design-system/page-header";
 import { BuildersDirectory } from "@/components/builders/builders-directory";
 import { SiteContainer } from "@/components/layout/site-container";
 import {

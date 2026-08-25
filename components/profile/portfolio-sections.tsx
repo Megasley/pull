@@ -1,6 +1,10 @@
 import Link from "next/link";
-import { ExternalLink, Globe, Star } from "lucide-react";
 
+import {
+  ExternalLinkIcon,
+  GlobeIcon,
+  StarIcon,
+} from "@/components/icons/outline-icons";
 import { ProfileEmptyState } from "@/components/profile/profile-empty-state";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -195,10 +199,7 @@ export function FeaturedRepositoriesSection({
                       {repo.fullName}
                     </p>
                   </div>
-                  <ExternalLink
-                    className="size-3.5 shrink-0 text-muted-foreground opacity-50 group-hover:opacity-100"
-                    aria-hidden
-                  />
+                  <ExternalLinkIcon className="size-3.5 shrink-0 text-muted-foreground opacity-50 group-hover:opacity-100" />
                 </div>
                 {repo.description ? (
                   <p
@@ -228,7 +229,7 @@ export function FeaturedRepositoriesSection({
                   ) : null}
                   {!profile ? (
                     <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                      <Star className="size-3" aria-hidden />
+                      <StarIcon className="size-3" />
                       {repo.stargazersCount}
                     </span>
                   ) : null}
@@ -294,7 +295,7 @@ export function FeaturedProjectsSection({
                   <Button asChild variant="outline" size="sm">
                     <a href={project.repoUrl} target="_blank" rel="noopener noreferrer">
                       Repo
-                      <ExternalLink aria-hidden />
+                      <ExternalLinkIcon className="size-3.5" />
                     </a>
                   </Button>
                 ) : null}
@@ -397,10 +398,7 @@ export function MergedPrHighlightsSection({
                     {item.repoFullName} · #{item.number}
                   </p>
                 </div>
-                <ExternalLink
-                  className="size-3.5 shrink-0 text-muted-foreground opacity-50 group-hover:opacity-100"
-                  aria-hidden
-                />
+                <ExternalLinkIcon className="size-3.5 shrink-0 text-muted-foreground opacity-50 group-hover:opacity-100" />
               </a>
             </li>
           ))}
@@ -475,9 +473,12 @@ export function ContributionStatsGrid({
   const items = profile
     ? [
         { label: "Merged PRs", value: stats.mergedPullRequests },
+        { label: "Contribution repos", value: stats.uniqueContributionRepos ?? 0 },
+        { label: "Roadmaps done", value: stats.roadmapsCompleted ?? 0 },
+        { label: "Projects approved", value: stats.projectsApproved ?? 0 },
+        { label: "Lessons done", value: stats.lessonsCompleted },
         { label: "Repositories", value: stats.repositories },
         { label: "Languages", value: stats.languagesUsed },
-        { label: "Lessons done", value: stats.lessonsCompleted },
         { label: "Achievements", value: stats.achievementsUnlocked },
       ]
     : [
@@ -576,7 +577,7 @@ export function WebsiteChip({
     <SocialChip
       href={href}
       label="Website"
-      icon={<Globe className="size-3.5" />}
+      icon={<GlobeIcon className="size-3.5" />}
       profile={profile}
     />
   );
