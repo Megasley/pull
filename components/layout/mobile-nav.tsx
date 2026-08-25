@@ -390,30 +390,24 @@ export function MobileNav({
                     ))}
                     {section.title === "Workspace" ? (
                       <>
-                        <MobileLink href="/review" pathname={pathname} onClick={close}>
+                        <MobileLink
+                          href="/review"
+                          pathname={pathname}
+                          onClick={close}
+                        >
                           Review
                         </MobileLink>
-                      ))}
-                      {section.title === "Workspace" ? (
-                        <>
+                        {profile?.role === "admin" ? (
                           <MobileLink
-                            href="/review"
+                            href="/admin"
                             pathname={pathname}
                             onClick={close}
                           >
-                            Review
+                            Admin
                           </MobileLink>
-                          {profile?.role === "admin" ? (
-                            <MobileLink
-                              href="/admin"
-                              pathname={pathname}
-                              onClick={close}
-                            >
-                              Admin
-                            </MobileLink>
-                          ) : null}
-                        </>
-                      ) : null}
+                        ) : null}
+                      </>
+                    ) : null}
                     </NavSection>
                   );
                 })

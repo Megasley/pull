@@ -68,8 +68,7 @@ export async function getUserLastActiveAt(userId: string): Promise<string | null
     .limit(1);
 
   const value = rows[0]?.lastActiveAt;
-  if (!value) return null;
-  return value instanceof Date ? value.toISOString() : String(value);
+  return value ?? null;
 }
 
 export async function getApprovedSubmissionCount(userId: string) {

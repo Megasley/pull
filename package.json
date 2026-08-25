@@ -28,7 +28,6 @@
     "docs:pdf": "npx tsx scripts/export-technical-overview-pdf.ts"
   },
   "dependencies": {
-    "@next/swc-darwin-arm64": "^16.2.11",
     "@next/third-parties": "^16.2.11",
     "@react-email/components": "^1.0.12",
     "@react-email/render": "^2.1.0",
