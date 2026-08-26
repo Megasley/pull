@@ -8,7 +8,7 @@ export type EmailNotificationPrefs = {
 export const DEFAULT_EMAIL_NOTIFICATION_PREFS: EmailNotificationPrefs = {
   reviewOutcomes: false,
   reviewQueue: false,
-  achievements: false,
+  achievements: true,
   product: false,
 };
 

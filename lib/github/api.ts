@@ -59,6 +59,7 @@ type SearchResponse = {
 type PullRequestDetail = {
   merged: boolean;
   merged_at: string | null;
+  draft: boolean;
   additions: number;
   deletions: number;
   changed_files: number;
@@ -179,6 +180,7 @@ export async function fetchAuthoredPullRequests(
       title: item.title,
       state: item.state,
       merged: Boolean(item.pull_request?.merged_at),
+      draft: false,
       repoFullName,
       htmlUrl: item.html_url,
       githubCreatedAt: item.created_at,
@@ -202,6 +204,7 @@ export async function fetchAuthoredPullRequests(
         `/repos/${item.repoFullName}/pulls/${item.number}`,
       );
       item.merged = detail.merged || item.merged;
+      item.draft = Boolean(detail.draft);
       item.githubMergedAt = detail.merged_at ?? item.githubMergedAt;
       item.filesChanged = detail.changed_files ?? 0;
       item.additions = detail.additions ?? 0;

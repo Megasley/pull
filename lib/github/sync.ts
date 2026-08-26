@@ -174,6 +174,11 @@ export async function syncGithubForUser(
     const { refreshUserScoreSnapshots } = await import("@/lib/builders/snapshots");
     await refreshUserScoreSnapshots(userId);
 
+    // Detects newly-earned PR-based achievements (first PR, first merged PR)
+    // and fires the achievement-unlock email automatically.
+    const { syncAchievementsForUser } = await import("@/lib/xp/achievements");
+    await syncAchievementsForUser(userId);
+
     return {
       ok: true,
       summary: {

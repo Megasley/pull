@@ -12,8 +12,12 @@ import { Button } from "@/components/ui/button";
 import {
   accountNavSections,
   isExternalHref,
+  isNavComingSoon,
+  isNavDivider,
+  isNavLink,
   primaryNav,
   siteConfig,
+  type NavGroupItem,
 } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
 import type { BuilderProfile } from "@/types/user";
@@ -23,6 +27,7 @@ type MobileNavProps = {
   displayName?: string;
   avatarUrl?: string | null;
   profile?: BuilderProfile | null;
+  orgMembership?: { slug: string; name: string } | null;
 };
 
 type SectionTone =
@@ -194,6 +199,7 @@ export function MobileNav({
   displayName,
   avatarUrl,
   profile,
+  orgMembership,
 }: MobileNavProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -314,40 +320,55 @@ export function MobileNav({
             ) : null}
 
             {primaryNav.map((item) => {
-              if (item.type === "link") {
-                return (
-                  <TopLevelMobileLink
-                    key={item.href}
-                    href={item.href}
-                    pathname={pathname}
-                    onClick={close}
-                    tone={toneForNavGroup(item.title)}
-                  >
-                    {item.title}
-                  </TopLevelMobileLink>
-                );
-              }
-
               return (
                 <NavSection
                   key={item.title}
                   title={item.title}
                   tone={toneForNavGroup(item.title)}
                 >
-                  {item.items.map((child) => (
-                    <MobileLink
-                      key={child.href}
-                      href={child.href}
-                      pathname={pathname}
-                      onClick={close}
-                      external={
-                        isExternalHref(child.href) ||
-                        ("external" in child && Boolean(child.external))
-                      }
-                    >
-                      {child.title}
-                    </MobileLink>
-                  ))}
+                  {(item.items as readonly NavGroupItem[]).map((child, i) => {
+                    if (isNavDivider(child)) {
+                      return (
+                        <li key={`divider-${i}`} aria-hidden>
+                          <div className="mx-4 border-t border-border/40" />
+                        </li>
+                      );
+                    }
+
+                    if (isNavComingSoon(child)) {
+                      return (
+                        <li key={child.title}>
+                          <div
+                            className="flex cursor-default items-center justify-between border-b border-border/60 px-4 py-3.5 font-mono text-xs uppercase tracking-[0.1em] text-foreground/30 last:border-b-0 select-none"
+                            aria-disabled="true"
+                          >
+                            <span>{child.title}</span>
+                            <span className="border border-border/30 px-1.5 py-0.5 text-[9px] tracking-widest text-foreground/30">
+                              Soon
+                            </span>
+                          </div>
+                        </li>
+                      );
+                    }
+
+                    return (
+                      <MobileLink
+                        key={child.href}
+                        href={child.href}
+                        pathname={pathname}
+                        onClick={close}
+                        external={
+                          isExternalHref(child.href) ||
+                          ("external" in child && Boolean(child.external))
+                        }
+                      >
+                        {child.title}
+                        {(isExternalHref(child.href) || ("external" in child && child.external)) && (
+                          <span className="ml-auto pl-2 opacity-40" aria-hidden>↗</span>
+                        )}
+                      </MobileLink>
+                    );
+                  })}
                   {item.title === "Contribute" ? (
                     <MobileLink
                       href={siteConfig.feedbackUrl}
@@ -390,6 +411,15 @@ export function MobileNav({
                     ))}
                     {section.title === "Workspace" ? (
                       <>
+                        {orgMembership ? (
+                          <MobileLink
+                            href={`/partners/${orgMembership.slug}`}
+                            pathname={pathname}
+                            onClick={close}
+                          >
+                            {orgMembership.name} Hub
+                          </MobileLink>
+                        ) : null}
                         <MobileLink
                           href="/review"
                           pathname={pathname}

@@ -117,6 +117,7 @@ export const githubPullRequests = pgTable(
     title: text("title").notNull(),
     state: text("state").notNull(),
     merged: boolean("merged").notNull().default(false),
+    draft: boolean("draft").notNull().default(false),
     repoFullName: text("repo_full_name").notNull(),
     htmlUrl: text("html_url").notNull(),
     githubCreatedAt: timestamp("github_created_at", {
@@ -150,6 +151,7 @@ export const githubPullRequests = pgTable(
     index("github_pull_requests_user_id_idx").on(table.userId),
     index("github_pull_requests_state_idx").on(table.state),
     index("github_pull_requests_merged_idx").on(table.merged),
+    index("github_pull_requests_draft_idx").on(table.draft),
     index("github_pull_requests_contribution_type_idx").on(table.contributionType),
   ],
 );

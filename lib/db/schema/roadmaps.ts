@@ -14,6 +14,8 @@ import {
   chapterQuizStatusEnum,
   difficultyEnum,
   nodeStatusEnum,
+  organizationStatusEnum,
+  organizationTypeEnum,
   progressStatusEnum,
   resourceTypeEnum,
   reviewDecisionEnum,
@@ -413,6 +415,8 @@ export const organizations = pgTable(
     description: text("description").notNull().default(""),
     logoUrl: text("logo_url"),
     website: text("website"),
+    type: organizationTypeEnum("type").notNull().default("team"),
+    status: organizationStatusEnum("status").notNull().default("active"),
     createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
       .notNull()
       .defaultNow(),
@@ -420,7 +424,11 @@ export const organizations = pgTable(
       .notNull()
       .defaultNow(),
   },
-  (table) => [index("organizations_name_idx").on(table.name)],
+  (table) => [
+    index("organizations_name_idx").on(table.name),
+    index("organizations_type_idx").on(table.type),
+    index("organizations_status_idx").on(table.status),
+  ],
 );
 
 export const xpEvents = pgTable(

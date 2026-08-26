@@ -23,7 +23,7 @@ export default async function ActivityPage() {
   const timeline = await loadContributionTimeline(profile.id);
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 pt-12 pb-16 sm:px-6 lg:px-8">
+    <div className="mx-auto w-full max-w-7xl px-4 pt-12 pb-16 sm:px-6 lg:px-8">
       <PageHeader
         eyebrow="prove // activity"
         title="Activity timeline"

@@ -47,7 +47,7 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
     : { users: [], total: 0 };
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 pt-12 pb-20 sm:px-6 lg:px-8">
+    <div className="mx-auto w-full max-w-7xl px-4 pt-12 pb-20 sm:px-6 lg:px-8">
       <PageHeader
         eyebrow="admin // users"
         title="Users"

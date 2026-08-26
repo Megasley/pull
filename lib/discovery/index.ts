@@ -16,9 +16,9 @@ export async function loadDiscoveryProfileContext(
   userId: string,
 ): Promise<DiscoveryProfileContext> {
   const [progressByRoadmap, repos, profile] = await Promise.all([
-    getAllCompletedNodeSlugs(userId),
-    listGithubRepositories(userId),
-    getBuilderProfile(userId),
+    getAllCompletedNodeSlugs(userId).catch(() => ({} as Record<string, string[]>)),
+    listGithubRepositories(userId).catch(() => []),
+    getBuilderProfile(userId).catch(() => null),
   ]);
 
   const roadmaps = buildAllRoadmapProgressSummaries(progressByRoadmap);

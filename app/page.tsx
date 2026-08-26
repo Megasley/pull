@@ -8,6 +8,7 @@ import { FinalCtaSection } from "@/components/landing/final-cta-section";
 import { HeroSection } from "@/components/landing/hero-section";
 import { ProofSection } from "@/components/landing/proof-section";
 import { ScrollProgress } from "@/components/landing/scroll-progress";
+import { TrustedBySection } from "@/components/landing/trusted-by-section";
 import { siteConfig } from "@/lib/site-config";
 
 export const metadata = {
@@ -20,6 +21,7 @@ export default function Home() {
     <div>
       <ScrollProgress />
       <HeroSection />
+      <TrustedBySection />
       <BuilderLoopSection />
       <FeaturedRoadmapsSection />
       <Suspense fallback={null}>

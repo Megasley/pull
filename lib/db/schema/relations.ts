@@ -8,6 +8,7 @@ import {
   githubPullRequests,
   githubRepositories,
 } from "./github";
+import { orgInviteLinks, orgMemberships, orgOpportunities, orgSkills } from "./partners";
 import {
   achievements,
   organizations,
@@ -43,6 +44,7 @@ export const usersRelations = relations(users, ({ many, one }) => ({
   githubIssues: many(githubIssues),
   githubCommits: many(githubCommits),
   githubContributionDays: many(githubContributionDays),
+  orgMemberships: many(orgMemberships),
 }));
 
 export const githubConnectionsRelations = relations(githubConnections, ({ one }) => ({
@@ -222,7 +224,12 @@ export const userAchievementsRelations = relations(userAchievements, ({ one }) =
   }),
 }));
 
-export const organizationsRelations = relations(organizations, () => ({}));
+export const organizationsRelations = relations(organizations, ({ many }) => ({
+  inviteLinks: many(orgInviteLinks),
+  memberships: many(orgMemberships),
+  skills: many(orgSkills),
+  opportunities: many(orgOpportunities),
+}));
 
 export const xpEventsRelations = relations(xpEvents, ({ one }) => ({
   user: one(users, {
@@ -230,3 +237,41 @@ export const xpEventsRelations = relations(xpEvents, ({ one }) => ({
     references: [users.id],
   }),
 }));
+
+export const orgInviteLinksRelations = relations(orgInviteLinks, ({ one, many }) => ({
+  organization: one(organizations, {
+    fields: [orgInviteLinks.organizationId],
+    references: [organizations.id],
+  }),
+  memberships: many(orgMemberships),
+}));
+
+export const orgMembershipsRelations = relations(orgMemberships, ({ one }) => ({
+  organization: one(organizations, {
+    fields: [orgMemberships.organizationId],
+    references: [organizations.id],
+  }),
+  user: one(users, {
+    fields: [orgMemberships.userId],
+    references: [users.id],
+  }),
+  inviteLink: one(orgInviteLinks, {
+    fields: [orgMemberships.inviteLinkId],
+    references: [orgInviteLinks.id],
+  }),
+}));
+
+export const orgSkillsRelations = relations(orgSkills, ({ one }) => ({
+  organization: one(organizations, {
+    fields: [orgSkills.organizationId],
+    references: [organizations.id],
+  }),
+}));
+
+export const orgOpportunitiesRelations = relations(orgOpportunities, ({ one }) => ({
+  organization: one(organizations, {
+    fields: [orgOpportunities.organizationId],
+    references: [organizations.id],
+  }),
+}));
+

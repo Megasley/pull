@@ -21,9 +21,10 @@ type UserMenuProps = {
   profile: BuilderProfile | null;
   displayName: string;
   avatarUrl: string | null;
+  orgMembership?: { slug: string; name: string } | null;
 };
 
-export function UserMenu({ profile, displayName, avatarUrl }: UserMenuProps) {
+export function UserMenu({ profile, displayName, avatarUrl, orgMembership }: UserMenuProps) {
   const initials = displayName
     .split(" ")
     .map((part) => part[0])
@@ -84,6 +85,13 @@ export function UserMenu({ profile, displayName, avatarUrl }: UserMenuProps) {
             ))}
             {section.title === "Workspace" ? (
               <>
+                {orgMembership ? (
+                  <DropdownMenuItem asChild>
+                    <Link href={`/partners/${orgMembership.slug}`}>
+                      {orgMembership.name} Hub
+                    </Link>
+                  </DropdownMenuItem>
+                ) : null}
                 <DropdownMenuItem asChild>
                   <Link href="/review">Review</Link>
                 </DropdownMenuItem>

@@ -9,9 +9,17 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { isExternalHref, primaryNav } from "@/lib/site-config";
+import {
+  isExternalHref,
+  isNavComingSoon,
+  isNavDivider,
+  isNavLink,
+  primaryNav,
+  type NavGroupItem,
+} from "@/lib/site-config";
 import { cn } from "@/lib/utils";
 
 function isActivePath(pathname: string, href: string) {
@@ -35,22 +43,8 @@ export function MainNav() {
   return (
     <nav aria-label="Main navigation" className="hidden items-center gap-0.5 md:flex">
       {primaryNav.map((item) => {
-        if (item.type === "link") {
-          const active = isActivePath(pathname, item.href);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              aria-current={active ? "page" : undefined}
-              className={navLinkClass(active)}
-            >
-              {item.title}
-            </Link>
-          );
-        }
-
-        const groupActive = item.items.some((child) =>
-          isActivePath(pathname, child.href),
+        const groupActive = (item.items as readonly NavGroupItem[]).some(
+          (child) => isNavLink(child) && isActivePath(pathname, child.href),
         );
 
         return (
@@ -71,12 +65,30 @@ export function MainNav() {
                 <ChevronDown className="size-3.5 opacity-60" aria-hidden />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="min-w-44">
-              {item.items.map((child) => {
+            <DropdownMenuContent align="start" className="min-w-52">
+              {(item.items as readonly NavGroupItem[]).map((child, i) => {
+                if (isNavDivider(child)) {
+                  return <DropdownMenuSeparator key={`divider-${i}`} />;
+                }
+
+                if (isNavComingSoon(child)) {
+                  return (
+                    <div
+                      key={child.title}
+                      className="flex cursor-default items-center justify-between px-2 py-1.5 text-sm text-muted-foreground/60 select-none"
+                      aria-disabled="true"
+                    >
+                      <span>{child.title}</span>
+                      <span className="ml-4 border border-border/50 px-1.5 py-0.5 font-mono text-[9px] tracking-widest uppercase text-muted-foreground/50">
+                        Soon
+                      </span>
+                    </div>
+                  );
+                }
+
                 const active = isActivePath(pathname, child.href);
                 const external =
-                  isExternalHref(child.href) ||
-                  ("external" in child && Boolean(child.external));
+                  isExternalHref(child.href) || Boolean(child.external);
 
                 return (
                   <DropdownMenuItem key={child.href} asChild>
@@ -88,6 +100,7 @@ export function MainNav() {
                         className={cn(active && "bg-accent")}
                       >
                         {child.title}
+                        <span className="ml-auto pl-2 opacity-40" aria-hidden>↗</span>
                       </a>
                     ) : (
                       <Link

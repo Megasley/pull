@@ -33,7 +33,7 @@ export default async function SupportPage() {
   const supporters = await loadSupporters();
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-16 px-4 py-16 sm:px-6 lg:px-8">
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-16 px-4 py-16 sm:px-6 lg:px-8">
       <PageHeader
         eyebrow="bitcoin // support"
         title="Support Pull"

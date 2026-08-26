@@ -90,3 +90,15 @@ export const chapterQuizStatusEnum = pgEnum("chapter_quiz_status", [
   "passed",
   "skipped",
 ]);
+
+export const organizationTypeEnum = pgEnum("organization_type", [
+  "team",
+  "learning_partner",
+  "hackathon",
+]);
+
+export const organizationStatusEnum = pgEnum("organization_status", [
+  "active",
+  "inactive",
+]);
+

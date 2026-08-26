@@ -37,13 +37,36 @@ export type NavLink = {
   external?: boolean;
 };
 
+export type NavLinkComingSoon = {
+  title: string;
+  comingSoon: true;
+};
+
+export type NavDivider = {
+  divider: true;
+};
+
+export type NavGroupItem = NavLink | NavLinkComingSoon | NavDivider;
+
 export function isExternalHref(href: string): boolean {
   return /^https?:\/\//i.test(href);
 }
 
+export function isNavLink(item: NavGroupItem): item is NavLink {
+  return "href" in item;
+}
+
+export function isNavComingSoon(item: NavGroupItem): item is NavLinkComingSoon {
+  return "comingSoon" in item && item.comingSoon === true;
+}
+
+export function isNavDivider(item: NavGroupItem): item is NavDivider {
+  return "divider" in item && item.divider === true;
+}
+
 export type NavGroup = {
   title: string;
-  items: readonly NavLink[];
+  items: readonly NavGroupItem[];
 };
 
 export type PrimaryNavItem =
@@ -59,7 +82,10 @@ export const primaryNav = [
   {
     type: "group",
     title: "Build",
-    items: [{ title: "Projects", href: "/projects" }],
+    items: [
+      { title: "Projects", href: "/projects" },
+      { title: "Developer Tools", href: "/developer-tools" },
+    ],
   },
   {
     type: "group",
@@ -79,7 +105,26 @@ export const primaryNav = [
     title: "Prove",
     items: [{ title: "Builders", href: "/builders" }],
   },
-  { type: "link", title: "Developer Tools", href: "/developer-tools" },
+  {
+    type: "group",
+    title: "Ecosystem",
+    items: [
+      { title: "Partners", href: "/ecosystem/partners" },
+      { title: "Hackathons", comingSoon: true },
+      { title: "Bounties", comingSoon: true },
+      {
+        title: "Get Funded",
+        href: "https://bitcoindevs.xyz/get-funded",
+        external: true,
+      },
+      { divider: true },
+      {
+        title: "Become a Pull Partner",
+        href: `mailto:${siteConfig.contactEmail}`,
+        external: true,
+      },
+    ],
+  },
 ] as const satisfies readonly PrimaryNavItem[];
 
 export type AccountNavSection = {
@@ -119,7 +164,10 @@ export const footerNav = [
   },
   {
     title: "Build",
-    links: [{ title: "Projects", href: "/projects" }],
+    links: [
+      { title: "Projects", href: "/projects" },
+      { title: "Developer Tools", href: "/developer-tools" },
+    ],
   },
   {
     title: "Contribute",
@@ -133,10 +181,6 @@ export const footerNav = [
   {
     title: "Prove",
     links: [{ title: "Builders Directory", href: "/builders" }],
-  },
-  {
-    title: "Developer Tools",
-    links: [{ title: "Browse tools", href: "/developer-tools" }],
   },
   {
     title: "Account",
@@ -160,10 +204,8 @@ export const footerNav = [
 export function flattenPrimaryNav(): NavLink[] {
   const links: NavLink[] = [];
   for (const item of primaryNav) {
-    if (item.type === "link") {
-      links.push({ title: item.title, href: item.href });
-    } else {
-      links.push(...item.items);
+    for (const child of item.items as readonly NavGroupItem[]) {
+      if (isNavLink(child)) links.push(child);
     }
   }
   return links;

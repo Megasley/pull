@@ -2,6 +2,8 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { getCurrentSessionContext } from "@/lib/auth/session";
+import { isDatabaseConfigured } from "@/lib/db/env";
+import { getPrimaryOrgMembership } from "@/lib/partners/memberships";
 import { cn } from "@/lib/utils";
 
 import { UserMenu } from "./user-menu";
@@ -35,12 +37,25 @@ export async function AuthControls({ className }: AuthControlsProps) {
   const avatarUrl =
     profile?.avatar ?? (user.user_metadata?.avatar_url as string | undefined) ?? null;
 
+  const orgMembership = isDatabaseConfigured()
+    ? await getPrimaryOrgMembership(user.id)
+    : null;
+
   return (
     <div className={cn("flex items-center gap-2", className)}>
       <Button size="sm" className="hidden md:inline-flex" asChild>
         <Link href="/dashboard">./dashboard</Link>
       </Button>
-      <UserMenu profile={profile} displayName={displayName} avatarUrl={avatarUrl} />
+      <UserMenu
+        profile={profile}
+        displayName={displayName}
+        avatarUrl={avatarUrl}
+        orgMembership={
+          orgMembership
+            ? { slug: orgMembership.organization.slug, name: orgMembership.organization.name }
+            : null
+        }
+      />
     </div>
   );
 }

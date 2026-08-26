@@ -1,6 +1,6 @@
 import { and, asc, count, desc, eq, inArray, lte, sql } from "drizzle-orm";
 
-import { getDb } from "@/lib/db";
+import { getDb, withDbRetry } from "@/lib/db";
 import { isDatabaseConfigured } from "@/lib/db/env";
 import {
   githubCommits,
@@ -267,6 +267,7 @@ export async function replaceGithubPullRequests(
     title: string;
     state: string;
     merged: boolean;
+    draft?: boolean;
     repoFullName: string;
     htmlUrl: string;
     githubCreatedAt: string | null;
@@ -294,6 +295,7 @@ export async function replaceGithubPullRequests(
       title: item.title,
       state: item.state,
       merged: item.merged,
+      draft: item.draft ?? false,
       repoFullName: item.repoFullName,
       htmlUrl: item.htmlUrl,
       githubCreatedAt: item.githubCreatedAt,
@@ -393,28 +395,30 @@ export async function listGithubRepositories(
   options: { pinnedOnly?: boolean; limit?: number } = {},
 ): Promise<GithubRepositoryRecord[]> {
   if (!isDatabaseConfigured()) return [];
-  const db = getDb();
-  const query = db
-    .select()
-    .from(githubRepositories)
-    .where(
-      options.pinnedOnly
-        ? and(
-            eq(githubRepositories.userId, userId),
-            eq(githubRepositories.isPinned, true),
-          )
-        : eq(githubRepositories.userId, userId),
-    )
-    .orderBy(
-      desc(githubRepositories.isPinned),
-      desc(githubRepositories.stargazersCount),
-      desc(githubRepositories.pushedAt),
-    );
+  return withDbRetry(async () => {
+    const db = getDb();
+    const query = db
+      .select()
+      .from(githubRepositories)
+      .where(
+        options.pinnedOnly
+          ? and(
+              eq(githubRepositories.userId, userId),
+              eq(githubRepositories.isPinned, true),
+            )
+          : eq(githubRepositories.userId, userId),
+      )
+      .orderBy(
+        desc(githubRepositories.isPinned),
+        desc(githubRepositories.stargazersCount),
+        desc(githubRepositories.pushedAt),
+      );
 
-  const rows =
-    options.limit === undefined ? await query : await query.limit(options.limit);
+    const rows =
+      options.limit === undefined ? await query : await query.limit(options.limit);
 
-  return rows.map(mapRepo);
+    return rows.map(mapRepo);
+  });
 }
 
 export async function listGithubContributionDays(
@@ -594,6 +598,19 @@ export async function countMergedGithubPullRequests(userId: string): Promise<num
     .from(githubPullRequests)
     .where(
       and(eq(githubPullRequests.userId, userId), eq(githubPullRequests.merged, true)),
+    );
+  return Number(row?.value ?? 0);
+}
+
+/** Total non-draft (ready for review) PRs synced for a user — "submitted", not just started. */
+export async function countSubmittedGithubPullRequests(userId: string): Promise<number> {
+  if (!isDatabaseConfigured()) return 0;
+  const db = getDb();
+  const [row] = await db
+    .select({ value: count() })
+    .from(githubPullRequests)
+    .where(
+      and(eq(githubPullRequests.userId, userId), eq(githubPullRequests.draft, false)),
     );
   return Number(row?.value ?? 0);
 }

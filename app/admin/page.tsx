@@ -137,7 +137,7 @@ export default async function AdminOverviewPage({
     ) : null;
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 pt-12 pb-20 sm:px-6 lg:px-8">
+    <div className="mx-auto w-full max-w-7xl px-4 pt-12 pb-20 sm:px-6 lg:px-8">
       <PageHeader
         eyebrow="admin // overview"
         title="Platform admin"
@@ -152,6 +152,9 @@ export default async function AdminOverviewPage({
             <RefreshAdminMetricsButton />
             <Button asChild variant="outline">
               <Link href="/admin/users">./users</Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link href="/admin/partners">./partners</Link>
             </Button>
             <Button asChild>
               <Link href="/review">./review</Link>

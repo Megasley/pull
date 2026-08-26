@@ -53,6 +53,10 @@ const CSP_HEADER = {
 };
 
 const nextConfig: NextConfig = {
+  // Allow HMR WebSocket connections when accessing the dev server via 127.0.0.1.
+  // Without this, hot reload is blocked and every change triggers a full page
+  // reload, which floods the DB connection pool and causes cascading ECONNRESET.
+  allowedDevOrigins: ["127.0.0.1"],
   async headers() {
     return [
       {
@@ -74,7 +78,7 @@ const nextConfig: NextConfig = {
     ],
   },
   experimental: {
-    optimizePackageImports: ["lucide-react", "drizzle-orm", "@supabase/supabase-js"],
+    optimizePackageImports: ["lucide-react", "drizzle-orm"],
   },
 };
 

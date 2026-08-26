@@ -68,7 +68,8 @@ export async function GET(request: Request) {
       const skipOnboarding =
         next.startsWith("/admin") ||
         next.startsWith("/settings") ||
-        next.startsWith("/onboarding");
+        next.startsWith("/onboarding") ||
+        next.startsWith("/invite/");
 
       if (!skipOnboarding) {
         return NextResponse.redirect(new URL("/onboarding", origin));
