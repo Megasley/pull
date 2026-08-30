@@ -14,6 +14,8 @@ import {
   chapterQuizStatusEnum,
   difficultyEnum,
   nodeStatusEnum,
+  organizationStatusEnum,
+  organizationTypeEnum,
   progressStatusEnum,
   resourceTypeEnum,
   reviewDecisionEnum,
@@ -87,6 +89,13 @@ export const projects = pgTable(
     description: text("description").notNull().default(""),
     difficulty: difficultyEnum("difficulty").notNull().default("intermediate"),
     estimatedDuration: text("estimated_duration"),
+    /**
+     * Admin-curated link from this catalog project to the real GitHub repo it
+     * sends contributors to (e.g. "bitcoin/bitcoin"). Nullable and manually
+     * set — Pull cannot auto-derive this, so unmapped projects simply won't
+     * appear in repo/project reconciliation queries. See lib/impact/queries.ts.
+     */
+    primaryRepoFullName: text("primary_repo_full_name"),
     createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
       .notNull()
       .defaultNow(),
@@ -94,7 +103,10 @@ export const projects = pgTable(
       .notNull()
       .defaultNow(),
   },
-  (table) => [index("projects_roadmap_id_idx").on(table.roadmapId)],
+  (table) => [
+    index("projects_roadmap_id_idx").on(table.roadmapId),
+    index("projects_primary_repo_full_name_idx").on(table.primaryRepoFullName),
+  ],
 );
 
 export const roadmapNodes = pgTable(
@@ -413,6 +425,8 @@ export const organizations = pgTable(
     description: text("description").notNull().default(""),
     logoUrl: text("logo_url"),
     website: text("website"),
+    type: organizationTypeEnum("type").notNull().default("team"),
+    status: organizationStatusEnum("status").notNull().default("active"),
     createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
       .notNull()
       .defaultNow(),
@@ -420,7 +434,11 @@ export const organizations = pgTable(
       .notNull()
       .defaultNow(),
   },
-  (table) => [index("organizations_name_idx").on(table.name)],
+  (table) => [
+    index("organizations_name_idx").on(table.name),
+    index("organizations_type_idx").on(table.type),
+    index("organizations_status_idx").on(table.status),
+  ],
 );
 
 export const xpEvents = pgTable(

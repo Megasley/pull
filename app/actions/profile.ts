@@ -32,6 +32,7 @@ export async function updatePublicProfileAction(formData: FormData) {
     lookingFor: formData.getAll("lookingFor").map(String),
     profilePublic: formData.get("profilePublic"),
     listedInDirectory: formData.get("listedInDirectory"),
+    country: formData.has("country") ? formData.get("country") : undefined,
   });
 
   if (!validation.ok) {

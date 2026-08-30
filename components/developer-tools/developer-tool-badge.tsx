@@ -3,7 +3,7 @@ import type { DeveloperToolDifficulty } from "@/lib/developer-tools/types";
 import { cn } from "@/lib/utils";
 
 const difficultyClassName: Record<DeveloperToolDifficulty, string> = {
-  Beginner: "border-ink/20 bg-signal text-ink",
+  Beginner: "border-ink/20 bg-signal text-signal-foreground",
   Intermediate: "border-ink/30 bg-ink/10 text-ink",
   Advanced: "border-ink bg-ink text-[var(--background)]",
 };

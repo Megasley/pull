@@ -1,10 +1,6 @@
 -- Step 16: review workflow fields and timeline
 
-DO $$ BEGIN
-  ALTER TYPE "public"."submission_status" ADD VALUE IF NOT EXISTS 'needs_changes';
-EXCEPTION
-  WHEN duplicate_object THEN NULL;
-END $$;--> statement-breakpoint
+ALTER TYPE "public"."submission_status" ADD VALUE IF NOT EXISTS 'needs_changes';--> statement-breakpoint
 
 DO $$ BEGIN
   CREATE TYPE "public"."user_role" AS ENUM('builder', 'reviewer', 'admin');

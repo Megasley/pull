@@ -37,8 +37,8 @@ export function RoadmapLockedBanner({
           className={cn(
             "flex size-9 shrink-0 items-center justify-center rounded-none border",
             isLocked
-              ? "border-[var(--signal)]/40 bg-[var(--signal)] text-ink"
-              : "border-ink/25 bg-signal text-ink",
+              ? "border-[var(--signal)]/40 bg-[var(--signal)] text-signal-foreground"
+              : "border-ink/25 bg-signal text-signal-foreground",
           )}
         >
           <Lock className="size-4" aria-hidden />
@@ -69,7 +69,7 @@ export function RoadmapLockedBanner({
         className={cn(
           "h-auto w-full whitespace-normal px-3 py-2 sm:w-auto sm:shrink-0",
           isLocked &&
-            "border-[var(--signal)] bg-[var(--signal)] text-ink hover:bg-[var(--signal)]/90",
+            "border-[var(--signal)] bg-[var(--signal)] text-signal-foreground hover:bg-[var(--signal)]/90",
         )}
       >
         <Link href={`/roadmaps/${prerequisiteSlug}`}>

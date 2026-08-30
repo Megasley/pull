@@ -10,16 +10,27 @@ import {
   fetchUserRepositories,
 } from "./api";
 import {
+  loadOpportunityClicksForAttribution,
+  loadPartnerMembershipsForAttribution,
+  resolveOpportunityAttribution,
+  resolvePartnerAttribution,
+} from "./attribution";
+import {
+  deriveLifecycleEvents,
+  getExistingPullRequestsForSync,
   getGithubConnection,
+  getResolvedGithubIds,
   markGithubSyncSuccess,
+  recordPullRequestEvents,
   replaceGithubCommits,
   replaceGithubContributionDays,
   replaceGithubIssues,
-  replaceGithubPullRequests,
   replaceGithubRepositories,
   setGithubSyncStatus,
   updateGithubConnectionToken,
   upsertGithubConnection,
+  upsertGithubPullRequests,
+  type PullRequestSyncInput,
 } from "./store";
 import type { GithubSyncSummary } from "@/types/github";
 
@@ -74,21 +85,56 @@ export async function syncGithubForUser(
       syncError: null,
     });
 
-    const [repos, graph, authoredIssues, assignedIssues] = await Promise.all([
-      fetchUserRepositories(client),
-      fetchPinnedAndContributions(client),
-      fetchAuthoredIssues(client, user.login),
-      fetchAssignedIssues(client, user.login),
-    ]);
+    const [repos, graph, authoredIssues, assignedIssues, existingPullRequests, memberships, opportunityClicks] =
+      await Promise.all([
+        fetchUserRepositories(client),
+        fetchPinnedAndContributions(client),
+        fetchAuthoredIssues(client, user.login),
+        fetchAssignedIssues(client, user.login),
+        getExistingPullRequestsForSync(userId),
+        loadPartnerMembershipsForAttribution(userId),
+        loadOpportunityClicksForAttribution(userId),
+      ]);
 
     const languageByRepo = Object.fromEntries(
       repos.map((repo) => [repo.full_name, repo.language]),
     );
 
-    const pullRequests = await fetchAuthoredPullRequests(client, user.login, {
+    const fetchedPullRequests = await fetchAuthoredPullRequests(client, user.login, {
       languageByRepo,
-      enrichLimit: 25,
+      resolvedGithubIds: getResolvedGithubIds(existingPullRequests),
     });
+
+    const pullRequestInputs: PullRequestSyncInput[] = fetchedPullRequests.map((item) => {
+      const isOwnRepo =
+        item.repoFullName.split("/")[0]?.toLowerCase() === user.login.toLowerCase();
+      const isNew = !existingPullRequests.has(item.githubId);
+
+      return {
+        ...item,
+        isOwnRepo,
+        attributedPartnerId: isNew
+          ? resolvePartnerAttribution(memberships, item.githubCreatedAt)
+          : null,
+        attributedOpportunityEventId: isNew
+          ? resolveOpportunityAttribution(
+              opportunityClicks,
+              item.repoFullName,
+              item.githubCreatedAt,
+            )
+          : null,
+      };
+    });
+
+    const upsertResults = await upsertGithubPullRequests(
+      userId,
+      pullRequestInputs,
+      existingPullRequests,
+    );
+    const lifecycleEvents = deriveLifecycleEvents(upsertResults, userId);
+    await recordPullRequestEvents(lifecycleEvents);
+
+    const pullRequests = pullRequestInputs;
 
     const pinnedNames = new Set(
       graph.viewer.pinnedItems.nodes
@@ -158,7 +204,6 @@ export async function syncGithubForUser(
     const issues = [...issueByGithubId.values()];
 
     await replaceGithubRepositories(userId, mappedRepos);
-    await replaceGithubPullRequests(userId, pullRequests);
     await replaceGithubIssues(userId, issues);
     await replaceGithubCommits(userId, commits);
     await replaceGithubContributionDays(userId, contributionDays);
@@ -173,6 +218,11 @@ export async function syncGithubForUser(
 
     const { refreshUserScoreSnapshots } = await import("@/lib/builders/snapshots");
     await refreshUserScoreSnapshots(userId);
+
+    // Detects newly-earned PR-based achievements (first PR, first merged PR)
+    // and fires the achievement-unlock email automatically.
+    const { syncAchievementsForUser } = await import("@/lib/xp/achievements");
+    await syncAchievementsForUser(userId);
 
     return {
       ok: true,

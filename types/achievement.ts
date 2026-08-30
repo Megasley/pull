@@ -11,9 +11,13 @@ export type AchievementCriteria =
   | { type: "nodes_complete"; roadmap: string; nodeIds: string[] }
   | { type: "nodes_complete_any"; roadmap: string; nodeIds: string[] }
   | { type: "roadmap_unlocked"; roadmap: string }
-  | { type: "submissions_approved"; min: number };
+  | { type: "submissions_approved"; min: number }
+  | { type: "github_pr_count"; min: number }
+  | { type: "github_merged_pr_count"; min: number };
 
 export type AchievementEvalContext = {
   progressByRoadmap: Record<string, string[]>;
   approvedSubmissionCount: number;
+  githubPrCount: number;
+  githubMergedPrCount: number;
 };

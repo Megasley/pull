@@ -12,14 +12,18 @@ const globalForDb = globalThis as unknown as {
 function createPostgresClient() {
   return postgres(getDatabaseUrl(), {
     prepare: false,
-    // Session/transaction poolers drop idle sockets; keep a small pool and recycle.
+    // Keep a small pool. Direct local connections (127.0.0.1:54322) don't go
+    // through a pooler so idle sockets can be silently dropped by Docker/OS.
     max: 3,
-    idle_timeout: 20,
-    connect_timeout: 8,
-    max_lifetime: 60 * 10,
+    // Recycle idle connections quickly so stale sockets don't linger.
+    idle_timeout: 10,
+    connect_timeout: 10,
+    // Rotate connections regularly to avoid silently dead long-lived sockets.
+    max_lifetime: 60 * 5,
+    // TCP keepalives detect dead connections before a query hits them.
+    keep_alive: 10,
     connection: {
       application_name: "pull",
-      // Prevent a single bad admin/dashboard query from hanging the whole function.
       statement_timeout: 8000,
     },
   });

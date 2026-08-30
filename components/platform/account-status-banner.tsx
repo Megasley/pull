@@ -10,7 +10,7 @@ export function AccountStatusBanner({ profile }: AccountStatusBannerProps) {
   }
 
   return (
-    <div className="border-b border-amber-500/40 bg-amber-500/10 px-4 py-2.5 text-center text-sm text-amber-950 dark:text-amber-100">
+    <div className="border-b border-warning/40 bg-warning/10 px-4 py-2.5 text-center text-sm text-warning">
       <p>
         Your account is suspended. You can sign in and view your dashboard, but
         submissions, reviews, and your public profile are disabled.

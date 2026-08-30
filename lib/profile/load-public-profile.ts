@@ -27,6 +27,7 @@ import { buildLevelInfo } from "@/lib/xp/levels";
 import { loadBuilderScore } from "@/lib/score";
 import { loadOpenSourceReputation } from "@/lib/reputation";
 import { loadContributionStreak } from "@/lib/dashboard/workspace";
+import { getPrimaryOrgMembership } from "@/lib/partners/memberships";
 import {
   countMergedGithubPullRequests,
   listGithubCommits,
@@ -109,6 +110,7 @@ async function loadPublicBuilderProfileData(
     mergedPullRequestCount,
     lastActiveAt,
     contributionStreak,
+    primaryOrgMembership,
   ] = await Promise.all([
     listUserAchievements(profile.id, progressByRoadmap),
     getApprovedSubmissionCount(profile.id),
@@ -121,7 +123,16 @@ async function loadPublicBuilderProfileData(
     countMergedGithubPullRequests(profile.id),
     getUserLastActiveAt(profile.id),
     loadContributionStreak(profile.id),
+    getPrimaryOrgMembership(profile.id),
   ]);
+
+  const partnerOrigin =
+    primaryOrgMembership?.organization.type === "learning_partner"
+      ? {
+          slug: primaryOrgMembership.organization.slug,
+          name: primaryOrgMembership.organization.name,
+        }
+      : null;
 
   const [reputation, timelineData] = await Promise.all([
     loadOpenSourceReputation(profile.id),
@@ -199,6 +210,7 @@ async function loadPublicBuilderProfileData(
     activity,
     contributionMix,
     collaborationCtas,
+    partnerOrigin,
   };
 }
 

@@ -1,5 +1,6 @@
 import { parseSkillsInput } from "@/lib/profile/portfolio";
 import { normalizeLookingFor, type LookingForId } from "@/lib/builders/looking-for";
+import { isKnownCountryCode } from "@/lib/geo/countries";
 
 function isHttpUrl(value: string): boolean {
   try {
@@ -34,6 +35,8 @@ export type ProfileEditValidation =
         lookingFor: LookingForId[];
         profilePublic: boolean;
         listedInDirectory: boolean;
+        /** undefined = leave unchanged; null = user cleared it. */
+        country?: string | null;
       };
     }
   | { ok: false; error: string };
@@ -48,6 +51,8 @@ export function validateProfileEditInput(input: {
   lookingFor?: string[] | string;
   profilePublic?: FormDataEntryValue | null;
   listedInDirectory?: FormDataEntryValue | null;
+  /** Absent = field not submitted, leave unchanged. Empty string = cleared. */
+  country?: FormDataEntryValue | null;
 }): ProfileEditValidation {
   const displayName = input.displayName?.trim() ?? "";
   const bio = input.bio?.trim() ?? "";
@@ -85,6 +90,18 @@ export function validateProfileEditInput(input: {
     }
   }
 
+  let country: string | null | undefined;
+  if (input.country !== undefined) {
+    const raw = String(input.country ?? "").trim().toUpperCase();
+    if (!raw) {
+      country = null;
+    } else if (isKnownCountryCode(raw)) {
+      country = raw;
+    } else {
+      return { ok: false, error: "Please choose a country from the list." };
+    }
+  }
+
   return {
     ok: true,
     data: {
@@ -97,6 +114,7 @@ export function validateProfileEditInput(input: {
       lookingFor,
       profilePublic,
       listedInDirectory,
+      country,
     },
   };
 }

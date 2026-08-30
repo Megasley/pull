@@ -3,6 +3,10 @@ import { notFound, redirect } from "next/navigation";
 
 import { AdminUserModeration } from "@/components/admin/admin-user-moderation";
 import { AdminUserRoleSelect } from "@/components/admin/admin-user-role-select";
+import { AttentionBanner, type AttentionItem } from "@/components/admin/attention-banner";
+import { CollapsibleCard } from "@/components/admin/collapsible-card";
+import { AdminSectionNav } from "@/components/admin/section-nav";
+import { UserImpactPanel } from "@/components/admin/user-impact-panel";
 import { PageHeader } from "@/components/design-system";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,6 +20,7 @@ import { isUuid } from "@/lib/admin/validate-user-id";
 import { isAdminRole } from "@/lib/auth/roles";
 import { bootstrapCurrentUserProfile } from "@/lib/auth/session";
 import { isDatabaseConfigured } from "@/lib/db/env";
+import { getUserImpactSummary } from "@/lib/impact/user-detail";
 import { buildAllRoadmapProgressSummaries } from "@/lib/progress/summary";
 import { getAllCompletedNodeSlugs } from "@/lib/progress/repository";
 import { SUBMISSION_STATUS_LABELS } from "@/types/submission";
@@ -53,17 +58,43 @@ export default async function AdminUserDetailPage({
     notFound();
   }
 
-  const [progressByRoadmap, submissions, githubSync, auditLog] = await Promise.all([
+  const [progressByRoadmap, submissions, githubSync, auditLog, impact] = await Promise.all([
     getAllCompletedNodeSlugs(user.id),
     getUserSubmissionsForAdmin(user.id),
     getUserGithubSyncForAdmin(user.id),
     listAuditLogForUser(user.id),
+    getUserImpactSummary(user.id),
   ]);
 
   const roadmaps = buildAllRoadmapProgressSummaries(progressByRoadmap);
 
+  const attentionItems: AttentionItem[] = [];
+  if (user.accountStatus !== "active") {
+    attentionItems.push({
+      tone: "destructive",
+      label: `Account ${user.accountStatus}`,
+      detail: user.moderationReason ?? undefined,
+      href: "#role",
+    });
+  }
+  if (githubSync?.syncError) {
+    attentionItems.push({
+      tone: "warning",
+      label: "GitHub sync error",
+      detail: githubSync.syncError,
+      href: "#system",
+    });
+  }
+
+  const navSections = [
+    { id: "role", label: "Role & moderation" },
+    { id: "impact", label: "Impact" },
+    { id: "learning", label: "Learning" },
+    { id: "system", label: "System" },
+  ];
+
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 pt-12 pb-20 sm:px-6 lg:px-8">
+    <div className="mx-auto w-full max-w-7xl px-4 pt-12 pb-20 sm:px-6 lg:px-8">
       <PageHeader
         eyebrow="admin // user"
         title={user.displayName}
@@ -76,9 +107,12 @@ export default async function AdminUserDetailPage({
         }
       />
 
+      <AttentionBanner items={attentionItems} />
+      <AdminSectionNav sections={navSections} />
+
       <div className="mt-8 grid gap-6 lg:grid-cols-[2fr_1fr]">
         <section className="space-y-6">
-          <div className="rounded-none border border-border bg-card p-4">
+          <div id="role" className="scroll-mt-16 rounded-none border border-border bg-card p-4">
             <h2 className="text-sm font-semibold">Role</h2>
             <div className="mt-3">
               <AdminUserRoleSelect
@@ -95,7 +129,13 @@ export default async function AdminUserDetailPage({
             moderationReason={user.moderationReason}
           />
 
-          <div className="rounded-none border border-border bg-card p-4">
+          {impact ? (
+            <div id="impact" className="scroll-mt-16 space-y-6">
+              <UserImpactPanel impact={impact} />
+            </div>
+          ) : null}
+
+          <div id="learning" className="scroll-mt-16 rounded-none border border-border bg-card p-4">
             <h2 className="text-sm font-semibold">Roadmap progress</h2>
             {roadmaps.length === 0 ? (
               <p className="mt-2 text-sm text-muted-foreground">
@@ -134,7 +174,7 @@ export default async function AdminUserDetailPage({
           </div>
         </section>
 
-        <aside className="space-y-6">
+        <aside id="system" className="scroll-mt-16 space-y-6">
           <div className="rounded-none border border-border bg-card p-4">
             <h2 className="text-sm font-semibold">GitHub sync</h2>
             {githubSync ? (
@@ -167,14 +207,11 @@ export default async function AdminUserDetailPage({
             )}
           </div>
 
-          <div className="rounded-none border border-border bg-card p-4">
-            <h2 className="text-sm font-semibold">Audit log</h2>
+          <CollapsibleCard title={`Audit log (${auditLog.length})`}>
             {auditLog.length === 0 ? (
-              <p className="mt-2 text-sm text-muted-foreground">
-                No admin actions yet.
-              </p>
+              <p className="text-sm text-muted-foreground">No admin actions yet.</p>
             ) : (
-              <ul className="mt-3 space-y-2 text-sm">
+              <ul className="space-y-2 text-sm">
                 {auditLog.map((entry) => (
                   <li key={entry.id} className="border-b border-border/60 pb-2">
                     <p className="font-medium">{entry.action}</p>
@@ -185,7 +222,7 @@ export default async function AdminUserDetailPage({
                 ))}
               </ul>
             )}
-          </div>
+          </CollapsibleCard>
         </aside>
       </div>
     </div>

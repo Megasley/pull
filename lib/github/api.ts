@@ -4,6 +4,8 @@ import {
   GITHUB_ACTIVITY_LIMIT,
   GITHUB_COMMIT_REPO_LIMIT,
   GITHUB_COMMITS_PER_REPO,
+  GITHUB_PR_ENRICH_BUDGET,
+  GITHUB_PR_SEARCH_MAX_PAGES,
   GITHUB_REPO_MAX_PAGES,
 } from "./config";
 
@@ -59,6 +61,7 @@ type SearchResponse = {
 type PullRequestDetail = {
   merged: boolean;
   merged_at: string | null;
+  draft: boolean;
   additions: number;
   deletions: number;
   changed_files: number;
@@ -160,17 +163,27 @@ export async function fetchAuthoredPullRequests(
   login: string,
   options: {
     languageByRepo?: Record<string, string | null>;
-    enrichLimit?: number;
+    enrichBudget?: number;
+    /** githubIds already known merged/closed as of the last sync — their
+     *  terminal state can't change, so we skip spending enrichment budget
+     *  re-fetching them. See lib/github/store.ts:partitionResolvedPullRequests. */
+    resolvedGithubIds?: Set<number>;
   } = {},
 ) {
-  const data = await client.request<SearchResponse>(
-    `/search/issues?q=${encodeURIComponent(`author:${login} type:pr`)}&sort=updated&order=desc&per_page=${GITHUB_ACTIVITY_LIMIT}`,
-  );
-
   const languageByRepo = options.languageByRepo ?? {};
-  const enrichLimit = options.enrichLimit ?? 25;
+  const enrichBudgetTotal = options.enrichBudget ?? GITHUB_PR_ENRICH_BUDGET;
+  const resolvedGithubIds = options.resolvedGithubIds ?? new Set<number>();
 
-  const base = data.items.map((item) => {
+  const items: SearchResponse["items"] = [];
+  for (let page = 1; page <= GITHUB_PR_SEARCH_MAX_PAGES; page += 1) {
+    const data = await client.request<SearchResponse>(
+      `/search/issues?q=${encodeURIComponent(`author:${login} type:pr`)}&sort=updated&order=desc&per_page=${GITHUB_ACTIVITY_LIMIT}&page=${page}`,
+    );
+    items.push(...data.items);
+    if (data.items.length < GITHUB_ACTIVITY_LIMIT) break;
+  }
+
+  const base = items.map((item) => {
     const repoFullName = repoFullNameFromUrl(item.repository_url);
     const labels = labelNames(item.labels);
     return {
@@ -179,6 +192,7 @@ export async function fetchAuthoredPullRequests(
       title: item.title,
       state: item.state,
       merged: Boolean(item.pull_request?.merged_at),
+      draft: false,
       repoFullName,
       htmlUrl: item.html_url,
       githubCreatedAt: item.created_at,
@@ -191,17 +205,34 @@ export async function fetchAuthoredPullRequests(
       deletions: 0,
       reviewComments: 0,
       contributionType: "other",
+      /** False means: draft/filesChanged/additions/deletions/reviewComments
+       *  below are search-API defaults, NOT verified — callers with a prior
+       *  DB row for this PR should keep the prior row's values for those
+       *  fields rather than overwrite with these placeholders. */
+      enriched: false,
     };
   });
 
-  // Enrich a subset with files changed / review comment counts.
-  for (const [index, item] of base.entries()) {
-    if (index >= enrichLimit) break;
+  // Spend the enrichment budget on PRs that aren't already known-resolved —
+  // that's where an accurate draft/ready-for-review read actually matters.
+  let budget = enrichBudgetTotal;
+  for (const item of base) {
+    if (resolvedGithubIds.has(item.githubId)) {
+      item.contributionType = inferContributionType(item.title, item.labels);
+      continue;
+    }
+    if (budget <= 0) {
+      item.contributionType = inferContributionType(item.title, item.labels);
+      continue;
+    }
+    budget -= 1;
+
     try {
       const detail = await client.request<PullRequestDetail>(
         `/repos/${item.repoFullName}/pulls/${item.number}`,
       );
       item.merged = detail.merged || item.merged;
+      item.draft = Boolean(detail.draft);
       item.githubMergedAt = detail.merged_at ?? item.githubMergedAt;
       item.filesChanged = detail.changed_files ?? 0;
       item.additions = detail.additions ?? 0;
@@ -210,14 +241,11 @@ export async function fetchAuthoredPullRequests(
       if (detail.labels?.length) {
         item.labels = detail.labels.map((label) => label.name);
       }
+      item.enriched = true;
     } catch {
-      // Keep search-level data if detail fetch fails.
+      // Keep search-level data if detail fetch fails — not enriched.
     }
 
-    item.contributionType = inferContributionType(item.title, item.labels);
-  }
-
-  for (const item of base.slice(enrichLimit)) {
     item.contributionType = inferContributionType(item.title, item.labels);
   }
 

@@ -11,6 +11,7 @@ import {
   userAchievements,
   userRoadmapProgress,
 } from "@/lib/db/schema";
+import { countGithubSyncedEntities, countMergedGithubPullRequests } from "@/lib/github/store";
 import { getRoadmap } from "@/lib/roadmap/load-roadmap";
 import {
   achievementXpKey,
@@ -69,6 +70,20 @@ async function getApprovedSubmissionCount(userId: string): Promise<number> {
   return Number(rows[0]?.value ?? 0);
 }
 
+async function getGithubPrCounts(
+  userId: string,
+): Promise<{ total: number; merged: number }> {
+  if (!isDatabaseConfigured()) {
+    return { total: 0, merged: 0 };
+  }
+
+  const [{ pullRequests: total }, merged] = await Promise.all([
+    countGithubSyncedEntities(userId),
+    countMergedGithubPullRequests(userId),
+  ]);
+  return { total, merged };
+}
+
 export const ensureAchievementsCatalog = cache(
   async function ensureAchievementsCatalog() {
     if (!isDatabaseConfigured()) {
@@ -110,9 +125,13 @@ export async function syncAchievementsForUser(userId: string): Promise<string[]>
 
   const progressByRoadmap = await getProgressByRoadmap(userId);
   const approvedSubmissionCount = await getApprovedSubmissionCount(userId);
+  const { total: githubPrCount, merged: githubMergedPrCount } =
+    await getGithubPrCounts(userId);
   const earnedSlugs = evaluateEarnedAchievementSlugs({
     progressByRoadmap,
     approvedSubmissionCount,
+    githubPrCount,
+    githubMergedPrCount,
   });
 
   const db = getDb();
@@ -169,10 +188,14 @@ export async function listUserAchievements(
   progressByRoadmap: Record<string, string[]>,
 ): Promise<AchievementItem[]> {
   const approvedSubmissionCount = await getApprovedSubmissionCount(userId);
+  const { total: githubPrCount, merged: githubMergedPrCount } =
+    await getGithubPrCounts(userId);
   const earnedSlugs = new Set(
     evaluateEarnedAchievementSlugs({
       progressByRoadmap,
       approvedSubmissionCount,
+      githubPrCount,
+      githubMergedPrCount,
     }),
   );
   let earnedAtBySlug: Record<string, string> = {};

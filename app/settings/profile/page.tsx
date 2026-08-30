@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 
 import { ProfileEditForm } from "@/components/profile/profile-edit-form";
 import { PageHeader } from "@/components/design-system";
+import { AppearanceSection } from "@/components/settings/appearance-section";
 import { bootstrapCurrentUserProfile } from "@/lib/auth/session";
 
 export const metadata = {
@@ -24,8 +25,11 @@ export default async function ProfileSettingsPage() {
         description={`These details appear on your public builder portfolio at /u/${profile.username}.`}
       />
 
-      <div className="mt-10 rounded-none border border-border bg-card p-5 sm:p-6">
-        <ProfileEditForm profile={profile} />
+      <div className="mt-10 space-y-6">
+        <AppearanceSection />
+        <div className="rounded-none border border-border bg-card p-5 sm:p-6">
+          <ProfileEditForm profile={profile} />
+        </div>
       </div>
     </div>
   );

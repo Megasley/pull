@@ -38,7 +38,8 @@ export function isAchievementEarned(
   definition: AchievementDefinition,
   context: AchievementEvalContext,
 ): boolean {
-  const { progressByRoadmap, approvedSubmissionCount } = context;
+  const { progressByRoadmap, approvedSubmissionCount, githubPrCount, githubMergedPrCount } =
+    context;
   const criteria = definition.criteria;
 
   switch (criteria.type) {
@@ -98,6 +99,12 @@ export function isAchievementEarned(
     }
     case "submissions_approved": {
       return approvedSubmissionCount >= criteria.min;
+    }
+    case "github_pr_count": {
+      return githubPrCount >= criteria.min;
+    }
+    case "github_merged_pr_count": {
+      return githubMergedPrCount >= criteria.min;
     }
     default: {
       return false;

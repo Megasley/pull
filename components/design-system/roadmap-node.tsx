@@ -28,7 +28,7 @@ const statusStyles: Record<
   },
   completed: {
     container: "border-ink/30 bg-signal/15 hover:border-ink/50 hover:bg-signal/25",
-    indicator: "border-ink bg-signal text-ink",
+    indicator: "border-ink bg-signal text-signal-foreground",
     icon: <CheckIcon className="size-3.5" />,
   },
   locked: {

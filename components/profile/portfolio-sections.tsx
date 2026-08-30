@@ -362,7 +362,7 @@ export function MergedPrHighlightsSection({
                     {profile ? (
                       <span className="profile-pr-pill-merged">Merged</span>
                     ) : (
-                      <Badge className="bg-signal text-ink hover:bg-signal/90">
+                      <Badge className="bg-signal text-signal-foreground hover:bg-signal/90">
                         Merged
                       </Badge>
                     )}

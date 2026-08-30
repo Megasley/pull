@@ -4,7 +4,10 @@ import { BetaBadge } from "@/components/layout/beta-badge";
 import { MainNav } from "@/components/layout/main-nav";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { SiteContainer } from "@/components/layout/site-container";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { getCurrentSessionContext } from "@/lib/auth/session";
+import { isDatabaseConfigured } from "@/lib/db/env";
+import { getPrimaryOrgMembership } from "@/lib/partners/memberships";
 import { siteConfig } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
 
@@ -23,6 +26,9 @@ export async function Navbar({ className }: NavbarProps) {
 
   const avatarUrl =
     profile?.avatar ?? (user?.user_metadata?.avatar_url as string | undefined) ?? null;
+
+  const orgMembership =
+    user && isDatabaseConfigured() ? await getPrimaryOrgMembership(user.id) : null;
 
   return (
     <header
@@ -48,12 +54,18 @@ export async function Navbar({ className }: NavbarProps) {
           >
             Feedback
           </a>
+          {!user ? <ThemeToggle className="hidden sm:inline-flex" /> : null}
           <AuthControls className="hidden md:flex" />
           <MobileNav
             isAuthenticated={Boolean(user)}
             displayName={displayName}
             avatarUrl={avatarUrl}
             profile={profile}
+            orgMembership={
+              orgMembership
+                ? { slug: orgMembership.organization.slug, name: orgMembership.organization.name }
+                : null
+            }
           />
         </div>
       </SiteContainer>

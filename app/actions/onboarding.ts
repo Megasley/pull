@@ -8,10 +8,14 @@ import { ensureWeeklyGoals } from "@/lib/dashboard/weekly-goals";
 import { getDb } from "@/lib/db";
 import { isDatabaseConfigured } from "@/lib/db/env";
 import { users } from "@/lib/db/schema";
+import { isKnownCountryCode } from "@/lib/geo/countries";
 
 export async function completeOnboardingAction(input: {
   roadmapSlug: string;
   weeklyGoalTitle?: string;
+  /** Optional — the onboarding wizard's country step is skippable. Never
+   *  asked again once onboarding completes; editable later in Settings. */
+  country?: string;
 }) {
   const profile = await bootstrapCurrentUserProfile();
 
@@ -32,6 +36,11 @@ export async function completeOnboardingAction(input: {
     return { ok: false as const, reason: "invalid_roadmap" as const };
   }
 
+  const country = input.country?.trim().toUpperCase();
+  if (country && !isKnownCountryCode(country)) {
+    return { ok: false as const, reason: "invalid_country" as const };
+  }
+
   const now = new Date().toISOString();
 
   try {
@@ -42,6 +51,7 @@ export async function completeOnboardingAction(input: {
         preferredRoadmapSlug: roadmapSlug,
         onboardingCompletedAt: now,
         updatedAt: now,
+        ...(country ? { country } : {}),
       })
       .where(eq(users.id, profile.id))
       .returning({ id: users.id });

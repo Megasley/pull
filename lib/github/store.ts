@@ -1,12 +1,13 @@
 import { and, asc, count, desc, eq, inArray, lte, sql } from "drizzle-orm";
 
-import { getDb } from "@/lib/db";
+import { getDb, withDbRetry } from "@/lib/db";
 import { isDatabaseConfigured } from "@/lib/db/env";
 import {
   githubCommits,
   githubConnections,
   githubContributionDays,
   githubIssues,
+  githubPullRequestEvents,
   githubPullRequests,
   githubRepositories,
 } from "@/lib/db/schema";
@@ -259,56 +260,321 @@ export async function replaceGithubRepositories(
   }
 }
 
-export async function replaceGithubPullRequests(
+export type ExistingPullRequestForSync = {
+  id: string;
+  githubId: number;
+  state: string;
+  merged: boolean;
+  draft: boolean;
+  filesChanged: number;
+  additions: number;
+  deletions: number;
+  reviewComments: number;
+  githubMergedAt: string | null;
+  githubClosedAt: string | null;
+};
+
+/** All of a user's currently-stored PRs, keyed by githubId, for sync-time diffing. */
+export async function getExistingPullRequestsForSync(
   userId: string,
-  items: Array<{
-    githubId: number;
-    number: number;
-    title: string;
-    state: string;
-    merged: boolean;
-    repoFullName: string;
-    htmlUrl: string;
-    githubCreatedAt: string | null;
-    githubClosedAt: string | null;
-    githubMergedAt: string | null;
-    labels?: string[];
-    language?: string | null;
-    filesChanged?: number;
-    additions?: number;
-    deletions?: number;
-    reviewComments?: number;
-    contributionType?: string;
-  }>,
-) {
-  if (!isDatabaseConfigured()) return;
+): Promise<Map<number, ExistingPullRequestForSync>> {
+  const map = new Map<number, ExistingPullRequestForSync>();
+  if (!isDatabaseConfigured()) return map;
+  const db = getDb();
+  const rows = await db
+    .select({
+      id: githubPullRequests.id,
+      githubId: githubPullRequests.githubId,
+      state: githubPullRequests.state,
+      merged: githubPullRequests.merged,
+      draft: githubPullRequests.draft,
+      filesChanged: githubPullRequests.filesChanged,
+      additions: githubPullRequests.additions,
+      deletions: githubPullRequests.deletions,
+      reviewComments: githubPullRequests.reviewComments,
+      githubMergedAt: githubPullRequests.githubMergedAt,
+      githubClosedAt: githubPullRequests.githubClosedAt,
+    })
+    .from(githubPullRequests)
+    .where(eq(githubPullRequests.userId, userId));
+  for (const row of rows) {
+    map.set(row.githubId, row);
+  }
+  return map;
+}
+
+/** PRs whose terminal state (merged or closed) can't change — safe to skip
+ *  re-enrichment for. See lib/github/api.ts:fetchAuthoredPullRequests. */
+export function getResolvedGithubIds(
+  existing: Map<number, ExistingPullRequestForSync>,
+): Set<number> {
+  const resolved = new Set<number>();
+  for (const row of existing.values()) {
+    if (row.merged || row.state === "closed") {
+      resolved.add(row.githubId);
+    }
+  }
+  return resolved;
+}
+
+export type PullRequestSyncInput = {
+  githubId: number;
+  number: number;
+  title: string;
+  state: string;
+  merged: boolean;
+  draft: boolean;
+  /** False when draft/filesChanged/additions/deletions/reviewComments came
+   *  from the search API default rather than a verified per-PR detail call —
+   *  see lib/github/api.ts:fetchAuthoredPullRequests. */
+  enriched: boolean;
+  repoFullName: string;
+  htmlUrl: string;
+  githubCreatedAt: string | null;
+  githubClosedAt: string | null;
+  githubMergedAt: string | null;
+  labels?: string[];
+  language?: string | null;
+  filesChanged?: number;
+  additions?: number;
+  deletions?: number;
+  reviewComments?: number;
+  contributionType?: string;
+  isOwnRepo: boolean;
+  /** Only applied when inserting a brand-new row — never overwrites existing
+   *  attribution on an update. See lib/github/attribution.ts. */
+  attributedPartnerId: string | null;
+  attributedOpportunityEventId: string | null;
+};
+
+/**
+ * Idempotent upsert by (userId, githubId) — replaces the old delete+reinsert
+ * pattern so a PR that ages out of the fetch window is simply left untouched
+ * rather than deleted, preserving durable history. Returns the row ids and
+ * before/after state needed to emit lifecycle events.
+ */
+export async function upsertGithubPullRequests(
+  userId: string,
+  items: PullRequestSyncInput[],
+  existing: Map<number, ExistingPullRequestForSync>,
+): Promise<
+  Array<{
+    input: PullRequestSyncInput;
+    pullRequestId: string;
+    previous: ExistingPullRequestForSync | null;
+  }>
+> {
+  if (!isDatabaseConfigured() || items.length === 0) return [];
   const db = getDb();
   const stamp = nowIso();
-  await db.delete(githubPullRequests).where(eq(githubPullRequests.userId, userId));
-  if (items.length === 0) return;
-  await db.insert(githubPullRequests).values(
-    items.map((item) => ({
-      userId,
-      githubId: item.githubId,
-      number: item.number,
-      title: item.title,
-      state: item.state,
-      merged: item.merged,
-      repoFullName: item.repoFullName,
-      htmlUrl: item.htmlUrl,
-      githubCreatedAt: item.githubCreatedAt,
-      githubClosedAt: item.githubClosedAt,
-      githubMergedAt: item.githubMergedAt,
-      labels: item.labels ?? [],
-      language: item.language ?? null,
-      filesChanged: item.filesChanged ?? 0,
-      additions: item.additions ?? 0,
-      deletions: item.deletions ?? 0,
-      reviewComments: item.reviewComments ?? 0,
-      contributionType: item.contributionType ?? "other",
-      syncedAt: stamp,
-    })),
-  );
+  const results: Array<{
+    input: PullRequestSyncInput;
+    pullRequestId: string;
+    previous: ExistingPullRequestForSync | null;
+  }> = [];
+
+  for (const item of items) {
+    const previous = existing.get(item.githubId) ?? null;
+
+    // Enrichment was skipped this sync (already-resolved or over budget) —
+    // keep the last verified values for the fields enrichment controls,
+    // rather than overwrite with search-API placeholders.
+    const draft = item.enriched ? item.draft : (previous?.draft ?? item.draft);
+    const filesChanged = item.enriched
+      ? (item.filesChanged ?? 0)
+      : (previous?.filesChanged ?? item.filesChanged ?? 0);
+    const additions = item.enriched
+      ? (item.additions ?? 0)
+      : (previous?.additions ?? item.additions ?? 0);
+    const deletions = item.enriched
+      ? (item.deletions ?? 0)
+      : (previous?.deletions ?? item.deletions ?? 0);
+    const reviewComments = item.enriched
+      ? (item.reviewComments ?? 0)
+      : (previous?.reviewComments ?? item.reviewComments ?? 0);
+
+    const [row] = await db
+      .insert(githubPullRequests)
+      .values({
+        userId,
+        githubId: item.githubId,
+        number: item.number,
+        title: item.title,
+        state: item.state,
+        merged: item.merged,
+        draft,
+        repoFullName: item.repoFullName,
+        htmlUrl: item.htmlUrl,
+        githubCreatedAt: item.githubCreatedAt,
+        githubClosedAt: item.githubClosedAt,
+        githubMergedAt: item.githubMergedAt,
+        labels: item.labels ?? [],
+        language: item.language ?? null,
+        filesChanged,
+        additions,
+        deletions,
+        reviewComments,
+        contributionType: item.contributionType ?? "other",
+        isOwnRepo: item.isOwnRepo,
+        // Only reached when there's no existing row (no unique-key
+        // conflict) — attribution is always fresh for a genuine first insert.
+        attributedPartnerId: item.attributedPartnerId,
+        attributedOpportunityEventId: item.attributedOpportunityEventId,
+        firstSyncedAt: stamp,
+        syncedAt: stamp,
+      })
+      .onConflictDoUpdate({
+        target: [githubPullRequests.userId, githubPullRequests.githubId],
+        set: {
+          title: item.title,
+          state: item.state,
+          merged: item.merged,
+          draft,
+          repoFullName: item.repoFullName,
+          htmlUrl: item.htmlUrl,
+          githubClosedAt: item.githubClosedAt,
+          githubMergedAt: item.githubMergedAt,
+          labels: item.labels ?? [],
+          language: item.language ?? null,
+          filesChanged,
+          additions,
+          deletions,
+          reviewComments,
+          contributionType: item.contributionType ?? "other",
+          isOwnRepo: item.isOwnRepo,
+          // attributedPartnerId / attributedOpportunityEventId / firstSyncedAt
+          // intentionally omitted — set once at insert, never overwritten.
+          syncedAt: stamp,
+        },
+      })
+      .returning({ id: githubPullRequests.id });
+
+    if (row) {
+      results.push({ input: item, pullRequestId: row.id, previous });
+    }
+  }
+
+  return results;
+}
+
+export type PullRequestLifecycleEventInput = {
+  pullRequestId: string;
+  userId: string;
+  eventType: "opened" | "ready_for_review" | "merged" | "closed";
+  occurredAt: string;
+  timestampSource: "github" | "sync_observed";
+};
+
+/**
+ * Idempotent by construction — unique(pullRequestId, eventType) plus
+ * onConflictDoNothing means re-running sync (retry, duplicate cron
+ * invocation) can never duplicate a lifecycle event.
+ */
+export async function recordPullRequestEvents(
+  events: PullRequestLifecycleEventInput[],
+): Promise<void> {
+  if (!isDatabaseConfigured() || events.length === 0) return;
+  const db = getDb();
+  await db
+    .insert(githubPullRequestEvents)
+    .values(
+      events.map((event) => ({
+        pullRequestId: event.pullRequestId,
+        userId: event.userId,
+        eventType: event.eventType,
+        occurredAt: event.occurredAt,
+        timestampSource: event.timestampSource,
+      })),
+    )
+    .onConflictDoNothing({
+      target: [githubPullRequestEvents.pullRequestId, githubPullRequestEvents.eventType],
+    });
+}
+
+/**
+ * Diffs upsert results against their prior state and returns the lifecycle
+ * events that should be recorded. Pure function — no I/O — so it's directly
+ * unit-testable. See tests/impact.test.ts.
+ */
+export function deriveLifecycleEvents(
+  results: Array<{
+    input: PullRequestSyncInput;
+    pullRequestId: string;
+    previous: ExistingPullRequestForSync | null;
+  }>,
+  userId: string,
+): PullRequestLifecycleEventInput[] {
+  const events: PullRequestLifecycleEventInput[] = [];
+
+  for (const { input, pullRequestId, previous } of results) {
+    if (!previous) {
+      // Brand new PR. We only know the state as of discovery — record
+      // "opened" using GitHub's real timestamp, and any terminal state
+      // that's already true, but never invent a ready_for_review transition
+      // we didn't actually observe happening.
+      if (input.githubCreatedAt) {
+        events.push({
+          pullRequestId,
+          userId,
+          eventType: "opened",
+          occurredAt: input.githubCreatedAt,
+          timestampSource: "github",
+        });
+      }
+      if (input.merged && input.githubMergedAt) {
+        events.push({
+          pullRequestId,
+          userId,
+          eventType: "merged",
+          occurredAt: input.githubMergedAt,
+          timestampSource: "github",
+        });
+      } else if (input.state === "closed" && input.githubClosedAt) {
+        events.push({
+          pullRequestId,
+          userId,
+          eventType: "closed",
+          occurredAt: input.githubClosedAt,
+          timestampSource: "github",
+        });
+      }
+      continue;
+    }
+
+    if (!previous.merged && input.merged && input.githubMergedAt) {
+      events.push({
+        pullRequestId,
+        userId,
+        eventType: "merged",
+        occurredAt: input.githubMergedAt,
+        timestampSource: "github",
+      });
+    } else if (previous.state !== "closed" && input.state === "closed" && !input.merged && input.githubClosedAt) {
+      events.push({
+        pullRequestId,
+        userId,
+        eventType: "closed",
+        occurredAt: input.githubClosedAt,
+        timestampSource: "github",
+      });
+    }
+
+    // Only trust a draft->ready transition when this sync actually
+    // re-verified draft status (enriched) — otherwise a resolved/
+    // budget-skipped PR's carried-forward `draft` value could look like a
+    // transition when nothing was actually observed.
+    if (previous.draft && input.enriched && !input.draft) {
+      events.push({
+        pullRequestId,
+        userId,
+        eventType: "ready_for_review",
+        occurredAt: new Date().toISOString(),
+        timestampSource: "sync_observed",
+      });
+    }
+  }
+
+  return events;
 }
 
 export async function replaceGithubIssues(
@@ -393,28 +659,30 @@ export async function listGithubRepositories(
   options: { pinnedOnly?: boolean; limit?: number } = {},
 ): Promise<GithubRepositoryRecord[]> {
   if (!isDatabaseConfigured()) return [];
-  const db = getDb();
-  const query = db
-    .select()
-    .from(githubRepositories)
-    .where(
-      options.pinnedOnly
-        ? and(
-            eq(githubRepositories.userId, userId),
-            eq(githubRepositories.isPinned, true),
-          )
-        : eq(githubRepositories.userId, userId),
-    )
-    .orderBy(
-      desc(githubRepositories.isPinned),
-      desc(githubRepositories.stargazersCount),
-      desc(githubRepositories.pushedAt),
-    );
+  return withDbRetry(async () => {
+    const db = getDb();
+    const query = db
+      .select()
+      .from(githubRepositories)
+      .where(
+        options.pinnedOnly
+          ? and(
+              eq(githubRepositories.userId, userId),
+              eq(githubRepositories.isPinned, true),
+            )
+          : eq(githubRepositories.userId, userId),
+      )
+      .orderBy(
+        desc(githubRepositories.isPinned),
+        desc(githubRepositories.stargazersCount),
+        desc(githubRepositories.pushedAt),
+      );
 
-  const rows =
-    options.limit === undefined ? await query : await query.limit(options.limit);
+    const rows =
+      options.limit === undefined ? await query : await query.limit(options.limit);
 
-  return rows.map(mapRepo);
+    return rows.map(mapRepo);
+  });
 }
 
 export async function listGithubContributionDays(
@@ -594,6 +862,19 @@ export async function countMergedGithubPullRequests(userId: string): Promise<num
     .from(githubPullRequests)
     .where(
       and(eq(githubPullRequests.userId, userId), eq(githubPullRequests.merged, true)),
+    );
+  return Number(row?.value ?? 0);
+}
+
+/** Total non-draft (ready for review) PRs synced for a user — "submitted", not just started. */
+export async function countSubmittedGithubPullRequests(userId: string): Promise<number> {
+  if (!isDatabaseConfigured()) return 0;
+  const db = getDb();
+  const [row] = await db
+    .select({ value: count() })
+    .from(githubPullRequests)
+    .where(
+      and(eq(githubPullRequests.userId, userId), eq(githubPullRequests.draft, false)),
     );
   return Number(row?.value ?? 0);
 }

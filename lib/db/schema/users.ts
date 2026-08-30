@@ -12,7 +12,7 @@ import {
 import type { EmailNotificationPrefs } from "@/types/notifications";
 import { DEFAULT_EMAIL_NOTIFICATION_PREFS } from "@/types/notifications";
 
-import { userAccountStatusEnum, userRoleEnum } from "./enums";
+import { acquisitionSourceEnum, userAccountStatusEnum, userRoleEnum } from "./enums";
 
 export const users = pgTable(
   "users",
@@ -51,6 +51,14 @@ export const users = pgTable(
       mode: "string",
     }),
     preferredRoadmapSlug: text("preferred_roadmap_slug"),
+    /** Optional, self-reported ISO 3166-1 alpha-2 code. Never inferred from IP. */
+    country: text("country"),
+    /** First-touch acquisition bucket. Set once at signup, immutable afterward. */
+    acquisitionSource: acquisitionSourceEnum("acquisition_source"),
+    acquisitionDetail: jsonb("acquisition_detail")
+      .$type<Record<string, unknown>>()
+      .notNull()
+      .default({}),
     xp: integer("xp").notNull().default(0),
     level: integer("level").notNull().default(1),
     createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
@@ -70,5 +78,7 @@ export const users = pgTable(
     index("users_role_idx").on(table.role),
     index("users_account_status_idx").on(table.accountStatus),
     index("users_last_active_at_idx").on(table.lastActiveAt),
+    index("users_country_idx").on(table.country),
+    index("users_acquisition_source_idx").on(table.acquisitionSource),
   ],
 );

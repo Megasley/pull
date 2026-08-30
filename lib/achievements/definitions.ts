@@ -130,6 +130,24 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     category: "milestones",
     criteria: { type: "any_roadmap_complete" },
   },
+  {
+    id: "first-pull-request",
+    title: "First Pull Request",
+    description: "Open your first pull request on GitHub.",
+    icon: "🔀",
+    xpReward: 50,
+    category: "open-source",
+    criteria: { type: "github_pr_count", min: 1 },
+  },
+  {
+    id: "first-merged-pr",
+    title: "First Merged PR",
+    description: "Get your first pull request merged.",
+    icon: "✅",
+    xpReward: 150,
+    category: "open-source",
+    criteria: { type: "github_merged_pr_count", min: 1 },
+  },
 ];
 
 export const ACHIEVEMENT_CATEGORY_LABELS: Record<AchievementCategory, string> = {

@@ -7,13 +7,18 @@ import { useEffect, useRef, useState } from "react";
 
 import { signOut } from "@/app/actions/auth";
 import { SiteContainer } from "@/components/layout/site-container";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   accountNavSections,
   isExternalHref,
+  isNavComingSoon,
+  isNavDivider,
+  isNavLink,
   primaryNav,
   siteConfig,
+  type NavGroupItem,
 } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
 import type { BuilderProfile } from "@/types/user";
@@ -23,6 +28,7 @@ type MobileNavProps = {
   displayName?: string;
   avatarUrl?: string | null;
   profile?: BuilderProfile | null;
+  orgMembership?: { slug: string; name: string } | null;
 };
 
 type SectionTone =
@@ -194,6 +200,7 @@ export function MobileNav({
   displayName,
   avatarUrl,
   profile,
+  orgMembership,
 }: MobileNavProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -290,6 +297,15 @@ export function MobileNav({
           className="flex-1 overflow-y-auto overscroll-contain"
         >
           <div className="flex flex-col gap-3 py-4 pb-28">
+            {!isAuthenticated ? (
+              <div className="flex items-center justify-between border border-border px-4 py-3">
+                <p className="font-mono text-[11px] font-bold tracking-[0.22em] text-foreground uppercase">
+                  Theme
+                </p>
+                <ThemeToggle />
+              </div>
+            ) : null}
+
             {isAuthenticated ? (
               <div className="flex items-center gap-3 border border-border bg-card px-3.5 py-3">
                 <Avatar className="size-10 shrink-0 rounded-none border border-border">
@@ -314,40 +330,55 @@ export function MobileNav({
             ) : null}
 
             {primaryNav.map((item) => {
-              if (item.type === "link") {
-                return (
-                  <TopLevelMobileLink
-                    key={item.href}
-                    href={item.href}
-                    pathname={pathname}
-                    onClick={close}
-                    tone={toneForNavGroup(item.title)}
-                  >
-                    {item.title}
-                  </TopLevelMobileLink>
-                );
-              }
-
               return (
                 <NavSection
                   key={item.title}
                   title={item.title}
                   tone={toneForNavGroup(item.title)}
                 >
-                  {item.items.map((child) => (
-                    <MobileLink
-                      key={child.href}
-                      href={child.href}
-                      pathname={pathname}
-                      onClick={close}
-                      external={
-                        isExternalHref(child.href) ||
-                        ("external" in child && Boolean(child.external))
-                      }
-                    >
-                      {child.title}
-                    </MobileLink>
-                  ))}
+                  {(item.items as readonly NavGroupItem[]).map((child, i) => {
+                    if (isNavDivider(child)) {
+                      return (
+                        <li key={`divider-${i}`} aria-hidden>
+                          <div className="mx-4 border-t border-border/40" />
+                        </li>
+                      );
+                    }
+
+                    if (isNavComingSoon(child)) {
+                      return (
+                        <li key={child.title}>
+                          <div
+                            className="flex cursor-default items-center justify-between border-b border-border/60 px-4 py-3.5 font-mono text-xs uppercase tracking-[0.1em] text-foreground/30 last:border-b-0 select-none"
+                            aria-disabled="true"
+                          >
+                            <span>{child.title}</span>
+                            <span className="border border-border/30 px-1.5 py-0.5 text-[9px] tracking-widest text-foreground/30">
+                              Soon
+                            </span>
+                          </div>
+                        </li>
+                      );
+                    }
+
+                    return (
+                      <MobileLink
+                        key={child.href}
+                        href={child.href}
+                        pathname={pathname}
+                        onClick={close}
+                        external={
+                          isExternalHref(child.href) ||
+                          ("external" in child && Boolean(child.external))
+                        }
+                      >
+                        {child.title}
+                        {(isExternalHref(child.href) || ("external" in child && child.external)) && (
+                          <span className="ml-auto pl-2 opacity-40" aria-hidden>↗</span>
+                        )}
+                      </MobileLink>
+                    );
+                  })}
                   {item.title === "Contribute" ? (
                     <MobileLink
                       href={siteConfig.feedbackUrl}
@@ -390,6 +421,15 @@ export function MobileNav({
                     ))}
                     {section.title === "Workspace" ? (
                       <>
+                        {orgMembership ? (
+                          <MobileLink
+                            href={`/partners/${orgMembership.slug}`}
+                            pathname={pathname}
+                            onClick={close}
+                          >
+                            {orgMembership.name} Hub
+                          </MobileLink>
+                        ) : null}
                         <MobileLink
                           href="/review"
                           pathname={pathname}
@@ -426,7 +466,7 @@ export function MobileNav({
               <Link
                 href="/roadmaps"
                 onClick={close}
-                className="block w-full border border-ink bg-ink px-3 py-3 text-center font-mono text-xs font-medium uppercase tracking-[0.1em] text-[var(--background)] transition-colors hover:bg-ink/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                className="block w-full border border-primary bg-primary px-3 py-3 text-center font-mono text-xs font-medium uppercase tracking-[0.1em] text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 ./start-building
               </Link>
@@ -451,7 +491,7 @@ export function MobileNav({
               <Link
                 href="/roadmaps"
                 onClick={close}
-                className="flex-[1.25] border border-ink bg-ink px-3 py-3 text-center font-mono text-xs font-medium uppercase tracking-[0.1em] text-[var(--background)] transition-colors hover:bg-ink/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                className="flex-[1.25] border border-primary bg-primary px-3 py-3 text-center font-mono text-xs font-medium uppercase tracking-[0.1em] text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 ./start-building
               </Link>

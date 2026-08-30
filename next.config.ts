@@ -32,6 +32,16 @@ const SECURITY_HEADERS = [
   },
 ];
 
+// The local Supabase CLI serves auth/API over plain HTTP (no TLS), which
+// `https:` in connect-src doesn't cover — without this, the browser client's
+// token auto-refresh is silently blocked by CSP on every local dev session.
+// Scoped to development only so production's connect-src stays as strict as
+// the real (https) Supabase project URL already requires.
+const localSupabaseOrigin =
+  process.env.NODE_ENV !== "production"
+    ? process.env.NEXT_PUBLIC_SUPABASE_URL?.trim()
+    : undefined;
+
 const CSP_HEADER = {
   key: "Content-Security-Policy",
   value: [
@@ -44,7 +54,7 @@ const CSP_HEADER = {
     "style-src 'self' 'unsafe-inline'",
     "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://va.vercel-scripts.com",
     "font-src 'self' data:",
-    "connect-src 'self' https: wss:",
+    ["connect-src 'self' https: wss:", localSupabaseOrigin].filter(Boolean).join(" "),
     "worker-src 'self' blob:",
     "media-src 'self' blob:",
     "object-src 'none'",
@@ -53,6 +63,10 @@ const CSP_HEADER = {
 };
 
 const nextConfig: NextConfig = {
+  // Allow HMR WebSocket connections when accessing the dev server via 127.0.0.1.
+  // Without this, hot reload is blocked and every change triggers a full page
+  // reload, which floods the DB connection pool and causes cascading ECONNRESET.
+  allowedDevOrigins: ["127.0.0.1"],
   async headers() {
     return [
       {
@@ -74,7 +88,7 @@ const nextConfig: NextConfig = {
     ],
   },
   experimental: {
-    optimizePackageImports: ["lucide-react", "drizzle-orm", "@supabase/supabase-js"],
+    optimizePackageImports: ["lucide-react", "drizzle-orm"],
   },
 };
 

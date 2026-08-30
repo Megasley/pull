@@ -28,7 +28,7 @@ export function PullRequestCard({ item, index = 0 }: PullRequestCardProps) {
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             {item.merged ? (
-              <Badge className="bg-signal text-ink hover:bg-signal/90">
+              <Badge className="bg-signal text-signal-foreground hover:bg-signal/90">
                 <GitMerge className="size-3" aria-hidden />
                 Merged
               </Badge>

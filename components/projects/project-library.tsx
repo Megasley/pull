@@ -248,7 +248,7 @@ function FilterChip({
         "shrink-0 rounded-none border px-2.5 py-1 text-xs transition-colors",
         active
           ? tone === "beginner"
-            ? "border-ink/20 bg-signal text-ink"
+            ? "border-ink/20 bg-signal text-signal-foreground"
             : tone === "intermediate"
               ? "border-ink/30 bg-ink/10 text-ink"
               : tone === "advanced"

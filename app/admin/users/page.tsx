@@ -10,6 +10,8 @@ import { listUsersForAdmin } from "@/lib/admin/repository";
 import { isAdminRole } from "@/lib/auth/roles";
 import { bootstrapCurrentUserProfile } from "@/lib/auth/session";
 import { isDatabaseConfigured } from "@/lib/db/env";
+import { getCountryInfo } from "@/lib/geo/countries";
+import { getUserImpactBadges } from "@/lib/impact/user-detail";
 
 export const metadata = {
   title: "Admin · Users",
@@ -46,8 +48,10 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
     ? await listUsersForAdmin({ query: query || undefined, limit: 100 })
     : { users: [], total: 0 };
 
+  const impactBadges = await getUserImpactBadges(users.map((u) => u.id));
+
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 pt-12 pb-20 sm:px-6 lg:px-8">
+    <div className="mx-auto w-full max-w-7xl px-4 pt-12 pb-20 sm:px-6 lg:px-8">
       <PageHeader
         eyebrow="admin // users"
         title="Users"
@@ -94,6 +98,8 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
               .join("")
               .slice(0, 2)
               .toUpperCase();
+            const impact = impactBadges.get(user.id);
+            const countryName = getCountryInfo(user.country)?.name ?? null;
 
             return (
               <div
@@ -118,6 +124,29 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
                       @{user.username} · gh:{user.githubUsername} · xp {user.xp} · lvl{" "}
                       {user.level}
                     </p>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <Badge variant="outline" className="font-mono text-[10px]">
+                        {impact?.totalPRs ?? 0} PR{impact?.totalPRs === 1 ? "" : "s"}
+                      </Badge>
+                      <Badge variant="outline" className="font-mono text-[10px]">
+                        {impact?.qualifyingMergedPRs ?? 0} merged
+                      </Badge>
+                      {impact?.isVerifiedContributor ? (
+                        <Badge variant="secondary" className="font-mono text-[10px]">
+                          verified
+                        </Badge>
+                      ) : null}
+                      {impact?.isRepeatContributor ? (
+                        <Badge variant="secondary" className="font-mono text-[10px]">
+                          repeat
+                        </Badge>
+                      ) : null}
+                      {countryName ? (
+                        <Badge variant="outline" className="font-mono text-[10px]">
+                          {countryName}
+                        </Badge>
+                      ) : null}
+                    </div>
                   </div>
                 </div>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center">

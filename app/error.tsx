@@ -24,7 +24,7 @@ export default function Error({ error, reset }: ErrorPageProps) {
     (message.includes("sync") || message.includes("oauth"));
 
   return (
-    <div className="bg-signal relative min-h-[70vh] overflow-hidden">
+    <div className="brand-fixed bg-signal relative min-h-[70vh] overflow-hidden">
       <div aria-hidden className="pointer-events-none absolute inset-0">
         <div className="tech-scanline absolute inset-x-0 top-0 h-px bg-ink/40" />
         <div className="tech-grid absolute inset-0 opacity-[0.12]" />
@@ -60,7 +60,7 @@ export default function Error({ error, reset }: ErrorPageProps) {
           ) : null}
         </p>
 
-        <div className="mt-8 overflow-hidden rounded-none border border-ink/20 bg-ink text-[var(--background)]">
+        <div className="brand-fixed mt-8 overflow-hidden rounded-none border border-ink/20 bg-ink text-[var(--background)]">
           <div className="flex items-center gap-2 border-b border-white/10 px-4 py-2.5">
             <span className="size-2 bg-signal" aria-hidden />
             <span className="font-mono text-[11px] text-white/50">
@@ -102,7 +102,7 @@ export default function Error({ error, reset }: ErrorPageProps) {
           <Button
             type="button"
             onClick={reset}
-            className="h-11 border-ink bg-ink px-5 text-[var(--background)] hover:bg-ink/90"
+            className="h-11 px-5"
           >
             ./retry
           </Button>

@@ -88,5 +88,6 @@ export type PublicBuilderProfileData = {
   activity: PublicProfileActivity;
   contributionMix: PublicContributionMix;
   collaborationCtas: ProfileCollaborationCta[];
+  partnerOrigin: { slug: string; name: string } | null;
   isOwner: boolean;
 };

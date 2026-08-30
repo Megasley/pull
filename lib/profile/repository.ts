@@ -1,6 +1,6 @@
 import { and, count, desc, eq, sql } from "drizzle-orm";
 
-import { getDb } from "@/lib/db";
+import { getDb, withDbRetry } from "@/lib/db";
 import { isDatabaseConfigured } from "@/lib/db/env";
 import { projectSubmissions, projects, users } from "@/lib/db/schema";
 import type { BuilderProfile } from "@/types/user";
@@ -31,6 +31,7 @@ function mapDrizzleUser(row: typeof users.$inferSelect): BuilderProfile {
     moderation_reason: row.moderationReason,
     onboarding_completed_at: row.onboardingCompletedAt,
     preferred_roadmap_slug: row.preferredRoadmapSlug,
+    country: row.country,
     xp: row.xp,
     level: row.level,
     created_at: row.createdAt,
@@ -41,81 +42,73 @@ function mapDrizzleUser(row: typeof users.$inferSelect): BuilderProfile {
 export async function getUserByUsername(
   username: string,
 ): Promise<BuilderProfile | null> {
-  if (!isDatabaseConfigured()) {
-    return null;
-  }
-
-  const db = getDb();
-  const rows = await db
-    .select()
-    .from(users)
-    .where(sql`lower(${users.username}) = ${username.toLowerCase()}`)
-    .limit(1);
-
-  return rows[0] ? mapDrizzleUser(rows[0]) : null;
+  if (!isDatabaseConfigured()) return null;
+  return withDbRetry(async () => {
+    const db = getDb();
+    const rows = await db
+      .select()
+      .from(users)
+      .where(sql`lower(${users.username}) = ${username.toLowerCase()}`)
+      .limit(1);
+    return rows[0] ? mapDrizzleUser(rows[0]) : null;
+  });
 }
 
 export async function getUserLastActiveAt(userId: string): Promise<string | null> {
-  if (!isDatabaseConfigured()) {
-    return null;
-  }
-
-  const db = getDb();
-  const rows = await db
-    .select({ lastActiveAt: users.lastActiveAt })
-    .from(users)
-    .where(eq(users.id, userId))
-    .limit(1);
-
-  const value = rows[0]?.lastActiveAt;
-  return value ?? null;
+  if (!isDatabaseConfigured()) return null;
+  return withDbRetry(async () => {
+    const db = getDb();
+    const rows = await db
+      .select({ lastActiveAt: users.lastActiveAt })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+    return rows[0]?.lastActiveAt ?? null;
+  });
 }
 
 export async function getApprovedSubmissionCount(userId: string) {
-  if (!isDatabaseConfigured()) {
-    return 0;
-  }
-
-  const db = getDb();
-  const rows = await db
-    .select({ value: count() })
-    .from(projectSubmissions)
-    .where(
-      and(
-        eq(projectSubmissions.userId, userId),
-        eq(projectSubmissions.status, "approved"),
-      ),
-    );
-
-  return Number(rows[0]?.value ?? 0);
+  if (!isDatabaseConfigured()) return 0;
+  return withDbRetry(async () => {
+    const db = getDb();
+    const rows = await db
+      .select({ value: count() })
+      .from(projectSubmissions)
+      .where(
+        and(
+          eq(projectSubmissions.userId, userId),
+          eq(projectSubmissions.status, "approved"),
+        ),
+      );
+    return Number(rows[0]?.value ?? 0);
+  });
 }
 
 export async function listApprovedSubmissionsForUser(userId: string) {
-  if (!isDatabaseConfigured()) {
-    return [];
-  }
-
-  const db = getDb();
-  return db
-    .select({
-      id: projectSubmissions.id,
-      status: projectSubmissions.status,
-      repoUrl: projectSubmissions.repoUrl,
-      projectSlug: projects.slug,
-      projectTitle: projects.title,
-      submittedAt: projectSubmissions.submittedAt,
-      reviewedAt: projectSubmissions.reviewedAt,
-      updatedAt: projectSubmissions.updatedAt,
-    })
-    .from(projectSubmissions)
-    .innerJoin(projects, eq(projectSubmissions.projectId, projects.id))
-    .where(
-      and(
-        eq(projectSubmissions.userId, userId),
-        eq(projectSubmissions.status, "approved"),
-      ),
-    )
-    .orderBy(desc(projectSubmissions.reviewedAt), desc(projectSubmissions.updatedAt));
+  if (!isDatabaseConfigured()) return [];
+  return withDbRetry(async () => {
+    const db = getDb();
+    return db
+      .select({
+        id: projectSubmissions.id,
+        status: projectSubmissions.status,
+        repoUrl: projectSubmissions.repoUrl,
+        projectSlug: projects.slug,
+        projectTitle: projects.title,
+        submittedAt: projectSubmissions.submittedAt,
+        reviewedAt: projectSubmissions.reviewedAt,
+        updatedAt: projectSubmissions.updatedAt,
+      })
+      .from(projectSubmissions)
+      .innerJoin(projects, eq(projectSubmissions.projectId, projects.id))
+      .where(
+        and(
+          eq(projectSubmissions.userId, userId),
+          eq(projectSubmissions.status, "approved"),
+        ),
+      )
+      .orderBy(desc(projectSubmissions.reviewedAt), desc(projectSubmissions.updatedAt));
+  });
 }
 
 export async function updateBuilderProfileFields(
@@ -130,34 +123,34 @@ export async function updateBuilderProfileFields(
     lookingFor: string[];
     profilePublic: boolean;
     listedInDirectory: boolean;
+    /** undefined = leave unchanged; null = explicitly cleared by the user. */
+    country?: string | null;
   },
 ): Promise<BuilderProfile | null> {
-  if (!isDatabaseConfigured()) {
-    return null;
-  }
-
+  if (!isDatabaseConfigured()) return null;
   const profilePublic = input.profilePublic;
   const listedInDirectory = profilePublic ? input.listedInDirectory : false;
-
-  const db = getDb();
-  const [updated] = await db
-    .update(users)
-    .set({
-      displayName: input.displayName,
-      bio: input.bio,
-      website: input.website,
-      twitterUrl: input.twitterUrl,
-      linkedinUrl: input.linkedinUrl,
-      skills: input.skills,
-      lookingFor: input.lookingFor,
-      profilePublic,
-      listedInDirectory,
-      updatedAt: new Date().toISOString(),
-    })
-    .where(eq(users.id, userId))
-    .returning();
-
-  return updated ? mapDrizzleUser(updated) : null;
+  return withDbRetry(async () => {
+    const db = getDb();
+    const [updated] = await db
+      .update(users)
+      .set({
+        displayName: input.displayName,
+        bio: input.bio,
+        website: input.website,
+        twitterUrl: input.twitterUrl,
+        linkedinUrl: input.linkedinUrl,
+        skills: input.skills,
+        lookingFor: input.lookingFor,
+        profilePublic,
+        listedInDirectory,
+        ...(input.country !== undefined ? { country: input.country } : {}),
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    return updated ? mapDrizzleUser(updated) : null;
+  });
 }
 
 /** Supabase row helper kept for auth path mapping */

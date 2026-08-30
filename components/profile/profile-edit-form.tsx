@@ -6,8 +6,11 @@ import { useRouter } from "next/navigation";
 import { updatePublicProfileAction } from "@/app/actions/profile";
 import { Button } from "@/components/ui/button";
 import { LOOKING_FOR_OPTIONS } from "@/lib/builders/looking-for";
+import { listCountriesForSelect } from "@/lib/geo/countries";
 import { formatSkillsForInput } from "@/lib/profile/portfolio";
 import type { BuilderProfile } from "@/types/user";
+
+const COUNTRY_OPTIONS = listCountriesForSelect();
 
 type ProfileEditFormProps = {
   profile: BuilderProfile;
@@ -204,6 +207,31 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
           placeholder="https://linkedin.com/in/…"
           className={fieldClassName}
         />
+      </div>
+
+      <div>
+        <label htmlFor="country" className="text-sm font-medium">
+          Country <span className="font-normal text-muted-foreground">(optional)</span>
+        </label>
+        <select
+          id="country"
+          name="country"
+          defaultValue={profile.country ?? ""}
+          disabled={pending}
+          className={fieldClassName}
+        >
+          <option value="">Prefer not to say</option>
+          {COUNTRY_OPTIONS.map((option) => (
+            <option key={option.code} value={option.code}>
+              {option.name}
+            </option>
+          ))}
+        </select>
+        <p className="mt-1.5 text-xs text-muted-foreground">
+          Never shown on your public portfolio. Used only in aggregate to help Pull report
+          where its contributors come from — never inferred, and you can change or remove
+          it any time.
+        </p>
       </div>
 
       <p className="text-xs text-muted-foreground">

@@ -42,6 +42,13 @@
   --color-signal: var(--signal);
   --color-signal-foreground: var(--signal-foreground);
   --color-ink: var(--ink);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-paper: var(--brand-paper);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -91,6 +98,19 @@
   --brand-glow: #c8f23155;
   --shadow-off-sm: 3px 3px 0 var(--ink);
   --shadow-off: 5px 5px 0 var(--ink);
+  /* One step above --card — dropdowns, popovers, and the profile page's
+     elevated card surface. Same as --card in light mode (paper is already
+     bright), but a distinct rung in dark mode's surface hierarchy. */
+  --surface-elevated: #ffffff;
+  /* Fixed brand ink/paper — do NOT redefine in .dark. For content drawn on
+     permanently-lime "fixed accent" surfaces (hero, final CTA) that must not
+     invert when the app theme changes; see .brand-fixed below. */
+  --brand-ink: #231e1e;
+  --brand-paper: #f4f4ef;
+  --success: #166534;
+  --success-foreground: #f4f4ef;
+  --warning: #92400e;
+  --warning-foreground: #f4f4ef;
 }
 
 .dark {
@@ -101,7 +121,11 @@
   --foreground: #f4f4ef;
   --card: #1c1a18;
   --card-foreground: #f4f4ef;
-  --popover: #1c1a18;
+  /* Deliberately brighter than --card (not equal to it) — gives dropdowns,
+     popovers, and other "floating above the page" surfaces their own rung in
+     the hierarchy instead of blending into cards. */
+  --surface-elevated: #26221f;
+  --popover: var(--surface-elevated);
   --popover-foreground: #f4f4ef;
   --primary: #c8f231;
   --primary-foreground: #231e1e;
@@ -112,8 +136,12 @@
   --accent: #c8f231;
   --accent-foreground: #231e1e;
   --destructive: #ff5c6a;
-  --border: #ffffff14;
-  --input: #ffffff1a;
+  --success: #4ade80;
+  --success-foreground: #231e1e;
+  --warning: #fbbf24;
+  --warning-foreground: #231e1e;
+  --border: #ffffff1f;
+  --input: #ffffff26;
   --ring: #c8f23188;
   --chart-1: #c8f231;
   --chart-2: #f4f4ef;
@@ -126,7 +154,7 @@
   --sidebar-primary-foreground: #231e1e;
   --sidebar-accent: #2a2724;
   --sidebar-accent-foreground: #f4f4ef;
-  --sidebar-border: #ffffff14;
+  --sidebar-border: #ffffff1f;
   --sidebar-ring: #c8f23188;
   --brand-glow: #c8f23133;
 }
@@ -166,6 +194,17 @@
 
   .text-ink {
     color: var(--ink);
+  }
+
+  /* Pins a subtree's ink/background polarity to the fixed light-mode brand
+     values regardless of the active theme. Use on sections whose own
+     background is a fixed brand color rather than the page surface — the
+     lime hero/final-CTA (bg-signal) and the dark "proof" band (bg-ink) —
+     so their ink-based text, borders, and buttons keep the same relationship
+     to that fixed background instead of inverting against it in dark mode. */
+  .brand-fixed {
+    --ink: var(--brand-ink);
+    --background: var(--brand-paper);
   }
 
   .tech-eyebrow {
@@ -557,6 +596,15 @@
   }
 }
 
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
 @keyframes lesson-complete-ring {
   0% {
     opacity: 0.9;
@@ -570,7 +618,7 @@
 
 /* ---- Public profile page (pull_profile_redesign.html) ---- */
 .profile-page {
-  --profile-surface: #ffffff;
+  --profile-surface: var(--surface-elevated);
   --profile-ink-soft: var(--muted-foreground);
   --profile-ink-faint: color-mix(in oklab, var(--ink) 45%, var(--background));
   --profile-line-soft: var(--secondary);
@@ -966,7 +1014,7 @@
   padding: 3px 8px;
   border-radius: 20px;
   background: var(--signal);
-  color: var(--ink);
+  color: var(--signal-foreground);
   text-transform: uppercase;
 }
 
@@ -1063,7 +1111,7 @@
   font-size: 9.5px;
   font-weight: 700;
   background: var(--signal);
-  color: var(--ink);
+  color: var(--signal-foreground);
   padding: 2px 6px;
   border-radius: 20px;
   margin-left: 6px;

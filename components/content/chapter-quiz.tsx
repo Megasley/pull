@@ -33,7 +33,7 @@ function optionBadgeClass(selected: boolean, submitted: boolean) {
     return "border-ink/40 bg-ink/10 text-ink";
   }
   if (selected) {
-    return "border-ink bg-signal text-ink";
+    return "border-ink bg-signal text-signal-foreground";
   }
   return "border-border bg-muted/40 text-muted-foreground";
 }
@@ -99,7 +99,7 @@ export function ChapterQuiz({
 
           <div className="relative flex flex-wrap items-start justify-between gap-4 pt-0.5">
             <div className="flex items-start gap-3">
-              <div className="flex size-11 shrink-0 items-center justify-center border border-ink/25 bg-signal text-ink shadow-[var(--shadow-off-sm)]">
+              <div className="flex size-11 shrink-0 items-center justify-center border border-ink/25 bg-signal text-signal-foreground shadow-[var(--shadow-off-sm)]">
                 <Trophy className="size-5" aria-hidden />
               </div>
               <div>
@@ -180,7 +180,7 @@ export function ChapterQuiz({
                 title={`Question ${index + 1}`}
                 className={cn(
                   "flex size-6 items-center justify-center border font-mono text-[10px] transition-colors",
-                  isCorrect && "border-ink bg-signal text-ink",
+                  isCorrect && "border-ink bg-signal text-signal-foreground",
                   isWrong && "border-destructive/50 bg-destructive/15 text-destructive",
                   !submitted && answered && "border-ink/40 bg-signal/25 text-ink",
                   !submitted &&
@@ -221,7 +221,7 @@ export function ChapterQuiz({
                   className={cn(
                     "flex size-8 shrink-0 items-center justify-center border font-mono text-xs font-semibold",
                     submitted && isCorrect
-                      ? "border-ink bg-signal text-ink"
+                      ? "border-ink bg-signal text-signal-foreground"
                       : submitted && questionAnswered
                         ? "border-destructive/40 bg-destructive/10 text-destructive"
                         : questionAnswered
@@ -332,7 +332,7 @@ export function ChapterQuiz({
           ) : null}
           <div className="relative flex items-start gap-3">
             {passed ? (
-              <div className="flex size-10 shrink-0 items-center justify-center border border-ink/25 bg-signal text-ink achievement-unlock-icon">
+              <div className="flex size-10 shrink-0 items-center justify-center border border-ink/25 bg-signal text-signal-foreground achievement-unlock-icon">
                 <Sparkles className="size-5" aria-hidden />
               </div>
             ) : (

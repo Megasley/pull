@@ -13,7 +13,7 @@ export function Logo({ className, showWordmark = true }: LogoProps) {
     <Link
       href="/"
       className={cn(
-        "group inline-flex items-center bg-ink transition-opacity hover:opacity-90",
+        "group inline-flex items-center bg-brand-ink transition-opacity hover:opacity-90",
         showWordmark ? "px-2.5 py-1.5" : "p-1.5",
         className,
       )}

@@ -237,6 +237,8 @@ function buildAchievements(
     evaluateEarnedAchievementSlugs({
       progressByRoadmap,
       approvedSubmissionCount: 0,
+      githubPrCount: 0,
+      githubMergedPrCount: 0,
     }),
   );
 

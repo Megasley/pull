@@ -11,6 +11,7 @@ import { createClient } from "@/lib/supabase/server";
 import { mapBuilderProfile, type BuilderProfile } from "@/types/user";
 
 import { normalizeAccountStatus, type UserAccountStatus } from "./account-status";
+import type { AcquisitionSignal } from "./acquisition";
 
 /** Throttle DB writes — enough for MAU, light on write load. */
 const ACTIVITY_TOUCH_MS = 60 * 60 * 1000;
@@ -115,7 +116,10 @@ async function enrichProfileFromDrizzle(
   }
 }
 
-export async function ensureBuilderProfile(user: User): Promise<BuilderProfile | null> {
+export async function ensureBuilderProfile(
+  user: User,
+  options: { acquisition?: AcquisitionSignal } = {},
+): Promise<BuilderProfile | null> {
   const supabase = await createClient();
 
   const { data: existing, error: existingError } = await supabase
@@ -178,6 +182,7 @@ export async function ensureBuilderProfile(user: User): Promise<BuilderProfile |
   const username = await generateUniqueUsername(supabase, githubUsername);
   const timestamp = new Date().toISOString();
   const role = resolveUserRole(githubUsername);
+  const acquisition = options.acquisition;
 
   const { data: created, error: createError } = await supabase
     .from("users")
@@ -192,6 +197,9 @@ export async function ensureBuilderProfile(user: User): Promise<BuilderProfile |
       role,
       xp: 0,
       level: 1,
+      // First-touch only — never written again after this insert.
+      acquisition_source: acquisition?.source ?? "direct",
+      acquisition_detail: acquisition?.detail ?? {},
       created_at: timestamp,
       updated_at: timestamp,
       last_active_at: timestamp,

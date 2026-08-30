@@ -26,7 +26,7 @@ export function DeveloperToolCard({ tool, className }: DeveloperToolCardProps) {
     >
       <div className="flex items-start gap-3">
         <div
-          className="flex size-12 shrink-0 items-center justify-center border border-ink bg-signal font-mono text-xs font-bold text-ink"
+          className="flex size-12 shrink-0 items-center justify-center border border-ink bg-signal font-mono text-xs font-bold text-signal-foreground"
           aria-hidden
         >
           {tool.logo}

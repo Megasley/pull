@@ -25,9 +25,9 @@ function decisionLabel(decision: string) {
 function decisionClass(decision: string) {
   switch (decision) {
     case "approve":
-      return "border-ink/20 bg-signal text-ink";
+      return "border-ink/20 bg-signal text-signal-foreground";
     case "request_changes":
-      return "border-amber-600/30 bg-amber-500/15 text-amber-800 dark:text-amber-200";
+      return "border-warning/30 bg-warning/15 text-warning";
     case "reject":
       return "border-destructive/30 bg-destructive/10 text-destructive";
     default:

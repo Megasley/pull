@@ -66,7 +66,7 @@ export default async function ReviewDetailPage({ params }: ReviewDetailPageProps
     }) && submission.claimedBy !== profile.id;
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 pt-12 pb-20 sm:px-6 lg:px-8">
+    <div className="mx-auto w-full max-w-7xl px-4 pt-12 pb-20 sm:px-6 lg:px-8">
       <Button asChild variant="ghost" size="sm" className="-ml-2 mb-8">
         <Link href="/review">
           <ArrowLeft aria-hidden />
