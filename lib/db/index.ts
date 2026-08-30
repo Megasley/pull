@@ -10,11 +10,17 @@ const globalForDb = globalThis as unknown as {
 };
 
 function createPostgresClient() {
-  return postgres(getDatabaseUrl(), {
+  const databaseUrl = getDatabaseUrl();
+  // Supabase's transaction pooler (pgbouncer) multiplexes many client
+  // connections onto few backend ones, so it can support a larger
+  // client-side pool. A direct/local connection (e.g. 127.0.0.1:54322 in
+  // Docker) has no such multiplexing and idle sockets can be silently
+  // dropped by Docker/OS, so keep that path's pool small.
+  const isPooled = /pooler\.supabase\.com:6543\b/.test(databaseUrl);
+
+  return postgres(databaseUrl, {
     prepare: false,
-    // Keep a small pool. Direct local connections (127.0.0.1:54322) don't go
-    // through a pooler so idle sockets can be silently dropped by Docker/OS.
-    max: 3,
+    max: isPooled ? 10 : 3,
     // Recycle idle connections quickly so stale sockets don't linger.
     idle_timeout: 10,
     connect_timeout: 10,
