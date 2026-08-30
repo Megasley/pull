@@ -15,6 +15,7 @@ import { EmptyState, PageHeader } from "@/components/design-system";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { FunnelMetrics, LessonDropOff } from "@/lib/admin/analytics";
+import { withTimeoutResult } from "@/lib/async/with-timeout";
 import { loadAdminLiveOps, type LiveLoad } from "@/lib/admin/live-ops";
 import {
   getAdminMetricsSnapshot,
@@ -52,6 +53,9 @@ export const metadata = {
 };
 
 export const maxDuration = 30;
+
+/** Budget for the impact-overview block below — see the comment at its call site. */
+const IMPACT_OVERVIEW_BUDGET_MS = 8_000;
 
 function snapshotMetaLabel(snapshot: AdminMetricsSnapshotView): string {
   if (snapshot.status === "missing") {
@@ -108,61 +112,69 @@ export default async function AdminOverviewPage({
 
   const [live, snapshot] = await Promise.all([loadAdminLiveOps(), getAdminMetricsSnapshot()]);
 
-  // Isolated from the two calls above and wrapped defensively: these are
-  // exactly the shape of per-user join that previously timed out inside the
+  // Isolated from the two calls above and time-boxed: these are exactly the
+  // shape of per-user join that previously timed out inside the
   // admin_metrics_snapshots cron and got disabled (see "First OSS via Pull"
   // below). Running them here, outside that shared transaction, on a single
-  // page load, with a graceful fallback, avoids repeating that failure mode.
+  // page load — with the same timeout-then-degrade budget loadAdminLiveOps
+  // uses for its slices — avoids repeating that failure mode: a slow query
+  // against real production data degrades this section instead of riding
+  // the request up to the page's own maxDuration.
   let impactOverview: ImpactOverviewData | null = null;
-  try {
-    const [
-      verifiedContributors,
-      repeatContributors,
-      activeContributors,
-      sustainedContributors,
-      totalMergedPRs,
-      uniqueRepositories,
-      timeToPr,
-      timeToMergedPr,
-      geography,
-      contributorGeography,
-      retention30,
-      retention90,
-      retention180,
-    ] = await Promise.all([
-      countVerifiedContributors(),
-      countRepeatContributors(),
-      countActiveContributors(),
-      countSustainedContributors(),
-      countTotalMergedPRs(),
-      countUniqueRepositories(),
-      timeToFirstPR(),
-      timeToFirstMergedPR(),
-      getGeographyBreakdown(),
-      countCountriesAmongContributors(true),
-      contributorRetention(30),
-      contributorRetention(90),
-      contributorRetention(180),
-    ]);
+  const impactOverviewResult = await withTimeoutResult(
+    (async () => {
+      const [
+        verifiedContributors,
+        repeatContributors,
+        activeContributors,
+        sustainedContributors,
+        totalMergedPRs,
+        uniqueRepositories,
+        timeToPr,
+        timeToMergedPr,
+        geography,
+        contributorGeography,
+        retention30,
+        retention90,
+        retention180,
+      ] = await Promise.all([
+        countVerifiedContributors(),
+        countRepeatContributors(),
+        countActiveContributors(),
+        countSustainedContributors(),
+        countTotalMergedPRs(),
+        countUniqueRepositories(),
+        timeToFirstPR(),
+        timeToFirstMergedPR(),
+        getGeographyBreakdown(),
+        countCountriesAmongContributors(true),
+        contributorRetention(30),
+        contributorRetention(90),
+        contributorRetention(180),
+      ]);
 
-    impactOverview = {
-      verifiedContributors,
-      repeatContributors,
-      activeContributors,
-      sustainedContributors,
-      totalMergedPRs,
-      uniqueRepositories,
-      medianDaysToFirstPR: timeToPr.medianDays,
-      medianDaysToFirstMergedPR: timeToMergedPr.medianDays,
-      geography,
-      contributorCountriesRepresented: contributorGeography.countriesRepresented,
-      africanContributorCountriesRepresented: contributorGeography.africanCountriesRepresented,
-      retention30,
-      retention90,
-      retention180,
-    };
-  } catch (error) {
-    console.warn("[admin] impact overview failed", error);
+      return {
+        verifiedContributors,
+        repeatContributors,
+        activeContributors,
+        sustainedContributors,
+        totalMergedPRs,
+        uniqueRepositories,
+        medianDaysToFirstPR: timeToPr.medianDays,
+        medianDaysToFirstMergedPR: timeToMergedPr.medianDays,
+        geography,
+        contributorCountriesRepresented: contributorGeography.countriesRepresented,
+        africanContributorCountriesRepresented: contributorGeography.africanCountriesRepresented,
+        retention30,
+        retention90,
+        retention180,
+      } satisfies ImpactOverviewData;
+    })(),
+    IMPACT_OVERVIEW_BUDGET_MS,
+    "admin.impactOverview",
+  );
+  if (impactOverviewResult.ok) {
+    impactOverview = impactOverviewResult.value;
   }
 
   const platformHealth = getPlatformHealth();
