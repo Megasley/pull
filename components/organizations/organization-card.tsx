@@ -13,7 +13,7 @@ export function OrganizationCard({ organization }: OrganizationDirectoryCardProp
     <article className="flex h-full flex-col border border-border bg-background p-4 transition-colors hover:bg-muted/20">
       <div className="flex items-start gap-3">
         <div
-          className="flex size-12 shrink-0 items-center justify-center border border-ink bg-signal font-mono text-xs font-bold text-ink"
+          className="flex size-12 shrink-0 items-center justify-center border border-ink bg-signal font-mono text-xs font-bold text-signal-foreground"
           aria-hidden
         >
           {organization.logoInitials}

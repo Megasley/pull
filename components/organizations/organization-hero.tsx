@@ -15,7 +15,7 @@ export function OrganizationHero({ organization }: OrganizationHeroProps) {
     <header className="flex flex-col gap-8 border-b border-border pb-10">
       <div className="flex min-w-0 flex-col gap-5 sm:flex-row sm:items-start">
         <div
-          className="flex size-20 shrink-0 items-center justify-center border-2 border-ink bg-signal font-mono text-xl font-bold tracking-tight text-ink sm:size-24 sm:text-2xl"
+          className="flex size-20 shrink-0 items-center justify-center border-2 border-ink bg-signal font-mono text-xl font-bold tracking-tight text-signal-foreground sm:size-24 sm:text-2xl"
           aria-hidden
         >
           {organization.logoInitials}

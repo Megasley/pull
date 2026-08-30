@@ -27,12 +27,10 @@ export function FoundingSponsorRecognition({
         {recognitionLabel}
       </p>
       {logoSrc ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={logoSrc}
-          alt={name}
-          className="h-5 w-auto dark:invert"
-        />
+        <div className="dark:bg-brand-paper dark:px-3 dark:py-2">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={logoSrc} alt={name} className="h-5 w-auto" />
+        </div>
       ) : (
         <p className="text-2xl font-bold tracking-[-0.03em]">{name}</p>
       )}

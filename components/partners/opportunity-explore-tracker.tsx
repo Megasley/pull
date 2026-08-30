@@ -25,7 +25,7 @@ export function OpportunityExploreTracker({ orgSlug, children }: OpportunityExpl
         if (!anchor) return;
 
         firedRef.current = true;
-        void recordOpportunityExploredAction(orgSlug);
+        void recordOpportunityExploredAction(orgSlug, anchor.href);
       }}
     >
       {children}

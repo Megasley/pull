@@ -117,12 +117,6 @@ export const primaryNav = [
         href: "https://bitcoindevs.xyz/get-funded",
         external: true,
       },
-      { divider: true },
-      {
-        title: "Become a Pull Partner",
-        href: `mailto:${siteConfig.contactEmail}`,
-        external: true,
-      },
     ],
   },
 ] as const satisfies readonly PrimaryNavItem[];

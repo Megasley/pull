@@ -51,7 +51,7 @@ export function PortfolioCompletionSection({
                 className="flex items-center gap-2 text-sm transition-colors hover:text-foreground"
               >
                 {item.done ? (
-                  <span className="flex size-4 shrink-0 items-center justify-center border border-ink bg-signal text-ink">
+                  <span className="flex size-4 shrink-0 items-center justify-center border border-ink bg-signal text-signal-foreground">
                     <Check className="size-2.5" aria-hidden />
                   </span>
                 ) : (

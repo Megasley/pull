@@ -59,6 +59,7 @@ export function PublicBuilderProfile({ data }: PublicBuilderProfileProps) {
     activity,
     contributionMix,
     collaborationCtas,
+    partnerOrigin,
     isOwner,
   } = data;
 
@@ -106,12 +107,37 @@ export function PublicBuilderProfile({ data }: PublicBuilderProfileProps) {
               <ProfileActivityStrip activity={activity} />
 
               <div className="mt-4 flex flex-wrap gap-2">
-                <span className="profile-badge profile-badge-accent">
-                  Builder score {builderScore.score}
-                </span>
-                <span className="profile-badge profile-badge-accent">
-                  OSS reputation {reputation.score}
-                </span>
+                {partnerOrigin ? (
+                  <Link
+                    href={`/ecosystem/partners/${partnerOrigin.slug}`}
+                    className="profile-badge"
+                  >
+                    via {partnerOrigin.name}
+                  </Link>
+                ) : null}
+                {partnerOrigin ? (
+                  <>
+                    <span className="profile-badge profile-badge-accent">
+                      OSS reputation {reputation.score}
+                    </span>
+                    {builderScore.score > 0 ? (
+                      <span className="profile-badge profile-badge-accent">
+                        Builder score {builderScore.score}
+                      </span>
+                    ) : null}
+                  </>
+                ) : (
+                  <>
+                    {builderScore.score > 0 ? (
+                      <span className="profile-badge profile-badge-accent">
+                        Builder score {builderScore.score}
+                      </span>
+                    ) : null}
+                    <span className="profile-badge profile-badge-accent">
+                      OSS reputation {reputation.score}
+                    </span>
+                  </>
+                )}
                 <span className="profile-badge profile-badge-level">
                   Level {level.level}
                 </span>
@@ -209,18 +235,37 @@ export function PublicBuilderProfile({ data }: PublicBuilderProfileProps) {
 
         <div className="profile-section">
           <div className="grid gap-5 lg:grid-cols-2">
-            <BuilderScorePanel
-              score={publicBuilderScore}
-              compact
-              variant="profile"
-              summaryText={publicBuilderSummary}
-            />
-            <ReputationPanel
-              reputation={publicReputation}
-              compact
-              variant="profile"
-              summaryText={publicReputationSummary}
-            />
+            {partnerOrigin ? (
+              <>
+                <ReputationPanel
+                  reputation={publicReputation}
+                  compact
+                  variant="profile"
+                  summaryText={publicReputationSummary}
+                />
+                <BuilderScorePanel
+                  score={publicBuilderScore}
+                  compact
+                  variant="profile"
+                  summaryText={publicBuilderSummary}
+                />
+              </>
+            ) : (
+              <>
+                <BuilderScorePanel
+                  score={publicBuilderScore}
+                  compact
+                  variant="profile"
+                  summaryText={publicBuilderSummary}
+                />
+                <ReputationPanel
+                  reputation={publicReputation}
+                  compact
+                  variant="profile"
+                  summaryText={publicReputationSummary}
+                />
+              </>
+            )}
           </div>
         </div>
 

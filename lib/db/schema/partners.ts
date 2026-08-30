@@ -10,7 +10,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
-import { difficultyEnum } from "./enums";
+import { difficultyEnum, orgQualificationStatusEnum } from "./enums";
 import { organizations } from "./roadmaps";
 import { users } from "./users";
 
@@ -62,6 +62,19 @@ export const orgMemberships = pgTable(
       withTimezone: true,
       mode: "string",
     }),
+    /**
+     * External-program completion signal (e.g. "this member graduated
+     * Thebuidl's own curriculum"). Pull cannot observe this directly — it
+     * must be set by an authorized partner/admin action. Defaults to "none"
+     * (unknown / not applicable), never inferred from Pull activity.
+     */
+    qualificationStatus: orgQualificationStatusEnum("qualification_status")
+      .notNull()
+      .default("none"),
+    qualifiedAt: timestamp("qualified_at", { withTimezone: true, mode: "string" }),
+    qualifiedByUserId: uuid("qualified_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
     joinedAt: timestamp("joined_at", { withTimezone: true, mode: "string" })
       .notNull()
       .defaultNow(),
@@ -73,6 +86,8 @@ export const orgMemberships = pgTable(
     uniqueIndex("org_memberships_org_user_idx").on(table.organizationId, table.userId),
     index("org_memberships_organization_id_idx").on(table.organizationId),
     index("org_memberships_user_id_idx").on(table.userId),
+    index("org_memberships_joined_at_idx").on(table.joinedAt),
+    index("org_memberships_qualification_status_idx").on(table.qualificationStatus),
   ],
 );
 

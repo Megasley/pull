@@ -12,8 +12,14 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
-import { githubSyncStatusEnum } from "./enums";
+import {
+  eventTimestampSourceEnum,
+  githubSyncStatusEnum,
+  prLifecycleEventTypeEnum,
+} from "./enums";
+import { organizations } from "./roadmaps";
 import { users } from "./users";
+import { opportunityEvents } from "./opportunities";
 
 export const githubConnections = pgTable(
   "github_connections",
@@ -139,6 +145,28 @@ export const githubPullRequests = pgTable(
     deletions: integer("deletions").notNull().default(0),
     reviewComments: integer("review_comments").notNull().default(0),
     contributionType: text("contribution_type").notNull().default("other"),
+    /** True when the PR's repo owner is the contributor's own GitHub login —
+     *  used to exclude personal-project PRs from "qualifying contribution"
+     *  definitions. See lib/impact/definitions.ts. */
+    isOwnRepo: boolean("is_own_repo").notNull().default(false),
+    /** Partner the user belonged to when this PR was opened (membership at
+     *  time of contribution — see lib/impact/attribution.ts). Set once at
+     *  first insert; never overwritten by later partner joins. */
+    attributedPartnerId: uuid("attributed_partner_id").references(() => organizations.id, {
+      onDelete: "set null",
+    }),
+    /** Opportunity click-through this PR is attributed to, if any (matched by
+     *  repo within the configured attribution window). Set once; never
+     *  overwritten by later opportunity interactions. */
+    attributedOpportunityEventId: uuid("attributed_opportunity_event_id").references(
+      () => opportunityEvents.id,
+      { onDelete: "set null" },
+    ),
+    /** Immutable — set only when Pull's sync first observed this PR. Distinct
+     *  from `syncedAt`, which updates on every sync. For rows that existed
+     *  before this column shipped, backfilled to githubCreatedAt (the closest
+     *  defensible proxy) — see scripts/backfill-contribution-history.ts. */
+    firstSyncedAt: timestamp("first_synced_at", { withTimezone: true, mode: "string" }),
     syncedAt: timestamp("synced_at", { withTimezone: true, mode: "string" })
       .notNull()
       .defaultNow(),
@@ -153,6 +181,48 @@ export const githubPullRequests = pgTable(
     index("github_pull_requests_merged_idx").on(table.merged),
     index("github_pull_requests_draft_idx").on(table.draft),
     index("github_pull_requests_contribution_type_idx").on(table.contributionType),
+    index("github_pull_requests_repo_full_name_idx").on(table.repoFullName),
+    index("github_pull_requests_attributed_partner_id_idx").on(table.attributedPartnerId),
+    index("github_pull_requests_is_own_repo_idx").on(table.isOwnRepo),
+  ],
+);
+
+/**
+ * Durable, append-only PR lifecycle ledger. Emitted by lib/github/sync.ts
+ * during reconciliation (state transitions detected against the previous
+ * upsert) and by the one-time backfill script for pre-existing rows.
+ * Idempotent by design: a PR can only record each event type once
+ * (unique index below) so repeated syncs never duplicate history.
+ */
+export const githubPullRequestEvents = pgTable(
+  "github_pull_request_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    pullRequestId: uuid("pull_request_id")
+      .notNull()
+      .references(() => githubPullRequests.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    eventType: prLifecycleEventTypeEnum("event_type").notNull(),
+    occurredAt: timestamp("occurred_at", { withTimezone: true, mode: "string" }).notNull(),
+    timestampSource: eventTimestampSourceEnum("timestamp_source").notNull().default("github"),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("github_pull_request_events_pr_event_type_idx").on(
+      table.pullRequestId,
+      table.eventType,
+    ),
+    index("github_pull_request_events_user_id_idx").on(table.userId),
+    index("github_pull_request_events_user_event_occurred_idx").on(
+      table.userId,
+      table.eventType,
+      table.occurredAt,
+    ),
+    index("github_pull_request_events_occurred_at_idx").on(table.occurredAt),
   ],
 );
 

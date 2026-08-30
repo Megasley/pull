@@ -68,7 +68,7 @@ export default async function InvitePage({ params }: PageProps) {
           </div>
           <Link
             href={`/sign-in?next=${encodeURIComponent(`/invite/${token}`)}`}
-            className="inline-block border border-ink bg-ink px-5 py-3 text-center font-mono text-sm text-[var(--background)] transition-colors hover:bg-ink/90"
+            className="inline-block border border-primary bg-primary px-5 py-3 text-center font-mono text-sm text-primary-foreground transition-colors hover:bg-primary/90"
           >
             Sign in to join →
           </Link>

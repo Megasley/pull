@@ -39,7 +39,7 @@ export function DashboardAccountMenu({
         >
           <Avatar className="size-7 border border-ink/20">
             {avatar ? <AvatarImage src={avatar} alt={displayName} /> : null}
-            <AvatarFallback className="bg-signal text-[10px] text-ink">
+            <AvatarFallback className="bg-signal text-[10px] text-signal-foreground">
               {initials}
             </AvatarFallback>
           </Avatar>

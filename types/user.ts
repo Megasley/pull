@@ -33,16 +33,20 @@ export type BuilderProfile = {
   moderationReason: string | null;
   onboardingCompletedAt: string | null;
   preferredRoadmapSlug: string | null;
+  /** Optional, self-reported ISO 3166-1 alpha-2 code. Never shown on the
+   *  public profile — see toPublicBuilderProfile — only used in aggregate
+   *  impact reporting (lib/impact/*). */
+  country: string | null;
   xp: number;
   level: number;
   createdAt: string;
   updatedAt: string;
 };
 
-/** Safe subset for anonymous public portfolio pages (no email / prefs / moderation). */
+/** Safe subset for anonymous public portfolio pages (no email / prefs / moderation / country). */
 export type PublicBuilderProfile = Omit<
   BuilderProfile,
-  "email" | "emailNotifications" | "moderationReason"
+  "email" | "emailNotifications" | "moderationReason" | "country"
 >;
 
 export function toPublicBuilderProfile(profile: BuilderProfile): PublicBuilderProfile {
@@ -98,6 +102,7 @@ export type BuilderProfileRow = {
   moderation_reason?: string | null;
   onboarding_completed_at?: string | null;
   preferred_roadmap_slug?: string | null;
+  country?: string | null;
   xp: number;
   level: number;
   created_at: string;
@@ -137,6 +142,7 @@ export function mapBuilderProfile(row: BuilderProfileRow): BuilderProfile {
     moderationReason: row.moderation_reason ?? null,
     onboardingCompletedAt: row.onboarding_completed_at ?? null,
     preferredRoadmapSlug: row.preferred_roadmap_slug ?? null,
+    country: row.country ?? null,
     xp: row.xp,
     level: row.level,
     createdAt: row.created_at,

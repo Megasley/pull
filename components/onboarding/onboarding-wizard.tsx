@@ -7,6 +7,7 @@ import { useState, useTransition } from "react";
 import { completeOnboardingAction } from "@/app/actions/onboarding";
 import { Button } from "@/components/ui/button";
 import { availableRoadmaps } from "@/lib/landing-data";
+import { listCountriesForSelect } from "@/lib/geo/countries";
 import { cn } from "@/lib/utils";
 
 const WEEKLY_GOAL_PRESETS = [
@@ -14,6 +15,8 @@ const WEEKLY_GOAL_PRESETS = [
   "Open 1 pull request",
   "Browse Open Source Projects for a contribution",
 ] as const;
+
+const COUNTRY_OPTIONS = listCountriesForSelect();
 
 type OnboardingWizardProps = {
   githubConnected: boolean;
@@ -24,6 +27,7 @@ export function OnboardingWizard({ githubConnected }: OnboardingWizardProps) {
   const [step, setStep] = useState(0);
   const [roadmapSlug, setRoadmapSlug] = useState("bitcoin");
   const [weeklyGoal, setWeeklyGoal] = useState<string>(WEEKLY_GOAL_PRESETS[0]);
+  const [country, setCountry] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -35,6 +39,7 @@ export function OnboardingWizard({ githubConnected }: OnboardingWizardProps) {
       const result = await completeOnboardingAction({
         roadmapSlug,
         weeklyGoalTitle: weeklyGoal,
+        country: country || undefined,
       });
 
       if (!result.ok) {
@@ -43,7 +48,9 @@ export function OnboardingWizard({ githubConnected }: OnboardingWizardProps) {
             ? "Database is not configured."
             : result.reason === "invalid_roadmap"
               ? "Pick Bitcoin or Lightning to continue."
-              : "Could not save onboarding. Try again.",
+              : result.reason === "invalid_country"
+                ? "Please choose a country from the list, or leave it blank."
+                : "Could not save onboarding. Try again.",
         );
         return;
       }
@@ -145,6 +152,31 @@ export function OnboardingWizard({ githubConnected }: OnboardingWizardProps) {
               </button>
             ))}
           </div>
+
+          <div className="pt-2">
+            <label htmlFor="onboarding-country" className="text-sm font-medium">
+              Country <span className="font-normal text-muted-foreground">(optional)</span>
+            </label>
+            <select
+              id="onboarding-country"
+              value={country}
+              onChange={(event) => setCountry(event.target.value)}
+              disabled={pending}
+              className="mt-1.5 w-full rounded-none border border-border bg-transparent px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+            >
+              <option value="">Prefer not to say</option>
+              {COUNTRY_OPTIONS.map((option) => (
+                <option key={option.code} value={option.code}>
+                  {option.name}
+                </option>
+              ))}
+            </select>
+            <p className="mt-1.5 text-xs text-muted-foreground">
+              Never shown on your public profile. Helps Pull report where its contributors come
+              from — change or remove it any time in Settings.
+            </p>
+          </div>
+
           {error ? <p className="text-sm text-destructive">{error}</p> : null}
           <div className="flex flex-wrap gap-3">
             <Button variant="outline" onClick={() => setStep(1)} disabled={pending}>

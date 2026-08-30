@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { signOut } from "@/app/actions/auth";
 import { SiteContainer } from "@/components/layout/site-container";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -296,6 +297,15 @@ export function MobileNav({
           className="flex-1 overflow-y-auto overscroll-contain"
         >
           <div className="flex flex-col gap-3 py-4 pb-28">
+            {!isAuthenticated ? (
+              <div className="flex items-center justify-between border border-border px-4 py-3">
+                <p className="font-mono text-[11px] font-bold tracking-[0.22em] text-foreground uppercase">
+                  Theme
+                </p>
+                <ThemeToggle />
+              </div>
+            ) : null}
+
             {isAuthenticated ? (
               <div className="flex items-center gap-3 border border-border bg-card px-3.5 py-3">
                 <Avatar className="size-10 shrink-0 rounded-none border border-border">
@@ -456,7 +466,7 @@ export function MobileNav({
               <Link
                 href="/roadmaps"
                 onClick={close}
-                className="block w-full border border-ink bg-ink px-3 py-3 text-center font-mono text-xs font-medium uppercase tracking-[0.1em] text-[var(--background)] transition-colors hover:bg-ink/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                className="block w-full border border-primary bg-primary px-3 py-3 text-center font-mono text-xs font-medium uppercase tracking-[0.1em] text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 ./start-building
               </Link>
@@ -481,7 +491,7 @@ export function MobileNav({
               <Link
                 href="/roadmaps"
                 onClick={close}
-                className="flex-[1.25] border border-ink bg-ink px-3 py-3 text-center font-mono text-xs font-medium uppercase tracking-[0.1em] text-[var(--background)] transition-colors hover:bg-ink/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                className="flex-[1.25] border border-primary bg-primary px-3 py-3 text-center font-mono text-xs font-medium uppercase tracking-[0.1em] text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 ./start-building
               </Link>

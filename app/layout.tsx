@@ -5,6 +5,7 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 import { Analytics } from "@vercel/analytics/next";
 
 import { SiteLayout } from "@/components/layout/site-layout";
+import { ThemeProvider } from "@/components/theme/theme-provider";
 import { DEV_CHUNK_RECOVERY_SCRIPT } from "@/lib/dev/chunk-error-recovery";
 import { siteConfig } from "@/lib/site-config";
 
@@ -65,6 +66,7 @@ export default function RootLayout({
       lang="en"
       data-scroll-behavior="smooth"
       className={`${spaceGrotesk.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col overflow-x-hidden font-sans text-foreground">
         {process.env.NODE_ENV === "development" ? (
@@ -72,7 +74,9 @@ export default function RootLayout({
             {DEV_CHUNK_RECOVERY_SCRIPT}
           </Script>
         ) : null}
-        <SiteLayout>{children}</SiteLayout>
+        <ThemeProvider>
+          <SiteLayout>{children}</SiteLayout>
+        </ThemeProvider>
         <Analytics />
         {gaId ? <GoogleAnalytics gaId={gaId} /> : null}
       </body>

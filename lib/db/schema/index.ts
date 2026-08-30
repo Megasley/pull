@@ -3,6 +3,7 @@ export * from "./admin-metrics-snapshots";
 export * from "./enums";
 export * from "./github";
 export * from "./goals";
+export * from "./opportunities";
 export * from "./partners";
 export * from "./relations";
 export * from "./roadmaps";

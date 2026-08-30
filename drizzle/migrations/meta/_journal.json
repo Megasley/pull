@@ -169,6 +169,13 @@
       "when": 1787900000000,
       "tag": "0023_pr_draft_and_hub_exploration",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1788036587743,
+      "tag": "0024_impact_tracking_foundation",
+      "breakpoints": true
     }
   ]
 }

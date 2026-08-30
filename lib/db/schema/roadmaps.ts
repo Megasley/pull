@@ -89,6 +89,13 @@ export const projects = pgTable(
     description: text("description").notNull().default(""),
     difficulty: difficultyEnum("difficulty").notNull().default("intermediate"),
     estimatedDuration: text("estimated_duration"),
+    /**
+     * Admin-curated link from this catalog project to the real GitHub repo it
+     * sends contributors to (e.g. "bitcoin/bitcoin"). Nullable and manually
+     * set — Pull cannot auto-derive this, so unmapped projects simply won't
+     * appear in repo/project reconciliation queries. See lib/impact/queries.ts.
+     */
+    primaryRepoFullName: text("primary_repo_full_name"),
     createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
       .notNull()
       .defaultNow(),
@@ -96,7 +103,10 @@ export const projects = pgTable(
       .notNull()
       .defaultNow(),
   },
-  (table) => [index("projects_roadmap_id_idx").on(table.roadmapId)],
+  (table) => [
+    index("projects_roadmap_id_idx").on(table.roadmapId),
+    index("projects_primary_repo_full_name_idx").on(table.primaryRepoFullName),
+  ],
 );
 
 export const roadmapNodes = pgTable(

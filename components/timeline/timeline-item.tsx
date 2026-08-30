@@ -45,6 +45,25 @@ type TimelineItemProps = {
   groupCount?: number;
 };
 
+// Time-only is ambiguous for anything but today (e.g. "8:17 AM" from last
+// week tells you nothing) — so fall back to a date, and add the year once
+// the event is old enough that "this year" isn't a safe assumption.
+function formatEventTimestamp(occurredAt: string): string | null {
+  if (!Number.isFinite(Date.parse(occurredAt))) return null;
+  const date = new Date(occurredAt);
+  const now = new Date();
+
+  if (date.toDateString() === now.toDateString()) {
+    return date.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+  }
+
+  return date.toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: date.getFullYear() === now.getFullYear() ? undefined : "numeric",
+  });
+}
+
 export function TimelineItem({
   event,
   index,
@@ -52,12 +71,7 @@ export function TimelineItem({
   groupCount,
 }: TimelineItemProps) {
   const Icon = TYPE_ICON[event.type];
-  const time = Number.isFinite(Date.parse(event.occurredAt))
-    ? new Date(event.occurredAt).toLocaleTimeString(undefined, {
-        hour: "numeric",
-        minute: "2-digit",
-      })
-    : null;
+  const time = formatEventTimestamp(event.occurredAt);
 
   if (profile) {
     const content = (

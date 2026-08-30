@@ -21,7 +21,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const partner = getPartnerBySlug(slug);
-  if (!partner) return { title: "Partner" };
+  if (!partner || partner.hidden) return { title: "Partner" };
   return {
     title: `${partner.name} · Partners`,
     description: partner.tagline,
@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function PartnerPage({ params }: Props) {
   const { slug } = await params;
   const partner = getPartnerBySlug(slug);
-  if (!partner) notFound();
+  if (!partner || partner.hidden) notFound();
 
   return (
     <SiteContainer className="pt-12 pb-20">
@@ -71,7 +71,7 @@ export default async function PartnerPage({ params }: Props) {
         <div className="mt-6">
           <a
             href={`mailto:${siteConfig.contactEmail}`}
-            className="inline-block border border-ink px-5 py-2.5 font-mono text-xs uppercase tracking-wide transition-colors hover:bg-ink hover:text-[var(--background)]"
+            className="inline-block border border-ink px-5 py-2.5 font-mono text-xs uppercase tracking-wide transition-colors hover:border-primary hover:bg-primary hover:text-primary-foreground"
           >
             Inquire about a partnership ↗
           </a>

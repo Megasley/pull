@@ -4,6 +4,7 @@ import { BetaBadge } from "@/components/layout/beta-badge";
 import { MainNav } from "@/components/layout/main-nav";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { SiteContainer } from "@/components/layout/site-container";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { getCurrentSessionContext } from "@/lib/auth/session";
 import { isDatabaseConfigured } from "@/lib/db/env";
 import { getPrimaryOrgMembership } from "@/lib/partners/memberships";
@@ -53,6 +54,7 @@ export async function Navbar({ className }: NavbarProps) {
           >
             Feedback
           </a>
+          {!user ? <ThemeToggle className="hidden sm:inline-flex" /> : null}
           <AuthControls className="hidden md:flex" />
           <MobileNav
             isAuthenticated={Boolean(user)}

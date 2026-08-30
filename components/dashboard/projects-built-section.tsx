@@ -49,7 +49,7 @@ export function ProjectsBuiltSection({ projects }: ProjectsBuiltSectionProps) {
                 variant="outline"
                 className={
                   project.source === "submission"
-                    ? "border-ink/20 bg-signal text-ink"
+                    ? "border-ink/20 bg-signal text-signal-foreground"
                     : "border-border"
                 }
               >

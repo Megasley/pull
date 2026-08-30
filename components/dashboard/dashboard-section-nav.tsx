@@ -55,7 +55,7 @@ export function DashboardSectionNav() {
               className={cn(
                 "inline-flex whitespace-nowrap border px-3 py-1.5 font-mono text-[11px] tracking-[0.14em] uppercase transition-colors",
                 activeId === section.id
-                  ? "border-ink/30 bg-signal text-ink"
+                  ? "border-ink/30 bg-signal text-signal-foreground"
                   : "border-transparent text-muted-foreground hover:border-border hover:text-foreground",
               )}
             >

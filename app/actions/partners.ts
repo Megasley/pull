@@ -2,10 +2,19 @@
 
 import { redirect } from "next/navigation";
 
+import { revalidatePath } from "next/cache";
+
 import { recordAdminAction } from "@/lib/admin/audit-log";
 import { isAdminRole } from "@/lib/auth/roles";
 import { bootstrapCurrentUserProfile } from "@/lib/auth/session";
 import { isDatabaseConfigured } from "@/lib/db/env";
+import type { OrgQualificationStatus } from "@/lib/partners/memberships";
+import { setMembershipQualificationStatus } from "@/lib/partners/memberships";
+import {
+  createOpportunity,
+  deleteOpportunity,
+  updateOpportunity,
+} from "@/lib/partners/opportunities";
 import {
   createPartnerOrg,
   deletePartnerOrg,
@@ -118,6 +127,189 @@ export async function updatePartnerOrgAction(
   });
 
   redirect(`/admin/partners/${org.slug}`);
+}
+
+const QUALIFICATION_STATUSES: OrgQualificationStatus[] = [
+  "none",
+  "qualified",
+  "completed",
+  "graduated",
+];
+
+export async function setMembershipQualificationStatusAction(
+  membershipId: string,
+  status: string,
+  orgSlug: string,
+): Promise<{ ok: boolean; error?: string }> {
+  requireAdmin();
+  const actor = await assertAdmin();
+
+  if (!QUALIFICATION_STATUSES.includes(status as OrgQualificationStatus)) {
+    return { ok: false, error: "Invalid qualification status." };
+  }
+
+  const updated = await setMembershipQualificationStatus(
+    membershipId,
+    status as OrgQualificationStatus,
+    actor.id,
+  );
+
+  if (!updated) {
+    return { ok: false, error: "Membership not found." };
+  }
+
+  await recordAdminAction({
+    actorUserId: actor.id,
+    action: "org_membership_qualification_updated",
+    metadata: { membershipId, status },
+  });
+
+  revalidatePath(`/admin/partners/${orgSlug}`);
+  return { ok: true };
+}
+
+// ─── Curated opportunities ──────────────────────────────────────────────────
+
+const DIFFICULTIES = ["beginner", "intermediate", "advanced"] as const;
+type Difficulty = (typeof DIFFICULTIES)[number];
+
+type ParsedOpportunityForm =
+  | { ok: false; error: string }
+  | {
+      ok: true;
+      data: {
+        title: string;
+        description: string;
+        difficulty: Difficulty;
+        skills: string[];
+        contributionType: string | undefined;
+        repositoryUrl: string | undefined;
+        issueUrl: string | undefined;
+        whyRecommended: string | undefined;
+        isPinned: boolean;
+      };
+    };
+
+function parseOpportunityForm(formData: FormData): ParsedOpportunityForm {
+  const title = (formData.get("title") as string)?.trim();
+  const description = (formData.get("description") as string)?.trim() ?? "";
+  const difficultyRaw = (formData.get("difficulty") as string)?.trim();
+  const difficulty = DIFFICULTIES.includes(difficultyRaw as Difficulty)
+    ? (difficultyRaw as Difficulty)
+    : "beginner";
+  const skills = parseSkillsInput((formData.get("skills") as string) ?? "");
+  const contributionType = (formData.get("contributionType") as string)?.trim() || undefined;
+  const repositoryUrl = (formData.get("repositoryUrl") as string)?.trim() || undefined;
+  const issueUrl = (formData.get("issueUrl") as string)?.trim() || undefined;
+  const whyRecommended = (formData.get("whyRecommended") as string)?.trim() || undefined;
+  const isPinned = formData.get("isPinned") === "on";
+
+  if (!title) {
+    return { ok: false, error: "Title is required." };
+  }
+  if (!repositoryUrl && !issueUrl) {
+    return { ok: false, error: "Add a repository URL, an issue URL, or both." };
+  }
+
+  return {
+    ok: true,
+    data: {
+      title,
+      description,
+      difficulty,
+      skills,
+      contributionType,
+      repositoryUrl,
+      issueUrl,
+      whyRecommended,
+      isPinned,
+    },
+  };
+}
+
+export type OpportunityFormState = { error: string } | null;
+
+export async function createOpportunityAction(
+  organizationId: string,
+  orgSlug: string,
+  _prevState: OpportunityFormState,
+  formData: FormData,
+): Promise<OpportunityFormState> {
+  requireAdmin();
+  const actor = await assertAdmin();
+
+  const parsed = parseOpportunityForm(formData);
+  if (!parsed.ok) return { error: parsed.error };
+
+  const opportunity = await createOpportunity(organizationId, parsed.data);
+
+  await recordAdminAction({
+    actorUserId: actor.id,
+    action: "org_opportunity_created",
+    metadata: { organizationId, opportunityId: opportunity.id, title: opportunity.title },
+  });
+
+  revalidatePath(`/admin/partners/${orgSlug}`);
+  revalidatePath(`/partners/${orgSlug}`);
+  return null;
+}
+
+export async function updateOpportunityAction(
+  opportunityId: string,
+  orgSlug: string,
+  _prevState: OpportunityFormState,
+  formData: FormData,
+): Promise<OpportunityFormState> {
+  requireAdmin();
+  const actor = await assertAdmin();
+
+  const parsed = parseOpportunityForm(formData);
+  if (!parsed.ok) return { error: parsed.error };
+
+  await updateOpportunity(opportunityId, parsed.data);
+
+  await recordAdminAction({
+    actorUserId: actor.id,
+    action: "org_opportunity_updated",
+    metadata: { opportunityId },
+  });
+
+  revalidatePath(`/admin/partners/${orgSlug}`);
+  revalidatePath(`/partners/${orgSlug}`);
+  return null;
+}
+
+export async function deleteOpportunityAction(
+  opportunityId: string,
+  orgSlug: string,
+): Promise<void> {
+  requireAdmin();
+  const actor = await assertAdmin();
+
+  await deleteOpportunity(opportunityId);
+
+  await recordAdminAction({
+    actorUserId: actor.id,
+    action: "org_opportunity_deleted",
+    metadata: { opportunityId },
+  });
+
+  revalidatePath(`/admin/partners/${orgSlug}`);
+  revalidatePath(`/partners/${orgSlug}`);
+}
+
+export async function toggleOpportunityPinnedAction(
+  opportunityId: string,
+  orgSlug: string,
+  isPinned: boolean,
+): Promise<void> {
+  requireAdmin();
+  await assertAdmin();
+
+  await updateOpportunity(opportunityId, { isPinned });
+
+  revalidatePath(`/admin/partners/${orgSlug}`);
+  revalidatePath(`/partners/${orgSlug}`);
 }
 
 export async function deletePartnerOrgAction(orgId: string): Promise<void> {

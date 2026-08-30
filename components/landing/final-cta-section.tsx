@@ -8,7 +8,7 @@ export function FinalCtaSection() {
   return (
     <section
       aria-labelledby="final-cta-heading"
-      className="bg-signal relative w-full overflow-hidden"
+      className="brand-fixed bg-signal relative w-full overflow-hidden"
     >
       <div aria-hidden className="pointer-events-none absolute inset-0">
         <div className="tech-scanline absolute inset-x-0 top-0 h-px bg-ink/40" />

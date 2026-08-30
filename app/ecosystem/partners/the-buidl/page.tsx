@@ -19,9 +19,9 @@ import { getPartnerOrgBySlug, listOrgSkills } from "@/lib/partners/orgs";
 const PAGE_PATH = "/ecosystem/partners/the-buidl";
 
 export const metadata: Metadata = {
-  title: "The Buidl × Pull | From Learning to Open Source",
+  title: "Thebuidl × Pull | From Learning to Open Source",
   description:
-    "The Buidl and Pull help developers move from structured learning into meaningful open source contribution.",
+    "Thebuidl and Pull help developers move from structured learning into meaningful open source contribution.",
   alternates: { canonical: PAGE_PATH },
 };
 
@@ -29,7 +29,7 @@ const HOW_IT_WORKS_STEPS = [
   {
     step: "01",
     label: "Complete your pathway",
-    body: "Build practical skills with The Buidl.",
+    body: "Build practical skills with Thebuidl.",
   },
   {
     step: "02",
@@ -99,18 +99,18 @@ export default async function TheBuidlPartnerPage() {
                   ← Partners
                 </Link>
                 <span className="text-muted-foreground/40">/</span>
-                <p className="tech-eyebrow">The Buidl × Pull</p>
+                <p className="tech-eyebrow text-[var(--signal)]">Thebuidl × Pull</p>
               </div>
 
               {partner.logoSrc ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={partner.logoSrc}
-                  alt={partner.name}
-                  className={`mx-auto mt-6 h-8 w-auto lg:mx-0 ${
-                    partner.logoLight ? "invert dark:invert-0" : "dark:invert"
-                  }`}
-                />
+                <div className="mx-auto mt-6 w-fit lg:mx-0 dark:bg-brand-paper dark:px-3 dark:py-2">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={partner.logoSrc}
+                    alt={partner.name}
+                    className={`h-8 w-auto ${partner.logoLight ? "invert" : ""}`}
+                  />
+                </div>
               ) : null}
 
               <h1 className="mt-6 text-balance text-[clamp(1.75rem,4vw,3rem)] font-bold leading-[1.1] tracking-[-0.04em]">
@@ -118,14 +118,17 @@ export default async function TheBuidlPartnerPage() {
               </h1>
 
               <p className="mt-5 max-w-xl font-mono text-sm leading-relaxed text-muted-foreground lg:mx-0">
-                The Buidl helps developers build practical skills. Pull helps them take the next
+                Thebuidl helps developers build practical skills. Pull helps them take the next
                 step by contributing to real open source projects.
               </p>
 
               <div className="mt-8 flex flex-wrap justify-center gap-3 lg:justify-start">
-                <Button asChild>
+                <Button
+                  asChild
+                  className="bg-signal border-[var(--signal)] hover:bg-[var(--signal)]/90"
+                >
                   <a href={partner.website} target="_blank" rel="noreferrer">
-                    Explore The Buidl ↗
+                    Explore Thebuidl ↗
                   </a>
                 </Button>
               </div>
@@ -206,7 +209,7 @@ export default async function TheBuidlPartnerPage() {
               {skills.map((skill) => (
                 <span
                   key={skill}
-                  className="border border-border px-2 py-0.5 font-mono text-[10px] text-muted-foreground uppercase tracking-wide"
+                  className="bg-signal/10 border-[var(--signal)]/40 border px-2 py-0.5 font-mono text-[10px] text-foreground uppercase tracking-wide"
                 >
                   {skill}
                 </span>

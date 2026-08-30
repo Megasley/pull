@@ -30,6 +30,8 @@ export type AdminUserRecord = {
   moderatedAt: string | null;
   onboardingCompletedAt: string | null;
   preferredRoadmapSlug: string | null;
+  country: string | null;
+  acquisitionSource: string | null;
   xp: number;
   level: number;
   createdAt: string;
@@ -72,6 +74,8 @@ function mapAdminUser(row: typeof users.$inferSelect): AdminUserRecord {
     moderatedAt: row.moderatedAt,
     onboardingCompletedAt: row.onboardingCompletedAt,
     preferredRoadmapSlug: row.preferredRoadmapSlug,
+    country: row.country,
+    acquisitionSource: row.acquisitionSource,
     xp: row.xp,
     level: row.level,
     createdAt: row.createdAt,

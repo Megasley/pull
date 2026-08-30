@@ -51,11 +51,8 @@ export function OrgInviteLinkPanel({ orgSlug, linkExists, seatCount: initialSeat
   }
 
   return (
-    <div className="border border-border p-6">
-      <h2 className="font-mono text-xs tracking-wide text-muted-foreground uppercase">
-        Invite link
-      </h2>
-      <p className="mt-2 max-w-xl font-mono text-xs leading-relaxed text-muted-foreground">
+    <div>
+      <p className="max-w-xl font-mono text-xs leading-relaxed text-muted-foreground">
         One shared link for everyone at this organization. Anyone who signs in through it joins
         automatically — no per-person invite or verification needed.
       </p>

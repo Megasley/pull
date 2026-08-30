@@ -102,3 +102,58 @@ export const organizationStatusEnum = pgEnum("organization_status", [
   "inactive",
 ]);
 
+/** First-touch acquisition bucket, set once at account creation and never overwritten. */
+export const acquisitionSourceEnum = pgEnum("acquisition_source", [
+  "direct",
+  "organic",
+  "referral",
+  "partner",
+  "program",
+  "bootcamp",
+  "campaign",
+  "other",
+]);
+
+/** Durable PR lifecycle transitions. See lib/github/store.ts:recordPullRequestEvents. */
+export const prLifecycleEventTypeEnum = pgEnum("pr_lifecycle_event_type", [
+  "opened",
+  "ready_for_review",
+  "merged",
+  "closed",
+]);
+
+/**
+ * Precision of a pr_lifecycle event's `occurredAt`:
+ * - "github": exact timestamp from GitHub's API (created_at / merged_at / closed_at)
+ * - "sync_observed": no exact timestamp is available (e.g. draft->ready has no
+ *   REST/Search API field); this is when Pull's periodic sync first noticed the
+ *   transition, not when it actually happened.
+ */
+export const eventTimestampSourceEnum = pgEnum("event_timestamp_source", [
+  "github",
+  "sync_observed",
+]);
+
+export const opportunitySourceTypeEnum = pgEnum("opportunity_source_type", [
+  "org_opportunity",
+  "discovery_repo",
+  "discovery_issue",
+  "project_catalog",
+]);
+
+export const opportunityEventTypeEnum = pgEnum("opportunity_event_type", [
+  "viewed",
+  "clicked_github",
+  "saved",
+  "showed_interest",
+]);
+
+/** Partner/program-controlled signal that an external pathway (e.g. Thebuidl's
+ *  own curriculum) was completed — set only via an authorized admin/partner action. */
+export const orgQualificationStatusEnum = pgEnum("org_qualification_status", [
+  "none",
+  "qualified",
+  "completed",
+  "graduated",
+]);
+

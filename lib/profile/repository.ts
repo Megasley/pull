@@ -31,6 +31,7 @@ function mapDrizzleUser(row: typeof users.$inferSelect): BuilderProfile {
     moderation_reason: row.moderationReason,
     onboarding_completed_at: row.onboardingCompletedAt,
     preferred_roadmap_slug: row.preferredRoadmapSlug,
+    country: row.country,
     xp: row.xp,
     level: row.level,
     created_at: row.createdAt,
@@ -122,6 +123,8 @@ export async function updateBuilderProfileFields(
     lookingFor: string[];
     profilePublic: boolean;
     listedInDirectory: boolean;
+    /** undefined = leave unchanged; null = explicitly cleared by the user. */
+    country?: string | null;
   },
 ): Promise<BuilderProfile | null> {
   if (!isDatabaseConfigured()) return null;
@@ -141,6 +144,7 @@ export async function updateBuilderProfileFields(
         lookingFor: input.lookingFor,
         profilePublic,
         listedInDirectory,
+        ...(input.country !== undefined ? { country: input.country } : {}),
         updatedAt: new Date().toISOString(),
       })
       .where(eq(users.id, userId))

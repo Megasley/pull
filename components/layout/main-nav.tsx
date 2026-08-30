@@ -97,7 +97,7 @@ export function MainNav() {
                         href={child.href}
                         target="_blank"
                         rel="noreferrer"
-                        className={cn(active && "bg-accent")}
+                        className={cn(active && "bg-accent text-accent-foreground")}
                       >
                         {child.title}
                         <span className="ml-auto pl-2 opacity-40" aria-hidden>↗</span>
@@ -106,7 +106,7 @@ export function MainNav() {
                       <Link
                         href={child.href}
                         aria-current={active ? "page" : undefined}
-                        className={cn(active && "bg-accent")}
+                        className={cn(active && "bg-accent text-accent-foreground")}
                       >
                         {child.title}
                       </Link>

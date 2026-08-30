@@ -8,7 +8,7 @@ export const difficultyLabel: Record<OrganizationDifficulty, string> = {
 };
 
 export const difficultyClassName: Record<OrganizationDifficulty, string> = {
-  beginner: "border-ink/20 bg-signal text-ink",
+  beginner: "border-ink/20 bg-signal text-signal-foreground",
   intermediate: "border-ink/30 bg-ink/10 text-ink",
   advanced: "border-ink bg-ink text-[var(--background)]",
 };

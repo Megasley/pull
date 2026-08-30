@@ -14,6 +14,7 @@
 }
 
 .mdx-content pre {
+  border: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
   background: #0d1117;
   color: #e6edf3;
 }
@@ -77,6 +78,7 @@
 .mermaid-frame {
   width: 100%;
   overflow: visible;
+  border: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
   background: #0d1117;
 }
 

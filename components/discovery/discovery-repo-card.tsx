@@ -1,7 +1,9 @@
 import { Clock3, ExternalLink, HeartPulse, Tag } from "lucide-react";
 
 import { DiscoveryBookmarkButton } from "@/components/discovery/discovery-bookmark-button";
+import { TrackedExternalLink } from "@/components/discovery/tracked-external-link";
 import { Badge } from "@/components/ui/badge";
+import { discoveryIssueKey, discoveryRepoKey } from "@/lib/opportunities/keys";
 import { cn } from "@/lib/utils";
 import type { DiscoveryRepository } from "@/types/discovery";
 
@@ -117,24 +119,30 @@ export function DiscoveryRepoCard({
       ) : null}
 
       <div className="mt-4 flex flex-wrap gap-2 border-t border-border pt-3">
-        <a
+        <TrackedExternalLink
           href={repository.url}
           target="_blank"
           rel="noreferrer"
+          opportunityKey={discoveryRepoKey(repository.repository)}
+          sourceType="discovery_repo"
+          repoFullName={repository.repository}
           className="inline-flex items-center gap-1 text-xs font-medium underline-offset-4 hover:underline"
         >
           Repository
           <ExternalLink className="size-3" aria-hidden />
-        </a>
-        <a
+        </TrackedExternalLink>
+        <TrackedExternalLink
           href={repository.issuesUrl}
           target="_blank"
           rel="noreferrer"
+          opportunityKey={discoveryIssueKey(repository.issuesUrl)}
+          sourceType="discovery_issue"
+          repoFullName={repository.repository}
           className="inline-flex items-center gap-1 text-xs font-medium underline-offset-4 hover:underline"
         >
           Issues
           <ExternalLink className="size-3" aria-hidden />
-        </a>
+        </TrackedExternalLink>
       </div>
     </article>
   );

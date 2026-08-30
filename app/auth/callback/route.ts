@@ -3,6 +3,7 @@ import { after } from "next/server";
 
 import { sanitizeRedirectPath } from "@/lib/auth/routes";
 import { canSignIn } from "@/lib/auth/account-status";
+import { deriveAcquisitionSignal } from "@/lib/auth/acquisition";
 import { ensureBuilderProfile } from "@/lib/auth/ensure-builder-profile";
 import {
   connectGithubFromSession,
@@ -44,7 +45,9 @@ export async function GET(request: Request) {
   } = await supabase.auth.getUser();
 
   if (user) {
-    const profile = await ensureBuilderProfile(user);
+    const profile = await ensureBuilderProfile(user, {
+      acquisition: deriveAcquisitionSignal(next),
+    });
 
     if (profile && !canSignIn(profile.accountStatus)) {
       await supabase.auth.signOut();

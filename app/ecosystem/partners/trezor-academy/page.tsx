@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 
 import { SectionDivider, SectionHeader } from "@/components/design-system";
 import { FoundingSponsorRecognition } from "@/components/ecosystem/founding-sponsor-recognition";
 import { SiteContainer } from "@/components/layout/site-container";
 import { Button } from "@/components/ui/button";
+import { getPartnerBySlug } from "@/lib/ecosystem/partners";
 
 export const metadata: Metadata = {
   title: "Trezor Academy · Partners",
@@ -52,6 +54,11 @@ const JOURNEY_STAGES = [
 ] as const;
 
 export default function TrezorAcademyPartnerPage() {
+  // Launching with Thebuidl first — see lib/ecosystem/partners.ts.
+  if (getPartnerBySlug("trezor-academy")?.hidden) {
+    notFound();
+  }
+
   return (
     <>
       {/* ── Hero ─────────────────────────────────────────────────────── */}
@@ -73,12 +80,14 @@ export default function TrezorAcademyPartnerPage() {
               </div>
 
               <div className="mt-6 flex flex-col items-center gap-3 md:items-start">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/trezor-academy-logo.svg"
-                  alt="Trezor Academy"
-                  className="h-6 w-auto dark:invert"
-                />
+                <div className="dark:bg-brand-paper dark:px-3 dark:py-2">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/trezor-academy-logo.svg"
+                    alt="Trezor Academy"
+                    className="h-6 w-auto"
+                  />
+                </div>
                 <span className="inline-block w-fit border border-ink px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.16em] text-ink">
                   Founding Sponsor
                 </span>

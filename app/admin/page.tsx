@@ -1,7 +1,16 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { AdminDetailsSection, AdminSection } from "@/components/admin/admin-section";
+import { AttentionBanner, type AttentionItem } from "@/components/admin/attention-banner";
+import {
+  ContributorImpactStats,
+  GeographyImpactStats,
+  RetentionImpactStats,
+  type ImpactOverviewData,
+} from "@/components/admin/impact-overview-panel";
 import { RefreshAdminMetricsButton } from "@/components/admin/refresh-admin-metrics-button";
+import { AdminSectionNav } from "@/components/admin/section-nav";
 import { EmptyState, PageHeader } from "@/components/design-system";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,6 +29,19 @@ import type {
 import { isAdminRole } from "@/lib/auth/roles";
 import { bootstrapCurrentUserProfile } from "@/lib/auth/session";
 import { isDatabaseConfigured } from "@/lib/db/env";
+import {
+  countActiveContributors,
+  countCountriesAmongContributors,
+  countRepeatContributors,
+  countSustainedContributors,
+  countTotalMergedPRs,
+  countUniqueRepositories,
+  countVerifiedContributors,
+  getGeographyBreakdown,
+  timeToFirstMergedPR,
+  timeToFirstPR,
+} from "@/lib/impact/queries";
+import { contributorRetention } from "@/lib/impact/retention";
 import { getPlatformHealth } from "@/lib/platform/health";
 import type { ProjectSubmissionRecord, UserRole } from "@/types/submission";
 import { REVIEW_QUEUE_STATUSES, SUBMISSION_STATUS_LABELS } from "@/types/submission";
@@ -84,10 +106,64 @@ export default async function AdminOverviewPage({
     );
   }
 
-  const [live, snapshot] = await Promise.all([
-    loadAdminLiveOps(),
-    getAdminMetricsSnapshot(),
-  ]);
+  const [live, snapshot] = await Promise.all([loadAdminLiveOps(), getAdminMetricsSnapshot()]);
+
+  // Isolated from the two calls above and wrapped defensively: these are
+  // exactly the shape of per-user join that previously timed out inside the
+  // admin_metrics_snapshots cron and got disabled (see "First OSS via Pull"
+  // below). Running them here, outside that shared transaction, on a single
+  // page load, with a graceful fallback, avoids repeating that failure mode.
+  let impactOverview: ImpactOverviewData | null = null;
+  try {
+    const [
+      verifiedContributors,
+      repeatContributors,
+      activeContributors,
+      sustainedContributors,
+      totalMergedPRs,
+      uniqueRepositories,
+      timeToPr,
+      timeToMergedPr,
+      geography,
+      contributorGeography,
+      retention30,
+      retention90,
+      retention180,
+    ] = await Promise.all([
+      countVerifiedContributors(),
+      countRepeatContributors(),
+      countActiveContributors(),
+      countSustainedContributors(),
+      countTotalMergedPRs(),
+      countUniqueRepositories(),
+      timeToFirstPR(),
+      timeToFirstMergedPR(),
+      getGeographyBreakdown(),
+      countCountriesAmongContributors(true),
+      contributorRetention(30),
+      contributorRetention(90),
+      contributorRetention(180),
+    ]);
+
+    impactOverview = {
+      verifiedContributors,
+      repeatContributors,
+      activeContributors,
+      sustainedContributors,
+      totalMergedPRs,
+      uniqueRepositories,
+      medianDaysToFirstPR: timeToPr.medianDays,
+      medianDaysToFirstMergedPR: timeToMergedPr.medianDays,
+      geography,
+      contributorCountriesRepresented: contributorGeography.countriesRepresented,
+      africanContributorCountriesRepresented: contributorGeography.africanCountriesRepresented,
+      retention30,
+      retention90,
+      retention180,
+    };
+  } catch (error) {
+    console.warn("[admin] impact overview failed", error);
+  }
 
   const platformHealth = getPlatformHealth();
   const payload: AdminMetricsSnapshotPayload | null =
@@ -111,30 +187,60 @@ export default async function AdminOverviewPage({
 
   const snapshotUnavailable = !payload;
 
-  const metricsBanner =
-    snapshot.status === "missing" ? (
-      <MetricsBanner
-        tone="warn"
-        title="Aggregates unavailable"
-        body="Launch metrics, funnel, and drop-off have not been computed yet. Use Refresh metrics or wait for the daily cron."
-      />
-    ) : snapshot.status === "error" ? (
-      <MetricsBanner
-        tone="error"
-        title="Aggregate refresh failed"
-        body={
-          payload
-            ? `Showing last good snapshot if available. Error: ${snapshot.error}`
-            : `No usable snapshot. Error: ${snapshot.error}`
-        }
-      />
-    ) : snapshot.stale ? (
-      <MetricsBanner
-        tone="warn"
-        title="Aggregates are stale"
-        body="Snapshot is older than ~36 hours. Cron may be missing CRON_SECRET or failing — try Refresh metrics."
-      />
-    ) : null;
+  const attentionItems: AttentionItem[] = [];
+  if (snapshot.status === "missing") {
+    attentionItems.push({
+      tone: "warning",
+      label: "Aggregates unavailable",
+      detail: "Launch metrics, funnel, and drop-off haven't been computed yet — use Refresh metrics or wait for the daily cron.",
+    });
+  } else if (snapshot.status === "error") {
+    attentionItems.push({
+      tone: "destructive",
+      label: "Aggregate refresh failed",
+      detail: snapshot.error,
+    });
+  } else if (snapshot.stale) {
+    attentionItems.push({
+      tone: "warning",
+      label: "Aggregates are stale",
+      detail: "Snapshot is older than ~36 hours — cron may be missing CRON_SECRET or failing.",
+    });
+  }
+  if (live.health.status === "ok" && live.health.data.stuckClaims > 0) {
+    attentionItems.push({
+      tone: "destructive",
+      label: `${live.health.data.stuckClaims} stuck claim${live.health.data.stuckClaims === 1 ? "" : "s"}`,
+      detail: "Reviewer claimed but expired without a decision.",
+      href: "/review?status=stuck",
+    });
+  }
+  if (live.cronHealth.status === "ok" && live.cronHealth.data.errorCount > 0) {
+    attentionItems.push({
+      tone: "warning",
+      label: `${live.cronHealth.data.errorCount} GitHub connection${live.cronHealth.data.errorCount === 1 ? "" : "s"} in error`,
+      detail: "See Cron / sync health below.",
+      href: "#system",
+    });
+  }
+  // Deliberately NOT flagging platformHealth (missing OAuth/cron secret/etc.)
+  // here — those are static config facts, not operational incidents. A
+  // config gap doesn't change over time or get "resolved" by looking at
+  // this page, so surfacing it as an alert makes the banner permanently red
+  // in any environment missing an optional secret (e.g. local dev) and
+  // trains the eye to ignore it. It's still visible, correctly framed as
+  // status rather than alarm, in the System section's health chips below.
+
+  const navSections = [
+    { id: "growth", label: "Growth" },
+    { id: "contributors", label: "Contributors" },
+    { id: "geography", label: "Geography" },
+    { id: "retention", label: "Retention" },
+    { id: "review", label: "Review" },
+    { id: "learning", label: "Learning" },
+    { id: "system", label: "System" },
+    { id: "users", label: "Users" },
+  ];
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 pt-12 pb-20 sm:px-6 lg:px-8">
@@ -163,15 +269,16 @@ export default async function AdminOverviewPage({
         }
       />
 
-      {metricsBanner}
+      <AttentionBanner items={attentionItems} />
+      <AdminSectionNav sections={navSections} />
 
-      <section className="mt-10">
-        <h2 className="text-lg font-semibold tracking-tight">Launch metrics</h2>
-        <p className="mt-1 max-w-2xl font-mono text-[11px] text-muted-foreground">
-          From snapshot · MAU = signed-in users with activity in the last 30 days.
-        </p>
+      <AdminSection
+        id="growth"
+        title="Growth"
+        description="From snapshot · MAU = signed-in users with activity in the last 30 days."
+      >
         {metrics ? (
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <StatCard label="Registered developers" value={metrics.registeredUsers} />
             <StatCard label="Monthly active users" value={metrics.monthlyActiveUsers} />
             <StatCard label="Projects listed" value={metrics.projectsListed} />
@@ -180,16 +287,28 @@ export default async function AdminOverviewPage({
         ) : (
           <UnavailableBlock label="Launch metrics" />
         )}
-      </section>
+      </AdminSection>
 
-      <section className="mt-12">
-        <h2 className="text-lg font-semibold tracking-tight">Review health</h2>
-        <p className="mt-1 font-mono text-[11px] text-muted-foreground">
-          Live · refreshed on each page load
-        </p>
+      <AdminSection
+        id="contributors"
+        title="Contributors"
+        description="Computed live from durable contribution history — see docs/metrics-definitions.md."
+      >
+        {impactOverview ? <ContributorImpactStats data={impactOverview} /> : <UnavailableBlock label="Contributor impact" />}
+      </AdminSection>
+
+      <AdminDetailsSection id="geography" title="Geography" description="Country is optional and self-reported.">
+        {impactOverview ? <GeographyImpactStats data={impactOverview} /> : <UnavailableBlock label="Geography" />}
+      </AdminDetailsSection>
+
+      <AdminDetailsSection id="retention" title="Retention" description="30/90/180-day contributor retention.">
+        {impactOverview ? <RetentionImpactStats data={impactOverview} /> : <UnavailableBlock label="Retention" />}
+      </AdminDetailsSection>
+
+      <AdminSection id="review" title="Review queue" description="Live · refreshed on each page load">
         {live.health.status === "ok" ? (
           <>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               <StatCardLink
                 label="Open queue"
                 value={live.health.data.openTotal}
@@ -223,61 +342,31 @@ export default async function AdminOverviewPage({
         ) : (
           <UnavailableBlock label="Review health" />
         )}
-      </section>
 
-      <section className="mt-12">
-        <h2 className="text-lg font-semibold tracking-tight">Recent submissions</h2>
-        <p className="mt-1 font-mono text-[11px] text-muted-foreground">
-          Live · all statuses, newest first
-        </p>
-        <RecentSubmissionsBlock load={live.recentSubmissions} />
-      </section>
-
-      <section className="mt-12">
-        <h2 className="text-lg font-semibold tracking-tight">Platform config</h2>
-        <div className="mt-4 flex flex-wrap gap-2">
-          <HealthChip label="Database" ok={platformHealth.database} />
-          <HealthChip label="Supabase auth" ok={platformHealth.supabaseAuth} />
-          <HealthChip label="GitHub OAuth" ok={platformHealth.githubOAuth} />
-          <HealthChip label="Resend" ok={platformHealth.resend} />
-          <HealthChip label="Cron secret" ok={platformHealth.cronSecret} />
+        <div className="mt-8">
+          <h3 className="text-sm font-semibold tracking-tight">Recent submissions</h3>
+          <p className="mt-1 font-mono text-[11px] text-muted-foreground">
+            Live · all statuses, newest first
+          </p>
+          <RecentSubmissionsBlock load={live.recentSubmissions} />
         </div>
-      </section>
+      </AdminSection>
 
-      <section className="mt-12">
-        <h2 className="text-lg font-semibold tracking-tight">Cron / sync health</h2>
-        <CronHealthBlock load={live.cronHealth} />
-      </section>
-
-      <section className="mt-12">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <h2 className="text-lg font-semibold tracking-tight">
-              Learning funnel ({funnelRange === "30d" ? "30d" : "all-time"})
-            </h2>
-            <p className="mt-1 font-mono text-[11px] text-muted-foreground">
-              From snapshot · both ranges are computed together each refresh
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Button
-              asChild
-              variant={funnelRange === "all" ? "default" : "outline"}
-              size="sm"
-            >
-              <Link href="/admin">All-time</Link>
-            </Button>
-            <Button
-              asChild
-              variant={funnelRange === "30d" ? "default" : "outline"}
-              size="sm"
-            >
-              <Link href="/admin?funnel=30d">30d</Link>
-            </Button>
-          </div>
+      <AdminDetailsSection
+        id="learning"
+        title={`Learning funnel (${funnelRange === "30d" ? "30d" : "all-time"})`}
+        description="From snapshot · both ranges are computed together each refresh"
+      >
+        <div className="mb-4 flex gap-2">
+          <Button asChild variant={funnelRange === "all" ? "default" : "outline"} size="sm">
+            <Link href="/admin">All-time</Link>
+          </Button>
+          <Button asChild variant={funnelRange === "30d" ? "default" : "outline"} size="sm">
+            <Link href="/admin?funnel=30d">30d</Link>
+          </Button>
         </div>
         {funnel ? (
-          <div className="mt-4 overflow-x-auto">
+          <div className="overflow-x-auto">
             <table className="w-full min-w-[480px] border-collapse text-sm">
               <thead>
                 <tr className="border-b border-border text-left">
@@ -314,84 +403,74 @@ export default async function AdminOverviewPage({
         ) : (
           <UnavailableBlock label="Learning funnel" />
         )}
-      </section>
 
-      <section className="mt-12">
-        <h2 className="text-lg font-semibold tracking-tight">Lesson drop-off</h2>
-        <p className="mt-1 font-mono text-[11px] text-muted-foreground">
-          From snapshot · lowest completion counts first
-        </p>
-        {snapshotUnavailable || !payload ? (
-          <UnavailableBlock label="Lesson drop-off" />
-        ) : dropOff.length === 0 ? (
-          <p className="mt-4 text-sm text-muted-foreground">
-            No lesson completions yet.
+        <div className="mt-8">
+          <h3 className="text-sm font-semibold tracking-tight">Lesson drop-off</h3>
+          <p className="mt-1 font-mono text-[11px] text-muted-foreground">
+            From snapshot · lowest completion counts first
           </p>
-        ) : (
-          <div className="mt-4 overflow-x-auto">
-            <table className="w-full min-w-[560px] border-collapse text-sm">
-              <thead>
-                <tr className="border-b border-border text-left">
-                  <th className="py-2 pr-4">Roadmap</th>
-                  <th className="py-2 pr-4">Lesson</th>
-                  <th className="py-2 pr-4">Completed</th>
-                </tr>
-              </thead>
-              <tbody>
-                {dropOff.map((row) => (
-                  <tr
-                    key={`${row.roadmapSlug}:${row.nodeSlug}`}
-                    className="border-b border-border/60"
-                  >
-                    <td className="py-2 pr-4">{row.roadmapSlug}</td>
-                    <td className="py-2 pr-4 font-mono text-xs">{row.nodeSlug}</td>
-                    <td className="py-2 pr-4">{row.completed}</td>
+          {snapshotUnavailable || !payload ? (
+            <UnavailableBlock label="Lesson drop-off" />
+          ) : dropOff.length === 0 ? (
+            <p className="mt-4 text-sm text-muted-foreground">No lesson completions yet.</p>
+          ) : (
+            <div className="mt-4 overflow-x-auto">
+              <table className="w-full min-w-[560px] border-collapse text-sm">
+                <thead>
+                  <tr className="border-b border-border text-left">
+                    <th className="py-2 pr-4">Roadmap</th>
+                    <th className="py-2 pr-4">Lesson</th>
+                    <th className="py-2 pr-4">Completed</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
+                </thead>
+                <tbody>
+                  {dropOff.map((row) => (
+                    <tr key={`${row.roadmapSlug}:${row.nodeSlug}`} className="border-b border-border/60">
+                      <td className="py-2 pr-4">{row.roadmapSlug}</td>
+                      <td className="py-2 pr-4 font-mono text-xs">{row.nodeSlug}</td>
+                      <td className="py-2 pr-4">{row.completed}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </AdminDetailsSection>
 
-      <section className="mt-12">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <h2 className="text-lg font-semibold tracking-tight">Users</h2>
-            <p className="mt-1 font-mono text-[11px] text-muted-foreground">
-              {roleCounts
-                ? `builders ${roleCounts.builder} · reviewers ${roleCounts.reviewer} · admins ${roleCounts.admin}`
-                : "Role counts unavailable — refresh metrics"}
-            </p>
-          </div>
+      <AdminDetailsSection id="system" title="System" description="Platform config and background sync health.">
+        <div className="flex flex-wrap gap-2">
+          <HealthChip label="Database" ok={platformHealth.database} />
+          <HealthChip label="Supabase auth" ok={platformHealth.supabaseAuth} />
+          <HealthChip label="GitHub OAuth" ok={platformHealth.githubOAuth} />
+          <HealthChip label="Resend" ok={platformHealth.resend} />
+          <HealthChip label="Cron secret" ok={platformHealth.cronSecret} />
+        </div>
+        <div className="mt-6">
+          <h3 className="text-sm font-semibold tracking-tight">Cron / sync health</h3>
+          <CronHealthBlock load={live.cronHealth} />
+        </div>
+      </AdminDetailsSection>
+
+      <AdminSection
+        id="users"
+        title="Users"
+        description={
+          roleCounts
+            ? `builders ${roleCounts.builder} · reviewers ${roleCounts.reviewer} · admins ${roleCounts.admin}`
+            : "Role counts unavailable — refresh metrics"
+        }
+        actions={
           <Button asChild variant="outline" size="sm">
             <Link href="/admin/users">Manage roles</Link>
           </Button>
-        </div>
-      </section>
-    </div>
-  );
-}
-
-function MetricsBanner({
-  tone,
-  title,
-  body,
-}: {
-  tone: "warn" | "error";
-  title: string;
-  body: string;
-}) {
-  return (
-    <div
-      className={`mt-6 border px-3 py-3 font-mono text-xs leading-relaxed ${
-        tone === "error"
-          ? "border-destructive/40 bg-destructive/10 text-destructive"
-          : "border-ink/25 bg-signal/15 text-foreground"
-      }`}
-    >
-      <p className="font-medium tracking-wide uppercase">{title}</p>
-      <p className="mt-1 text-muted-foreground">{body}</p>
+        }
+      >
+        <p className="text-sm text-muted-foreground">
+          See individual contributor impact — country, PRs, retention status — on each
+          user&apos;s detail page.
+        </p>
+      </AdminSection>
     </div>
   );
 }
@@ -561,7 +640,7 @@ function HealthChip({ label, ok }: { label: string; ok: boolean }) {
     <span
       className={`rounded-none border px-2.5 py-1 text-xs ${
         ok
-          ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-800 dark:text-emerald-200"
+          ? "border-success/40 bg-success/10 text-success"
           : "border-destructive/40 bg-destructive/10 text-destructive"
       }`}
     >

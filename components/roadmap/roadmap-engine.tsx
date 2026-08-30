@@ -42,7 +42,7 @@ function TopicChip({
       <span
         className={cn(
           "flex size-4 shrink-0 items-center justify-center rounded-none border",
-          status === "completed" && "border-ink bg-signal text-ink",
+          status === "completed" && "border-ink bg-signal text-signal-foreground",
           status === "active" && "border-ink bg-ink text-[var(--background)]",
           status === "default" && "border-border bg-transparent text-muted-foreground",
           locked && "border-border bg-muted/40 text-muted-foreground",

@@ -17,7 +17,7 @@ export function NewPartnerOrgForm() {
     <form action={formAction} className="mt-10 flex flex-col gap-6">
       <div className="flex flex-col gap-2">
         <label htmlFor="name" className={labelCls}>Organization Name</label>
-        <input id="name" name="name" placeholder="The Buidl" required className={inputCls} />
+        <input id="name" name="name" placeholder="Thebuidl" required className={inputCls} />
       </div>
 
       <div className="flex flex-col gap-2">
