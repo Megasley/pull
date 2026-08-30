@@ -54,8 +54,9 @@ export const metadata = {
 
 export const maxDuration = 30;
 
-/** Budget for the impact-overview block below — see the comment at its call site. */
-const IMPACT_OVERVIEW_BUDGET_MS = 8_000;
+/** Budget for DB calls below that must degrade gracefully instead of riding
+ *  a hung connection up to this page's own maxDuration — see call sites. */
+const ADMIN_QUERY_BUDGET_MS = 8_000;
 
 function snapshotMetaLabel(snapshot: AdminMetricsSnapshotView): string {
   if (snapshot.status === "missing") {
@@ -110,7 +111,17 @@ export default async function AdminOverviewPage({
     );
   }
 
-  const [live, snapshot] = await Promise.all([loadAdminLiveOps(), getAdminMetricsSnapshot()]);
+  // getAdminMetricsSnapshot() has no internal timeout guard (unlike each
+  // slice of loadAdminLiveOps, via settleLive). Bound it here so a hung
+  // connection degrades this section instead of silently riding the whole
+  // request up to maxDuration with no error and no console output.
+  const [live, snapshotResult] = await Promise.all([
+    loadAdminLiveOps(),
+    withTimeoutResult(getAdminMetricsSnapshot(), ADMIN_QUERY_BUDGET_MS, "admin.snapshot"),
+  ]);
+  const snapshot: AdminMetricsSnapshotView = snapshotResult.ok
+    ? snapshotResult.value
+    : { status: "missing" };
 
   // Isolated from the two calls above and time-boxed: these are exactly the
   // shape of per-user join that previously timed out inside the
@@ -170,7 +181,7 @@ export default async function AdminOverviewPage({
         retention180,
       } satisfies ImpactOverviewData;
     })(),
-    IMPACT_OVERVIEW_BUDGET_MS,
+    ADMIN_QUERY_BUDGET_MS,
     "admin.impactOverview",
   );
   if (impactOverviewResult.ok) {
