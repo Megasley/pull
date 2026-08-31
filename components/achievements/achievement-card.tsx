@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import type { AchievementItem } from "@/types/dashboard";
 import type { AchievementCategory } from "@/types/achievement";
 import { Badge } from "@/components/ui/badge";
+import { ACHIEVEMENT_ICONS } from "@/components/achievements/achievement-icons";
 
 type AchievementCardProps = {
   achievement: AchievementItem;
@@ -22,12 +23,13 @@ export function AchievementCard({
   const category = achievement.category as AchievementCategory | undefined;
   const celebrate = achievement.earned && achievement.recentlyUnlocked;
   const isProfile = variant === "profile";
+  const Icon = ACHIEVEMENT_ICONS[achievement.icon];
 
   if (isProfile && achievement.earned) {
     return (
       <li className={cn("profile-ach-card", className)}>
         <div className="profile-ach-icon" aria-hidden>
-          {achievement.icon}
+          <Icon className="size-[18px]" />
         </div>
         <div className="min-w-0">
           <p className="text-sm font-bold text-ink">
@@ -73,7 +75,7 @@ export function AchievementCard({
       <div className="relative flex items-start gap-3">
         <div
           className={cn(
-            "flex size-11 shrink-0 items-center justify-center rounded-none border text-xl",
+            "flex size-11 shrink-0 items-center justify-center rounded-none border",
             achievement.earned
               ? "border-primary/30 bg-primary/10"
               : "border-border bg-muted/30 grayscale",
@@ -81,7 +83,7 @@ export function AchievementCard({
           )}
           aria-hidden
         >
-          {achievement.icon}
+          <Icon className="size-5" />
         </div>
 
         <div className="min-w-0 flex-1 space-y-1.5">

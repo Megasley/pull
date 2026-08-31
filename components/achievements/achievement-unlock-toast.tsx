@@ -7,6 +7,7 @@ import {
   readMigratedSessionStorage,
   writePullSessionStorage,
 } from "@/lib/storage/brand-keys";
+import { ACHIEVEMENT_ICONS } from "@/components/achievements/achievement-icons";
 import type { AchievementItem } from "@/types/dashboard";
 
 type AchievementUnlockToastProps = {
@@ -61,6 +62,8 @@ export function AchievementUnlockToast({ achievements }: AchievementUnlockToastP
     return null;
   }
 
+  const Icon = ACHIEVEMENT_ICONS[current.icon];
+
   return (
     <div
       className="fixed right-4 bottom-4 z-50 w-[min(100%-2rem,22rem)] animate-fade-in-up"
@@ -69,8 +72,8 @@ export function AchievementUnlockToast({ achievements }: AchievementUnlockToastP
     >
       <div className="overflow-hidden rounded-none border border-primary/30 bg-card p-4">
         <div className="flex items-start gap-3">
-          <div className="flex size-11 items-center justify-center rounded-none border border-primary/30 bg-primary/10 text-xl achievement-unlock-icon">
-            {current.icon}
+          <div className="flex size-11 items-center justify-center rounded-none border border-primary/30 bg-primary/10 achievement-unlock-icon">
+            <Icon className="size-5" />
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-[11px] font-medium uppercase tracking-wide text-primary">
