@@ -15,7 +15,6 @@ import {
 } from "@/components/profile/portfolio-sections";
 import {
   ProfileActivityStrip,
-  ProfileCollaborationCtas,
   ProfileContributionMixSection,
 } from "@/components/profile/profile-value-sections";
 import { ProfileEmptyState } from "@/components/profile/profile-empty-state";
@@ -57,7 +56,6 @@ export function PublicBuilderProfile({ data }: PublicBuilderProfileProps) {
     strengthLine,
     activity,
     contributionMix,
-    collaborationCtas,
     partnerOrigin,
     isOwner,
   } = data;
@@ -80,104 +78,98 @@ export function PublicBuilderProfile({ data }: PublicBuilderProfileProps) {
     <div className="profile-page">
       <SiteContainer className="pb-20">
         <header className="profile-header">
-          <div className="flex min-w-0 flex-col gap-5 sm:flex-row sm:items-start">
-            <Avatar className="profile-avatar rounded-full">
-              {profile.avatar ? (
-                <AvatarImage src={profile.avatar} alt={profile.displayName} />
-              ) : null}
-              <AvatarFallback className="rounded-full bg-signal/30 font-mono text-lg text-ink">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
-
-            <div className="min-w-0 flex-1">
-              <p className="profile-eyebrow">Builder // @{profile.username}</p>
-              <h1 className="profile-name">{profile.displayName}</h1>
-              <p className="profile-handle">@{profile.username}</p>
-              <p className="profile-tagline mt-2">
-                {profile.bio.trim() ||
-                  "Open source builder on Pull - learning, shipping, and contributing."}
-              </p>
-
-              {strengthLine ? (
-                <p className="profile-strength-line">{strengthLine}</p>
-              ) : null}
-
-              <ProfileActivityStrip activity={activity} />
-
-              <div className="mt-4 flex flex-wrap gap-2">
-                {partnerOrigin ? (
-                  <Link
-                    href={`/ecosystem/partners/${partnerOrigin.slug}`}
-                    className="profile-badge"
-                  >
-                    via {partnerOrigin.name}
-                  </Link>
+          <div className="min-w-0 flex-1">
+            <div className="profile-identity">
+              <Avatar className="profile-avatar rounded-full">
+                {profile.avatar ? (
+                  <AvatarImage src={profile.avatar} alt={profile.displayName} />
                 ) : null}
-                {partnerOrigin ? (
-                  <>
-                    <span className="profile-badge profile-badge-accent">
-                      OSS reputation {reputation.score}
-                    </span>
-                    {builderScore.score > 0 ? (
-                      <span className="profile-badge profile-badge-accent">
-                        Builder score {builderScore.score}
-                      </span>
-                    ) : null}
-                  </>
-                ) : (
-                  <>
-                    {builderScore.score > 0 ? (
-                      <span className="profile-badge profile-badge-accent">
-                        Builder score {builderScore.score}
-                      </span>
-                    ) : null}
-                    <span className="profile-badge profile-badge-accent">
-                      OSS reputation {reputation.score}
-                    </span>
-                  </>
-                )}
-                <span className="profile-badge profile-badge-level">
-                  Level {level.level} · {level.xp} XP
-                </span>
+                <AvatarFallback className="rounded-full bg-signal/30 font-mono text-lg text-ink">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+
+              <div className="min-w-0">
+                <p className="profile-eyebrow">Builder // @{profile.username}</p>
+                <h1 className="profile-name">{profile.displayName}</h1>
+                <p className="profile-handle">@{profile.username}</p>
               </div>
+            </div>
 
-              {profile.lookingFor.includes("not_actively_looking") &&
-              collaborationCtas.length === 0 ? (
-                <p className="mt-4 font-mono text-xs text-muted-foreground">
-                  Not actively looking right now.
-                </p>
+            <p className="profile-tagline mt-4">
+              {profile.bio.trim() ||
+                "Open source builder on Pull - learning, shipping, and contributing."}
+            </p>
+
+            {strengthLine ? (
+              <p className="profile-strength-line">{strengthLine}</p>
+            ) : null}
+
+            <ProfileActivityStrip activity={activity} />
+
+            <div className="mt-4 flex flex-wrap justify-center gap-2 sm:justify-start">
+              {partnerOrigin ? (
+                <Link
+                  href={`/ecosystem/partners/${partnerOrigin.slug}`}
+                  className="profile-badge"
+                >
+                  via {partnerOrigin.name}
+                </Link>
               ) : null}
+              {partnerOrigin ? (
+                <>
+                  <span className="profile-badge profile-badge-accent">
+                    OSS reputation {reputation.score}
+                  </span>
+                  {builderScore.score > 0 ? (
+                    <span className="profile-badge profile-badge-accent">
+                      Builder score {builderScore.score}
+                    </span>
+                  ) : null}
+                </>
+              ) : (
+                <>
+                  {builderScore.score > 0 ? (
+                    <span className="profile-badge profile-badge-accent">
+                      Builder score {builderScore.score}
+                    </span>
+                  ) : null}
+                  <span className="profile-badge profile-badge-accent">
+                    OSS reputation {reputation.score}
+                  </span>
+                </>
+              )}
+              <span className="profile-badge profile-badge-level">
+                Level {level.level} · {level.xp} XP
+              </span>
+            </div>
 
-              <ProfileCollaborationCtas ctas={collaborationCtas} />
-
-              <div className="mt-4 flex flex-wrap gap-4">
+            <div className="mt-4 flex flex-wrap gap-4">
+              <SocialChip
+                href={githubUrl}
+                label={`@${profile.githubUsername}`}
+                icon={<ExternalLinkIcon className="size-3.5" />}
+                profile
+              />
+              {profile.website ? (
+                <WebsiteChip href={profile.website} profile />
+              ) : null}
+              {profile.twitterUrl ? (
                 <SocialChip
-                  href={githubUrl}
-                  label={`@${profile.githubUsername}`}
+                  href={profile.twitterUrl}
+                  label="X / Twitter"
                   icon={<ExternalLinkIcon className="size-3.5" />}
                   profile
                 />
-                {profile.website ? (
-                  <WebsiteChip href={profile.website} profile />
-                ) : null}
-                {profile.twitterUrl ? (
-                  <SocialChip
-                    href={profile.twitterUrl}
-                    label="X / Twitter"
-                    icon={<ExternalLinkIcon className="size-3.5" />}
-                    profile
-                  />
-                ) : null}
-                {profile.linkedinUrl ? (
-                  <SocialChip
-                    href={profile.linkedinUrl}
-                    label="LinkedIn"
-                    icon={<ExternalLinkIcon className="size-3.5" />}
-                    profile
-                  />
-                ) : null}
-              </div>
+              ) : null}
+              {profile.linkedinUrl ? (
+                <SocialChip
+                  href={profile.linkedinUrl}
+                  label="LinkedIn"
+                  icon={<ExternalLinkIcon className="size-3.5" />}
+                  profile
+                />
+              ) : null}
             </div>
           </div>
 

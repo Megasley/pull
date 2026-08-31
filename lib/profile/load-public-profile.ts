@@ -16,7 +16,6 @@ import {
   toPublicTimelineEvents,
 } from "@/lib/profile/portfolio";
 import {
-  buildCollaborationCtas,
   buildContributionMix,
   buildProfileStrengthLine,
   buildPublicProfileActivity,
@@ -174,12 +173,6 @@ async function loadPublicBuilderProfileData(
     streak: contributionStreak,
   });
   const contributionMix = buildContributionMix(mergedPrs, timelineData.totals);
-  const collaborationCtas = buildCollaborationCtas({
-    lookingFor: profile.lookingFor,
-    username: profile.username,
-    website: profile.website,
-    linkedinUrl: profile.linkedinUrl,
-  });
 
   return {
     profile: publicProfile,
@@ -209,7 +202,6 @@ async function loadPublicBuilderProfileData(
     strengthLine,
     activity,
     contributionMix,
-    collaborationCtas,
     partnerOrigin,
   };
 }

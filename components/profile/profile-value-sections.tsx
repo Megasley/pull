@@ -1,15 +1,8 @@
-import Link from "next/link";
-
-import { ExternalLinkIcon } from "@/components/icons/outline-icons";
 import {
   formatProfileDate,
   formatRelativeActivity,
 } from "@/lib/profile/public-insights";
-import type {
-  ProfileCollaborationCta,
-  PublicContributionMix,
-  PublicProfileActivity,
-} from "@/types/profile";
+import type { PublicContributionMix, PublicProfileActivity } from "@/types/profile";
 import { cn } from "@/lib/utils";
 
 import { PortfolioSection } from "./portfolio-sections";
@@ -63,35 +56,6 @@ export function ProfileActivityStrip({ activity }: ProfileActivityStripProps) {
           >
             {item.value}
           </p>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-type ProfileCollaborationCtasProps = {
-  ctas: ProfileCollaborationCta[];
-};
-
-export function ProfileCollaborationCtas({ ctas }: ProfileCollaborationCtasProps) {
-  if (ctas.length === 0) return null;
-
-  return (
-    <div className="mt-4 space-y-2">
-      {ctas.map((cta) => (
-        <div key={cta.id} className="profile-collab-cta">
-          <div className="min-w-0 flex-1">
-            <p className="profile-collab-label">{cta.label}</p>
-            <p className="profile-collab-message">{cta.message}</p>
-          </div>
-          <Link
-            href={cta.href}
-            className="profile-collab-action"
-            {...(cta.external ? { target: "_blank", rel: "noreferrer" } : {})}
-          >
-            {cta.actionLabel}
-            {cta.external ? <ExternalLinkIcon className="size-3" /> : null}
-          </Link>
         </div>
       ))}
     </div>

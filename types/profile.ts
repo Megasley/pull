@@ -1,5 +1,4 @@
 import type { AchievementItem, ContributionStreak } from "@/types/dashboard";
-import type { LookingForId } from "@/lib/builders/looking-for";
 import type { PublicBuilderProfile } from "@/types/user";
 import type { BuilderScoreResult } from "@/types/score";
 import type { ReputationResult } from "@/types/reputation";
@@ -54,15 +53,6 @@ export type PublicContributionMix = {
   activityTypes: ContributionMixItem[];
 };
 
-export type ProfileCollaborationCta = {
-  id: LookingForId;
-  label: string;
-  message: string;
-  actionLabel: string;
-  href: string;
-  external?: boolean;
-};
-
 export type PublicBuilderProfileData = {
   profile: PublicBuilderProfile;
   level: {
@@ -87,7 +77,6 @@ export type PublicBuilderProfileData = {
   strengthLine: string | null;
   activity: PublicProfileActivity;
   contributionMix: PublicContributionMix;
-  collaborationCtas: ProfileCollaborationCta[];
   partnerOrigin: { slug: string; name: string } | null;
   isOwner: boolean;
 };
