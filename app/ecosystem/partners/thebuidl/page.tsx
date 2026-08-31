@@ -16,7 +16,7 @@ import { getUserOrgMembershipBySlug } from "@/lib/partners/memberships";
 import { pickRelevantRepositories } from "@/lib/partners/opportunities";
 import { getPartnerOrgBySlug, listOrgSkills } from "@/lib/partners/orgs";
 
-const PAGE_PATH = "/ecosystem/partners/the-buidl";
+const PAGE_PATH = "/ecosystem/partners/thebuidl";
 
 export const metadata: Metadata = {
   title: "Thebuidl × Pull | From Learning to Open Source",
@@ -62,7 +62,7 @@ const WHAT_YOU_GET = [
 ] as const;
 
 export default async function TheBuidlPartnerPage() {
-  const partner = getPartnerBySlug("the-buidl");
+  const partner = getPartnerBySlug("thebuidl");
   if (!partner) return null;
 
   const profile = await bootstrapCurrentUserProfile();

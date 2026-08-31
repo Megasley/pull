@@ -123,7 +123,7 @@ const partners: EcosystemPartner[] = [
       "Helping Pull create more opportunities for developers to learn, build, contribute, and develop real open source experience.",
   },
   {
-    slug: "the-buidl",
+    slug: "thebuidl",
     name: "Thebuidl",
     tagline: "Training the next generation of Bitcoin and Lightning developers.",
     description:

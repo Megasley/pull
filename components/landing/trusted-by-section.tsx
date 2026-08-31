@@ -10,7 +10,7 @@ const PARTNERS = [
     name: "Thebuidl",
     logo: "/buidl-logo.svg",
     logoLight: true,
-    height: "h-9",
+    height: "h-12",
     href: "https://thebuidl.xyz",
   },
 ];
