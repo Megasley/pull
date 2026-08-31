@@ -37,12 +37,22 @@ const unpinned = selectFeaturedRepositories(
 assert(unpinned[0]?.id === "d", "fallback stars");
 
 const prs = [
-  { id: "1", merged: true, reviewComments: 1, mergedAt: "2026-01-01T00:00:00.000Z" },
-  { id: "2", merged: true, reviewComments: 5, mergedAt: "2026-02-01T00:00:00.000Z" },
-  { id: "3", merged: false, reviewComments: 9, mergedAt: null },
+  { id: "1", title: "Feature A", merged: true, reviewComments: 1, mergedAt: "2026-01-01T00:00:00.000Z" },
+  { id: "2", title: "Feature B", merged: true, reviewComments: 5, mergedAt: "2026-02-01T00:00:00.000Z" },
+  { id: "3", title: "Not merged", merged: false, reviewComments: 9, mergedAt: null },
 ];
 const highlights = selectMergedPrHighlights(prs, 2);
 assert(highlights.length === 2 && highlights[0]?.id === "2", "highlight ranking");
+
+const duplicateTitlePrs = [
+  { id: "4", title: "Feat/partners", merged: true, reviewComments: 3, mergedAt: "2026-03-01T00:00:00.000Z" },
+  { id: "5", title: "Feat/partners", merged: true, reviewComments: 1, mergedAt: "2026-02-15T00:00:00.000Z" },
+];
+const dedupedHighlights = selectMergedPrHighlights(duplicateTitlePrs, 6);
+assert(
+  dedupedHighlights.length === 1 && dedupedHighlights[0]?.id === "4",
+  "dedupe same-title highlights, keep highest-signal",
+);
 
 const tech = deriveTechnologies(["TypeScript", "Rust", "TypeScript", null, "Go"]);
 assert(tech[0]?.name === "TypeScript" && tech[0].count === 2, "tech counts");
@@ -50,10 +60,13 @@ assert(tech.length === 3, "tech length");
 
 const timeline = toPublicTimelineEvents([
   { href: "https://github.com/a/b/pull/1", type: "merged" },
+  { href: "https://github.com/a/b/commit/abc", type: "commit" },
+  { href: "https://github.com/a/b/pull/2", type: "pull_request" },
   { href: "/projects/foo/submit", type: "project_submission" },
   { href: "/review/abc", type: "review" },
   { href: "/roadmaps/bitcoin", type: "roadmap_completion" },
 ]);
+assert(timeline.length === 4, "drop commit / opened-pr noise from public timeline");
 assert(timeline[1]?.href === "/projects/foo", "sanitize submit");
 assert(timeline[2]?.href === null, "drop review");
 assert(timeline[3]?.href === "/roadmaps/bitcoin", "keep public");

@@ -29,6 +29,12 @@ export function BuilderScorePanel({
   summaryText,
 }: BuilderScorePanelProps) {
   const isProfile = variant === "profile";
+  // Lead with genuine strengths on the public profile rather than the
+  // authoring order — a card that opens with five "Emerging" tags before
+  // its one "Exceptional" one reads as weaker than the score itself.
+  const orderedFactors = isProfile
+    ? [...score.factors].sort((a, b) => b.strengthPercent - a.strengthPercent)
+    : score.factors;
 
   return (
     <div
@@ -81,7 +87,7 @@ export function BuilderScorePanel({
           compact || isProfile ? "sm:grid-cols-2" : "md:grid-cols-2",
         )}
       >
-        {score.factors.map((factor) => (
+        {orderedFactors.map((factor) => (
           <FactorRow key={factor.id} factor={factor} variant={variant} />
         ))}
       </div>

@@ -25,7 +25,6 @@ import { BuilderScorePanel } from "@/components/score/builder-score-panel";
 import { ReputationPanel } from "@/components/reputation/reputation-panel";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { lookingForLabel } from "@/lib/builders/looking-for";
 import {
   buildPublicReputationSummary,
   withPublicReputationCopy,
@@ -139,36 +138,12 @@ export function PublicBuilderProfile({ data }: PublicBuilderProfileProps) {
                   </>
                 )}
                 <span className="profile-badge profile-badge-level">
-                  Level {level.level}
+                  Level {level.level} · {level.xp} XP
                 </span>
-                <span className="profile-badge">{level.xp} XP</span>
-                {stats.mergedPullRequests > 0 ? (
-                  <span className="profile-badge">
-                    {stats.mergedPullRequests} merged PRs
-                  </span>
-                ) : null}
               </div>
 
-              {profile.lookingFor.filter((id) => id !== "not_actively_looking").length >
-              0 ? (
-                <div className="mt-4">
-                  <p className="font-mono text-[11px] tracking-[0.12em] text-muted-foreground uppercase">
-                    Looking for
-                  </p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {profile.lookingFor
-                      .filter((id) => id !== "not_actively_looking")
-                      .map((id) => (
-                        <span
-                          key={id}
-                          className="border border-ink/20 bg-signal/15 px-2.5 py-1 font-mono text-[11px] tracking-wide uppercase"
-                        >
-                          {lookingForLabel(id)}
-                        </span>
-                      ))}
-                  </div>
-                </div>
-              ) : profile.lookingFor.includes("not_actively_looking") ? (
+              {profile.lookingFor.includes("not_actively_looking") &&
+              collaborationCtas.length === 0 ? (
                 <p className="mt-4 font-mono text-xs text-muted-foreground">
                   Not actively looking right now.
                 </p>
