@@ -98,6 +98,7 @@ export const primaryNav = [
         href: "https://opensource.guide/",
         external: true,
       },
+      { title: "Bounties", comingSoon: true },
     ],
   },
   {
@@ -110,13 +111,12 @@ export const primaryNav = [
     title: "Ecosystem",
     items: [
       { title: "Partners", href: "/ecosystem/partners" },
-      { title: "Hackathons", comingSoon: true },
-      { title: "Bounties", comingSoon: true },
       {
         title: "Get Funded",
         href: "https://bitcoindevs.xyz/get-funded",
         external: true,
       },
+      { title: "Hackathons", comingSoon: true },
     ],
   },
 ] as const satisfies readonly PrimaryNavItem[];

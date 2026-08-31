@@ -1,6 +1,21 @@
 export type AchievementCategory =
   "learning" | "projects" | "open-source" | "milestones";
 
+export type AchievementIconKey =
+  | "target"
+  | "blocks"
+  | "bitcoin"
+  | "link"
+  | "hammer"
+  | "wallet"
+  | "zap"
+  | "unlock"
+  | "globe"
+  | "map"
+  | "flag"
+  | "git-pull-request"
+  | "git-merge";
+
 export type AchievementCriteria =
   | { type: "lessons_completed"; min: number }
   | { type: "roadmap_progress"; roadmap: string; percent: number }

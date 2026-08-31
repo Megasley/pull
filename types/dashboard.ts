@@ -2,6 +2,7 @@ import type { BuilderProfile } from "@/types/user";
 import type { RoadmapProgressSummary } from "@/types/progress";
 import type { BuilderScoreResult } from "@/types/score";
 import type { ReputationResult } from "@/types/reputation";
+import type { AchievementIconKey } from "@/types/achievement";
 
 export type ContinueLearningItem = {
   roadmapSlug: string;
@@ -43,7 +44,7 @@ export type AchievementItem = {
   id: string;
   title: string;
   description: string;
-  icon: string;
+  icon: AchievementIconKey;
   category?: string;
   xpReward?: number;
   earned: boolean;
