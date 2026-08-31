@@ -30,6 +30,11 @@ export function ReputationPanel({
 }: ReputationPanelProps) {
   const isProfile = variant === "profile";
   const maxMonth = Math.max(1, ...reputation.monthly.map((month) => month.total));
+  // Lead with genuine strengths on the public profile — see the matching
+  // comment in components/score/builder-score-panel.tsx.
+  const orderedFactors = isProfile
+    ? [...reputation.factors].sort((a, b) => b.strengthPercent - a.strengthPercent)
+    : reputation.factors;
 
   return (
     <div
@@ -91,7 +96,7 @@ export function ReputationPanel({
           compact || isProfile ? "sm:grid-cols-2" : "md:grid-cols-2",
         )}
       >
-        {reputation.factors.map((factor) => (
+        {orderedFactors.map((factor) => (
           <FactorRow key={factor.id} factor={factor} variant={variant} />
         ))}
       </div>

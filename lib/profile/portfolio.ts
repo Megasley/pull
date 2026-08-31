@@ -39,8 +39,15 @@ export function selectFeaturedRepositories<
 }
 
 export function selectMergedPrHighlights<
-  T extends { merged: boolean; reviewComments: number; mergedAt: string | null },
+  T extends {
+    merged: boolean;
+    reviewComments: number;
+    mergedAt: string | null;
+    title: string;
+  },
 >(items: T[], limit = 6): T[] {
+  const seenTitles = new Set<string>();
+
   return items
     .filter((item) => item.merged)
     .sort((a, b) => {
@@ -50,6 +57,14 @@ export function selectMergedPrHighlights<
       const aTime = a.mergedAt ? Date.parse(a.mergedAt) : 0;
       const bTime = b.mergedAt ? Date.parse(b.mergedAt) : 0;
       return bTime - aTime;
+    })
+    // Same branch pushed as a PR title more than once (e.g. "Feat/partners")
+    // reads as a glitch in a curated "highlights" list — keep the
+    // highest-signal instance only.
+    .filter((item) => {
+      if (seenTitles.has(item.title)) return false;
+      seenTitles.add(item.title);
+      return true;
     })
     .slice(0, limit);
 }
@@ -72,28 +87,45 @@ export function deriveTechnologies(
     .slice(0, limit);
 }
 
-/** Make timeline links safe for anonymous public viewers. */
+/**
+ * Event types worth a public visitor's attention. Raw commits (arbitrary,
+ * sometimes internal-facing commit messages), "opened PR"/"opened issue"
+ * entries (redundant once the same PR has a "merged" entry, and low-signal
+ * on their own), are already summarized in the Contribution mix section —
+ * showing them again here is noise, not "necessary info."
+ */
+const PUBLIC_TIMELINE_TYPES = new Set([
+  "merged",
+  "review",
+  "project_submission",
+  "roadmap_completion",
+]);
+
+/** Make the timeline safe and relevant for anonymous public viewers. */
 export function toPublicTimelineEvents<T extends { href: string | null; type: string }>(
   events: T[],
   limit = 12,
 ): T[] {
-  return events.slice(0, limit).map((event) => {
-    if (!event.href) return event;
-    if (event.href.startsWith("http")) return event;
+  return events
+    .filter((event) => PUBLIC_TIMELINE_TYPES.has(event.type))
+    .slice(0, limit)
+    .map((event) => {
+      if (!event.href) return event;
+      if (event.href.startsWith("http")) return event;
 
-    // Owner-only submit / review routes → public project or drop.
-    if (event.href.includes("/submit")) {
-      return {
-        ...event,
-        href: event.href.replace(/\/submit\/?$/, ""),
-      };
-    }
-    if (event.href.startsWith("/review/")) {
-      return { ...event, href: null };
-    }
-    if (event.href.startsWith("/activity")) {
-      return { ...event, href: null };
-    }
-    return event;
-  });
+      // Owner-only submit / review routes → public project or drop.
+      if (event.href.includes("/submit")) {
+        return {
+          ...event,
+          href: event.href.replace(/\/submit\/?$/, ""),
+        };
+      }
+      if (event.href.startsWith("/review/")) {
+        return { ...event, href: null };
+      }
+      if (event.href.startsWith("/activity")) {
+        return { ...event, href: null };
+      }
+      return event;
+    });
 }

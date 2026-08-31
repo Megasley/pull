@@ -453,10 +453,7 @@ export const developerTools: DeveloperTool[] = [
     clicks: 0,
     websiteClicks: 0,
     docsClicks: 0,
-    learningPaths: [
-      { title: "Bitcoin roadmap", href: "/roadmaps/bitcoin" },
-      { title: "Fedimint organization", href: "/organizations/fedimint" },
-    ],
+    learningPaths: [{ title: "Bitcoin roadmap", href: "/roadmaps/bitcoin" }],
     projectIdeas: [
       {
         title: "Self Custody Tool",

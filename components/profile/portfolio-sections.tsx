@@ -72,7 +72,17 @@ export function SkillsTechnologiesSection({
   technologies: PortfolioTechnology[];
   profile?: boolean;
 }) {
-  if (skills.length === 0 && technologies.length === 0) {
+  // On the public profile, a self-declared skill that GitHub already
+  // detected as a language (with a real usage count) is the same fact shown
+  // twice — keep the richer, evidence-backed version and only surface
+  // declared skills GitHub couldn't have inferred (e.g. "Figma", "Rust" with
+  // no pushed Rust code yet).
+  const technologyNames = new Set(technologies.map((tech) => tech.name.toLowerCase()));
+  const visibleSkills = profile
+    ? skills.filter((skill) => !technologyNames.has(skill.toLowerCase()))
+    : skills;
+
+  if (visibleSkills.length === 0 && technologies.length === 0) {
     return (
       <PortfolioSection title="Skills & technologies" profile={profile}>
         {profile ? (
@@ -101,9 +111,9 @@ export function SkillsTechnologiesSection({
       profile={profile}
     >
       <div className="space-y-4">
-        {skills.length > 0 ? (
+        {visibleSkills.length > 0 ? (
           <div className="flex flex-wrap gap-2">
-            {skills.map((skill) =>
+            {visibleSkills.map((skill) =>
               profile ? (
                 <span key={skill} className="profile-tech-tag">
                   {skill}
@@ -470,17 +480,25 @@ export function ContributionStatsGrid({
   };
   profile?: boolean;
 }) {
+  const profileItems = [
+    { label: "Merged PRs", value: stats.mergedPullRequests },
+    { label: "Contribution repos", value: stats.uniqueContributionRepos ?? 0 },
+    { label: "Roadmaps done", value: stats.roadmapsCompleted ?? 0 },
+    { label: "Projects approved", value: stats.projectsApproved ?? 0 },
+    { label: "Lessons done", value: stats.lessonsCompleted },
+    { label: "Repositories", value: stats.repositories },
+    { label: "Languages", value: stats.languagesUsed },
+    { label: "Achievements", value: stats.achievementsUnlocked },
+  ];
+  // A public profile should showcase what's there, not advertise what
+  // isn't — drop zero-value stats, unless everything is zero (a brand-new
+  // profile), in which case showing nothing would look broken.
+  const nonZeroProfileItems = profileItems.filter((item) => item.value > 0);
+
   const items = profile
-    ? [
-        { label: "Merged PRs", value: stats.mergedPullRequests },
-        { label: "Contribution repos", value: stats.uniqueContributionRepos ?? 0 },
-        { label: "Roadmaps done", value: stats.roadmapsCompleted ?? 0 },
-        { label: "Projects approved", value: stats.projectsApproved ?? 0 },
-        { label: "Lessons done", value: stats.lessonsCompleted },
-        { label: "Repositories", value: stats.repositories },
-        { label: "Languages", value: stats.languagesUsed },
-        { label: "Achievements", value: stats.achievementsUnlocked },
-      ]
+    ? nonZeroProfileItems.length > 0
+      ? nonZeroProfileItems
+      : profileItems
     : [
         { label: "Merged PRs", value: stats.mergedPullRequests },
         {
