@@ -67,6 +67,15 @@ const nextConfig: NextConfig = {
   // Without this, hot reload is blocked and every change triggers a full page
   // reload, which floods the DB connection pool and causes cascading ECONNRESET.
   allowedDevOrigins: ["127.0.0.1"],
+  async redirects() {
+    return [
+      {
+        source: "/ecosystem/partners/the-buidl",
+        destination: "/ecosystem/partners/thebuidl",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {
