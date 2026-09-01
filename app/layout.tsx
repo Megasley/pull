@@ -32,19 +32,21 @@ export const metadata: Metadata = {
   },
   description: siteConfig.description,
   icons: {
-    // Unique paths so Safari does not reuse a cached favicon URL.
+    // Unique paths so Safari does not reuse a cached favicon URL — bumped to
+    // -v2 for the terminal-prompt redesign so browsers don't keep showing
+    // the old mark from cache.
     icon: [
-      { url: "/pull-icon.png", type: "image/png", sizes: "32x32" },
-      { url: "/pull-favicon.ico", sizes: "32x32" },
+      { url: "/pull-icon-v2.png", type: "image/png", sizes: "32x32" },
+      { url: "/pull-favicon-v2.ico", sizes: "32x32" },
     ],
     apple: [
       {
-        url: "/pull-apple-touch-icon.png",
+        url: "/pull-apple-touch-icon-v2.png",
         sizes: "180x180",
         type: "image/png",
       },
     ],
-    shortcut: "/pull-favicon.ico",
+    shortcut: "/pull-favicon-v2.ico",
   },
 };
 

@@ -52,7 +52,7 @@ const CSP_HEADER = {
     "frame-src 'self' https://www.youtube-nocookie.com https://player.vimeo.com",
     "img-src 'self' data: blob: https: data:",
     "style-src 'self' 'unsafe-inline'",
-    "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://va.vercel-scripts.com",
+    "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://va.vercel-scripts.com https://www.googletagmanager.com",
     "font-src 'self' data:",
     ["connect-src 'self' https: wss:", localSupabaseOrigin].filter(Boolean).join(" "),
     "worker-src 'self' blob:",
