@@ -42,33 +42,52 @@ async function loadQualifyingMergeTimestamps(): Promise<Map<string, number[]>> {
   return byUser;
 }
 
-export async function contributorRetention(
+function computeRetention(
+  byUser: Map<string, number[]>,
   windowDays: RetentionWindowDays,
-): Promise<RetentionResult> {
-  if (!isDatabaseConfigured()) return { windowDays, cohortSize: 0, retainedCount: 0, rate: null };
+): RetentionResult {
+  const windowMs = windowDays * 24 * 60 * 60 * 1000;
+  const now = Date.now();
+
+  let cohortSize = 0;
+  let retainedCount = 0;
+
+  for (const timestamps of byUser.values()) {
+    const first = timestamps[0];
+    if (now - first < windowMs) continue; // hasn't had the full window yet
+    cohortSize += 1;
+    const retained = timestamps.some((ts) => ts > first && ts <= first + windowMs);
+    if (retained) retainedCount += 1;
+  }
+
+  return {
+    windowDays,
+    cohortSize,
+    retainedCount,
+    rate: cohortSize > 0 ? retainedCount / cohortSize : null,
+  };
+}
+
+/**
+ * Retention for each window in one scan of githubPullRequests, since the
+ * query doesn't depend on windowDays at all — only the in-memory
+ * calculation does.
+ */
+export async function contributorRetentionForWindows(
+  windowsDays: RetentionWindowDays[],
+): Promise<RetentionResult[]> {
+  if (!isDatabaseConfigured()) {
+    return windowsDays.map((windowDays) => ({
+      windowDays,
+      cohortSize: 0,
+      retainedCount: 0,
+      rate: null,
+    }));
+  }
 
   return withDbRetry(async () => {
     const byUser = await loadQualifyingMergeTimestamps();
-    const windowMs = windowDays * 24 * 60 * 60 * 1000;
-    const now = Date.now();
-
-    let cohortSize = 0;
-    let retainedCount = 0;
-
-    for (const timestamps of byUser.values()) {
-      const first = timestamps[0];
-      if (now - first < windowMs) continue; // hasn't had the full window yet
-      cohortSize += 1;
-      const retained = timestamps.some((ts) => ts > first && ts <= first + windowMs);
-      if (retained) retainedCount += 1;
-    }
-
-    return {
-      windowDays,
-      cohortSize,
-      retainedCount,
-      rate: cohortSize > 0 ? retainedCount / cohortSize : null,
-    };
+    return windowsDays.map((windowDays) => computeRetention(byUser, windowDays));
   });
 }
 

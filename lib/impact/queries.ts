@@ -193,9 +193,15 @@ export async function countDevelopersWhoOpenedPR(filters: ImpactFilters = {}): P
   });
 }
 
-/** "Verified Contributor" — see lib/impact/definitions.ts. */
-export async function countVerifiedContributors(filters: ImpactFilters = {}): Promise<number> {
-  if (!isDatabaseConfigured()) return 0;
+/**
+ * "Verified Contributor" (>=1 qualifying merged PR) and "Repeat Contributor"
+ * (>=2) in one scan of githubPullRequests instead of two — both derive from
+ * the same per-user qualifying-PR count. See lib/impact/definitions.ts.
+ */
+export async function countVerifiedAndRepeatContributors(
+  filters: ImpactFilters = {},
+): Promise<{ verified: number; repeat: number }> {
+  if (!isDatabaseConfigured()) return { verified: 0, repeat: 0 };
   return withDbRetry(async () => {
     const db = getDb();
     const userConditions = [...userDateConditions(filters), ...userGeoAndSourceConditions(filters)];
@@ -203,34 +209,17 @@ export async function countVerifiedContributors(filters: ImpactFilters = {}): Pr
     if (filters.repoFullName) prConditions.push(eq(githubPullRequests.repoFullName, filters.repoFullName));
     if (filters.partnerId) prConditions.push(eq(githubPullRequests.attributedPartnerId, filters.partnerId));
 
-    return scalarCount(
-      db
-        .select({ value: sql<number>`count(distinct ${githubPullRequests.userId})::int` })
-        .from(githubPullRequests)
-        .innerJoin(users, eq(githubPullRequests.userId, users.id))
-        .where(and(...userConditions, ...prConditions)),
-    );
-  });
-}
-
-/** "Repeat Contributor" — >= 2 qualifying merged contributions. */
-export async function countRepeatContributors(filters: ImpactFilters = {}): Promise<number> {
-  if (!isDatabaseConfigured()) return 0;
-  return withDbRetry(async () => {
-    const db = getDb();
-    const userConditions = [...userDateConditions(filters), ...userGeoAndSourceConditions(filters)];
-    const prConditions = [...qualifyingConditions()];
-    if (filters.partnerId) prConditions.push(eq(githubPullRequests.attributedPartnerId, filters.partnerId));
-
     const rows = await db
       .select({ userId: githubPullRequests.userId, value: count() })
       .from(githubPullRequests)
       .innerJoin(users, eq(githubPullRequests.userId, users.id))
       .where(and(...userConditions, ...prConditions))
-      .groupBy(githubPullRequests.userId)
-      .having(sql`count(*) >= 2`);
+      .groupBy(githubPullRequests.userId);
 
-    return rows.length;
+    return {
+      verified: rows.length,
+      repeat: rows.filter((row) => Number(row.value) >= 2).length,
+    };
   });
 }
 
