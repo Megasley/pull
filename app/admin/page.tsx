@@ -280,6 +280,9 @@ export default async function AdminOverviewPage({
           <>
             <RefreshAdminMetricsButton />
             <Button asChild variant="outline">
+              <Link href="/admin/activity">./activity</Link>
+            </Button>
+            <Button asChild variant="outline">
               <Link href="/admin/users">./users</Link>
             </Button>
             <Button asChild variant="outline">

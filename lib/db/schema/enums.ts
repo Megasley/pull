@@ -134,6 +134,15 @@ export const eventTimestampSourceEnum = pgEnum("event_timestamp_source", [
   "sync_observed",
 ]);
 
+/** First-time contribution milestones. See lib/milestones/. */
+export const milestoneTypeEnum = pgEnum("milestone_type", [
+  "first_opportunity_explored",
+  "first_pr_opened",
+  "first_pr_submitted",
+  "first_pr_merged",
+  "first_verified_contribution",
+]);
+
 export const opportunitySourceTypeEnum = pgEnum("opportunity_source_type", [
   "org_opportunity",
   "discovery_repo",

@@ -14,7 +14,9 @@ export type AchievementIconKey =
   | "map"
   | "flag"
   | "git-pull-request"
-  | "git-merge";
+  | "git-merge"
+  | "send"
+  | "shield-check";
 
 export type AchievementCriteria =
   | { type: "lessons_completed"; min: number }
@@ -28,11 +30,15 @@ export type AchievementCriteria =
   | { type: "roadmap_unlocked"; roadmap: string }
   | { type: "submissions_approved"; min: number }
   | { type: "github_pr_count"; min: number }
-  | { type: "github_merged_pr_count"; min: number };
+  | { type: "github_merged_pr_count"; min: number }
+  | { type: "github_pr_ready_for_review_count"; min: number }
+  | { type: "github_verified_merged_pr_count"; min: number };
 
 export type AchievementEvalContext = {
   progressByRoadmap: Record<string, string[]>;
   approvedSubmissionCount: number;
   githubPrCount: number;
   githubMergedPrCount: number;
+  githubPrReadyForReviewCount: number;
+  githubVerifiedMergedPrCount: number;
 };

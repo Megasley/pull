@@ -106,6 +106,12 @@ export function isAchievementEarned(
     case "github_merged_pr_count": {
       return githubMergedPrCount >= criteria.min;
     }
+    case "github_pr_ready_for_review_count": {
+      return context.githubPrReadyForReviewCount >= criteria.min;
+    }
+    case "github_verified_merged_pr_count": {
+      return context.githubVerifiedMergedPrCount >= criteria.min;
+    }
     default: {
       return false;
     }

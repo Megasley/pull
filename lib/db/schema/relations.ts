@@ -9,6 +9,7 @@ import {
   githubPullRequests,
   githubRepositories,
 } from "./github";
+import { adminNotifications, milestoneEvents } from "./milestones";
 import { opportunityEvents } from "./opportunities";
 import { orgInviteLinks, orgMemberships, orgOpportunities, orgSkills } from "./partners";
 import {
@@ -259,6 +260,29 @@ export const userAchievementsRelations = relations(userAchievements, ({ one }) =
   achievement: one(achievements, {
     fields: [userAchievements.achievementId],
     references: [achievements.id],
+  }),
+}));
+
+export const milestoneEventsRelations = relations(milestoneEvents, ({ one, many }) => ({
+  user: one(users, {
+    fields: [milestoneEvents.userId],
+    references: [users.id],
+  }),
+  project: one(projects, {
+    fields: [milestoneEvents.projectId],
+    references: [projects.id],
+  }),
+  adminNotifications: many(adminNotifications),
+}));
+
+export const adminNotificationsRelations = relations(adminNotifications, ({ one }) => ({
+  milestoneEvent: one(milestoneEvents, {
+    fields: [adminNotifications.milestoneEventId],
+    references: [milestoneEvents.id],
+  }),
+  subjectUser: one(users, {
+    fields: [adminNotifications.subjectUserId],
+    references: [users.id],
   }),
 }));
 

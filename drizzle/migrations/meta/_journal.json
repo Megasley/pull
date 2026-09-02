@@ -176,6 +176,13 @@
       "when": 1788036587743,
       "tag": "0024_impact_tracking_foundation",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1788700000000,
+      "tag": "0025_admin_milestones_and_notifications",
+      "breakpoints": true
     }
   ]
 }
