@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 
-import { getDb } from "@/lib/db";
+import { getDb, withDbRetry } from "@/lib/db";
 import { isDatabaseConfigured } from "@/lib/db/env";
 import { users } from "@/lib/db/schema";
 import { loadOpenSourceReputation } from "@/lib/reputation";
@@ -21,15 +21,17 @@ export async function refreshUserScoreSnapshots(userId: string): Promise<{
       loadOpenSourceReputation(userId),
     ]);
 
-    const db = getDb();
-    await db
-      .update(users)
-      .set({
-        builderScore: builderScore.score,
-        ossReputation: reputation.score,
-        scoresUpdatedAt: new Date().toISOString(),
-      })
-      .where(eq(users.id, userId));
+    await withDbRetry(async () => {
+      const db = getDb();
+      await db
+        .update(users)
+        .set({
+          builderScore: builderScore.score,
+          ossReputation: reputation.score,
+          scoresUpdatedAt: new Date().toISOString(),
+        })
+        .where(eq(users.id, userId));
+    });
 
     return {
       builderScore: builderScore.score,
@@ -53,15 +55,17 @@ export function persistScoreSnapshotsAsync(
 
   void (async () => {
     try {
-      const db = getDb();
-      await db
-        .update(users)
-        .set({
-          builderScore: scores.builderScore,
-          ossReputation: scores.ossReputation,
-          scoresUpdatedAt: new Date().toISOString(),
-        })
-        .where(eq(users.id, userId));
+      await withDbRetry(async () => {
+        const db = getDb();
+        await db
+          .update(users)
+          .set({
+            builderScore: scores.builderScore,
+            ossReputation: scores.ossReputation,
+            scoresUpdatedAt: new Date().toISOString(),
+          })
+          .where(eq(users.id, userId));
+      });
     } catch (error) {
       console.warn("[builders] score snapshot persist failed", {
         userId,

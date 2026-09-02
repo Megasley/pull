@@ -1,6 +1,6 @@
 import { and, count, desc, eq, isNull } from "drizzle-orm";
 
-import { getDb } from "@/lib/db";
+import { getDb, withDbRetry } from "@/lib/db";
 import { isDatabaseConfigured } from "@/lib/db/env";
 import { adminNotifications, milestoneEvents, users } from "@/lib/db/schema";
 import type { MilestoneType } from "@/lib/milestones/types";
@@ -62,46 +62,54 @@ export async function listAdminNotifications(input?: {
     return { notifications: [], total: 0 };
   }
 
-  const db = getDb();
   const limit = Math.min(Math.max(input?.limit ?? 20, 1), 100);
   const offset = Math.max(input?.offset ?? 0, 0);
   const where = input?.unreadOnly ? isNull(adminNotifications.readAt) : undefined;
 
-  const [rows, totalRows] = await Promise.all([
-    baseQuery().where(where).orderBy(desc(adminNotifications.createdAt)).limit(limit).offset(offset),
-    db.select({ value: count() }).from(adminNotifications).where(where),
-  ]);
+  return withDbRetry(async () => {
+    const db = getDb();
+    const [rows, totalRows] = await Promise.all([
+      baseQuery().where(where).orderBy(desc(adminNotifications.createdAt)).limit(limit).offset(offset),
+      db.select({ value: count() }).from(adminNotifications).where(where),
+    ]);
 
-  return {
-    notifications: rows.map(mapRow),
-    total: totalRows[0]?.value ?? 0,
-  };
+    return {
+      notifications: rows.map(mapRow),
+      total: totalRows[0]?.value ?? 0,
+    };
+  });
 }
 
 export async function countUnreadAdminNotifications(): Promise<number> {
   if (!isDatabaseConfigured()) return 0;
-  const db = getDb();
-  const rows = await db
-    .select({ value: count() })
-    .from(adminNotifications)
-    .where(isNull(adminNotifications.readAt));
-  return rows[0]?.value ?? 0;
+  return withDbRetry(async () => {
+    const db = getDb();
+    const rows = await db
+      .select({ value: count() })
+      .from(adminNotifications)
+      .where(isNull(adminNotifications.readAt));
+    return rows[0]?.value ?? 0;
+  });
 }
 
 export async function markAdminNotificationRead(id: string): Promise<void> {
   if (!isDatabaseConfigured()) return;
-  const db = getDb();
-  await db
-    .update(adminNotifications)
-    .set({ readAt: new Date().toISOString() })
-    .where(and(eq(adminNotifications.id, id), isNull(adminNotifications.readAt)));
+  return withDbRetry(async () => {
+    const db = getDb();
+    await db
+      .update(adminNotifications)
+      .set({ readAt: new Date().toISOString() })
+      .where(and(eq(adminNotifications.id, id), isNull(adminNotifications.readAt)));
+  });
 }
 
 export async function markAllAdminNotificationsRead(): Promise<void> {
   if (!isDatabaseConfigured()) return;
-  const db = getDb();
-  await db
-    .update(adminNotifications)
-    .set({ readAt: new Date().toISOString() })
-    .where(isNull(adminNotifications.readAt));
+  return withDbRetry(async () => {
+    const db = getDb();
+    await db
+      .update(adminNotifications)
+      .set({ readAt: new Date().toISOString() })
+      .where(isNull(adminNotifications.readAt));
+  });
 }
