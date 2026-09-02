@@ -18,6 +18,12 @@ function createPostgresClient() {
   // dropped by Docker/OS, so keep that path's pool small.
   const isPooled = /pooler\.supabase\.com:6543\b/.test(databaseUrl);
 
+  // TEMP-DIAGNOSTIC: confirm whether prod is actually on the Supabase
+  // pooler (max:10) or a direct connection (max:3) before ruling on the
+  // /admin timeout investigation. Logs a boolean only, never the
+  // connection string. Remove this once confirmed.
+  console.log("[db] using pooled connection:", isPooled);
+
   return postgres(databaseUrl, {
     prepare: false,
     max: isPooled ? 10 : 3,

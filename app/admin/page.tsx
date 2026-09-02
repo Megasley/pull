@@ -33,16 +33,15 @@ import { isDatabaseConfigured } from "@/lib/db/env";
 import {
   countActiveContributors,
   countCountriesAmongContributors,
-  countRepeatContributors,
   countSustainedContributors,
   countTotalMergedPRs,
   countUniqueRepositories,
-  countVerifiedContributors,
+  countVerifiedAndRepeatContributors,
   getGeographyBreakdown,
   timeToFirstMergedPR,
   timeToFirstPR,
 } from "@/lib/impact/queries";
-import { contributorRetention } from "@/lib/impact/retention";
+import { contributorRetentionForWindows } from "@/lib/impact/retention";
 import { getPlatformHealth } from "@/lib/platform/health";
 import type { ProjectSubmissionRecord, UserRole } from "@/types/submission";
 import { REVIEW_QUEUE_STATUSES, SUBMISSION_STATUS_LABELS } from "@/types/submission";
@@ -135,8 +134,7 @@ export default async function AdminOverviewPage({
   const impactOverviewResult = await withTimeoutResult(
     (async () => {
       const [
-        verifiedContributors,
-        repeatContributors,
+        verifiedAndRepeat,
         activeContributors,
         sustainedContributors,
         totalMergedPRs,
@@ -145,12 +143,9 @@ export default async function AdminOverviewPage({
         timeToMergedPr,
         geography,
         contributorGeography,
-        retention30,
-        retention90,
-        retention180,
+        [retention30, retention90, retention180],
       ] = await Promise.all([
-        countVerifiedContributors(),
-        countRepeatContributors(),
+        countVerifiedAndRepeatContributors(),
         countActiveContributors(),
         countSustainedContributors(),
         countTotalMergedPRs(),
@@ -159,10 +154,9 @@ export default async function AdminOverviewPage({
         timeToFirstMergedPR(),
         getGeographyBreakdown(),
         countCountriesAmongContributors(true),
-        contributorRetention(30),
-        contributorRetention(90),
-        contributorRetention(180),
+        contributorRetentionForWindows([30, 90, 180]),
       ]);
+      const { verified: verifiedContributors, repeat: repeatContributors } = verifiedAndRepeat;
 
       return {
         verifiedContributors,

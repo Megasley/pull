@@ -1,11 +1,20 @@
 import { redirect } from "next/navigation";
 
 import { listAdminNotifications, countUnreadAdminNotifications } from "@/lib/admin/notifications";
+import { withTimeout } from "@/lib/async/with-timeout";
 import { isAdminRole } from "@/lib/auth/roles";
 import { bootstrapCurrentUserProfile } from "@/lib/auth/session";
 import { isDatabaseConfigured } from "@/lib/db/env";
 import { NotificationBell } from "@/components/admin/notification-bell";
 import { PageHeader } from "@/components/design-system";
+
+// This layout wraps every /admin/* route with no Suspense boundary around
+// {children}, so an unguarded await here blocks the whole page — including
+// page.tsx's own carefully timeout-budgeted queries — up to the route's
+// maxDuration with no fallback. Budget it the same way page.tsx budgets its
+// own DB calls (see ADMIN_QUERY_BUDGET_MS there) so a hung connection
+// degrades to an empty bell instead of a 504.
+const ADMIN_LAYOUT_QUERY_BUDGET_MS = 8_000;
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const profile = await bootstrapCurrentUserProfile();
@@ -28,8 +37,18 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   const [{ notifications }, unreadCount] = isDatabaseConfigured()
     ? await Promise.all([
-        listAdminNotifications({ limit: 8 }),
-        countUnreadAdminNotifications(),
+        withTimeout(
+          listAdminNotifications({ limit: 8 }),
+          ADMIN_LAYOUT_QUERY_BUDGET_MS,
+          { notifications: [], total: 0 },
+          "admin.layout.notifications",
+        ),
+        withTimeout(
+          countUnreadAdminNotifications(),
+          ADMIN_LAYOUT_QUERY_BUDGET_MS,
+          0,
+          "admin.layout.unreadCount",
+        ),
       ])
     : [{ notifications: [] }, 0];
 

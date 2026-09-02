@@ -6,12 +6,11 @@ import { githubConnections, githubPullRequests, orgInviteLinks, orgMemberships, 
 
 import {
   countActiveContributors,
-  countRepeatContributors,
   countSustainedContributors,
   countTotalMergedPRs,
   countTotalPRs,
   countUniqueRepositories,
-  countVerifiedContributors,
+  countVerifiedAndRepeatContributors,
   type ImpactFilters,
 } from "./queries";
 import { summarizeDurations, type DurationSummary } from "./stats";
@@ -61,8 +60,7 @@ export async function getPartnerImpact(organizationId: string): Promise<PartnerI
       exploredRows,
       countryRows,
       qualifiedRows,
-      verifiedContributors,
-      repeatContributors,
+      verifiedAndRepeat,
       activeContributors,
       sustainedContributors,
       totalPRs,
@@ -99,8 +97,7 @@ export async function getPartnerImpact(organizationId: string): Promise<PartnerI
             inArray(orgMemberships.qualificationStatus, ["qualified", "completed", "graduated"]),
           ),
         ),
-      countVerifiedContributors(filters),
-      countRepeatContributors(filters),
+      countVerifiedAndRepeatContributors(filters),
       countActiveContributors(filters),
       countSustainedContributors(filters),
       countTotalPRs(filters),
@@ -109,6 +106,7 @@ export async function getPartnerImpact(organizationId: string): Promise<PartnerI
       partnerTimeToFirstContribution(organizationId, false),
       partnerTimeToFirstContribution(organizationId, true),
     ]);
+    const { verified: verifiedContributors, repeat: repeatContributors } = verifiedAndRepeat;
 
     return {
       organizationId,
