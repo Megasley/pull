@@ -239,6 +239,8 @@ function buildAchievements(
       approvedSubmissionCount: 0,
       githubPrCount: 0,
       githubMergedPrCount: 0,
+      githubPrReadyForReviewCount: 0,
+      githubVerifiedMergedPrCount: 0,
     }),
   );
 

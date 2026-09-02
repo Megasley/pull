@@ -9,6 +9,8 @@ import {
   Hammer,
   Link2,
   Map,
+  Send,
+  ShieldCheck,
   Target,
   Unlock,
   Wallet,
@@ -34,4 +36,6 @@ export const ACHIEVEMENT_ICONS: Record<
   flag: Flag,
   "git-pull-request": GitPullRequest,
   "git-merge": GitMerge,
+  send: Send,
+  "shield-check": ShieldCheck,
 };

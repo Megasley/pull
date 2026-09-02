@@ -1,8 +1,9 @@
-import { and, desc, eq, gte } from "drizzle-orm";
+import { and, count, desc, eq, gte } from "drizzle-orm";
 
 import { getDb } from "@/lib/db";
 import { isDatabaseConfigured } from "@/lib/db/env";
 import { opportunityEvents } from "@/lib/db/schema";
+import { recordMilestones } from "@/lib/milestones/service";
 
 /** "Viewed" events within this window for the same (user, opportunity) are
  *  deduped to one row — avoids a burst of rows from page refreshes/re-renders
@@ -56,6 +57,17 @@ export async function recordOpportunityEvent(input: RecordOpportunityEventInput)
     if (recent) return;
   }
 
+  // Checked before inserting (not "count === 1 after") so a concurrent
+  // duplicate request can't skip the milestone attempt — recordMilestones'
+  // unique(user_id, milestone_type) constraint is what actually guarantees
+  // exactly one milestone/notification even if two requests both see zero
+  // prior rows and both attempt it.
+  const [{ value: priorCount }] = await db
+    .select({ value: count() })
+    .from(opportunityEvents)
+    .where(eq(opportunityEvents.userId, input.userId));
+  const isFirstEver = priorCount === 0;
+
   await db.insert(opportunityEvents).values({
     userId: input.userId,
     opportunityKey: input.opportunityKey,
@@ -65,4 +77,16 @@ export async function recordOpportunityEvent(input: RecordOpportunityEventInput)
     repoFullName: input.repoFullName ?? null,
     metadata: input.metadata ?? {},
   });
+
+  if (isFirstEver) {
+    await recordMilestones([
+      {
+        userId: input.userId,
+        milestoneType: "first_opportunity_explored",
+        occurredAt: new Date().toISOString(),
+        repository: input.repoFullName ?? null,
+        metadata: { opportunityKey: input.opportunityKey, sourceType: input.sourceType },
+      },
+    ]);
+  }
 }

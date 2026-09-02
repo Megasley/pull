@@ -879,6 +879,27 @@ export async function countSubmittedGithubPullRequests(userId: string): Promise<
   return Number(row?.value ?? 0);
 }
 
+/**
+ * Merged PRs into a repo the user doesn't own — the "verified contribution"
+ * bar (matches qualifyingConditions() in lib/impact/queries.ts): a merge to
+ * your own repo isn't independent evidence of real open source impact.
+ */
+export async function countVerifiedMergedPullRequests(userId: string): Promise<number> {
+  if (!isDatabaseConfigured()) return 0;
+  const db = getDb();
+  const [row] = await db
+    .select({ value: count() })
+    .from(githubPullRequests)
+    .where(
+      and(
+        eq(githubPullRequests.userId, userId),
+        eq(githubPullRequests.merged, true),
+        eq(githubPullRequests.isOwnRepo, false),
+      ),
+    );
+  return Number(row?.value ?? 0);
+}
+
 /** Batch merged-PR counts for directory cards (same source as profile stats). */
 export async function countMergedGithubPullRequestsByUserIds(
   userIds: string[],

@@ -11,7 +11,12 @@ import {
   userAchievements,
   userRoadmapProgress,
 } from "@/lib/db/schema";
-import { countGithubSyncedEntities, countMergedGithubPullRequests } from "@/lib/github/store";
+import {
+  countGithubSyncedEntities,
+  countMergedGithubPullRequests,
+  countSubmittedGithubPullRequests,
+  countVerifiedMergedPullRequests,
+} from "@/lib/github/store";
 import { getRoadmap } from "@/lib/roadmap/load-roadmap";
 import {
   achievementXpKey,
@@ -70,18 +75,23 @@ async function getApprovedSubmissionCount(userId: string): Promise<number> {
   return Number(rows[0]?.value ?? 0);
 }
 
-async function getGithubPrCounts(
-  userId: string,
-): Promise<{ total: number; merged: number }> {
+async function getGithubPrCounts(userId: string): Promise<{
+  total: number;
+  merged: number;
+  readyForReview: number;
+  verifiedMerged: number;
+}> {
   if (!isDatabaseConfigured()) {
-    return { total: 0, merged: 0 };
+    return { total: 0, merged: 0, readyForReview: 0, verifiedMerged: 0 };
   }
 
-  const [{ pullRequests: total }, merged] = await Promise.all([
+  const [{ pullRequests: total }, merged, readyForReview, verifiedMerged] = await Promise.all([
     countGithubSyncedEntities(userId),
     countMergedGithubPullRequests(userId),
+    countSubmittedGithubPullRequests(userId),
+    countVerifiedMergedPullRequests(userId),
   ]);
-  return { total, merged };
+  return { total, merged, readyForReview, verifiedMerged };
 }
 
 export const ensureAchievementsCatalog = cache(
@@ -125,13 +135,19 @@ export async function syncAchievementsForUser(userId: string): Promise<string[]>
 
   const progressByRoadmap = await getProgressByRoadmap(userId);
   const approvedSubmissionCount = await getApprovedSubmissionCount(userId);
-  const { total: githubPrCount, merged: githubMergedPrCount } =
-    await getGithubPrCounts(userId);
+  const {
+    total: githubPrCount,
+    merged: githubMergedPrCount,
+    readyForReview: githubPrReadyForReviewCount,
+    verifiedMerged: githubVerifiedMergedPrCount,
+  } = await getGithubPrCounts(userId);
   const earnedSlugs = evaluateEarnedAchievementSlugs({
     progressByRoadmap,
     approvedSubmissionCount,
     githubPrCount,
     githubMergedPrCount,
+    githubPrReadyForReviewCount,
+    githubVerifiedMergedPrCount,
   });
 
   const db = getDb();
@@ -188,14 +204,20 @@ export async function listUserAchievements(
   progressByRoadmap: Record<string, string[]>,
 ): Promise<AchievementItem[]> {
   const approvedSubmissionCount = await getApprovedSubmissionCount(userId);
-  const { total: githubPrCount, merged: githubMergedPrCount } =
-    await getGithubPrCounts(userId);
+  const {
+    total: githubPrCount,
+    merged: githubMergedPrCount,
+    readyForReview: githubPrReadyForReviewCount,
+    verifiedMerged: githubVerifiedMergedPrCount,
+  } = await getGithubPrCounts(userId);
   const earnedSlugs = new Set(
     evaluateEarnedAchievementSlugs({
       progressByRoadmap,
       approvedSubmissionCount,
       githubPrCount,
       githubMergedPrCount,
+      githubPrReadyForReviewCount,
+      githubVerifiedMergedPrCount,
     }),
   );
   let earnedAtBySlug: Record<string, string> = {};

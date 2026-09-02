@@ -152,6 +152,24 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     category: "open-source",
     criteria: { type: "github_merged_pr_count", min: 1 },
   },
+  {
+    id: "first-pr-submitted",
+    title: "First Pull Request Submitted",
+    description: "Move your first pull request from draft to ready for review.",
+    icon: "send",
+    xpReward: 75,
+    category: "open-source",
+    criteria: { type: "github_pr_ready_for_review_count", min: 1 },
+  },
+  {
+    id: "verified-contribution",
+    title: "Verified Open Source Contribution",
+    description: "Get a pull request merged into a project you don't own.",
+    icon: "shield-check",
+    xpReward: 200,
+    category: "open-source",
+    criteria: { type: "github_verified_merged_pr_count", min: 1 },
+  },
 ];
 
 export const ACHIEVEMENT_CATEGORY_LABELS: Record<AchievementCategory, string> = {

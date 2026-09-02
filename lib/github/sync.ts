@@ -32,6 +32,8 @@ import {
   upsertGithubPullRequests,
   type PullRequestSyncInput,
 } from "./store";
+import { derivePrMilestoneCandidates } from "@/lib/milestones/pr-signals";
+import { recordMilestones } from "@/lib/milestones/service";
 import type { GithubSyncSummary } from "@/types/github";
 
 export type SyncGithubResult =
@@ -133,6 +135,13 @@ export async function syncGithubForUser(
     );
     const lifecycleEvents = deriveLifecycleEvents(upsertResults, userId);
     await recordPullRequestEvents(lifecycleEvents);
+
+    // Idempotent: recordMilestones() is a no-op for any milestone this user
+    // already has, so a re-run over the same PRs (or a partially-overlapping
+    // batch) never creates duplicates. Derived from the same upsertResults
+    // already computed above — no extra GitHub API calls or DB reads.
+    const milestoneCandidates = derivePrMilestoneCandidates(upsertResults, userId);
+    await recordMilestones(milestoneCandidates);
 
     const pullRequests = pullRequestInputs;
 
