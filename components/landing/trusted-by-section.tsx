@@ -1,10 +1,8 @@
 import { cn } from "@/lib/utils";
 
-// Launching with Thebuidl first — Trezor Academy stays off this section
-// until its partnership is finalized (see lib/ecosystem/partners.ts).
-// Static, not a marquee: a single logo scrolling past itself just
-// advertises that there's only one. Revisit the scrolling treatment once
-// there are enough logos for motion to read as "many," not "looping."
+// Static, not a marquee: a handful of logos scrolling past themselves just
+// advertises that there are only a few. Revisit the scrolling treatment
+// once there are enough logos for motion to read as "many," not "looping."
 const PARTNERS = [
   {
     name: "Thebuidl",
@@ -12,6 +10,16 @@ const PARTNERS = [
     logoLight: true,
     height: "h-12",
     href: "https://thebuidl.xyz",
+  },
+  {
+    name: "Trezor Academy",
+    logo: "/trezor-academy-logo.svg",
+    // Wordmark, not an icon (viewBox 194x18 vs TheBuidl's roughly-square
+    // 57x45) — matching h-12 on both stretches this to ~500px wide and
+    // drowns out the icon mark next to it. A much smaller height keeps the
+    // two visually balanced.
+    height: "h-5",
+    href: "https://academy.trezor.io/",
   },
 ];
 

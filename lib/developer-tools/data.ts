@@ -848,4 +848,41 @@ export const developerTools: DeveloperTool[] = [
       },
     ],
   },
+  {
+    id: "pontmore-protocol",
+    slug: "pontmore-protocol",
+    name: "Pontmore Protocol",
+    description:
+      "Nostr-native protocol family for trust-minimized Bitcoin-to-fiat atomic swaps and community-operated escrow.",
+    overview:
+      "Pontmore defines a set of protocol proposals (agent identity, escrow descriptors, swap state machines, dispute policy) for coordinating Bitcoin-fiat swaps over Nostr, without app-based identity or a centralized exchange. Clients and escrow operators can be built independently against the shared spec.",
+    whyUse: [
+      "Coordinate BTC-fiat swaps without giving up custody of identity to a centralized exchange.",
+      "Nostr-native identity — no app-specific account required.",
+      "Open protocol: build a client or run community-level escrow against a shared spec.",
+    ],
+    buildUseCase: "BTC-Fiat Swaps",
+    category: "Protocols",
+    tags: ["Nostr", "Bitcoin", "Escrow", "Protocol", "Atomic Swaps"],
+    openSource: true,
+    difficulty: "Advanced",
+    website: "https://pontmore.xyz",
+    docs: "https://github.com/pontmore/protocol",
+    github: "https://github.com/pontmore/protocol",
+    logo: "PP",
+    featured: false,
+    sponsored: false,
+    featuredPartner: false,
+    clicks: 0,
+    websiteClicks: 0,
+    docsClicks: 0,
+    learningPaths: [{ title: "Bitcoin roadmap", href: "/roadmaps/bitcoin" }],
+    projectIdeas: [
+      {
+        title: "Swap Client",
+        description: "Build a client against the Pontmore swap-coordination spec.",
+        href: "/projects",
+      },
+    ],
+  },
 ];

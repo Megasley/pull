@@ -6,7 +6,7 @@ import type {
 } from "@/lib/developer-tools/types";
 
 /** Temporary catalog scope — expand when more categories go live. */
-const PUBLISHED_CATEGORIES = new Set<DeveloperToolCategory>(["APIs", "SDKs"]);
+const PUBLISHED_CATEGORIES = new Set<DeveloperToolCategory>(["APIs", "SDKs", "Protocols"]);
 
 function isPublished(tool: DeveloperTool): boolean {
   return PUBLISHED_CATEGORIES.has(tool.category);

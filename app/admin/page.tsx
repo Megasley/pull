@@ -15,6 +15,7 @@ import { EmptyState, PageHeader } from "@/components/design-system";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { FunnelMetrics, LessonDropOff } from "@/lib/admin/analytics";
+import { limitConcurrency } from "@/lib/async/limit-concurrency";
 import { withTimeoutResult } from "@/lib/async/with-timeout";
 import { loadAdminLiveOps, type LiveLoad } from "@/lib/admin/live-ops";
 import {
@@ -56,6 +57,12 @@ export const maxDuration = 30;
 /** Budget for DB calls below that must degrade gracefully instead of riding
  *  a hung connection up to this page's own maxDuration — see call sites. */
 const ADMIN_QUERY_BUDGET_MS = 8_000;
+
+/** Peak simultaneous connections the impact-overview bundle below is allowed
+ *  to hold — it fires ~10 queries (some with their own internal Promise.all)
+ *  that would otherwise all open connections at once against a pool sized
+ *  for far fewer. See lib/async/limit-concurrency.ts. */
+const ADMIN_IMPACT_QUERY_CONCURRENCY = 3;
 
 function snapshotMetaLabel(snapshot: AdminMetricsSnapshotView): string {
   if (snapshot.status === "missing") {
@@ -133,6 +140,7 @@ export default async function AdminOverviewPage({
   let impactOverview: ImpactOverviewData | null = null;
   const impactOverviewResult = await withTimeoutResult(
     (async () => {
+      const limit = limitConcurrency(ADMIN_IMPACT_QUERY_CONCURRENCY);
       const [
         verifiedAndRepeat,
         activeContributors,
@@ -145,16 +153,16 @@ export default async function AdminOverviewPage({
         contributorGeography,
         [retention30, retention90, retention180],
       ] = await Promise.all([
-        countVerifiedAndRepeatContributors(),
-        countActiveContributors(),
-        countSustainedContributors(),
-        countTotalMergedPRs(),
-        countUniqueRepositories(),
-        timeToFirstPR(),
-        timeToFirstMergedPR(),
-        getGeographyBreakdown(),
-        countCountriesAmongContributors(true),
-        contributorRetentionForWindows([30, 90, 180]),
+        limit(() => countVerifiedAndRepeatContributors()),
+        limit(() => countActiveContributors()),
+        limit(() => countSustainedContributors()),
+        limit(() => countTotalMergedPRs()),
+        limit(() => countUniqueRepositories()),
+        limit(() => timeToFirstPR()),
+        limit(() => timeToFirstMergedPR()),
+        limit(() => getGeographyBreakdown()),
+        limit(() => countCountriesAmongContributors(true)),
+        limit(() => contributorRetentionForWindows([30, 90, 180])),
       ]);
       const { verified: verifiedContributors, repeat: repeatContributors } = verifiedAndRepeat;
 

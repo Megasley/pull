@@ -106,10 +106,6 @@ const partners: EcosystemPartner[] = [
   {
     slug: "trezor-academy",
     name: "Trezor Academy",
-    // Launching with Thebuidl first — Trezor Academy stays hidden from the
-    // ecosystem index, the trusted-by marquee, and its own page until the
-    // partnership is finalized. Flip this to unhide.
-    hidden: true,
     tagline: "Supporting the next generation of open source builders.",
     description:
       "Trezor Academy is a Pull Founding Sponsor, supporting the platform during its first year as Pull builds the infrastructure for developers to learn, build, contribute, and prove their work.",
