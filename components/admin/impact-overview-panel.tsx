@@ -1,4 +1,4 @@
-import type { GeographyBreakdown } from "@/lib/impact/queries";
+import type { FirstContributionByAttribution, GeographyBreakdown } from "@/lib/impact/queries";
 import type { RetentionResult } from "@/lib/impact/retention";
 
 export type ImpactOverviewData = {
@@ -16,6 +16,7 @@ export type ImpactOverviewData = {
   retention30: RetentionResult;
   retention90: RetentionResult;
   retention180: RetentionResult;
+  firstContributionByAttribution: FirstContributionByAttribution;
 };
 
 function Stat({ label, value, hint }: { label: string; value: string | number; hint?: string }) {
@@ -40,9 +41,9 @@ function formatRate(result: RetentionResult): string {
 
 /**
  * Computed live from durable contribution history (lib/impact/*) rather than
- * the daily admin_metrics_snapshots cron — see the "First OSS via Pull" stat
- * in the Growth section, which is still intentionally disabled for exactly
- * the reason this runs on-demand here instead of inside that cron.
+ * the daily admin_metrics_snapshots cron — see firstOssViaPull in
+ * lib/admin/metrics-snapshot.ts, still intentionally disabled there for
+ * exactly the reason this runs on-demand here instead of inside that cron.
  * "Qualifying" excludes merges into a contributor's own repos — see
  * docs/metrics-definitions.md.
  */
@@ -78,6 +79,42 @@ export function GeographyImpactStats({ data }: { data: ImpactOverviewData }) {
       <Stat
         label="African countries among contributors"
         value={data.africanContributorCountriesRepresented}
+      />
+    </div>
+  );
+}
+
+/**
+ * The four honestly-scoped replacements for the deprecated single
+ * "firstOssViaPull" number (see docs/metrics-definitions.md — that metric
+ * implied "Pull caused this contribution," a causal claim the data can't
+ * support). All four are correlation only, strongest to weakest signal:
+ * opportunity-click attribution, then partner-membership attribution, then
+ * plain time-after-joining with no attribution at all.
+ */
+export function AttributionImpactStats({ data }: { data: ImpactOverviewData }) {
+  const a = data.firstContributionByAttribution;
+  return (
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <Stat
+        label="Time to first PR after joining"
+        value={formatDays(a.afterJoining.medianDays)}
+        hint={`${a.afterJoining.pending} pending`}
+      />
+      <Stat
+        label="Time to first merged PR after joining"
+        value={formatDays(a.firstMergedAfterJoining.medianDays)}
+        hint={`${a.firstMergedAfterJoining.pending} pending`}
+      />
+      <Stat
+        label="Time to first partner-attributed PR"
+        value={formatDays(a.partnerAttributed.medianDays)}
+        hint="correlation via membership timing, not causation"
+      />
+      <Stat
+        label="Time to first opportunity-attributed PR"
+        value={formatDays(a.opportunityAttributed.medianDays)}
+        hint="strongest signal — still not proof of causation"
       />
     </div>
   );

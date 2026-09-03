@@ -402,6 +402,70 @@ export async function timeToFirstMergedPR(filters: ImpactFilters = {}): Promise<
   });
 }
 
+export type FirstContributionByAttribution = {
+  /** Time from joining to first tracked PR (any repo, merged or not). */
+  afterJoining: DurationSummary;
+  /** Same, restricted to the first *merged* PR. */
+  firstMergedAfterJoining: DurationSummary;
+  /** Time from joining to first PR attributed to a partner membership
+   *  (attributedPartnerId is not null) — correlation via membership timing,
+   *  not causation. See docs/metrics-definitions.md. */
+  partnerAttributed: DurationSummary;
+  /** Time from joining to first PR attributed to a tracked "clicked
+   *  through to GitHub" opportunity event — the strongest available
+   *  correlation signal, still not causal proof. */
+  opportunityAttributed: DurationSummary;
+};
+
+/**
+ * Replaces the deprecated single "firstOssViaPull" metric (see
+ * docs/metrics-definitions.md — flagged as an overloaded "Pull caused this
+ * contribution" claim the data can't support) with four honestly-scoped
+ * correlation metrics, computed in one query pass via FILTER clauses
+ * instead of four separate round trips.
+ */
+export async function timeToFirstContributionByAttribution(): Promise<FirstContributionByAttribution> {
+  const empty = summarizeDurations([], 0);
+  if (!isDatabaseConfigured()) {
+    return {
+      afterJoining: empty,
+      firstMergedAfterJoining: empty,
+      partnerAttributed: empty,
+      opportunityAttributed: empty,
+    };
+  }
+
+  return withDbRetry(async () => {
+    const db = getDb();
+    const rows = await db
+      .select({
+        userCreatedAt: users.createdAt,
+        firstPrAt: sql<string | null>`min(${githubPullRequests.githubCreatedAt})`,
+        firstMergedPrAt: sql<string | null>`min(${githubPullRequests.githubMergedAt}) filter (where ${githubPullRequests.merged} = true)`,
+        firstPartnerPrAt: sql<string | null>`min(${githubPullRequests.githubCreatedAt}) filter (where ${githubPullRequests.attributedPartnerId} is not null)`,
+        firstOpportunityPrAt: sql<string | null>`min(${githubPullRequests.githubCreatedAt}) filter (where ${githubPullRequests.attributedOpportunityEventId} is not null)`,
+      })
+      .from(users)
+      .leftJoin(githubPullRequests, eq(githubPullRequests.userId, users.id))
+      .groupBy(users.id, users.createdAt);
+
+    return {
+      afterJoining: summarizeRowsAsDuration(
+        rows.map((row) => ({ userCreatedAt: row.userCreatedAt, firstAt: row.firstPrAt })),
+      ),
+      firstMergedAfterJoining: summarizeRowsAsDuration(
+        rows.map((row) => ({ userCreatedAt: row.userCreatedAt, firstAt: row.firstMergedPrAt })),
+      ),
+      partnerAttributed: summarizeRowsAsDuration(
+        rows.map((row) => ({ userCreatedAt: row.userCreatedAt, firstAt: row.firstPartnerPrAt })),
+      ),
+      opportunityAttributed: summarizeRowsAsDuration(
+        rows.map((row) => ({ userCreatedAt: row.userCreatedAt, firstAt: row.firstOpportunityPrAt })),
+      ),
+    };
+  });
+}
+
 function summarizeRowsAsDuration(
   rows: Array<{ userCreatedAt: string; firstAt: string | null }>,
 ): DurationSummary {

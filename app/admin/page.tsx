@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { AdminDetailsSection, AdminSection } from "@/components/admin/admin-section";
 import { AttentionBanner, type AttentionItem } from "@/components/admin/attention-banner";
 import {
+  AttributionImpactStats,
   ContributorImpactStats,
   GeographyImpactStats,
   RetentionImpactStats,
@@ -39,6 +40,7 @@ import {
   countUniqueRepositories,
   countVerifiedAndRepeatContributors,
   getGeographyBreakdown,
+  timeToFirstContributionByAttribution,
   timeToFirstMergedPR,
   timeToFirstPR,
 } from "@/lib/impact/queries";
@@ -131,8 +133,9 @@ export default async function AdminOverviewPage({
 
   // Isolated from the two calls above and time-boxed: these are exactly the
   // shape of per-user join that previously timed out inside the
-  // admin_metrics_snapshots cron and got disabled (see "First OSS via Pull"
-  // below). Running them here, outside that shared transaction, on a single
+  // admin_metrics_snapshots cron and got disabled (see firstOssViaPull in
+  // lib/admin/metrics-snapshot.ts). Running them here, outside that shared
+  // transaction, on a single
   // page load — with the same timeout-then-degrade budget loadAdminLiveOps
   // uses for its slices — avoids repeating that failure mode: a slow query
   // against real production data degrades this section instead of riding
@@ -152,6 +155,7 @@ export default async function AdminOverviewPage({
         geography,
         contributorGeography,
         [retention30, retention90, retention180],
+        firstContributionByAttribution,
       ] = await Promise.all([
         limit(() => countVerifiedAndRepeatContributors()),
         limit(() => countActiveContributors()),
@@ -163,6 +167,7 @@ export default async function AdminOverviewPage({
         limit(() => getGeographyBreakdown()),
         limit(() => countCountriesAmongContributors(true)),
         limit(() => contributorRetentionForWindows([30, 90, 180])),
+        limit(() => timeToFirstContributionByAttribution()),
       ]);
       const { verified: verifiedContributors, repeat: repeatContributors } = verifiedAndRepeat;
 
@@ -181,6 +186,7 @@ export default async function AdminOverviewPage({
         retention30,
         retention90,
         retention180,
+        firstContributionByAttribution,
       } satisfies ImpactOverviewData;
     })(),
     ADMIN_QUERY_BUDGET_MS,
@@ -259,6 +265,7 @@ export default async function AdminOverviewPage({
   const navSections = [
     { id: "growth", label: "Growth" },
     { id: "contributors", label: "Contributors" },
+    { id: "attribution", label: "Attribution" },
     { id: "geography", label: "Geography" },
     { id: "retention", label: "Retention" },
     { id: "review", label: "Review" },
@@ -306,11 +313,10 @@ export default async function AdminOverviewPage({
         description="From snapshot · MAU = signed-in users with activity in the last 30 days."
       >
         {metrics ? (
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-3 sm:grid-cols-3">
             <StatCard label="Registered developers" value={metrics.registeredUsers} />
             <StatCard label="Monthly active users" value={metrics.monthlyActiveUsers} />
             <StatCard label="Projects listed" value={metrics.projectsListed} />
-            <StatCard label="First OSS via Pull" value={metrics.firstOssViaPull} />
           </div>
         ) : (
           <UnavailableBlock label="Launch metrics" />
@@ -324,6 +330,14 @@ export default async function AdminOverviewPage({
       >
         {impactOverview ? <ContributorImpactStats data={impactOverview} /> : <UnavailableBlock label="Contributor impact" />}
       </AdminSection>
+
+      <AdminDetailsSection
+        id="attribution"
+        title="Attribution"
+        description="Correlation, not causation — see docs/metrics-definitions.md. Replaces the deprecated single firstOssViaPull number."
+      >
+        {impactOverview ? <AttributionImpactStats data={impactOverview} /> : <UnavailableBlock label="Attribution" />}
+      </AdminDetailsSection>
 
       <AdminDetailsSection id="geography" title="Geography" description="Country is optional and self-reported.">
         {impactOverview ? <GeographyImpactStats data={impactOverview} /> : <UnavailableBlock label="Geography" />}
@@ -415,15 +429,9 @@ export default async function AdminOverviewPage({
                   <td className="py-2 pr-4">Passed ≥1 chapter quiz</td>
                   <td className="py-2">{funnel.passedQuizUsers}</td>
                 </tr>
-                <tr className="border-b border-border/60">
+                <tr>
                   <td className="py-2 pr-4">Submitted ≥1 project</td>
                   <td className="py-2">{funnel.submittedProjectUsers}</td>
-                </tr>
-                <tr>
-                  <td className="py-2 pr-4">First OSS via Pull</td>
-                  <td className="py-2">
-                    {funnel.firstOssViaPull == null ? "—" : funnel.firstOssViaPull}
-                  </td>
                 </tr>
               </tbody>
             </table>
