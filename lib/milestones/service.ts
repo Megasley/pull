@@ -52,13 +52,24 @@ function toRecord(row: typeof milestoneEvents.$inferSelect): MilestoneEventRecor
  * calls syncAchievementsForUser() once per sync, which fires the
  * achievement-unlock email through the existing pipeline. Calling it again
  * here would just be redundant, not incremental.
+ *
+ * `notify: false` (used by scripts/backfill-milestones.ts) records the
+ * milestone — and thus the admin activity feed sees the correct historical
+ * achievedAt — without creating an admin_notifications row. The notification
+ * copy says "just" (e.g. "just had their first PR merged"); firing it today
+ * for a months-old backfilled event would be misleading and would flood the
+ * notification bell in one batch. Live callers (github sync, opportunity
+ * events) always want notify: true, the default.
  */
 export async function recordMilestones(
   candidates: MilestoneCandidate[],
+  options?: { notify?: boolean },
 ): Promise<MilestoneEventRecord[]> {
   if (!isDatabaseConfigured() || candidates.length === 0) {
     return [];
   }
+
+  const notify = options?.notify ?? true;
 
   const db = getDb();
   const deduped = dedupeEarliest(candidates);
@@ -89,7 +100,7 @@ export async function recordMilestones(
     }
   }
 
-  if (created.length > 0) {
+  if (created.length > 0 && notify) {
     await createAdminNotifications(created);
   }
 
