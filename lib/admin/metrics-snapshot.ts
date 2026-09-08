@@ -10,7 +10,7 @@ import {
 } from "@/lib/admin/metrics-queries";
 import type { FunnelMetrics, LessonDropOff } from "@/lib/admin/analytics";
 import type { PlatformMetrics } from "@/lib/admin/repository";
-import { getDb } from "@/lib/db";
+import { getDb, withDbRetry } from "@/lib/db";
 import { isDatabaseConfigured } from "@/lib/db/env";
 import { adminMetricsSnapshots, users } from "@/lib/db/schema";
 import { getAllProjects } from "@/lib/projects/catalog";
@@ -108,14 +108,16 @@ async function buildFunnel(since: string | null): Promise<FunnelMetrics> {
 
 async function buildRoleCounts(): Promise<Record<UserRole, number>> {
   try {
-    const db = getDb();
-    const rows = await db
-      .select({
-        role: users.role,
-        value: count(),
-      })
-      .from(users)
-      .groupBy(users.role);
+    const rows = await withDbRetry(async () => {
+      const db = getDb();
+      return db
+        .select({
+          role: users.role,
+          value: count(),
+        })
+        .from(users)
+        .groupBy(users.role);
+    });
 
     const result = emptyRoles();
     for (const row of rows) {
@@ -179,7 +181,6 @@ export async function saveAdminMetricsSnapshot(input: {
     throw new Error("Database is not configured");
   }
 
-  const db = getDb();
   const computedAt = new Date().toISOString();
   const payload = input.payload ?? {
     version: 1 as const,
@@ -195,22 +196,25 @@ export async function saveAdminMetricsSnapshot(input: {
     roleCounts: emptyRoles(),
   };
 
-  await db
-    .insert(adminMetricsSnapshots)
-    .values({
-      id: ADMIN_METRICS_SNAPSHOT_ID,
-      computedAt,
-      payload,
-      error: input.error ?? null,
-    })
-    .onConflictDoUpdate({
-      target: adminMetricsSnapshots.id,
-      set: {
+  await withDbRetry(async () => {
+    const db = getDb();
+    await db
+      .insert(adminMetricsSnapshots)
+      .values({
+        id: ADMIN_METRICS_SNAPSHOT_ID,
         computedAt,
         payload,
         error: input.error ?? null,
-      },
-    });
+      })
+      .onConflictDoUpdate({
+        target: adminMetricsSnapshots.id,
+        set: {
+          computedAt,
+          payload,
+          error: input.error ?? null,
+        },
+      });
+  });
 
   return { computedAt };
 }
@@ -256,12 +260,14 @@ export async function getAdminMetricsSnapshot(): Promise<AdminMetricsSnapshotVie
   }
 
   try {
-    const db = getDb();
-    const rows = await db
-      .select()
-      .from(adminMetricsSnapshots)
-      .where(eq(adminMetricsSnapshots.id, ADMIN_METRICS_SNAPSHOT_ID))
-      .limit(1);
+    const rows = await withDbRetry(async () => {
+      const db = getDb();
+      return db
+        .select()
+        .from(adminMetricsSnapshots)
+        .where(eq(adminMetricsSnapshots.id, ADMIN_METRICS_SNAPSHOT_ID))
+        .limit(1);
+    });
 
     const row = rows[0];
     if (!row) {

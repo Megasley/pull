@@ -53,6 +53,11 @@ export const users = pgTable(
     preferredRoadmapSlug: text("preferred_roadmap_slug"),
     /** Optional, self-reported ISO 3166-1 alpha-2 code. Never inferred from IP. */
     country: text("country"),
+    /** Opt-in: show the country flag on the public profile/directory card.
+     *  Defaults false — country is collected under a "never shown publicly"
+     *  promise, so existing rows must stay hidden until a user explicitly
+     *  turns this on. See types/user.ts:toPublicBuilderProfile. */
+    showCountryPublicly: boolean("show_country_publicly").notNull().default(false),
     /** First-touch acquisition bucket. Set once at signup, immutable afterward. */
     acquisitionSource: acquisitionSourceEnum("acquisition_source"),
     acquisitionDetail: jsonb("acquisition_detail")

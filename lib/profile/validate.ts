@@ -37,6 +37,7 @@ export type ProfileEditValidation =
         listedInDirectory: boolean;
         /** undefined = leave unchanged; null = user cleared it. */
         country?: string | null;
+        showCountryPublicly: boolean;
       };
     }
   | { ok: false; error: string };
@@ -53,6 +54,7 @@ export function validateProfileEditInput(input: {
   listedInDirectory?: FormDataEntryValue | null;
   /** Absent = field not submitted, leave unchanged. Empty string = cleared. */
   country?: FormDataEntryValue | null;
+  showCountryPublicly?: FormDataEntryValue | null;
 }): ProfileEditValidation {
   const displayName = input.displayName?.trim() ?? "";
   const bio = input.bio?.trim() ?? "";
@@ -92,7 +94,9 @@ export function validateProfileEditInput(input: {
 
   let country: string | null | undefined;
   if (input.country !== undefined) {
-    const raw = String(input.country ?? "").trim().toUpperCase();
+    const raw = String(input.country ?? "")
+      .trim()
+      .toUpperCase();
     if (!raw) {
       country = null;
     } else if (isKnownCountryCode(raw)) {
@@ -101,6 +105,12 @@ export function validateProfileEditInput(input: {
       return { ok: false, error: "Please choose a country from the list." };
     }
   }
+
+  // Can't show a flag for a country that's blank — force off if the user is
+  // clearing their country in this same submission. If country isn't part of
+  // this submission at all (undefined), trust the checkbox as sent.
+  const showCountryPublicly =
+    country === null ? false : parseCheckbox(input.showCountryPublicly);
 
   return {
     ok: true,
@@ -115,6 +125,7 @@ export function validateProfileEditInput(input: {
       profilePublic,
       listedInDirectory,
       country,
+      showCountryPublicly,
     },
   };
 }

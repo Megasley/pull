@@ -33,20 +33,24 @@ export type BuilderProfile = {
   moderationReason: string | null;
   onboardingCompletedAt: string | null;
   preferredRoadmapSlug: string | null;
-  /** Optional, self-reported ISO 3166-1 alpha-2 code. Never shown on the
-   *  public profile — see toPublicBuilderProfile — only used in aggregate
-   *  impact reporting (lib/impact/*). */
+  /** Optional, self-reported ISO 3166-1 alpha-2 code. Only shown on the
+   *  public profile when showCountryPublicly is true — see
+   *  toPublicBuilderProfile — otherwise used only in aggregate impact
+   *  reporting (lib/impact/*). */
   country: string | null;
+  /** Opt-in flag: show the country flag on the public profile/card. */
+  showCountryPublicly: boolean;
   xp: number;
   level: number;
   createdAt: string;
   updatedAt: string;
 };
 
-/** Safe subset for anonymous public portfolio pages (no email / prefs / moderation / country). */
+/** Safe subset for anonymous public portfolio pages (no email / prefs / moderation).
+ *  `country` is included but value-gated by showCountryPublicly — see below. */
 export type PublicBuilderProfile = Omit<
   BuilderProfile,
-  "email" | "emailNotifications" | "moderationReason" | "country"
+  "email" | "emailNotifications" | "moderationReason" | "showCountryPublicly"
 >;
 
 export function toPublicBuilderProfile(profile: BuilderProfile): PublicBuilderProfile {
@@ -71,6 +75,8 @@ export function toPublicBuilderProfile(profile: BuilderProfile): PublicBuilderPr
     accountStatus: profile.accountStatus,
     onboardingCompletedAt: profile.onboardingCompletedAt,
     preferredRoadmapSlug: profile.preferredRoadmapSlug,
+    // Only surfaced when the user has explicitly opted in.
+    country: profile.showCountryPublicly ? profile.country : null,
     xp: profile.xp,
     level: profile.level,
     createdAt: profile.createdAt,
@@ -103,6 +109,7 @@ export type BuilderProfileRow = {
   onboarding_completed_at?: string | null;
   preferred_roadmap_slug?: string | null;
   country?: string | null;
+  show_country_publicly?: boolean | null;
   xp: number;
   level: number;
   created_at: string;
@@ -143,6 +150,7 @@ export function mapBuilderProfile(row: BuilderProfileRow): BuilderProfile {
     onboardingCompletedAt: row.onboarding_completed_at ?? null,
     preferredRoadmapSlug: row.preferred_roadmap_slug ?? null,
     country: row.country ?? null,
+    showCountryPublicly: row.show_country_publicly ?? false,
     xp: row.xp,
     level: row.level,
     createdAt: row.created_at,

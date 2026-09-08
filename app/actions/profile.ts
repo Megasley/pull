@@ -33,6 +33,7 @@ export async function updatePublicProfileAction(formData: FormData) {
     profilePublic: formData.get("profilePublic"),
     listedInDirectory: formData.get("listedInDirectory"),
     country: formData.has("country") ? formData.get("country") : undefined,
+    showCountryPublicly: formData.get("showCountryPublicly"),
   });
 
   if (!validation.ok) {

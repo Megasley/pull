@@ -190,6 +190,13 @@
       "when": 1788871445385,
       "tag": "0026_add_github_reviewed_pull_requests",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1788874122986,
+      "tag": "0027_add_show_country_publicly",
+      "breakpoints": true
     }
   ]
 }

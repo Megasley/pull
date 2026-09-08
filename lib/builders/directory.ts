@@ -45,6 +45,8 @@ export type BuilderDirectoryCard = {
   mergedPullRequests: number;
   lastActiveAt: string | null;
   activeRecently: boolean;
+  /** Only populated when the builder opted in to showing it publicly. */
+  country: string | null;
 };
 
 export type BuilderDirectoryResult = {
@@ -228,6 +230,8 @@ async function listBuildersForDirectoryInner(
       builderScore: users.builderScore,
       ossReputation: users.ossReputation,
       lastActiveAt: users.lastActiveAt,
+      country: users.country,
+      showCountryPublicly: users.showCountryPublicly,
     })
     .from(users)
     .where(whereClause)
@@ -251,6 +255,7 @@ async function listBuildersForDirectoryInner(
         mergedPullRequests: 0,
         lastActiveAt: row.lastActiveAt,
         activeRecently: isActiveRecently(row.lastActiveAt),
+        country: row.showCountryPublicly ? row.country : null,
       } satisfies BuilderDirectoryCard;
     })
     .filter(

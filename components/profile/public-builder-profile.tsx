@@ -24,6 +24,7 @@ import { BuilderScorePanel } from "@/components/score/builder-score-panel";
 import { ReputationPanel } from "@/components/reputation/reputation-panel";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { countryFlagEmoji, getCountryInfo } from "@/lib/geo/countries";
 import {
   buildPublicReputationSummary,
   withPublicReputationCopy,
@@ -67,6 +68,8 @@ export function PublicBuilderProfile({ data }: PublicBuilderProfileProps) {
     .slice(0, 2)
     .toUpperCase();
 
+  const countryFlag = countryFlagEmoji(profile.country);
+  const countryName = getCountryInfo(profile.country)?.name ?? null;
   const profileUrl = `${siteConfig.url}/u/${profile.username}`;
   const githubUrl = `https://github.com/${profile.githubUsername}`;
   const publicBuilderScore = withPublicBuilderScoreCopy(builderScore);
@@ -91,7 +94,19 @@ export function PublicBuilderProfile({ data }: PublicBuilderProfileProps) {
 
               <div className="min-w-0">
                 <p className="profile-eyebrow">Builder // @{profile.username}</p>
-                <h1 className="profile-name">{profile.displayName}</h1>
+                <h1 className="profile-name">
+                  {profile.displayName}
+                  {countryFlag ? (
+                    <span
+                      className="ml-2 align-middle"
+                      role="img"
+                      aria-label={countryName ?? "Country flag"}
+                      title={countryName ?? undefined}
+                    >
+                      {countryFlag}
+                    </span>
+                  ) : null}
+                </h1>
                 <p className="profile-handle">@{profile.username}</p>
               </div>
             </div>
@@ -151,9 +166,7 @@ export function PublicBuilderProfile({ data }: PublicBuilderProfileProps) {
                 icon={<ExternalLinkIcon className="size-3.5" />}
                 profile
               />
-              {profile.website ? (
-                <WebsiteChip href={profile.website} profile />
-              ) : null}
+              {profile.website ? <WebsiteChip href={profile.website} profile /> : null}
               {profile.twitterUrl ? (
                 <SocialChip
                   href={profile.twitterUrl}
