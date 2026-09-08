@@ -4,6 +4,7 @@ import { lookingForLabel, type LookingForId } from "@/lib/builders/looking-for";
 import type { BuilderDirectoryCard } from "@/lib/builders/directory";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { countryFlagEmoji, getCountryInfo } from "@/lib/geo/countries";
 import { cn } from "@/lib/utils";
 
 type BuilderCardProps = {
@@ -45,6 +46,8 @@ export function BuilderCard({ builder, className, compact }: BuilderCardProps) {
   const githubUrl = builder.githubUsername
     ? `https://github.com/${builder.githubUsername}`
     : null;
+  const countryFlag = countryFlagEmoji(builder.country);
+  const countryName = getCountryInfo(builder.country)?.name ?? null;
 
   return (
     <article
@@ -66,6 +69,16 @@ export function BuilderCard({ builder, className, compact }: BuilderCardProps) {
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="truncate text-sm font-semibold tracking-tight">
               {builder.displayName}
+              {countryFlag ? (
+                <span
+                  className="ml-1.5"
+                  role="img"
+                  aria-label={countryName ?? "Country flag"}
+                  title={countryName ?? undefined}
+                >
+                  {countryFlag}
+                </span>
+              ) : null}
             </h3>
             {builder.activeRecently ? (
               <span className="shrink-0 border border-ink/20 bg-signal/20 px-1.5 py-0.5 font-mono text-[9px] tracking-wide text-foreground uppercase">

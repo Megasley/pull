@@ -37,7 +37,11 @@ function africa(code: string, name: string, region: string): [string, CountryInf
   return [code, { code, name, continent: AFRICA, region }];
 }
 
-function other(code: string, name: string, continent: Continent): [string, CountryInfo] {
+function other(
+  code: string,
+  name: string,
+  continent: Continent,
+): [string, CountryInfo] {
   return [code, { code, name, continent, region: continent }];
 }
 
@@ -282,4 +286,19 @@ export function listCountriesForSelect(): Array<{ code: string; name: string }> 
   return Object.values(COUNTRIES)
     .map(({ code, name }) => ({ code, name }))
     .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/**
+ * Unicode flag emoji for a known ISO 3166-1 alpha-2 code, built from the two
+ * Regional Indicator Symbols (U+1F1E6 = 🇦, offset from 'A'). Returns null for
+ * an unknown/missing code rather than a mangled emoji.
+ */
+export function countryFlagEmoji(code: string | null | undefined): string | null {
+  const info = getCountryInfo(code);
+  if (!info) return null;
+  const REGIONAL_INDICATOR_A = 0x1f1e6;
+  const codePoints = [...info.code.toUpperCase()].map(
+    (letter) => REGIONAL_INDICATOR_A + (letter.charCodeAt(0) - 65),
+  );
+  return String.fromCodePoint(...codePoints);
 }

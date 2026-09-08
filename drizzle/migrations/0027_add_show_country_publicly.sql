@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "show_country_publicly" boolean DEFAULT false NOT NULL;
