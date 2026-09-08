@@ -13,6 +13,7 @@ export type GithubActionResult =
         pullRequests: number;
         issues: number;
         commits: number;
+        reviewsGiven: number;
       };
     }
   | { ok: false; error: string; reason?: "unauthenticated" };
@@ -43,6 +44,7 @@ export async function connectGithubAction(): Promise<GithubActionResult> {
       pullRequests: sync.summary.pullRequests,
       issues: sync.summary.issues,
       commits: sync.summary.commits,
+      reviewsGiven: sync.summary.reviewsGiven,
     },
   };
 }
@@ -68,6 +70,7 @@ export async function refreshGithubSyncAction(): Promise<GithubActionResult> {
       pullRequests: sync.summary.pullRequests,
       issues: sync.summary.issues,
       commits: sync.summary.commits,
+      reviewsGiven: sync.summary.reviewsGiven,
     },
   };
 }

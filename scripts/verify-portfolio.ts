@@ -3,6 +3,7 @@
  * Run: npx tsx scripts/verify-portfolio.ts
  */
 import {
+  DEFAULT_PORTFOLIO_FILTERS,
   filterPortfolioItems,
   inferContributionType,
   toPortfolioItem,
@@ -63,27 +64,20 @@ assert(items[0]?.status === "merged", "merged status");
 assert(items[1]?.status === "open", "open status");
 
 const merged = filterPortfolioItems(items, {
-  query: "",
-  status: "all",
-  language: "all",
-  contributionType: "all",
+  ...DEFAULT_PORTFOLIO_FILTERS,
   mergedOnly: true,
 });
 assert(merged.length === 1 && merged[0]?.merged, "merged filter");
 
 const search = filterPortfolioItems(items, {
+  ...DEFAULT_PORTFOLIO_FILTERS,
   query: "mempool",
-  status: "all",
-  language: "all",
-  contributionType: "all",
 });
 assert(search.length === 1, "search repo");
 
 const byLang = filterPortfolioItems(items, {
-  query: "",
-  status: "all",
+  ...DEFAULT_PORTFOLIO_FILTERS,
   language: "Rust",
-  contributionType: "all",
 });
 assert(byLang.length === 1 && byLang[0]?.language === "Rust", "language filter");
 

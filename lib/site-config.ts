@@ -1,3 +1,21 @@
+import {
+  Activity,
+  Bell,
+  ClipboardCheck,
+  FolderGit2,
+  GitPullRequest,
+  LayoutDashboard,
+  RefreshCw,
+  Settings,
+  ShieldCheck,
+  Trophy,
+} from "lucide-react";
+import type { ComponentType, SVGProps } from "react";
+
+/** lucide-react doesn't export a public `LucideIcon` type — every icon
+ *  component shares this shape, so it stands in for one. */
+export type NavIcon = ComponentType<SVGProps<SVGSVGElement>>;
+
 export const siteConfig = {
   name: "Pull",
   description: "The operating system for open source builders.",
@@ -121,9 +139,15 @@ export const primaryNav = [
   },
 ] as const satisfies readonly PrimaryNavItem[];
 
+export type AccountNavItem = NavLink & {
+  icon: NavIcon;
+  /** Only rendered for profile.role === "admin". */
+  adminOnly?: boolean;
+};
+
 export type AccountNavSection = {
   title: string;
-  items: readonly NavLink[];
+  items: readonly AccountNavItem[];
 };
 
 /** Signed-in account / workspace links (avatar + mobile Account section). */
@@ -131,19 +155,21 @@ export const accountNavSections = [
   {
     title: "Workspace",
     items: [
-      { title: "Dashboard", href: "/dashboard" },
-      { title: "Repositories", href: "/repositories" },
-      { title: "Activity", href: "/activity" },
-      { title: "PR portfolio", href: "/portfolio" },
-      { title: "Reputation", href: "/reputation" },
+      { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+      { title: "Repositories", href: "/repositories", icon: FolderGit2 },
+      { title: "Activity", href: "/activity", icon: Activity },
+      { title: "PR portfolio", href: "/portfolio", icon: GitPullRequest },
+      { title: "Reputation", href: "/reputation", icon: Trophy },
+      { title: "Review", href: "/review", icon: ClipboardCheck },
+      { title: "Admin", href: "/admin", icon: ShieldCheck, adminOnly: true },
     ],
   },
   {
     title: "Profile",
     items: [
-      { title: "Edit portfolio", href: "/settings/profile" },
-      { title: "Notifications", href: "/settings/notifications" },
-      { title: "GitHub sync", href: "/settings/github" },
+      { title: "Edit portfolio", href: "/settings/profile", icon: Settings },
+      { title: "Notifications", href: "/settings/notifications", icon: Bell },
+      { title: "GitHub sync", href: "/settings/github", icon: RefreshCw },
     ],
   },
 ] as const satisfies readonly AccountNavSection[];

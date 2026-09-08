@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { LogOut, UserRound } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { Building2, LogOut, UserRound } from "lucide-react";
 
 import { signOut } from "@/app/actions/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -14,8 +15,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { accountNavSections } from "@/lib/site-config";
+import { accountNavSections, isExternalHref } from "@/lib/site-config";
+import { cn } from "@/lib/utils";
 import type { BuilderProfile } from "@/types/user";
+
+function isActivePath(pathname: string, href: string) {
+  if (isExternalHref(href)) return false;
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 type UserMenuProps = {
   profile: BuilderProfile | null;
@@ -24,7 +31,13 @@ type UserMenuProps = {
   orgMembership?: { slug: string; name: string } | null;
 };
 
-export function UserMenu({ profile, displayName, avatarUrl, orgMembership }: UserMenuProps) {
+export function UserMenu({
+  profile,
+  displayName,
+  avatarUrl,
+  orgMembership,
+}: UserMenuProps) {
+  const pathname = usePathname();
   const initials = displayName
     .split(" ")
     .map((part) => part[0])
@@ -72,35 +85,49 @@ export function UserMenu({ profile, displayName, avatarUrl, orgMembership }: Use
             </DropdownMenuLabel>
             {section.title === "Profile" && profile ? (
               <DropdownMenuItem asChild>
-                <Link href={`/u/${profile.username}`}>
+                <Link
+                  href={`/u/${profile.username}`}
+                  className={cn(
+                    isActivePath(pathname, `/u/${profile.username}`) && "bg-muted",
+                  )}
+                >
                   <UserRound aria-hidden />
                   Builder portfolio
                 </Link>
               </DropdownMenuItem>
             ) : null}
-            {section.items.map((item) => (
-              <DropdownMenuItem key={item.href} asChild>
-                <Link href={item.href}>{item.title}</Link>
-              </DropdownMenuItem>
-            ))}
-            {section.title === "Workspace" ? (
-              <>
-                {orgMembership ? (
-                  <DropdownMenuItem asChild>
-                    <Link href={`/partners/${orgMembership.slug}`}>
-                      {orgMembership.name} Hub
+            {section.items
+              .filter(
+                (item) =>
+                  !("adminOnly" in item && item.adminOnly) || profile?.role === "admin",
+              )
+              .map((item) => {
+                const Icon = item.icon;
+                return (
+                  <DropdownMenuItem key={item.href} asChild>
+                    <Link
+                      href={item.href}
+                      className={cn(isActivePath(pathname, item.href) && "bg-muted")}
+                    >
+                      <Icon aria-hidden />
+                      {item.title}
                     </Link>
                   </DropdownMenuItem>
-                ) : null}
-                <DropdownMenuItem asChild>
-                  <Link href="/review">Review</Link>
-                </DropdownMenuItem>
-                {profile?.role === "admin" ? (
-                  <DropdownMenuItem asChild>
-                    <Link href="/admin">Admin</Link>
-                  </DropdownMenuItem>
-                ) : null}
-              </>
+                );
+              })}
+            {section.title === "Workspace" && orgMembership ? (
+              <DropdownMenuItem asChild>
+                <Link
+                  href={`/partners/${orgMembership.slug}`}
+                  className={cn(
+                    isActivePath(pathname, `/partners/${orgMembership.slug}`) &&
+                      "bg-muted",
+                  )}
+                >
+                  <Building2 aria-hidden />
+                  {orgMembership.name} Hub
+                </Link>
+              </DropdownMenuItem>
             ) : null}
           </div>
         ))}

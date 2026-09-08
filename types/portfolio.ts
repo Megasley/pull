@@ -3,6 +3,8 @@ export type ContributionType =
 
 export type PullRequestPortfolioStatus = "merged" | "open" | "closed";
 
+export type PortfolioSort = "recent" | "merged" | "impact";
+
 export type PullRequestPortfolioItem = {
   id: string;
   number: number;
@@ -22,10 +24,37 @@ export type PullRequestPortfolioItem = {
   contributionType: ContributionType;
 };
 
+export type PullRequestReviewItem = {
+  id: string;
+  number: number;
+  title: string;
+  status: PullRequestPortfolioStatus;
+  merged: boolean;
+  repoFullName: string;
+  htmlUrl: string;
+  authorLogin: string | null;
+  language: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+};
+
 export type PortfolioFilters = {
   query: string;
   status: PullRequestPortfolioStatus | "all";
   language: string | "all";
+  repo: string | "all";
   contributionType: ContributionType | "all";
   mergedOnly?: boolean;
+  sort: PortfolioSort;
+};
+
+export type PortfolioRepoBreakdown = {
+  repoFullName: string;
+  count: number;
+};
+
+export type PortfolioCadence = {
+  /** Oldest -> newest, always exactly 12 entries. */
+  months: Array<{ label: string; monthKey: string; count: number }>;
+  activeMonths: number;
 };

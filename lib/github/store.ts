@@ -10,6 +10,7 @@ import {
   githubPullRequestEvents,
   githubPullRequests,
   githubRepositories,
+  githubReviewedPullRequests,
 } from "@/lib/db/schema";
 import type {
   GithubCommitRecord,
@@ -18,6 +19,7 @@ import type {
   GithubIssueRecord,
   GithubPullRequestRecord,
   GithubRepositoryRecord,
+  GithubReviewedPullRequestRecord,
   GithubSyncStatus,
 } from "@/types/github";
 
@@ -487,7 +489,10 @@ export async function recordPullRequestEvents(
       })),
     )
     .onConflictDoNothing({
-      target: [githubPullRequestEvents.pullRequestId, githubPullRequestEvents.eventType],
+      target: [
+        githubPullRequestEvents.pullRequestId,
+        githubPullRequestEvents.eventType,
+      ],
     });
 }
 
@@ -549,7 +554,12 @@ export function deriveLifecycleEvents(
         occurredAt: input.githubMergedAt,
         timestampSource: "github",
       });
-    } else if (previous.state !== "closed" && input.state === "closed" && !input.merged && input.githubClosedAt) {
+    } else if (
+      previous.state !== "closed" &&
+      input.state === "closed" &&
+      !input.merged &&
+      input.githubClosedAt
+    ) {
       events.push({
         pullRequestId,
         userId,
@@ -611,6 +621,65 @@ export async function replaceGithubIssues(
       syncedAt: stamp,
     })),
   );
+}
+
+export async function replaceGithubReviewedPullRequests(
+  userId: string,
+  items: Array<{
+    githubId: number;
+    number: number;
+    title: string;
+    state: string;
+    merged: boolean;
+    repoFullName: string;
+    htmlUrl: string;
+    authorLogin: string | null;
+    language: string | null;
+    githubCreatedAt: string | null;
+    githubUpdatedAt: string | null;
+  }>,
+) {
+  if (!isDatabaseConfigured()) return;
+  const db = getDb();
+  const stamp = nowIso();
+  await db
+    .delete(githubReviewedPullRequests)
+    .where(eq(githubReviewedPullRequests.userId, userId));
+  if (items.length === 0) return;
+  await db.insert(githubReviewedPullRequests).values(
+    items.map((item) => ({
+      userId,
+      ...item,
+      syncedAt: stamp,
+    })),
+  );
+}
+
+export async function listGithubReviewedPullRequests(
+  userId: string,
+): Promise<GithubReviewedPullRequestRecord[]> {
+  if (!isDatabaseConfigured()) return [];
+  const db = getDb();
+  const rows = await db
+    .select()
+    .from(githubReviewedPullRequests)
+    .where(eq(githubReviewedPullRequests.userId, userId))
+    .orderBy(desc(githubReviewedPullRequests.githubUpdatedAt));
+
+  return rows.map((row) => ({
+    id: row.id,
+    githubId: row.githubId,
+    number: row.number,
+    title: row.title,
+    state: row.state,
+    merged: row.merged,
+    repoFullName: row.repoFullName,
+    htmlUrl: row.htmlUrl,
+    authorLogin: row.authorLogin,
+    language: row.language,
+    githubCreatedAt: row.githubCreatedAt,
+    githubUpdatedAt: row.githubUpdatedAt,
+  }));
 }
 
 export async function replaceGithubCommits(
@@ -867,7 +936,9 @@ export async function countMergedGithubPullRequests(userId: string): Promise<num
 }
 
 /** Total non-draft (ready for review) PRs synced for a user — "submitted", not just started. */
-export async function countSubmittedGithubPullRequests(userId: string): Promise<number> {
+export async function countSubmittedGithubPullRequests(
+  userId: string,
+): Promise<number> {
   if (!isDatabaseConfigured()) return 0;
   const db = getDb();
   const [row] = await db

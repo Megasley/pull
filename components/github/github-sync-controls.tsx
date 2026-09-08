@@ -74,7 +74,7 @@ export function GithubSyncControls({ connected, syncStatus }: GithubSyncControls
                   }
                   setMessage(
                     result.summary
-                      ? `Synced ${result.summary.repositories} repos, ${result.summary.pullRequests} PRs, ${result.summary.issues} issues, ${result.summary.commits} commits.`
+                      ? `Synced ${result.summary.repositories} repos, ${result.summary.pullRequests} PRs, ${result.summary.reviewsGiven} reviews, ${result.summary.issues} issues, ${result.summary.commits} commits.`
                       : "Sync complete.",
                   );
                   router.refresh();

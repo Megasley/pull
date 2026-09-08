@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -46,11 +47,16 @@ export default async function PortfolioPage() {
       />
 
       <div className="mt-10">
-        <PullRequestPortfolio
-          items={portfolio.items}
-          connected={portfolio.connected}
-          stats={portfolio.stats}
-        />
+        <Suspense fallback={null}>
+          <PullRequestPortfolio
+            items={portfolio.items}
+            reviews={portfolio.reviews}
+            topRepos={portfolio.topRepos}
+            cadence={portfolio.cadence}
+            connected={portfolio.connected}
+            stats={portfolio.stats}
+          />
+        </Suspense>
       </div>
     </div>
   );

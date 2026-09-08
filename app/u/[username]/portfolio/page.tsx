@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -54,12 +55,17 @@ export default async function PublicPortfolioPage({ params }: PageProps) {
       />
 
       <div className="mt-10">
-        <PullRequestPortfolio
-          items={portfolio.items}
-          connected={portfolio.connected}
-          stats={portfolio.stats}
-          publicView
-        />
+        <Suspense fallback={null}>
+          <PullRequestPortfolio
+            items={portfolio.items}
+            reviews={portfolio.reviews}
+            topRepos={portfolio.topRepos}
+            cadence={portfolio.cadence}
+            connected={portfolio.connected}
+            stats={portfolio.stats}
+            publicView
+          />
+        </Suspense>
       </div>
     </div>
   );

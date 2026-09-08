@@ -8,10 +8,16 @@ import {
   githubPullRequestEvents,
   githubPullRequests,
   githubRepositories,
+  githubReviewedPullRequests,
 } from "./github";
 import { adminNotifications, milestoneEvents } from "./milestones";
 import { opportunityEvents } from "./opportunities";
-import { orgInviteLinks, orgMemberships, orgOpportunities, orgSkills } from "./partners";
+import {
+  orgInviteLinks,
+  orgMemberships,
+  orgOpportunities,
+  orgSkills,
+} from "./partners";
 import {
   achievements,
   organizations,
@@ -46,11 +52,22 @@ export const usersRelations = relations(users, ({ many, one }) => ({
   githubPullRequests: many(githubPullRequests),
   githubPullRequestEvents: many(githubPullRequestEvents),
   githubIssues: many(githubIssues),
+  githubReviewedPullRequests: many(githubReviewedPullRequests),
   githubCommits: many(githubCommits),
   githubContributionDays: many(githubContributionDays),
   orgMemberships: many(orgMemberships),
   opportunityEvents: many(opportunityEvents),
 }));
+
+export const githubReviewedPullRequestsRelations = relations(
+  githubReviewedPullRequests,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [githubReviewedPullRequests.userId],
+      references: [users.id],
+    }),
+  }),
+);
 
 export const githubConnectionsRelations = relations(githubConnections, ({ one }) => ({
   user: one(users, {
@@ -66,21 +83,24 @@ export const githubRepositoriesRelations = relations(githubRepositories, ({ one 
   }),
 }));
 
-export const githubPullRequestsRelations = relations(githubPullRequests, ({ one, many }) => ({
-  user: one(users, {
-    fields: [githubPullRequests.userId],
-    references: [users.id],
+export const githubPullRequestsRelations = relations(
+  githubPullRequests,
+  ({ one, many }) => ({
+    user: one(users, {
+      fields: [githubPullRequests.userId],
+      references: [users.id],
+    }),
+    attributedPartner: one(organizations, {
+      fields: [githubPullRequests.attributedPartnerId],
+      references: [organizations.id],
+    }),
+    attributedOpportunityEvent: one(opportunityEvents, {
+      fields: [githubPullRequests.attributedOpportunityEventId],
+      references: [opportunityEvents.id],
+    }),
+    events: many(githubPullRequestEvents),
   }),
-  attributedPartner: one(organizations, {
-    fields: [githubPullRequests.attributedPartnerId],
-    references: [organizations.id],
-  }),
-  attributedOpportunityEvent: one(opportunityEvents, {
-    fields: [githubPullRequests.attributedOpportunityEventId],
-    references: [opportunityEvents.id],
-  }),
-  events: many(githubPullRequestEvents),
-}));
+);
 
 export const githubPullRequestEventsRelations = relations(
   githubPullRequestEvents,
@@ -343,4 +363,3 @@ export const orgOpportunitiesRelations = relations(orgOpportunities, ({ one }) =
     references: [organizations.id],
   }),
 }));
-

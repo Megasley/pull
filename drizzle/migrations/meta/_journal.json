@@ -183,6 +183,13 @@
       "when": 1788700000000,
       "tag": "0025_admin_milestones_and_notifications",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1788871445385,
+      "tag": "0026_add_github_reviewed_pull_requests",
+      "breakpoints": true
     }
   ]
 }

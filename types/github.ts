@@ -60,6 +60,21 @@ export type GithubPullRequestRecord = {
   contributionType: string;
 };
 
+export type GithubReviewedPullRequestRecord = {
+  id: string;
+  githubId: number;
+  number: number;
+  title: string;
+  state: string;
+  merged: boolean;
+  repoFullName: string;
+  htmlUrl: string;
+  authorLogin: string | null;
+  language: string | null;
+  githubCreatedAt: string | null;
+  githubUpdatedAt: string | null;
+};
+
 export type GithubIssueRecord = {
   id: string;
   githubId: number;
@@ -94,6 +109,7 @@ export type GithubSyncSummary = {
   commits: number;
   contributionDays: number;
   totalStars: number;
+  reviewsGiven: number;
 };
 
 export type GithubDashboardSnapshot = {
