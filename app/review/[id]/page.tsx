@@ -6,7 +6,7 @@ import { ReviewActionsPanel } from "@/components/reviews/review-actions-panel";
 import { ReviewTimeline } from "@/components/reviews/review-timeline";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { bootstrapCurrentUserProfile } from "@/lib/auth/session";
+import { requireActiveAccount } from "@/lib/auth/require-active-account";
 import { isDatabaseConfigured } from "@/lib/db/env";
 import {
   getRequiredApprovals,
@@ -35,12 +35,13 @@ export async function generateMetadata({ params }: ReviewDetailPageProps) {
 
 export default async function ReviewDetailPage({ params }: ReviewDetailPageProps) {
   const { id } = await params;
-  const profile = await bootstrapCurrentUserProfile();
+  const accountGate = await requireActiveAccount();
 
-  if (!profile) {
+  if (!accountGate.ok) {
     redirect(`/sign-in?next=/review/${id}`);
   }
 
+  const profile = accountGate.profile;
   if (!isDatabaseConfigured()) {
     notFound();
   }

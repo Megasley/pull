@@ -1,4 +1,4 @@
-import { count, desc, eq, ilike, or, sql } from "drizzle-orm";
+import { and, count, desc, eq, ilike, or, sql } from "drizzle-orm";
 
 import { recordAdminAction } from "@/lib/admin/audit-log";
 import {
@@ -404,8 +404,23 @@ export type ModerationResult =
   | { ok: true; user: AdminUserRecord }
   | {
       ok: false;
-      reason: "database_unconfigured" | "not_found" | "invalid_status";
+      reason:
+        | "database_unconfigured"
+        | "not_found"
+        | "invalid_status"
+        | "last_admin"
+        | "self_moderation";
     };
+
+async function countActiveAdmins(): Promise<number> {
+  const db = getDb();
+  const rows = await db
+    .select({ value: count() })
+    .from(users)
+    .where(and(eq(users.role, "admin"), eq(users.accountStatus, "active")));
+
+  return rows[0]?.value ?? 0;
+}
 
 async function applyModeration(input: {
   userId: string;
@@ -429,6 +444,17 @@ async function applyModeration(input: {
     return { ok: false, reason: "not_found" };
   }
 
+  const disablesAccount = input.action === "suspend" || input.action === "ban";
+  if (disablesAccount && existing.role === "admin") {
+    if (input.userId === input.actorUserId) {
+      return { ok: false, reason: "self_moderation" };
+    }
+
+    if (existing.accountStatus === "active" && (await countActiveAdmins()) <= 1) {
+      return { ok: false, reason: "last_admin" };
+    }
+  }
+
   const now = new Date().toISOString();
   const patch =
     input.action === "restore"
@@ -448,11 +474,22 @@ async function applyModeration(input: {
           updatedAt: now,
         };
 
-  const [updated] = await db
-    .update(users)
-    .set(patch)
-    .where(eq(users.id, input.userId))
-    .returning();
+  const updated = await db.transaction(async (transaction) => {
+    const [updatedUser] = await transaction
+      .update(users)
+      .set(patch)
+      .where(eq(users.id, input.userId))
+      .returning();
+
+    if (updatedUser && disablesAccount) {
+      await transaction.execute(sql`
+        DELETE FROM auth.sessions
+        WHERE user_id = ${input.userId}::uuid
+      `);
+    }
+
+    return updatedUser;
+  });
 
   if (!updated) {
     return { ok: false, reason: "not_found" };

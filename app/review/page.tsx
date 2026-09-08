@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { EmptyState, PageHeader } from "@/components/design-system";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { bootstrapCurrentUserProfile } from "@/lib/auth/session";
+import { requireActiveAccount } from "@/lib/auth/require-active-account";
 import { isDatabaseConfigured } from "@/lib/db/env";
 import {
   getClaimMinutes,
@@ -28,12 +28,13 @@ type ReviewQueuePageProps = {
 
 export default async function ReviewQueuePage({ searchParams }: ReviewQueuePageProps) {
   const { status: statusFilter } = await searchParams;
-  const profile = await bootstrapCurrentUserProfile();
+  const accountGate = await requireActiveAccount();
 
-  if (!profile) {
+  if (!accountGate.ok) {
     redirect("/sign-in?next=/review");
   }
 
+  const profile = accountGate.profile;
   const ctx = await loadPeerReviewContext(profile.id, profile.role);
   const allQueue = isDatabaseConfigured() ? await listReviewQueue(profile.id) : [];
 
