@@ -7,6 +7,7 @@ import {
   fetchAuthoredPullRequests,
   fetchPinnedAndContributions,
   fetchRecentCommits,
+  fetchReviewedPullRequests,
   fetchUserRepositories,
 } from "./api";
 import {
@@ -26,6 +27,7 @@ import {
   replaceGithubContributionDays,
   replaceGithubIssues,
   replaceGithubRepositories,
+  replaceGithubReviewedPullRequests,
   setGithubSyncStatus,
   updateGithubConnectionToken,
   upsertGithubConnection,
@@ -87,46 +89,58 @@ export async function syncGithubForUser(
       syncError: null,
     });
 
-    const [repos, graph, authoredIssues, assignedIssues, existingPullRequests, memberships, opportunityClicks] =
-      await Promise.all([
-        fetchUserRepositories(client),
-        fetchPinnedAndContributions(client),
-        fetchAuthoredIssues(client, user.login),
-        fetchAssignedIssues(client, user.login),
-        getExistingPullRequestsForSync(userId),
-        loadPartnerMembershipsForAttribution(userId),
-        loadOpportunityClicksForAttribution(userId),
-      ]);
+    const [
+      repos,
+      graph,
+      authoredIssues,
+      assignedIssues,
+      existingPullRequests,
+      memberships,
+      opportunityClicks,
+    ] = await Promise.all([
+      fetchUserRepositories(client),
+      fetchPinnedAndContributions(client),
+      fetchAuthoredIssues(client, user.login),
+      fetchAssignedIssues(client, user.login),
+      getExistingPullRequestsForSync(userId),
+      loadPartnerMembershipsForAttribution(userId),
+      loadOpportunityClicksForAttribution(userId),
+    ]);
 
     const languageByRepo = Object.fromEntries(
       repos.map((repo) => [repo.full_name, repo.language]),
     );
 
-    const fetchedPullRequests = await fetchAuthoredPullRequests(client, user.login, {
-      languageByRepo,
-      resolvedGithubIds: getResolvedGithubIds(existingPullRequests),
-    });
+    const [fetchedPullRequests, reviewedPullRequests] = await Promise.all([
+      fetchAuthoredPullRequests(client, user.login, {
+        languageByRepo,
+        resolvedGithubIds: getResolvedGithubIds(existingPullRequests),
+      }),
+      fetchReviewedPullRequests(client, user.login, languageByRepo),
+    ]);
 
-    const pullRequestInputs: PullRequestSyncInput[] = fetchedPullRequests.map((item) => {
-      const isOwnRepo =
-        item.repoFullName.split("/")[0]?.toLowerCase() === user.login.toLowerCase();
-      const isNew = !existingPullRequests.has(item.githubId);
+    const pullRequestInputs: PullRequestSyncInput[] = fetchedPullRequests.map(
+      (item) => {
+        const isOwnRepo =
+          item.repoFullName.split("/")[0]?.toLowerCase() === user.login.toLowerCase();
+        const isNew = !existingPullRequests.has(item.githubId);
 
-      return {
-        ...item,
-        isOwnRepo,
-        attributedPartnerId: isNew
-          ? resolvePartnerAttribution(memberships, item.githubCreatedAt)
-          : null,
-        attributedOpportunityEventId: isNew
-          ? resolveOpportunityAttribution(
-              opportunityClicks,
-              item.repoFullName,
-              item.githubCreatedAt,
-            )
-          : null,
-      };
-    });
+        return {
+          ...item,
+          isOwnRepo,
+          attributedPartnerId: isNew
+            ? resolvePartnerAttribution(memberships, item.githubCreatedAt)
+            : null,
+          attributedOpportunityEventId: isNew
+            ? resolveOpportunityAttribution(
+                opportunityClicks,
+                item.repoFullName,
+                item.githubCreatedAt,
+              )
+            : null,
+        };
+      },
+    );
 
     const upsertResults = await upsertGithubPullRequests(
       userId,
@@ -214,6 +228,7 @@ export async function syncGithubForUser(
 
     await replaceGithubRepositories(userId, mappedRepos);
     await replaceGithubIssues(userId, issues);
+    await replaceGithubReviewedPullRequests(userId, reviewedPullRequests);
     await replaceGithubCommits(userId, commits);
     await replaceGithubContributionDays(userId, contributionDays);
 
@@ -242,6 +257,7 @@ export async function syncGithubForUser(
         commits: commits.length,
         contributionDays: contributionDays.length,
         totalStars,
+        reviewsGiven: reviewedPullRequests.length,
       },
     };
   } catch (error) {

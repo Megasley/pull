@@ -32,13 +32,7 @@ type MobileNavProps = {
 };
 
 type SectionTone =
-  | "learn"
-  | "build"
-  | "contribute"
-  | "builders"
-  | "workspace"
-  | "profile"
-  | "account";
+  "learn" | "build" | "contribute" | "builders" | "workspace" | "profile" | "account";
 
 const sectionToneClass: Record<SectionTone, string> = {
   learn: "border-l-signal bg-background",
@@ -309,9 +303,7 @@ export function MobileNav({
             {isAuthenticated ? (
               <div className="flex items-center gap-3 border border-border bg-card px-3.5 py-3">
                 <Avatar className="size-10 shrink-0 rounded-none border border-border">
-                  {avatarUrl ? (
-                    <AvatarImage src={avatarUrl} alt={displayName} />
-                  ) : null}
+                  {avatarUrl ? <AvatarImage src={avatarUrl} alt={displayName} /> : null}
                   <AvatarFallback className="rounded-none font-mono text-xs">
                     {initials}
                   </AvatarFallback>
@@ -373,8 +365,11 @@ export function MobileNav({
                         }
                       >
                         {child.title}
-                        {(isExternalHref(child.href) || ("external" in child && child.external)) && (
-                          <span className="ml-auto pl-2 opacity-40" aria-hidden>↗</span>
+                        {(isExternalHref(child.href) ||
+                          ("external" in child && child.external)) && (
+                          <span className="ml-auto pl-2 opacity-40" aria-hidden>
+                            ↗
+                          </span>
                         )}
                       </MobileLink>
                     );
@@ -398,56 +393,42 @@ export function MobileNav({
                   const tone: SectionTone =
                     section.title === "Workspace" ? "workspace" : "profile";
 
-                return (
-                  <NavSection key={section.title} title={section.title} tone={tone}>
-                    {section.title === "Profile" && profile ? (
-                      <MobileLink
-                        href={`/u/${profile.username}`}
-                        pathname={pathname}
-                        onClick={close}
-                      >
-                        Builder portfolio
-                      </MobileLink>
-                    ) : null}
-                    {section.items.map((navItem) => (
-                      <MobileLink
-                        key={navItem.href}
-                        href={navItem.href}
-                        pathname={pathname}
-                        onClick={close}
-                      >
-                        {navItem.title}
-                      </MobileLink>
-                    ))}
-                    {section.title === "Workspace" ? (
-                      <>
-                        {orgMembership ? (
-                          <MobileLink
-                            href={`/partners/${orgMembership.slug}`}
-                            pathname={pathname}
-                            onClick={close}
-                          >
-                            {orgMembership.name} Hub
-                          </MobileLink>
-                        ) : null}
+                  return (
+                    <NavSection key={section.title} title={section.title} tone={tone}>
+                      {section.title === "Profile" && profile ? (
                         <MobileLink
-                          href="/review"
+                          href={`/u/${profile.username}`}
                           pathname={pathname}
                           onClick={close}
                         >
-                          Review
+                          Builder portfolio
                         </MobileLink>
-                        {profile?.role === "admin" ? (
+                      ) : null}
+                      {section.items
+                        .filter(
+                          (navItem) =>
+                            !("adminOnly" in navItem && navItem.adminOnly) ||
+                            profile?.role === "admin",
+                        )
+                        .map((navItem) => (
                           <MobileLink
-                            href="/admin"
+                            key={navItem.href}
+                            href={navItem.href}
                             pathname={pathname}
                             onClick={close}
                           >
-                            Admin
+                            {navItem.title}
                           </MobileLink>
-                        ) : null}
-                      </>
-                    ) : null}
+                        ))}
+                      {section.title === "Workspace" && orgMembership ? (
+                        <MobileLink
+                          href={`/partners/${orgMembership.slug}`}
+                          pathname={pathname}
+                          onClick={close}
+                        >
+                          {orgMembership.name} Hub
+                        </MobileLink>
+                      ) : null}
                     </NavSection>
                   );
                 })

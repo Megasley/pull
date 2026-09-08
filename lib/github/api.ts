@@ -7,6 +7,7 @@ import {
   GITHUB_PR_ENRICH_BUDGET,
   GITHUB_PR_SEARCH_MAX_PAGES,
   GITHUB_REPO_MAX_PAGES,
+  GITHUB_REVIEW_SEARCH_MAX_PAGES,
 } from "./config";
 
 export type GithubApiUser = {
@@ -48,10 +49,12 @@ type SearchIssueItem = {
   state: string;
   html_url: string;
   created_at: string;
+  updated_at?: string;
   closed_at: string | null;
   labels?: Array<{ name: string } | string>;
   pull_request?: { merged_at?: string | null; url?: string };
   repository_url: string;
+  user?: { login: string } | null;
 };
 
 type SearchResponse = {
@@ -250,6 +253,38 @@ export async function fetchAuthoredPullRequests(
   }
 
   return base;
+}
+
+export async function fetchReviewedPullRequests(
+  client: GithubClient,
+  login: string,
+  languageByRepo: Record<string, string | null> = {},
+) {
+  const items: SearchResponse["items"] = [];
+  for (let page = 1; page <= GITHUB_REVIEW_SEARCH_MAX_PAGES; page += 1) {
+    const data = await client.request<SearchResponse>(
+      `/search/issues?q=${encodeURIComponent(`type:pr reviewed-by:${login} -author:${login}`)}&sort=updated&order=desc&per_page=${GITHUB_ACTIVITY_LIMIT}&page=${page}`,
+    );
+    items.push(...data.items);
+    if (data.items.length < GITHUB_ACTIVITY_LIMIT) break;
+  }
+
+  return items.map((item) => {
+    const repoFullName = repoFullNameFromUrl(item.repository_url);
+    return {
+      githubId: item.id,
+      number: item.number,
+      title: item.title,
+      state: item.state,
+      merged: Boolean(item.pull_request?.merged_at),
+      repoFullName,
+      htmlUrl: item.html_url,
+      authorLogin: item.user?.login ?? null,
+      language: languageByRepo[repoFullName] ?? null,
+      githubCreatedAt: item.created_at,
+      githubUpdatedAt: item.updated_at ?? null,
+    };
+  });
 }
 
 export async function fetchAuthoredIssues(client: GithubClient, login: string) {

@@ -152,9 +152,12 @@ export const githubPullRequests = pgTable(
     /** Partner the user belonged to when this PR was opened (membership at
      *  time of contribution — see lib/impact/attribution.ts). Set once at
      *  first insert; never overwritten by later partner joins. */
-    attributedPartnerId: uuid("attributed_partner_id").references(() => organizations.id, {
-      onDelete: "set null",
-    }),
+    attributedPartnerId: uuid("attributed_partner_id").references(
+      () => organizations.id,
+      {
+        onDelete: "set null",
+      },
+    ),
     /** Opportunity click-through this PR is attributed to, if any (matched by
      *  repo within the configured attribution window). Set once; never
      *  overwritten by later opportunity interactions. */
@@ -182,7 +185,9 @@ export const githubPullRequests = pgTable(
     index("github_pull_requests_draft_idx").on(table.draft),
     index("github_pull_requests_contribution_type_idx").on(table.contributionType),
     index("github_pull_requests_repo_full_name_idx").on(table.repoFullName),
-    index("github_pull_requests_attributed_partner_id_idx").on(table.attributedPartnerId),
+    index("github_pull_requests_attributed_partner_id_idx").on(
+      table.attributedPartnerId,
+    ),
     index("github_pull_requests_is_own_repo_idx").on(table.isOwnRepo),
   ],
 );
@@ -205,8 +210,13 @@ export const githubPullRequestEvents = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     eventType: prLifecycleEventTypeEnum("event_type").notNull(),
-    occurredAt: timestamp("occurred_at", { withTimezone: true, mode: "string" }).notNull(),
-    timestampSource: eventTimestampSourceEnum("timestamp_source").notNull().default("github"),
+    occurredAt: timestamp("occurred_at", {
+      withTimezone: true,
+      mode: "string",
+    }).notNull(),
+    timestampSource: eventTimestampSourceEnum("timestamp_source")
+      .notNull()
+      .default("github"),
     createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
       .notNull()
       .defaultNow(),
@@ -223,6 +233,51 @@ export const githubPullRequestEvents = pgTable(
       table.occurredAt,
     ),
     index("github_pull_request_events_occurred_at_idx").on(table.occurredAt),
+  ],
+);
+
+/**
+ * Pull requests the user reviewed but did not author, synced from GitHub's
+ * `reviewed-by:` search qualifier. Lighter-weight than githubPullRequests —
+ * no per-PR detail enrichment or lifecycle events, since these exist only to
+ * surface review activity on the portfolio, not to drive milestones or
+ * attribution. Replaced wholesale on every sync, same as githubIssues.
+ */
+export const githubReviewedPullRequests = pgTable(
+  "github_reviewed_pull_requests",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    githubId: bigint("github_id", { mode: "number" }).notNull(),
+    number: integer("number").notNull(),
+    title: text("title").notNull(),
+    state: text("state").notNull(),
+    merged: boolean("merged").notNull().default(false),
+    repoFullName: text("repo_full_name").notNull(),
+    htmlUrl: text("html_url").notNull(),
+    authorLogin: text("author_login"),
+    language: text("language"),
+    githubCreatedAt: timestamp("github_created_at", {
+      withTimezone: true,
+      mode: "string",
+    }),
+    githubUpdatedAt: timestamp("github_updated_at", {
+      withTimezone: true,
+      mode: "string",
+    }),
+    syncedAt: timestamp("synced_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("github_reviewed_pull_requests_user_github_id_idx").on(
+      table.userId,
+      table.githubId,
+    ),
+    index("github_reviewed_pull_requests_user_id_idx").on(table.userId),
+    index("github_reviewed_pull_requests_repo_full_name_idx").on(table.repoFullName),
   ],
 );
 

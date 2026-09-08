@@ -1,29 +1,43 @@
 "use client";
 
-import { useDeferredValue, useMemo, useState } from "react";
+import { useCallback, useDeferredValue, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Search } from "lucide-react";
 
 import { EmptyState } from "@/components/design-system";
+import { PullRequestCadence } from "@/components/portfolio/pull-request-cadence";
 import { PullRequestCard } from "@/components/portfolio/pull-request-card";
+import { PullRequestReviewCard } from "@/components/portfolio/pull-request-review-card";
 import { Button } from "@/components/ui/button";
 import {
   CONTRIBUTION_TYPE_LABEL,
   PORTFOLIO_PAGE_SIZE,
+  PORTFOLIO_SORT_LABEL,
   PORTFOLIO_STATUS_LABEL,
   filterPortfolioItems,
+  filterReviewItems,
   getPortfolioLanguages,
   paginatePortfolioItems,
 } from "@/lib/portfolio/filter";
 import { cn } from "@/lib/utils";
 import type {
   ContributionType,
+  PortfolioCadence as PortfolioCadenceData,
+  PortfolioRepoBreakdown,
+  PortfolioSort,
   PullRequestPortfolioItem,
   PullRequestPortfolioStatus,
+  PullRequestReviewItem,
 } from "@/types/portfolio";
+
+type PortfolioView = "authored" | "reviewed";
 
 type PullRequestPortfolioProps = {
   items: PullRequestPortfolioItem[];
+  reviews: PullRequestReviewItem[];
+  topRepos: PortfolioRepoBreakdown[];
+  cadence: PortfolioCadenceData;
   connected: boolean;
   stats: {
     total: number;
@@ -31,28 +45,97 @@ type PullRequestPortfolioProps = {
     open: number;
     closed: number;
     repos: number;
+    reviewsGiven: number;
   };
   /** Hide owner-only sync CTAs on public portfolio pages. */
   publicView?: boolean;
 };
 
 const CONTRIBUTION_TYPES = Object.keys(CONTRIBUTION_TYPE_LABEL) as ContributionType[];
+const SORT_OPTIONS = Object.keys(PORTFOLIO_SORT_LABEL) as PortfolioSort[];
+
+function readParam<T extends string>(
+  searchParams: URLSearchParams,
+  key: string,
+  allowed: readonly T[],
+  fallback: T,
+): T {
+  const value = searchParams.get(key);
+  return (allowed as readonly string[]).includes(value ?? "") ? (value as T) : fallback;
+}
 
 export function PullRequestPortfolio({
   items,
+  reviews,
+  topRepos,
+  cadence,
   connected,
   stats,
   publicView = false,
 }: PullRequestPortfolioProps) {
-  const [query, setQuery] = useState("");
-  const [status, setStatus] = useState<PullRequestPortfolioStatus | "all">("all");
-  const [language, setLanguage] = useState<string | "all">("all");
-  const [contributionType, setContributionType] = useState<ContributionType | "all">(
-    "all",
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const [view, setView] = useState<PortfolioView>(
+    readParam(searchParams, "view", ["authored", "reviewed"] as const, "authored"),
   );
-  const [mergedOnly, setMergedOnly] = useState(false);
-  const [page, setPage] = useState(1);
+  const [query, setQuery] = useState(searchParams.get("q") ?? "");
+  const [status, setStatus] = useState<PullRequestPortfolioStatus | "all">(
+    readParam(
+      searchParams,
+      "status",
+      ["all", "merged", "open", "closed"] as const,
+      "all",
+    ),
+  );
+  const [language, setLanguage] = useState<string>(
+    searchParams.get("language") ?? "all",
+  );
+  const [repo, setRepo] = useState<string>(searchParams.get("repo") ?? "all");
+  const [contributionType, setContributionType] = useState<ContributionType | "all">(
+    readParam(searchParams, "type", ["all", ...CONTRIBUTION_TYPES] as const, "all"),
+  );
+  const [mergedOnly, setMergedOnly] = useState(searchParams.get("merged") === "1");
+  const [sort, setSort] = useState<PortfolioSort>(
+    readParam(searchParams, "sort", SORT_OPTIONS, "merged"),
+  );
+  const [page, setPage] = useState(Number(searchParams.get("page") ?? "1") || 1);
   const deferredQuery = useDeferredValue(query);
+
+  const resetPage = useCallback(() => setPage(1), []);
+
+  // Mirror filter state into the URL so a filtered view is shareable/bookmarkable.
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (view !== "authored") params.set("view", view);
+    if (deferredQuery) params.set("q", deferredQuery);
+    if (status !== "all") params.set("status", status);
+    if (language !== "all") params.set("language", language);
+    if (repo !== "all") params.set("repo", repo);
+    if (contributionType !== "all") params.set("type", contributionType);
+    if (mergedOnly) params.set("merged", "1");
+    if (sort !== "merged") params.set("sort", sort);
+    if (page > 1) params.set("page", String(page));
+
+    const next = params.toString();
+    if (next !== searchParams.toString()) {
+      router.replace(next ? `${pathname}?${next}` : pathname, { scroll: false });
+    }
+    // Only the filter state itself should trigger a URL sync — router/pathname/
+    // searchParams identity changes on every navigation and would loop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    view,
+    deferredQuery,
+    status,
+    language,
+    repo,
+    contributionType,
+    mergedOnly,
+    sort,
+    page,
+  ]);
 
   const languages = useMemo(() => getPortfolioLanguages(items), [items]);
 
@@ -62,20 +145,29 @@ export function PullRequestPortfolio({
         query: deferredQuery,
         status,
         language,
+        repo,
         contributionType,
         mergedOnly,
+        sort,
       }),
-    [items, deferredQuery, status, language, contributionType, mergedOnly],
+    [items, deferredQuery, status, language, repo, contributionType, mergedOnly, sort],
   );
 
-  const paginated = useMemo(
+  const filteredReviews = useMemo(
+    () => filterReviewItems(reviews, { query: deferredQuery, repo }),
+    [reviews, deferredQuery, repo],
+  );
+
+  const paginatedAuthored = useMemo(
     () => paginatePortfolioItems(filtered, page, PORTFOLIO_PAGE_SIZE),
     [filtered, page],
   );
+  const paginatedReviews = useMemo(
+    () => paginatePortfolioItems(filteredReviews, page, PORTFOLIO_PAGE_SIZE),
+    [filteredReviews, page],
+  );
 
-  function resetPage() {
-    setPage(1);
-  }
+  const paginated = view === "authored" ? paginatedAuthored : paginatedReviews;
 
   if (!connected) {
     return (
@@ -96,7 +188,7 @@ export function PullRequestPortfolio({
     );
   }
 
-  if (items.length === 0) {
+  if (items.length === 0 && reviews.length === 0) {
     return (
       <EmptyState
         title="No pull requests synced yet"
@@ -113,12 +205,41 @@ export function PullRequestPortfolio({
 
   return (
     <div className="space-y-8">
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <Stat label="Pull requests" value={stats.total} />
         <Stat label="Merged" value={stats.merged} highlight />
         <Stat label="Open" value={stats.open} />
         <Stat label="Repositories" value={stats.repos} />
+        <Stat label="Reviews given" value={stats.reviewsGiven} />
       </div>
+
+      {items.length > 0 ? <PullRequestCadence cadence={cadence} /> : null}
+
+      {reviews.length > 0 ? (
+        <nav
+          className="-mx-1 flex flex-nowrap gap-2 overflow-x-auto overscroll-x-contain px-1 pb-1 [scrollbar-width:thin]"
+          aria-label="Portfolio view"
+        >
+          <FilterChip
+            active={view === "authored"}
+            onClick={() => {
+              setView("authored");
+              resetPage();
+            }}
+          >
+            Authored ({stats.total})
+          </FilterChip>
+          <FilterChip
+            active={view === "reviewed"}
+            onClick={() => {
+              setView("reviewed");
+              resetPage();
+            }}
+          >
+            Reviewed ({stats.reviewsGiven})
+          </FilterChip>
+        </nav>
+      ) : null}
 
       <div className="space-y-4 rounded-none border border-border bg-card p-4 sm:p-5">
         <label className="relative block">
@@ -139,106 +260,172 @@ export function PullRequestPortfolio({
           />
         </label>
 
-        <FilterRow label="Status">
-          {(["all", "merged", "open", "closed"] as const).map((item) => (
-            <FilterChip
-              key={item}
-              active={status === item && !mergedOnly}
-              onClick={() => {
-                setStatus(item);
-                setMergedOnly(false);
-                resetPage();
-              }}
-            >
-              {PORTFOLIO_STATUS_LABEL[item]}
-            </FilterChip>
-          ))}
-          <FilterChip
-            active={mergedOnly}
-            onClick={() => {
-              setMergedOnly(true);
-              setStatus("all");
-              resetPage();
-            }}
-          >
-            Highlight merged
-          </FilterChip>
-        </FilterRow>
+        {view === "authored" ? (
+          <>
+            <FilterRow label="Sort by">
+              {SORT_OPTIONS.map((item) => (
+                <FilterChip
+                  key={item}
+                  active={sort === item}
+                  onClick={() => {
+                    setSort(item);
+                    resetPage();
+                  }}
+                >
+                  {PORTFOLIO_SORT_LABEL[item]}
+                </FilterChip>
+              ))}
+            </FilterRow>
 
-        <FilterRow label="Language">
-          <FilterChip
-            active={language === "all"}
-            onClick={() => {
-              setLanguage("all");
-              resetPage();
-            }}
-          >
-            All
-          </FilterChip>
-          {languages.map((item) => (
-            <FilterChip
-              key={item}
-              active={language === item}
-              onClick={() => {
-                setLanguage(item);
-                resetPage();
-              }}
-            >
-              {item}
-            </FilterChip>
-          ))}
-        </FilterRow>
+            <FilterRow label="Status">
+              {(["all", "merged", "open", "closed"] as const).map((item) => (
+                <FilterChip
+                  key={item}
+                  active={status === item && !mergedOnly}
+                  onClick={() => {
+                    setStatus(item);
+                    setMergedOnly(false);
+                    resetPage();
+                  }}
+                >
+                  {PORTFOLIO_STATUS_LABEL[item]}
+                </FilterChip>
+              ))}
+              <FilterChip
+                active={mergedOnly}
+                onClick={() => {
+                  setMergedOnly(true);
+                  setStatus("all");
+                  resetPage();
+                }}
+              >
+                Highlight merged
+              </FilterChip>
+            </FilterRow>
 
-        <FilterRow label="Contribution type">
-          <FilterChip
-            active={contributionType === "all"}
-            onClick={() => {
-              setContributionType("all");
-              resetPage();
-            }}
-          >
-            All
-          </FilterChip>
-          {CONTRIBUTION_TYPES.map((item) => (
+            <FilterRow label="Language">
+              <FilterChip
+                active={language === "all"}
+                onClick={() => {
+                  setLanguage("all");
+                  resetPage();
+                }}
+              >
+                All
+              </FilterChip>
+              {languages.map((item) => (
+                <FilterChip
+                  key={item}
+                  active={language === item}
+                  onClick={() => {
+                    setLanguage(item);
+                    resetPage();
+                  }}
+                >
+                  {item}
+                </FilterChip>
+              ))}
+            </FilterRow>
+
+            <FilterRow label="Contribution type">
+              <FilterChip
+                active={contributionType === "all"}
+                onClick={() => {
+                  setContributionType("all");
+                  resetPage();
+                }}
+              >
+                All
+              </FilterChip>
+              {CONTRIBUTION_TYPES.map((item) => (
+                <FilterChip
+                  key={item}
+                  active={contributionType === item}
+                  onClick={() => {
+                    setContributionType(item);
+                    resetPage();
+                  }}
+                >
+                  {CONTRIBUTION_TYPE_LABEL[item]}
+                </FilterChip>
+              ))}
+            </FilterRow>
+          </>
+        ) : null}
+
+        {topRepos.length > 1 ? (
+          <FilterRow label="Top repositories">
             <FilterChip
-              key={item}
-              active={contributionType === item}
+              active={repo === "all"}
               onClick={() => {
-                setContributionType(item);
+                setRepo("all");
                 resetPage();
               }}
             >
-              {CONTRIBUTION_TYPE_LABEL[item]}
+              All
             </FilterChip>
-          ))}
-        </FilterRow>
+            {topRepos.map((item) => (
+              <FilterChip
+                key={item.repoFullName}
+                active={repo === item.repoFullName}
+                onClick={() => {
+                  setRepo(item.repoFullName);
+                  resetPage();
+                }}
+              >
+                {item.repoFullName} ({item.count})
+              </FilterChip>
+            ))}
+          </FilterRow>
+        ) : null}
       </div>
 
       <p className="text-sm text-muted-foreground">
-        Showing {paginated.items.length} of {paginated.total} pull requests
+        Showing {paginated.items.length} of {paginated.total}{" "}
+        {view === "authored" ? "pull requests" : "reviewed pull requests"}
       </p>
 
       {paginated.items.length === 0 ? (
         <EmptyState
-          title="No matching pull requests"
-          description="Try a different search or clear filters."
-          actionLabel="Clear filters"
-          onAction={() => {
-            setQuery("");
-            setStatus("all");
-            setLanguage("all");
-            setContributionType("all");
-            setMergedOnly(false);
-            setPage(1);
-          }}
+          title={
+            view === "authored"
+              ? "No matching pull requests"
+              : "No reviewed pull requests"
+          }
+          description={
+            view === "authored"
+              ? "Try a different search or clear filters."
+              : "PRs this builder has reviewed for others will show up here."
+          }
+          actionLabel={view === "authored" ? "Clear filters" : undefined}
+          onAction={
+            view === "authored"
+              ? () => {
+                  setQuery("");
+                  setStatus("all");
+                  setLanguage("all");
+                  setRepo("all");
+                  setContributionType("all");
+                  setMergedOnly(false);
+                  setSort("merged");
+                  setPage(1);
+                }
+              : undefined
+          }
         />
       ) : (
         <ul className="grid gap-4">
-          {paginated.items.map((item, index) => (
-            <li key={item.id}>
-              <PullRequestCard item={item} index={index} />
-            </li>
-          ))}
+          {view === "authored"
+            ? paginatedAuthored.items.map((item, index) => (
+                <li key={item.id}>
+                  <PullRequestCard item={item} index={index} />
+                </li>
+              ))
+            : paginatedReviews.items.map((item, index) => (
+                <li key={item.id}>
+                  <PullRequestReviewCard item={item} index={index} />
+                </li>
+              ))}
         </ul>
       )}
 

@@ -34,6 +34,14 @@ export const GITHUB_PR_SEARCH_MAX_PAGES = 3;
  */
 export const GITHUB_PR_ENRICH_BUDGET = 40;
 
+/**
+ * Pages of `reviewed-by:` search results to fetch per sync (100/page).
+ * No per-PR enrichment happens on these rows, so a single page is cheap and
+ * covers the common case; raise alongside GITHUB_PR_SEARCH_MAX_PAGES if
+ * reviewers report missing older reviewed PRs.
+ */
+export const GITHUB_REVIEW_SEARCH_MAX_PAGES = 1;
+
 /** Cap recent commits fetched across top repos. */
 export const GITHUB_COMMIT_REPO_LIMIT = 8;
 export const GITHUB_COMMITS_PER_REPO = 10;

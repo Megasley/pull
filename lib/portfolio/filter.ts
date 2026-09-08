@@ -1,10 +1,17 @@
 import { inferContributionType } from "@/lib/github/contribution-type";
-import type { GithubPullRequestRecord } from "@/types/github";
+import type {
+  GithubPullRequestRecord,
+  GithubReviewedPullRequestRecord,
+} from "@/types/github";
 import type {
   ContributionType,
+  PortfolioCadence,
   PortfolioFilters,
+  PortfolioRepoBreakdown,
+  PortfolioSort,
   PullRequestPortfolioItem,
   PullRequestPortfolioStatus,
+  PullRequestReviewItem,
 } from "@/types/portfolio";
 
 export const PORTFOLIO_PAGE_SIZE = 12;
@@ -27,6 +34,22 @@ export const PORTFOLIO_STATUS_LABEL: Record<
   merged: "Merged",
   open: "Open",
   closed: "Closed",
+};
+
+export const PORTFOLIO_SORT_LABEL: Record<PortfolioSort, string> = {
+  merged: "Most merged",
+  recent: "Most recent",
+  impact: "Most impactful",
+};
+
+export const DEFAULT_PORTFOLIO_FILTERS: PortfolioFilters = {
+  query: "",
+  status: "all",
+  language: "all",
+  repo: "all",
+  contributionType: "all",
+  mergedOnly: false,
+  sort: "merged",
 };
 
 export { inferContributionType };
@@ -76,6 +99,30 @@ export function toPortfolioItem(pr: GithubPullRequestRecord): PullRequestPortfol
   };
 }
 
+export function sortPortfolioItems(
+  items: PullRequestPortfolioItem[],
+  sort: PortfolioSort,
+): PullRequestPortfolioItem[] {
+  const recencyTime = (item: PullRequestPortfolioItem) =>
+    Date.parse(item.mergedAt ?? item.createdAt ?? "") || 0;
+
+  switch (sort) {
+    case "impact":
+      return [...items].sort((a, b) => {
+        const impact = b.additions + b.deletions - (a.additions + a.deletions);
+        return impact !== 0 ? impact : recencyTime(b) - recencyTime(a);
+      });
+    case "recent":
+      return [...items].sort((a, b) => recencyTime(b) - recencyTime(a));
+    case "merged":
+    default:
+      return [...items].sort((a, b) => {
+        if (a.merged !== b.merged) return Number(b.merged) - Number(a.merged);
+        return recencyTime(b) - recencyTime(a);
+      });
+  }
+}
+
 export function filterPortfolioItems(
   items: PullRequestPortfolioItem[],
   filters: PortfolioFilters,
@@ -88,6 +135,7 @@ export function filterPortfolioItems(
     if (filters.language !== "all" && item.language !== filters.language) {
       return false;
     }
+    if (filters.repo !== "all" && item.repoFullName !== filters.repo) return false;
     if (
       filters.contributionType !== "all" &&
       item.contributionType !== filters.contributionType
@@ -110,13 +158,7 @@ export function filterPortfolioItems(
     return haystack.includes(query);
   });
 
-  // Merged contributions first, then by merged/created date.
-  return [...filtered].sort((a, b) => {
-    if (a.merged !== b.merged) return Number(b.merged) - Number(a.merged);
-    const aTime = Date.parse(a.mergedAt ?? a.createdAt ?? "") || 0;
-    const bTime = Date.parse(b.mergedAt ?? b.createdAt ?? "") || 0;
-    return bTime - aTime;
-  });
+  return sortPortfolioItems(filtered, filters.sort);
 }
 
 export function paginatePortfolioItems<T>(
@@ -147,6 +189,110 @@ export function getPortfolioLanguages(items: PullRequestPortfolioItem[]) {
         .filter((language): language is string => Boolean(language)),
     ),
   ].sort((a, b) => a.localeCompare(b));
+}
+
+export function getPortfolioRepoBreakdown(
+  items: Array<{ repoFullName: string }>,
+  limit = 6,
+): PortfolioRepoBreakdown[] {
+  const counts = new Map<string, number>();
+  for (const item of items) {
+    counts.set(item.repoFullName, (counts.get(item.repoFullName) ?? 0) + 1);
+  }
+
+  return [...counts.entries()]
+    .map(([repoFullName, count]) => ({ repoFullName, count }))
+    .sort((a, b) => b.count - a.count || a.repoFullName.localeCompare(b.repoFullName))
+    .slice(0, limit);
+}
+
+/**
+ * Monthly PR cadence over the trailing 12 months (oldest -> newest), keyed
+ * off merged date when available so it reflects landed work, not just
+ * opened-but-abandoned PRs.
+ */
+export function getPortfolioCadence(
+  items: PullRequestPortfolioItem[],
+): PortfolioCadence {
+  const now = new Date();
+  const counts = new Map<string, number>();
+
+  for (const item of items) {
+    const source = item.mergedAt ?? item.createdAt;
+    if (!source) continue;
+    const date = new Date(source);
+    if (Number.isNaN(date.getTime())) continue;
+    const key = `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}`;
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+
+  const months: PortfolioCadence["months"] = [];
+  for (let offset = 11; offset >= 0; offset -= 1) {
+    const monthDate = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - offset, 1),
+    );
+    const monthKey = `${monthDate.getUTCFullYear()}-${String(monthDate.getUTCMonth() + 1).padStart(2, "0")}`;
+    months.push({
+      monthKey,
+      label: monthDate.toLocaleDateString(undefined, {
+        month: "short",
+        timeZone: "UTC",
+      }),
+      count: counts.get(monthKey) ?? 0,
+    });
+  }
+
+  return {
+    months,
+    activeMonths: months.filter((month) => month.count > 0).length,
+  };
+}
+
+export function toReviewItem(
+  pr: GithubReviewedPullRequestRecord,
+): PullRequestReviewItem {
+  return {
+    id: pr.id,
+    number: pr.number,
+    title: pr.title,
+    status: resolvePortfolioStatus(pr.state, pr.merged),
+    merged: pr.merged,
+    repoFullName: pr.repoFullName,
+    htmlUrl: pr.htmlUrl,
+    authorLogin: pr.authorLogin,
+    language: pr.language,
+    createdAt: pr.githubCreatedAt,
+    updatedAt: pr.githubUpdatedAt,
+  };
+}
+
+export function filterReviewItems(
+  items: PullRequestReviewItem[],
+  filters: { query: string; repo: string | "all" },
+): PullRequestReviewItem[] {
+  const query = filters.query.trim().toLowerCase();
+
+  const filtered = items.filter((item) => {
+    if (filters.repo !== "all" && item.repoFullName !== filters.repo) return false;
+    if (!query) return true;
+
+    const haystack = [
+      item.title,
+      item.repoFullName,
+      item.authorLogin ?? "",
+      item.language ?? "",
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    return haystack.includes(query);
+  });
+
+  return [...filtered].sort((a, b) => {
+    const aTime = Date.parse(a.updatedAt ?? a.createdAt ?? "") || 0;
+    const bTime = Date.parse(b.updatedAt ?? b.createdAt ?? "") || 0;
+    return bTime - aTime;
+  });
 }
 
 export function getPortfolioStats(items: PullRequestPortfolioItem[]) {
