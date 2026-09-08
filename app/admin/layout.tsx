@@ -1,9 +1,12 @@
 import { redirect } from "next/navigation";
 
-import { listAdminNotifications, countUnreadAdminNotifications } from "@/lib/admin/notifications";
+import {
+  listAdminNotifications,
+  countUnreadAdminNotifications,
+} from "@/lib/admin/notifications";
 import { withTimeout } from "@/lib/async/with-timeout";
+import { requireActiveAccount } from "@/lib/auth/require-active-account";
 import { isAdminRole } from "@/lib/auth/roles";
-import { bootstrapCurrentUserProfile } from "@/lib/auth/session";
 import { isDatabaseConfigured } from "@/lib/db/env";
 import { NotificationBell } from "@/components/admin/notification-bell";
 import { PageHeader } from "@/components/design-system";
@@ -17,12 +20,13 @@ import { PageHeader } from "@/components/design-system";
 const ADMIN_LAYOUT_QUERY_BUDGET_MS = 8_000;
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const profile = await bootstrapCurrentUserProfile();
+  const accountGate = await requireActiveAccount();
 
-  if (!profile) {
+  if (!accountGate.ok) {
     redirect("/sign-in?next=/admin");
   }
 
+  const profile = accountGate.profile;
   if (!isAdminRole(profile.role)) {
     return (
       <div className="mx-auto w-full max-w-3xl px-4 pt-12 pb-20 sm:px-6 lg:px-8">

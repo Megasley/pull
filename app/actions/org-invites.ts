@@ -2,9 +2,8 @@
 
 import { redirect } from "next/navigation";
 
+import { requireAdmin as requireActiveAdmin } from "@/app/actions/admin";
 import { recordAdminAction } from "@/lib/admin/audit-log";
-import { isAdminRole } from "@/lib/auth/roles";
-import { bootstrapCurrentUserProfile } from "@/lib/auth/session";
 import { isDatabaseConfigured } from "@/lib/db/env";
 import { getPartnerOrgBySlug } from "@/lib/partners/orgs";
 import {
@@ -16,9 +15,9 @@ import {
 import { getSiteUrl } from "@/lib/supabase/env";
 
 async function assertAdmin() {
-  const profile = await bootstrapCurrentUserProfile();
-  if (!profile || !isAdminRole(profile.role)) redirect("/sign-in");
-  return profile;
+  const gate = await requireActiveAdmin();
+  if (!gate.ok) redirect("/sign-in");
+  return gate.profile;
 }
 
 function requireDb() {
@@ -62,10 +61,19 @@ export async function generateOrgInviteLinkAction(
 // ─── Get current active link info (URL is not stored — only returned at generation time) ──
 
 export type OrgInviteLinkInfo =
-  | { exists: true; linkId: string; seatCap: number | null; seatCount: number; expiresAt: string | null; status: string }
+  | {
+      exists: true;
+      linkId: string;
+      seatCap: number | null;
+      seatCount: number;
+      expiresAt: string | null;
+      status: string;
+    }
   | { exists: false };
 
-export async function getOrgInviteLinkInfoAction(orgSlug: string): Promise<OrgInviteLinkInfo> {
+export async function getOrgInviteLinkInfoAction(
+  orgSlug: string,
+): Promise<OrgInviteLinkInfo> {
   await assertAdmin();
   requireDb();
 

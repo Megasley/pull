@@ -4,9 +4,8 @@ import { redirect } from "next/navigation";
 
 import { revalidatePath } from "next/cache";
 
+import { requireAdmin as requireActiveAdmin } from "@/app/actions/admin";
 import { recordAdminAction } from "@/lib/admin/audit-log";
-import { isAdminRole } from "@/lib/auth/roles";
-import { bootstrapCurrentUserProfile } from "@/lib/auth/session";
 import { isDatabaseConfigured } from "@/lib/db/env";
 import type { OrgQualificationStatus } from "@/lib/partners/memberships";
 import { setMembershipQualificationStatus } from "@/lib/partners/memberships";
@@ -30,11 +29,11 @@ function requireAdmin() {
 }
 
 async function assertAdmin() {
-  const profile = await bootstrapCurrentUserProfile();
-  if (!profile || !isAdminRole(profile.role)) {
+  const gate = await requireActiveAdmin();
+  if (!gate.ok) {
     redirect("/sign-in");
   }
-  return profile;
+  return gate.profile;
 }
 
 function parseSkillsInput(raw: string): string[] {
@@ -117,7 +116,13 @@ export async function updatePartnerOrgAction(
     return { error: "At least one skill is required." };
   }
 
-  const org = await updatePartnerOrg(orgId, { name, description, website, logoUrl, status });
+  const org = await updatePartnerOrg(orgId, {
+    name,
+    description,
+    website,
+    logoUrl,
+    status,
+  });
   await setOrgSkills(org.id, skills);
 
   await recordAdminAction({
@@ -198,10 +203,12 @@ function parseOpportunityForm(formData: FormData): ParsedOpportunityForm {
     ? (difficultyRaw as Difficulty)
     : "beginner";
   const skills = parseSkillsInput((formData.get("skills") as string) ?? "");
-  const contributionType = (formData.get("contributionType") as string)?.trim() || undefined;
+  const contributionType =
+    (formData.get("contributionType") as string)?.trim() || undefined;
   const repositoryUrl = (formData.get("repositoryUrl") as string)?.trim() || undefined;
   const issueUrl = (formData.get("issueUrl") as string)?.trim() || undefined;
-  const whyRecommended = (formData.get("whyRecommended") as string)?.trim() || undefined;
+  const whyRecommended =
+    (formData.get("whyRecommended") as string)?.trim() || undefined;
   const isPinned = formData.get("isPinned") === "on";
 
   if (!title) {
@@ -246,7 +253,11 @@ export async function createOpportunityAction(
   await recordAdminAction({
     actorUserId: actor.id,
     action: "org_opportunity_created",
-    metadata: { organizationId, opportunityId: opportunity.id, title: opportunity.title },
+    metadata: {
+      organizationId,
+      opportunityId: opportunity.id,
+      title: opportunity.title,
+    },
   });
 
   revalidatePath(`/admin/partners/${orgSlug}`);

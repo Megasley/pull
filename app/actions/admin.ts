@@ -9,26 +9,30 @@ import {
   suspendUser,
   updateUserRole,
 } from "@/lib/admin/repository";
+import { requireActiveAccount } from "@/lib/auth/require-active-account";
 import { isAdminRole } from "@/lib/auth/roles";
-import { bootstrapCurrentUserProfile, getCurrentUser } from "@/lib/auth/session";
+import { getCurrentUser } from "@/lib/auth/session";
 import type { UserRole } from "@/types/submission";
 
 const VALID_ROLES: UserRole[] = ["builder", "reviewer", "admin"];
 
 export async function requireAdmin() {
-  const user = await getCurrentUser();
+  const accountGate = await requireActiveAccount();
 
+  if (!accountGate.ok) {
+    return accountGate;
+  }
+
+  if (!isAdminRole(accountGate.profile.role)) {
+    return { ok: false as const, reason: "forbidden" as const };
+  }
+
+  const user = await getCurrentUser();
   if (!user) {
     return { ok: false as const, reason: "unauthenticated" as const };
   }
 
-  const profile = await bootstrapCurrentUserProfile();
-
-  if (!profile || !isAdminRole(profile.role)) {
-    return { ok: false as const, reason: "forbidden" as const };
-  }
-
-  return { ok: true as const, user, profile };
+  return { ok: true as const, user, profile: accountGate.profile };
 }
 
 function roleErrorMessage(reason: string) {
@@ -81,6 +85,10 @@ export async function updateUserRoleAction(userId: string, role: UserRole) {
 
 function moderationErrorMessage(reason: string) {
   switch (reason) {
+    case "last_admin":
+      return "Cannot suspend or ban the last active admin.";
+    case "self_moderation":
+      return "You cannot suspend or ban your own account. Ask another admin.";
     case "not_found":
       return "User not found.";
     default:
