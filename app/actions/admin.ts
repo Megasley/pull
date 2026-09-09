@@ -5,6 +5,8 @@ import { revalidatePath } from "next/cache";
 import { refreshAdminMetricsSnapshot } from "@/lib/admin/metrics-snapshot";
 import {
   banUser,
+  deleteUser,
+  getAdminUserById,
   restoreUser,
   suspendUser,
   updateUserRole,
@@ -171,6 +173,66 @@ export async function restoreUserAction(userId: string) {
   revalidatePath("/admin/users");
   revalidatePath(`/admin/users/${userId}`);
   return { ok: true as const, user: result.user };
+}
+
+function deleteUserErrorMessage(reason: string) {
+  switch (reason) {
+    case "not_found":
+      return "User not found.";
+    case "self_delete":
+      return "You cannot delete your own account. Ask another admin.";
+    case "last_admin":
+      return "Cannot delete the last remaining admin.";
+    default:
+      return "Could not delete user.";
+  }
+}
+
+/**
+ * Requires the admin to type the user's exact username as a confirmation —
+ * checked server-side, not just in the UI, since this is irreversible.
+ */
+export async function deleteUserAction(userId: string, confirmUsername: string) {
+  const gate = await requireAdmin();
+  if (!gate.ok) {
+    return { ok: false as const, reason: gate.reason };
+  }
+
+  const target = await getAdminUserById(userId);
+  if (!target) {
+    return {
+      ok: false as const,
+      reason: "not_found" as const,
+      error: deleteUserErrorMessage("not_found"),
+    };
+  }
+
+  if (confirmUsername.trim() !== target.username) {
+    return {
+      ok: false as const,
+      reason: "confirmation_mismatch" as const,
+      error: "Type the username exactly to confirm.",
+    };
+  }
+
+  const result = await deleteUser({ userId, actorUserId: gate.user.id });
+
+  if (!result.ok) {
+    return {
+      ok: false as const,
+      reason: result.reason,
+      error: deleteUserErrorMessage(result.reason),
+    };
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/admin/users");
+
+  return {
+    ok: true as const,
+    authDeleted: result.authDeleted,
+    authDeleteError: result.authDeleteError,
+  };
 }
 
 /** Manually recompute launch/funnel metrics snapshot (same work as the cron). */

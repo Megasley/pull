@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
+import { AdminUserDangerZone } from "@/components/admin/admin-user-danger-zone";
 import { AdminUserModeration } from "@/components/admin/admin-user-moderation";
 import { AdminUserRoleSelect } from "@/components/admin/admin-user-role-select";
 import { AttentionBanner, type AttentionItem } from "@/components/admin/attention-banner";
@@ -91,6 +92,7 @@ export default async function AdminUserDetailPage({
     { id: "impact", label: "Impact" },
     { id: "learning", label: "Learning" },
     { id: "system", label: "System" },
+    { id: "danger", label: "Danger zone" },
   ];
 
   return (
@@ -171,6 +173,14 @@ export default async function AdminUserDetailPage({
                 ))}
               </ul>
             )}
+          </div>
+
+          <div id="danger" className="scroll-mt-16">
+            <AdminUserDangerZone
+              userId={user.id}
+              username={user.username}
+              isSelf={user.id === profile.id}
+            />
           </div>
         </section>
 

@@ -13,6 +13,7 @@ import { getDb, getPostgresClient, withDbRetry } from "@/lib/db";
 import { isDatabaseConfigured } from "@/lib/db/env";
 import { projectSubmissions, projects, users } from "@/lib/db/schema";
 import { getAllProjects } from "@/lib/projects/catalog";
+import { createAdminClient, isSupabaseAdminConfigured } from "@/lib/supabase/admin";
 import type { SubmissionStatus, UserRole } from "@/types/submission";
 
 /** Soft budget so /admin never burns a full Vercel function timeout. */
@@ -526,6 +527,108 @@ export async function banUser(input: {
 
 export async function restoreUser(input: { userId: string; actorUserId: string }) {
   return applyModeration({ ...input, action: "restore" });
+}
+
+export type DeleteUserResult =
+  | { ok: true; authDeleted: boolean; authDeleteError?: string }
+  | {
+      ok: false;
+      reason: "database_unconfigured" | "not_found" | "self_delete" | "last_admin";
+    };
+
+/**
+ * Permanently deletes a user's public.users row (cascading GitHub sync data,
+ * milestones, achievements, submissions, org memberships, and everything
+ * else FK'd to it with onDelete: cascade — see lib/db/schema/*.ts), then
+ * best-effort removes their Supabase Auth login too.
+ *
+ * Those two deletes are NOT tied by a database foreign key in this schema
+ * (public.users.id isn't FK'd to auth.users.id), so this function does both
+ * explicitly, public.users first: if the Auth deletion then fails (e.g. no
+ * service role key configured), the user is left signed-in but with no
+ * profile — the least broken state, since ensureBuilderProfile() will just
+ * silently recreate a fresh row for them on next visit rather than leaving
+ * the app in an inconsistent one. See lib/auth/ensure-builder-profile.ts.
+ */
+export async function deleteUser(input: {
+  userId: string;
+  actorUserId: string;
+}): Promise<DeleteUserResult> {
+  if (!isDatabaseConfigured()) {
+    return { ok: false, reason: "database_unconfigured" };
+  }
+
+  const db = getDb();
+  const existingRows = await db
+    .select()
+    .from(users)
+    .where(eq(users.id, input.userId))
+    .limit(1);
+
+  const existing = existingRows[0];
+  if (!existing) {
+    return { ok: false, reason: "not_found" };
+  }
+
+  if (input.userId === input.actorUserId) {
+    return { ok: false, reason: "self_delete" };
+  }
+
+  if (existing.role === "admin") {
+    const admins = await countAdmins();
+    if (admins <= 1) {
+      return { ok: false, reason: "last_admin" };
+    }
+  }
+
+  const [deleted] = await db.delete(users).where(eq(users.id, input.userId)).returning();
+
+  if (!deleted) {
+    return { ok: false, reason: "not_found" };
+  }
+
+  let authDeleted = false;
+  let authDeleteError: string | undefined;
+
+  if (isSupabaseAdminConfigured()) {
+    try {
+      const admin = createAdminClient();
+      const { error } = await admin.auth.admin.deleteUser(input.userId);
+      if (error) {
+        authDeleteError = error.message;
+      } else {
+        authDeleted = true;
+      }
+    } catch (error) {
+      authDeleteError = error instanceof Error ? error.message : "Unknown error.";
+    }
+  } else {
+    authDeleteError = "SUPABASE_SERVICE_ROLE_KEY not configured.";
+  }
+
+  // Written after both delete attempts, with targetUserId already null —
+  // the FK can't reference a row that no longer exists, so the full
+  // identifying snapshot lives in metadata instead. This is the only
+  // remaining record of who this was.
+  await recordAdminAction({
+    actorUserId: input.actorUserId,
+    targetUserId: null,
+    action: "delete_user",
+    metadata: {
+      deletedUserId: existing.id,
+      username: existing.username,
+      displayName: existing.displayName,
+      githubUsername: existing.githubUsername,
+      email: existing.email,
+      role: existing.role,
+      accountStatus: existing.accountStatus,
+      createdAt: existing.createdAt,
+      authDeleted,
+      authDeleteError: authDeleteError ?? null,
+    },
+  });
+
+  return { ok: true, authDeleted, authDeleteError };
 }
 
 export type CronSyncHealth = {
