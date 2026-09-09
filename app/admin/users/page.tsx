@@ -12,6 +12,7 @@ import { bootstrapCurrentUserProfile } from "@/lib/auth/session";
 import { isDatabaseConfigured } from "@/lib/db/env";
 import { getCountryInfo } from "@/lib/geo/countries";
 import { getUserImpactBadges } from "@/lib/impact/user-detail";
+import { cn } from "@/lib/utils";
 
 export const metadata = {
   title: "Admin · Users",
@@ -19,7 +20,7 @@ export const metadata = {
 };
 
 type AdminUsersPageProps = {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; deleted?: string; authWarning?: string }>;
 };
 
 export default async function AdminUsersPage({ searchParams }: AdminUsersPageProps) {
@@ -41,7 +42,7 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
     );
   }
 
-  const { q } = await searchParams;
+  const { q, deleted, authWarning } = await searchParams;
   const query = q?.trim() ?? "";
 
   const { users, total } = isDatabaseConfigured()
@@ -63,6 +64,21 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
           </Button>
         }
       />
+
+      {deleted ? (
+        <div
+          className={cn(
+            "mt-6 border px-3 py-2.5 font-mono text-xs",
+            authWarning
+              ? "border-warning/40 bg-warning/10 text-warning"
+              : "border-success/40 bg-success/10 text-success",
+          )}
+        >
+          {authWarning
+            ? `@${deleted} was deleted, but their Supabase Auth login could not be removed automatically — remove it manually from Supabase → Authentication → Users.`
+            : `@${deleted} was permanently deleted.`}
+        </div>
+      ) : null}
 
       <form className="mt-8" action="/admin/users" method="get">
         <label htmlFor="admin-user-search" className="sr-only">

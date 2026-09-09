@@ -4,7 +4,12 @@ import { getDb } from "@/lib/db";
 import { isDatabaseConfigured } from "@/lib/db/env";
 import { adminAuditLog } from "@/lib/db/schema";
 
-export type AdminAuditAction = "role_change" | "suspend" | "ban" | "restore";
+export type AdminAuditAction =
+  | "role_change"
+  | "suspend"
+  | "ban"
+  | "restore"
+  | "delete_user";
 
 export type AdminAuditEntry = {
   id: string;
