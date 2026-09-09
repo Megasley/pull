@@ -101,6 +101,7 @@ export function UserImpactPanel({ impact }: { impact: UserImpactSummary }) {
                 <span className="font-mono text-[11px] text-muted-foreground">
                   {pr.merged ? "merged" : pr.draft ? "draft" : pr.state}
                   {pr.isOwnRepo ? " · own repo" : ""}
+                  {pr.isPracticeRepo ? " · practice repo" : ""}
                   {pr.attributedPartnerName ? ` · via ${pr.attributedPartnerName}` : ""}
                   {pr.attributedViaOpportunity ? " · via tracked opportunity" : ""}
                 </span>

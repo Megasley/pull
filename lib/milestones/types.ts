@@ -3,7 +3,12 @@ export type MilestoneType =
   | "first_pr_opened"
   | "first_pr_submitted"
   | "first_pr_merged"
-  | "first_verified_contribution";
+  | "first_verified_contribution"
+  | "practice_first_pr_opened"
+  | "practice_first_pr_submitted"
+  | "practice_first_pr_merged"
+  | "first_contribution_started"
+  | "first_contribution_completed";
 
 export const MILESTONE_TYPES: readonly MilestoneType[] = [
   "first_opportunity_explored",
@@ -11,6 +16,11 @@ export const MILESTONE_TYPES: readonly MilestoneType[] = [
   "first_pr_submitted",
   "first_pr_merged",
   "first_verified_contribution",
+  "practice_first_pr_opened",
+  "practice_first_pr_submitted",
+  "practice_first_pr_merged",
+  "first_contribution_started",
+  "first_contribution_completed",
 ];
 
 /** A candidate milestone to attempt recording. Idempotency happens at the

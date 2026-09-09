@@ -21,6 +21,12 @@ export type PrSyncResult = {
  * observed, or a brand-new PR discovered already non-draft (it never went
  * through a draft phase Pull witnessed) — the milestone is about the PR
  * being ready for review, not about literally catching the transition.
+ *
+ * A PR against the First Contribution practice repository (input.isPracticeRepo)
+ * emits the separate practice_first_pr_* milestone types instead of the real
+ * first_pr_* ones, and never emits first_verified_contribution — practice
+ * activity must never satisfy or inflate the real contributor milestones.
+ * See lib/first-contribution/practice-repo.ts and lib/db/schema/enums.ts.
  */
 export function derivePrMilestoneCandidates(
   results: PrSyncResult[],
@@ -36,12 +42,16 @@ export function derivePrMilestoneCandidates(
       pullRequestNumber: input.number,
     };
 
+    const [openedType, submittedType, mergedType] = input.isPracticeRepo
+      ? (["practice_first_pr_opened", "practice_first_pr_submitted", "practice_first_pr_merged"] as const)
+      : (["first_pr_opened", "first_pr_submitted", "first_pr_merged"] as const);
+
     const isNew = !previous;
 
     if (isNew && input.githubCreatedAt) {
       candidates.push({
         ...base,
-        milestoneType: "first_pr_opened",
+        milestoneType: openedType,
         occurredAt: input.githubCreatedAt,
       });
     }
@@ -54,7 +64,7 @@ export function derivePrMilestoneCandidates(
     if (transitionedToReady || discoveredReady) {
       candidates.push({
         ...base,
-        milestoneType: "first_pr_submitted",
+        milestoneType: submittedType,
         // No exact "became ready" timestamp exists (same reasoning as the
         // ready_for_review lifecycle event) — use the discovery/observation
         // time, not an invented one.
@@ -67,11 +77,11 @@ export function derivePrMilestoneCandidates(
     if (justMerged && input.githubMergedAt) {
       candidates.push({
         ...base,
-        milestoneType: "first_pr_merged",
+        milestoneType: mergedType,
         occurredAt: input.githubMergedAt,
       });
 
-      if (!input.isOwnRepo) {
+      if (!input.isOwnRepo && !input.isPracticeRepo) {
         candidates.push({
           ...base,
           milestoneType: "first_verified_contribution",

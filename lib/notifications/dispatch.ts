@@ -252,6 +252,7 @@ export async function notifyWelcome(input: {
     react: WelcomeEmail({
       displayName: input.displayName,
       href: appUrl("/dashboard"),
+      firstContributionHref: appUrl("/first-contribution"),
     }),
   });
 }

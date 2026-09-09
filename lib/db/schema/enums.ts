@@ -134,13 +134,24 @@ export const eventTimestampSourceEnum = pgEnum("event_timestamp_source", [
   "sync_observed",
 ]);
 
-/** First-time contribution milestones. See lib/milestones/. */
+/** First-time contribution milestones. See lib/milestones/.
+ *  The practice_* values are a deliberately separate track for First
+ *  Contribution practice-repo activity — see lib/first-contribution/ — so a
+ *  user can hold both a practice_first_pr_merged and a real first_pr_merged
+ *  row without the unique(user_id, milestone_type) index colliding.
+ *  first_contribution_started/completed cover the journey itself (all 10
+ *  steps), independent of practice-repo PR activity. */
 export const milestoneTypeEnum = pgEnum("milestone_type", [
   "first_opportunity_explored",
   "first_pr_opened",
   "first_pr_submitted",
   "first_pr_merged",
   "first_verified_contribution",
+  "practice_first_pr_opened",
+  "practice_first_pr_submitted",
+  "practice_first_pr_merged",
+  "first_contribution_started",
+  "first_contribution_completed",
 ]);
 
 export const opportunitySourceTypeEnum = pgEnum("opportunity_source_type", [

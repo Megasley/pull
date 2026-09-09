@@ -81,12 +81,16 @@ function buildSetupItems(
     data.openPullRequests.length === 0 &&
     data.contributingRepos.length === 0
   ) {
+    // Routes through the guided First Contribution journey rather than
+    // straight into /issues — someone with zero PRs and zero contributing
+    // repos hasn't opened a real one yet, which is exactly who that guide
+    // is for. /issues is still where they end up, just after the on-ramp.
     items.push({
       id: "contribute",
-      title: "Open a contribution",
-      description: "Find an issue, open a PR, then sync to track it here.",
-      href: "/issues",
-      actionLabel: "Find issues",
+      title: "Make your first contribution",
+      description: "New to open source? Walk through forking, changing, and opening your first PR.",
+      href: "/first-contribution",
+      actionLabel: "Start guide",
       icon: "branch",
     });
   }

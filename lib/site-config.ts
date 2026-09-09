@@ -111,11 +111,7 @@ export const primaryNav = [
     items: [
       { title: "Open Source Projects", href: "/discover" },
       { title: "Issues", href: "/issues" },
-      {
-        title: "Open Source Guide",
-        href: "https://opensource.guide/",
-        external: true,
-      },
+      { title: "First Contribution", href: "/first-contribution" },
       { title: "Bounties", comingSoon: true },
     ],
   },
@@ -194,6 +190,7 @@ export const footerNav = [
     links: [
       { title: "Open Source Projects", href: "/discover" },
       { title: "Issues", href: "/issues" },
+      { title: "First Contribution", href: "/first-contribution" },
       { title: "Support", href: "/support" },
       { title: "Feedback", href: siteConfig.feedbackUrl },
     ],

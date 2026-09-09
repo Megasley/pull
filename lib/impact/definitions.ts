@@ -17,17 +17,22 @@
 export type ContributionFact = {
   merged: boolean;
   isOwnRepo: boolean;
+  /** True for Pull's First Contribution practice repository. Optional so
+   *  existing call sites that predate this field don't need updating —
+   *  defaults to not-practice. See lib/first-contribution/practice-repo.ts. */
+  isPracticeRepo?: boolean;
 };
 
 /**
  * A "qualifying contribution" is a merged pull request into a repository
- * the contributor does not themselves own. This excludes personal-project
- * PRs (e.g. merging your own PR into your own fork) from impact-reporting
- * counts, while leaving the achievement/XP system's broader definition
- * untouched.
+ * the contributor does not themselves own, and that isn't Pull's own First
+ * Contribution practice repository. This excludes personal-project PRs
+ * (e.g. merging your own PR into your own fork) and practice-repo activity
+ * (a training exercise, not external impact) from impact-reporting counts,
+ * while leaving the achievement/XP system's broader definition untouched.
  */
 export function isQualifyingContribution(pr: ContributionFact): boolean {
-  return pr.merged && !pr.isOwnRepo;
+  return pr.merged && !pr.isOwnRepo && !pr.isPracticeRepo;
 }
 
 /** A developer with at least one qualifying merged contribution. */

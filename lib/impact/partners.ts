@@ -155,7 +155,11 @@ async function partnerTimeToFirstContribution(
     eq(githubPullRequests.attributedPartnerId, organizationId),
     inArray(githubPullRequests.userId, userIds),
     ...(mergedOnly
-      ? [eq(githubPullRequests.merged, true), eq(githubPullRequests.isOwnRepo, false)]
+      ? [
+          eq(githubPullRequests.merged, true),
+          eq(githubPullRequests.isOwnRepo, false),
+          eq(githubPullRequests.isPracticeRepo, false),
+        ]
       : []),
   ];
 

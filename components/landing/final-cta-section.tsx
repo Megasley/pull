@@ -36,13 +36,21 @@ export function FinalCtaSection() {
           </p>
         </Reveal>
         <Reveal variant="zoom" delayMs={210}>
-          <Button
-            size="lg"
-            asChild
-            className="h-12 w-full border-ink bg-ink px-6 text-[var(--background)] hover:bg-ink/90 sm:w-auto"
-          >
-            <Link href="/roadmaps">./start-building</Link>
-          </Button>
+          <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+            <Button
+              size="lg"
+              asChild
+              className="h-12 w-full border-ink bg-ink px-6 text-[var(--background)] hover:bg-ink/90 sm:w-auto"
+            >
+              <Link href="/roadmaps">./start-building</Link>
+            </Button>
+            <Link
+              href="/first-contribution"
+              className="font-mono text-sm text-ink/70 underline underline-offset-4 hover:text-ink"
+            >
+              or make your first PR today →
+            </Link>
+          </div>
         </Reveal>
       </SiteContainer>
     </section>

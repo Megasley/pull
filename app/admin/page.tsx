@@ -10,6 +10,7 @@ import {
   RetentionImpactStats,
   type ImpactOverviewData,
 } from "@/components/admin/impact-overview-panel";
+import { FirstContributionFunnelPanel } from "@/components/admin/first-contribution-funnel-panel";
 import { RefreshAdminMetricsButton } from "@/components/admin/refresh-admin-metrics-button";
 import { AdminSectionNav } from "@/components/admin/section-nav";
 import { EmptyState, PageHeader } from "@/components/design-system";
@@ -32,6 +33,7 @@ import type {
 import { isAdminRole } from "@/lib/auth/roles";
 import { bootstrapCurrentUserProfile } from "@/lib/auth/session";
 import { isDatabaseConfigured } from "@/lib/db/env";
+import { getFirstContributionFunnel, type FirstContributionFunnel } from "@/lib/first-contribution/funnel";
 import {
   countActiveContributors,
   countCountriesAmongContributors,
@@ -123,13 +125,20 @@ export default async function AdminOverviewPage({
   // slice of loadAdminLiveOps, via settleLive). Bound it here so a hung
   // connection degrades this section instead of silently riding the whole
   // request up to maxDuration with no error and no console output.
-  const [live, snapshotResult] = await Promise.all([
+  const [live, snapshotResult, firstContributionFunnelResult] = await Promise.all([
     loadAdminLiveOps(),
     withTimeoutResult(getAdminMetricsSnapshot(), ADMIN_QUERY_BUDGET_MS, "admin.snapshot"),
+    withTimeoutResult(
+      getFirstContributionFunnel(),
+      ADMIN_QUERY_BUDGET_MS,
+      "admin.firstContributionFunnel",
+    ),
   ]);
   const snapshot: AdminMetricsSnapshotView = snapshotResult.ok
     ? snapshotResult.value
     : { status: "missing" };
+  const firstContributionFunnel: FirstContributionFunnel | null =
+    firstContributionFunnelResult.ok ? firstContributionFunnelResult.value : null;
 
   // Isolated from the two calls above and time-boxed: these are exactly the
   // shape of per-user join that previously timed out inside the
@@ -270,6 +279,7 @@ export default async function AdminOverviewPage({
     { id: "retention", label: "Retention" },
     { id: "review", label: "Review" },
     { id: "learning", label: "Learning" },
+    { id: "first-contribution", label: "First Contribution" },
     { id: "system", label: "System" },
     { id: "users", label: "Users" },
   ];
@@ -472,6 +482,18 @@ export default async function AdminOverviewPage({
             </div>
           )}
         </div>
+      </AdminDetailsSection>
+
+      <AdminDetailsSection
+        id="first-contribution"
+        title="First Contribution funnel"
+        description="Computed live from milestone_events · where people drop off between starting and their first merged practice PR."
+      >
+        {firstContributionFunnel ? (
+          <FirstContributionFunnelPanel data={firstContributionFunnel} />
+        ) : (
+          <UnavailableBlock label="First Contribution funnel" />
+        )}
       </AdminDetailsSection>
 
       <AdminDetailsSection id="system" title="System" description="Platform config and background sync health.">

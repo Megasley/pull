@@ -21,6 +21,7 @@ function baseInput(overrides: Partial<PullRequestSyncInput> = {}): PullRequestSy
     githubClosedAt: null,
     githubMergedAt: null,
     isOwnRepo: false,
+    isPracticeRepo: false,
     attributedPartnerId: null,
     attributedOpportunityEventId: null,
     ...overrides,
@@ -172,6 +173,61 @@ describe("milestones/pr-signals — derivePrMilestoneCandidates", () => {
     const first = derivePrMilestoneCandidates(results, "user-1");
     const second = derivePrMilestoneCandidates(results, "user-1");
     expect(second).toEqual(first);
+  });
+
+  it("a brand new practice-repo PR yields practice_first_pr_opened + practice_first_pr_submitted, never the real types", () => {
+    const results: PrSyncResult[] = [
+      {
+        input: baseInput({
+          repoFullName: "Megasley/pull-first-contribution",
+          isPracticeRepo: true,
+          draft: false,
+        }),
+        pullRequestId: "pr-1",
+        previous: null,
+      },
+    ];
+    expect(types(derivePrMilestoneCandidates(results, "user-1"))).toEqual([
+      "practice_first_pr_opened",
+      "practice_first_pr_submitted",
+    ]);
+  });
+
+  it("a practice-repo merge yields practice_first_pr_merged only — never first_pr_merged or first_verified_contribution", () => {
+    const results: PrSyncResult[] = [
+      {
+        input: baseInput({
+          repoFullName: "Megasley/pull-first-contribution",
+          isPracticeRepo: true,
+          merged: true,
+          githubMergedAt: "2025-02-01T00:00:00.000Z",
+        }),
+        pullRequestId: "pr-1",
+        previous: existing({ merged: false }),
+      },
+    ];
+    expect(types(derivePrMilestoneCandidates(results, "user-1"))).toEqual([
+      "practice_first_pr_merged",
+    ]);
+  });
+
+  it("a practice-repo PR never satisfies the real first_pr_opened milestone, even mixed in the same sync batch as a real PR", () => {
+    const results: PrSyncResult[] = [
+      { input: baseInput({ isPracticeRepo: true }), pullRequestId: "pr-1", previous: null },
+      {
+        input: baseInput({
+          githubId: 2,
+          repoFullName: "bitcoin/bitcoin",
+          isPracticeRepo: false,
+        }),
+        pullRequestId: "pr-2",
+        previous: null,
+      },
+    ];
+    const emitted = types(derivePrMilestoneCandidates(results, "user-1"));
+    expect(emitted).toContain("first_pr_opened");
+    expect(emitted).toContain("practice_first_pr_opened");
+    expect(emitted.filter((t) => t === "first_pr_opened")).toHaveLength(1);
   });
 
   it("carries repo/PR context onto every candidate", () => {

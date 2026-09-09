@@ -12,6 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { SubmissionStatusBadge } from "@/components/projects/submission-status-badge";
+import { DIFFICULTY_BADGE_CLASS } from "@/lib/design/difficulty-color";
 import { cn } from "@/lib/utils";
 import type { ProjectCatalogItem } from "@/types/project";
 import type { SubmissionStatus } from "@/types/submission";
@@ -21,12 +22,6 @@ const difficultyLabels: Record<RoadmapDifficulty, string> = {
   beginner: "Beginner",
   intermediate: "Intermediate",
   advanced: "Advanced",
-};
-
-const difficultyClass: Record<RoadmapDifficulty, string> = {
-  beginner: "border-ink/20 bg-signal text-signal-foreground",
-  intermediate: "border-ink/30 bg-ink/10 text-ink",
-  advanced: "border-ink bg-ink text-[var(--background)]",
 };
 
 type ProjectCardProps = {
@@ -54,9 +49,10 @@ export function ProjectCard({
       <CardHeader className="space-y-3">
         <div className="flex flex-wrap items-center gap-2">
           <Badge
+            variant="outline"
             className={cn(
               "rounded-none font-mono text-[11px] tracking-[0.12em] uppercase",
-              difficultyClass[project.difficulty],
+              DIFFICULTY_BADGE_CLASS[project.difficulty],
             )}
           >
             {difficultyLabels[project.difficulty]}

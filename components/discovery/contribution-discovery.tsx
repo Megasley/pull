@@ -6,6 +6,7 @@ import { Search } from "lucide-react";
 import { EmptyState } from "@/components/design-system";
 import { DiscoveryRepoCard } from "@/components/discovery/discovery-repo-card";
 import { Button } from "@/components/ui/button";
+import { DIFFICULTY_DOT_CLASS } from "@/lib/design/difficulty-color";
 import {
   DISCOVERY_DIFFICULTY_OPTIONS,
   DISCOVERY_PAGE_SIZE,
@@ -213,6 +214,12 @@ export function ContributionDiscovery({
                   resetPage();
                 }}
               >
+                {item !== "all" ? (
+                  <span
+                    className={cn("mr-1.5 inline-block size-1.5 rounded-full", DIFFICULTY_DOT_CLASS[item])}
+                    aria-hidden
+                  />
+                ) : null}
                 {difficultyLabels[item]}
               </FilterChip>
             ))}

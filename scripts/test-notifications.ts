@@ -59,6 +59,7 @@ async function main() {
       react: WelcomeEmail({
         displayName: "Megasley",
         href: "https://pullos.dev/dashboard",
+        firstContributionHref: "https://pullos.dev/first-contribution",
       }),
     }),
   });

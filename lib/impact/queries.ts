@@ -170,7 +170,11 @@ export async function countDevelopersWhoExploredOpportunities(
 // ─── 6-8. Contribution-based developer counts ───────────────────────────────
 
 function qualifyingConditions() {
-  return [eq(githubPullRequests.merged, true), eq(githubPullRequests.isOwnRepo, false)];
+  return [
+    eq(githubPullRequests.merged, true),
+    eq(githubPullRequests.isOwnRepo, false),
+    eq(githubPullRequests.isPracticeRepo, false),
+  ];
 }
 
 export async function countDevelopersWhoOpenedPR(filters: ImpactFilters = {}): Promise<number> {
