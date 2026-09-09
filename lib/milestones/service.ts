@@ -3,8 +3,19 @@ import { inArray } from "drizzle-orm";
 import { getDb, withDbRetry } from "@/lib/db";
 import { isDatabaseConfigured } from "@/lib/db/env";
 import { adminNotifications, milestoneEvents, users } from "@/lib/db/schema";
+import type { FirstContributionEventName } from "@/lib/first-contribution/analytics";
+import { trackFirstContributionEvent } from "@/lib/first-contribution/analytics-server";
 import { buildMilestoneCopy } from "./copy";
 import type { MilestoneCandidate, MilestoneEventRecord, MilestoneType } from "./types";
+
+/** The only milestone types First Contribution cares about — everything else
+ *  (real first_pr_*, first_verified_contribution, ...) has no First
+ *  Contribution analytics event and is left alone here. */
+const PRACTICE_PR_MILESTONE_EVENTS: Partial<Record<MilestoneType, FirstContributionEventName>> = {
+  practice_first_pr_opened: "first_contribution_pr_opened",
+  practice_first_pr_submitted: "first_contribution_pr_submitted",
+  practice_first_pr_merged: "first_contribution_pr_merged",
+};
 
 /** Keep the earliest-occurring candidate per (user, milestone type) — if a
  *  sync batch discovers several qualifying PRs at once (e.g. a user's very
@@ -60,6 +71,10 @@ function toRecord(row: typeof milestoneEvents.$inferSelect): MilestoneEventRecor
  * for a months-old backfilled event would be misleading and would flood the
  * notification bell in one batch. Live callers (github sync, opportunity
  * events) always want notify: true, the default.
+ *
+ * The same `notify` flag gates First Contribution's practice-PR analytics
+ * events (first_contribution_pr_opened/submitted/merged) for the same
+ * reason — a backfill run must not emit events that look like live activity.
  */
 export async function recordMilestones(
   candidates: MilestoneCandidate[],
@@ -102,9 +117,22 @@ export async function recordMilestones(
 
   if (created.length > 0 && notify) {
     await createAdminNotifications(created);
+    await trackPracticePrEvents(created);
   }
 
   return created;
+}
+
+async function trackPracticePrEvents(events: MilestoneEventRecord[]): Promise<void> {
+  for (const event of events) {
+    const eventName = PRACTICE_PR_MILESTONE_EVENTS[event.milestoneType];
+    if (!eventName) continue;
+
+    await trackFirstContributionEvent(eventName, {
+      repository: event.repository,
+      pullRequestNumber: event.pullRequestNumber,
+    });
+  }
 }
 
 async function createAdminNotifications(events: MilestoneEventRecord[]): Promise<void> {

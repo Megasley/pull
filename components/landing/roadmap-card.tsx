@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Clock, FolderKanban, Lock } from "lucide-react";
+import { ArrowRight, Clock, FolderKanban } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useRoadmapProgress } from "@/hooks/use-roadmap-progress";
+import { DIFFICULTY_BADGE_CLASS } from "@/lib/design/difficulty-color";
 import type { LandingRoadmap } from "@/lib/landing-data";
 import { calculateRoadmapProgress } from "@/lib/roadmap/progress";
 import { getRoadmapFromRegistry } from "@/lib/roadmap/prerequisites";
@@ -49,7 +50,6 @@ function roadmapCtaLabel(completed: number, total: number): string {
 
 export function RoadmapCard({ roadmap, className }: RoadmapCardProps) {
   const isComingSoon = roadmap.status === "coming-soon";
-  const isLocked = Boolean(roadmap.prerequisite);
   const registryRoadmap = getRoadmapFromRegistry(roadmap.slug);
   const { completedIds } = useRoadmapProgress(
     roadmap.slug,
@@ -71,25 +71,17 @@ export function RoadmapCard({ roadmap, className }: RoadmapCardProps) {
       )}
     >
       <CardHeader>
-        <div className="flex items-start justify-between gap-3">
-          <div className="space-y-1">
-            <CardDescription className="font-mono text-[11px] tracking-[0.12em] uppercase">
-              {isComingSoon
-                ? "Coming soon"
-                : progress.completed > 0
-                  ? `${progress.percentage}% complete`
-                  : "Available now"}
-            </CardDescription>
-            <CardTitle className="text-xl font-bold tracking-[-0.03em]">
-              {roadmap.title}
-            </CardTitle>
-          </div>
-          {isLocked ? (
-            <Badge variant="outline" className="shrink-0 gap-1">
-              <Lock className="size-3" aria-hidden />
-              Gated
-            </Badge>
-          ) : null}
+        <div className="space-y-1">
+          <CardDescription className="font-mono text-[11px] tracking-[0.12em] uppercase">
+            {isComingSoon
+              ? "Coming soon"
+              : progress.completed > 0
+                ? `${progress.percentage}% complete`
+                : "Available now"}
+          </CardDescription>
+          <CardTitle className="text-xl font-bold tracking-[-0.03em]">
+            {roadmap.title}
+          </CardTitle>
         </div>
         <CardDescription className="text-sm leading-relaxed text-muted-foreground">
           {roadmap.description}
@@ -98,7 +90,9 @@ export function RoadmapCard({ roadmap, className }: RoadmapCardProps) {
 
       <CardContent className="flex flex-1 flex-col space-y-4">
         <div className="flex flex-wrap gap-2">
-          <Badge variant="secondary">{difficultyLabels[roadmap.difficulty]}</Badge>
+          <Badge variant="outline" className={DIFFICULTY_BADGE_CLASS[roadmap.difficulty]}>
+            {difficultyLabels[roadmap.difficulty]}
+          </Badge>
           <Badge variant="outline" className="gap-1">
             <Clock className="size-3" aria-hidden />
             {roadmap.duration}

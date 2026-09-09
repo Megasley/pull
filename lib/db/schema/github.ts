@@ -149,6 +149,12 @@ export const githubPullRequests = pgTable(
      *  used to exclude personal-project PRs from "qualifying contribution"
      *  definitions. See lib/impact/definitions.ts. */
     isOwnRepo: boolean("is_own_repo").notNull().default(false),
+    /** True when this PR targets Pull's First Contribution practice
+     *  repository (lib/first-contribution/practice-repo.ts). Excluded from
+     *  qualifying-contribution / verified-contribution impact metrics for
+     *  the same reason isOwnRepo is — practice activity isn't external
+     *  open-source impact. See lib/impact/definitions.ts. */
+    isPracticeRepo: boolean("is_practice_repo").notNull().default(false),
     /** Partner the user belonged to when this PR was opened (membership at
      *  time of contribution — see lib/impact/attribution.ts). Set once at
      *  first insert; never overwritten by later partner joins. */
@@ -189,6 +195,7 @@ export const githubPullRequests = pgTable(
       table.attributedPartnerId,
     ),
     index("github_pull_requests_is_own_repo_idx").on(table.isOwnRepo),
+    index("github_pull_requests_is_practice_repo_idx").on(table.isPracticeRepo),
   ],
 );
 

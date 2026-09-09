@@ -34,6 +34,7 @@ import {
   upsertGithubPullRequests,
   type PullRequestSyncInput,
 } from "./store";
+import { isPracticeRepoFullName } from "@/lib/first-contribution/practice-repo";
 import { derivePrMilestoneCandidates } from "@/lib/milestones/pr-signals";
 import { recordMilestones } from "@/lib/milestones/service";
 import type { GithubSyncSummary } from "@/types/github";
@@ -123,11 +124,13 @@ export async function syncGithubForUser(
       (item) => {
         const isOwnRepo =
           item.repoFullName.split("/")[0]?.toLowerCase() === user.login.toLowerCase();
+        const isPracticeRepo = isPracticeRepoFullName(item.repoFullName);
         const isNew = !existingPullRequests.has(item.githubId);
 
         return {
           ...item,
           isOwnRepo,
+          isPracticeRepo,
           attributedPartnerId: isNew
             ? resolvePartnerAttribution(memberships, item.githubCreatedAt)
             : null,

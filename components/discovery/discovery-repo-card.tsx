@@ -3,15 +3,23 @@ import { Clock3, ExternalLink, HeartPulse, Tag } from "lucide-react";
 import { DiscoveryBookmarkButton } from "@/components/discovery/discovery-bookmark-button";
 import { TrackedExternalLink } from "@/components/discovery/tracked-external-link";
 import { Badge } from "@/components/ui/badge";
+import { DIFFICULTY_BADGE_CLASS } from "@/lib/design/difficulty-color";
+import { getLanguageColor } from "@/lib/discovery/language-color";
 import { discoveryIssueKey, discoveryRepoKey } from "@/lib/opportunities/keys";
 import { cn } from "@/lib/utils";
-import type { DiscoveryRepository } from "@/types/discovery";
+import type { DiscoveryRepository, RepositoryHealth } from "@/types/discovery";
 
 const HEALTH_LABEL = {
   excellent: "Excellent health",
   good: "Good health",
   fair: "Fair health",
 } as const;
+
+const HEALTH_STYLES: Record<RepositoryHealth, string> = {
+  excellent: "text-emerald-600 dark:text-emerald-400",
+  good: "text-blue-600 dark:text-blue-400",
+  fair: "text-amber-600 dark:text-amber-400",
+};
 
 const SIZE_LABEL = {
   small: "Small",
@@ -57,8 +65,17 @@ export function DiscoveryRepoCard({
       </p>
 
       <div className="mt-4 flex flex-wrap gap-2">
-        <Badge variant="secondary">{repository.difficulty}</Badge>
-        <Badge variant="outline">{repository.language}</Badge>
+        <Badge variant="outline" className={DIFFICULTY_BADGE_CLASS[repository.difficulty]}>
+          {repository.difficulty}
+        </Badge>
+        <Badge variant="outline" className="gap-1.5">
+          <span
+            className="size-2 shrink-0 rounded-full"
+            style={{ backgroundColor: getLanguageColor(repository.language) }}
+            aria-hidden
+          />
+          {repository.language}
+        </Badge>
         <Badge variant="outline">{SIZE_LABEL[repository.size]}</Badge>
       </div>
 
@@ -92,7 +109,10 @@ export function DiscoveryRepoCard({
           </span>
         </p>
         <p className="flex min-w-0 items-start gap-1.5">
-          <HeartPulse className="mt-0.5 size-3.5 shrink-0" aria-hidden />
+          <HeartPulse
+            className={cn("mt-0.5 size-3.5 shrink-0", HEALTH_STYLES[repository.health])}
+            aria-hidden
+          />
           <span className="min-w-0 break-words">{HEALTH_LABEL[repository.health]}</span>
         </p>
       </div>

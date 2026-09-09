@@ -343,6 +343,9 @@ export type PullRequestSyncInput = {
   reviewComments?: number;
   contributionType?: string;
   isOwnRepo: boolean;
+  /** True when repoFullName is Pull's First Contribution practice repo —
+   *  see lib/first-contribution/practice-repo.ts. */
+  isPracticeRepo: boolean;
   /** Only applied when inserting a brand-new row — never overwrites existing
    *  attribution on an update. See lib/github/attribution.ts. */
   attributedPartnerId: string | null;
@@ -418,6 +421,7 @@ export async function upsertGithubPullRequests(
         reviewComments,
         contributionType: item.contributionType ?? "other",
         isOwnRepo: item.isOwnRepo,
+        isPracticeRepo: item.isPracticeRepo,
         // Only reached when there's no existing row (no unique-key
         // conflict) — attribution is always fresh for a genuine first insert.
         attributedPartnerId: item.attributedPartnerId,
@@ -444,6 +448,7 @@ export async function upsertGithubPullRequests(
           reviewComments,
           contributionType: item.contributionType ?? "other",
           isOwnRepo: item.isOwnRepo,
+          isPracticeRepo: item.isPracticeRepo,
           // attributedPartnerId / attributedOpportunityEventId / firstSyncedAt
           // intentionally omitted — set once at insert, never overwritten.
           syncedAt: stamp,
@@ -903,7 +908,14 @@ export async function countGithubSyncedEntities(userId: string) {
     db
       .select({ value: count() })
       .from(githubPullRequests)
-      .where(eq(githubPullRequests.userId, userId)),
+      .where(
+        and(
+          eq(githubPullRequests.userId, userId),
+          // Excludes the First Contribution practice repo — see
+          // countMergedGithubPullRequests below for why.
+          eq(githubPullRequests.isPracticeRepo, false),
+        ),
+      ),
     db
       .select({ value: count() })
       .from(githubIssues)
@@ -922,7 +934,18 @@ export async function countGithubSyncedEntities(userId: string) {
   };
 }
 
-/** Total merged PRs synced for a user (not capped by list limits). */
+/**
+ * Total merged PRs synced for a user (not capped by list limits).
+ *
+ * Excludes the First Contribution practice repo — this count feeds the
+ * "First Merged PR" achievement (lib/achievements/definitions.ts) and public
+ * profile / partner-facing stats (lib/profile/load-public-profile.ts,
+ * app/partners/[slug]/page.tsx), all of which represent real GitHub
+ * contribution activity. A practice-repo merge must not unlock that
+ * achievement or its email, or inflate those surfaces — same principle as
+ * countVerifiedMergedPullRequests below and derivePrMilestoneCandidates in
+ * lib/milestones/pr-signals.ts.
+ */
 export async function countMergedGithubPullRequests(userId: string): Promise<number> {
   if (!isDatabaseConfigured()) return 0;
   const db = getDb();
@@ -930,12 +953,24 @@ export async function countMergedGithubPullRequests(userId: string): Promise<num
     .select({ value: count() })
     .from(githubPullRequests)
     .where(
-      and(eq(githubPullRequests.userId, userId), eq(githubPullRequests.merged, true)),
+      and(
+        eq(githubPullRequests.userId, userId),
+        eq(githubPullRequests.merged, true),
+        eq(githubPullRequests.isPracticeRepo, false),
+      ),
     );
   return Number(row?.value ?? 0);
 }
 
-/** Total non-draft (ready for review) PRs synced for a user — "submitted", not just started. */
+/**
+ * Total non-draft (ready for review) PRs synced for a user — "submitted",
+ * not just started.
+ *
+ * Excludes the First Contribution practice repo, for the same reason as
+ * countMergedGithubPullRequests above — this feeds the "First Pull Request
+ * Submitted" achievement, and a practice PR going ready-for-review must not
+ * unlock it or its email.
+ */
 export async function countSubmittedGithubPullRequests(
   userId: string,
 ): Promise<number> {
@@ -945,15 +980,21 @@ export async function countSubmittedGithubPullRequests(
     .select({ value: count() })
     .from(githubPullRequests)
     .where(
-      and(eq(githubPullRequests.userId, userId), eq(githubPullRequests.draft, false)),
+      and(
+        eq(githubPullRequests.userId, userId),
+        eq(githubPullRequests.draft, false),
+        eq(githubPullRequests.isPracticeRepo, false),
+      ),
     );
   return Number(row?.value ?? 0);
 }
 
 /**
- * Merged PRs into a repo the user doesn't own — the "verified contribution"
- * bar (matches qualifyingConditions() in lib/impact/queries.ts): a merge to
- * your own repo isn't independent evidence of real open source impact.
+ * Merged PRs into a repo the user doesn't own and that isn't the First
+ * Contribution practice repo — the "verified contribution" bar (matches
+ * qualifyingConditions() in lib/impact/queries.ts): neither a merge to your
+ * own repo nor a practice-repo merge is independent evidence of real open
+ * source impact.
  */
 export async function countVerifiedMergedPullRequests(userId: string): Promise<number> {
   if (!isDatabaseConfigured()) return 0;
@@ -966,6 +1007,7 @@ export async function countVerifiedMergedPullRequests(userId: string): Promise<n
         eq(githubPullRequests.userId, userId),
         eq(githubPullRequests.merged, true),
         eq(githubPullRequests.isOwnRepo, false),
+        eq(githubPullRequests.isPracticeRepo, false),
       ),
     );
   return Number(row?.value ?? 0);

@@ -197,6 +197,20 @@
       "when": 1788874122986,
       "tag": "0027_add_show_country_publicly",
       "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1788915187603,
+      "tag": "0028_fine_doctor_spectrum",
+      "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1788941010915,
+      "tag": "0029_wise_tiger_shark",
+      "breakpoints": true
     }
   ]
 }

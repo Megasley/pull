@@ -98,6 +98,16 @@ export function OnboardingWizard({ githubConnected }: OnboardingWizardProps) {
           <Button className="mt-6" onClick={() => setStep(1)}>
             Continue
           </Button>
+          <p className="text-sm text-muted-foreground">
+            Want to skip ahead and make your first pull request today instead?{" "}
+            <Link
+              href="/first-contribution"
+              className="underline underline-offset-4 hover:text-foreground"
+            >
+              Try First Contribution
+            </Link>
+            .
+          </p>
         </section>
       ) : null}
 

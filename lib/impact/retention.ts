@@ -27,7 +27,13 @@ async function loadQualifyingMergeTimestamps(): Promise<Map<string, number[]>> {
   const rows = await db
     .select({ userId: githubPullRequests.userId, mergedAt: githubPullRequests.githubMergedAt })
     .from(githubPullRequests)
-    .where(and(eq(githubPullRequests.merged, true), eq(githubPullRequests.isOwnRepo, false)));
+    .where(
+      and(
+        eq(githubPullRequests.merged, true),
+        eq(githubPullRequests.isOwnRepo, false),
+        eq(githubPullRequests.isPracticeRepo, false),
+      ),
+    );
 
   const byUser = new Map<string, number[]>();
   for (const row of rows) {

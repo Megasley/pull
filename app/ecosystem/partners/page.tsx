@@ -9,6 +9,7 @@ import {
   groupPartnersByCategory,
   listPartners,
   type EcosystemPartner,
+  type PartnerType,
 } from "@/lib/ecosystem/partners";
 import { siteConfig } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
@@ -17,6 +18,18 @@ export const metadata: Metadata = {
   title: "Partners · Ecosystem",
   description:
     "Organizations and communities working with Pull to place developers into open source contribution programs.",
+};
+
+/** founding_sponsor is excluded — it never reaches PartnerCard (filtered
+ *  into its own featured, signal-lime hero section below), so it doesn't
+ *  need an entry here. One color per remaining tier so the type badge is
+ *  scannable across a grid of many partners at a glance. */
+const PARTNER_TYPE_BADGE_CLASS: Record<Exclude<PartnerType, "founding_sponsor">, string> = {
+  ecosystem_sponsor: "border-violet-500/40 bg-violet-500/10 text-violet-700 dark:text-violet-400",
+  learning_partner: "border-blue-500/40 bg-blue-500/10 text-blue-700 dark:text-blue-400",
+  project_partner: "border-teal-500/40 bg-teal-500/10 text-teal-700 dark:text-teal-400",
+  strategic_partner: "border-rose-500/40 bg-rose-500/10 text-rose-700 dark:text-rose-400",
+  community_partner: "border-orange-500/40 bg-orange-500/10 text-orange-700 dark:text-orange-400",
 };
 
 const HOW_PARTNERSHIPS_WORK_STEPS = [
@@ -106,7 +119,14 @@ function PartnerCard({ partner }: { partner: EcosystemPartner }) {
         <div className="flex items-start gap-4">
           <PartnerLogo partner={partner} boxClassName="h-14 w-24 p-2" imgClassName="h-7" />
           <div className="min-w-0 flex-1">
-            <span className="inline-block border border-border px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+            <span
+              className={cn(
+                "inline-block border px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest",
+                partner.partnerType === "founding_sponsor"
+                  ? "border-border text-muted-foreground"
+                  : PARTNER_TYPE_BADGE_CLASS[partner.partnerType],
+              )}
+            >
               {PARTNER_TYPE_LABELS[partner.partnerType]}
             </span>
             <h3 className="mt-2 text-lg font-semibold tracking-tight">{partner.name}</h3>

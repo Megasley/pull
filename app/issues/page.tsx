@@ -63,6 +63,19 @@ export default async function IssuesPage() {
         }
       />
 
+      {!personalized || context.githubActivityCount === 0 ? (
+        <p className="mt-4 max-w-2xl text-sm text-muted-foreground">
+          Never opened a pull request before?{" "}
+          <Link
+            href="/first-contribution"
+            className="underline underline-offset-4 hover:text-foreground"
+          >
+            Practice on a guided repo first
+          </Link>
+          , then come back here for the real thing.
+        </p>
+      ) : null}
+
       <div className="mt-10">
         <Suspense
           fallback={

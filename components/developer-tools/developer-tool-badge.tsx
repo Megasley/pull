@@ -1,11 +1,15 @@
 import { Badge } from "@/components/ui/badge";
+import { DIFFICULTY_BADGE_CLASS } from "@/lib/design/difficulty-color";
 import type { DeveloperToolDifficulty } from "@/lib/developer-tools/types";
 import { cn } from "@/lib/utils";
 
+/** DeveloperToolDifficulty is capitalized ("Beginner"), unlike the shared
+ *  RoadmapDifficulty ("beginner") DIFFICULTY_BADGE_CLASS is keyed by — map
+ *  onto the shared palette rather than keeping a second copy of the colors. */
 const difficultyClassName: Record<DeveloperToolDifficulty, string> = {
-  Beginner: "border-ink/20 bg-signal text-signal-foreground",
-  Intermediate: "border-ink/30 bg-ink/10 text-ink",
-  Advanced: "border-ink bg-ink text-[var(--background)]",
+  Beginner: DIFFICULTY_BADGE_CLASS.beginner,
+  Intermediate: DIFFICULTY_BADGE_CLASS.intermediate,
+  Advanced: DIFFICULTY_BADGE_CLASS.advanced,
 };
 
 export function DeveloperToolBadge({

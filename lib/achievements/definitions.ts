@@ -1,3 +1,7 @@
+import {
+  FIRST_CONTRIBUTION_ROADMAP_SLUG,
+  firstContributionSteps,
+} from "@/lib/first-contribution/steps";
 import type {
   AchievementCategory,
   AchievementCriteria,
@@ -169,6 +173,25 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     xpReward: 200,
     category: "open-source",
     criteria: { type: "github_verified_merged_pr_count", min: 1 },
+  },
+  {
+    id: "first-contribution-complete",
+    title: "First Contribution",
+    description:
+      "Complete the First Contribution journey: fork, change, and merge your first pull request.",
+    icon: "rocket",
+    xpReward: 150,
+    category: "open-source",
+    criteria: {
+      type: "nodes_complete",
+      roadmap: FIRST_CONTRIBUTION_ROADMAP_SLUG,
+      // All 10 steps, not the roadmap registry — First Contribution reuses
+      // the generic userRoadmapProgress table without being a registered
+      // roadmap (see lib/first-contribution/progress.ts), so the
+      // roadmap_complete criteria (which looks up roadmap content by slug)
+      // can't be used here the way roadmap-complete achievements use it.
+      nodeIds: firstContributionSteps.map((step) => step.slug),
+    },
   },
 ];
 

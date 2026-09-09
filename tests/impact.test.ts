@@ -31,6 +31,16 @@ describe("impact/definitions — qualifying contribution rules", () => {
     expect(isQualifyingContribution({ merged: false, isOwnRepo: false })).toBe(false);
   });
 
+  it("excludes a merged PR into the First Contribution practice repo", () => {
+    expect(
+      isQualifyingContribution({ merged: true, isOwnRepo: false, isPracticeRepo: true }),
+    ).toBe(false);
+  });
+
+  it("still qualifies a merged PR when isPracticeRepo is omitted (back-compat default)", () => {
+    expect(isQualifyingContribution({ merged: true, isOwnRepo: false })).toBe(true);
+  });
+
   it("verified/repeat contributor thresholds match the documented definitions", () => {
     expect(isVerifiedContributor(0)).toBe(false);
     expect(isVerifiedContributor(1)).toBe(true);
@@ -150,6 +160,7 @@ function baseInput(overrides: Partial<PullRequestSyncInput> = {}): PullRequestSy
     githubClosedAt: null,
     githubMergedAt: null,
     isOwnRepo: false,
+    isPracticeRepo: false,
     attributedPartnerId: null,
     attributedOpportunityEventId: null,
     ...overrides,

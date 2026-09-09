@@ -6,6 +6,7 @@ import { Search } from "lucide-react";
 import { EmptyState } from "@/components/design-system";
 import { ProjectCard } from "@/components/projects/project-card";
 import { Button } from "@/components/ui/button";
+import { DIFFICULTY_BADGE_CLASS } from "@/lib/design/difficulty-color";
 import {
   DIFFICULTY_OPTIONS,
   PROJECT_PAGE_SIZE,
@@ -247,13 +248,9 @@ function FilterChip({
       className={cn(
         "shrink-0 rounded-none border px-2.5 py-1 text-xs transition-colors",
         active
-          ? tone === "beginner"
-            ? "border-ink/20 bg-signal text-signal-foreground"
-            : tone === "intermediate"
-              ? "border-ink/30 bg-ink/10 text-ink"
-              : tone === "advanced"
-                ? "border-ink bg-ink text-[var(--background)]"
-                : "border-primary/40 bg-primary/15 text-foreground"
+          ? tone === "default"
+            ? "border-primary/40 bg-primary/15 text-foreground"
+            : DIFFICULTY_BADGE_CLASS[tone]
           : "border-border bg-transparent text-muted-foreground hover:border-border hover:text-foreground",
       )}
     >

@@ -62,6 +62,7 @@ async function main() {
         githubCreatedAt: githubPullRequests.githubCreatedAt,
         githubMergedAt: githubPullRequests.githubMergedAt,
         isOwnRepo: githubPullRequests.isOwnRepo,
+        isPracticeRepo: githubPullRequests.isPracticeRepo,
       })
       .from(githubPullRequests),
     db
@@ -96,6 +97,7 @@ async function main() {
         githubClosedAt: null,
         githubMergedAt: row.githubMergedAt,
         isOwnRepo: row.isOwnRepo,
+        isPracticeRepo: row.isPracticeRepo,
         attributedPartnerId: null,
         attributedOpportunityEventId: null,
       },

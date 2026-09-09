@@ -16,7 +16,8 @@ export type AchievementIconKey =
   | "git-pull-request"
   | "git-merge"
   | "send"
-  | "shield-check";
+  | "shield-check"
+  | "rocket";
 
 export type AchievementCriteria =
   | { type: "lessons_completed"; min: number }

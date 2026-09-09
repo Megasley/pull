@@ -58,6 +58,7 @@ export type UserImpactSummary = {
     merged: boolean;
     draft: boolean;
     isOwnRepo: boolean;
+    isPracticeRepo: boolean;
     attributedPartnerName: string | null;
     attributedViaOpportunity: boolean;
     githubCreatedAt: string | null;
@@ -107,6 +108,7 @@ export async function getUserImpactSummary(userId: string): Promise<UserImpactSu
         merged: githubPullRequests.merged,
         draft: githubPullRequests.draft,
         isOwnRepo: githubPullRequests.isOwnRepo,
+        isPracticeRepo: githubPullRequests.isPracticeRepo,
         attributedPartnerId: githubPullRequests.attributedPartnerId,
         attributedOpportunityEventId: githubPullRequests.attributedOpportunityEventId,
         githubCreatedAt: githubPullRequests.githubCreatedAt,
@@ -116,7 +118,7 @@ export async function getUserImpactSummary(userId: string): Promise<UserImpactSu
       .where(eq(githubPullRequests.userId, userId))
       .orderBy(desc(githubPullRequests.githubCreatedAt));
 
-    const qualifying = prs.filter((pr) => pr.merged && !pr.isOwnRepo);
+    const qualifying = prs.filter((pr) => pr.merged && !pr.isOwnRepo && !pr.isPracticeRepo);
     const uniqueRepos = new Set(prs.map((pr) => pr.repoFullName.toLowerCase())).size;
     const firstPR = [...prs].reverse().find((pr) => pr.githubCreatedAt);
     const firstQualifyingMerged = [...qualifying]
@@ -208,6 +210,7 @@ export async function getUserImpactSummary(userId: string): Promise<UserImpactSu
         merged: pr.merged,
         draft: pr.draft,
         isOwnRepo: pr.isOwnRepo,
+        isPracticeRepo: pr.isPracticeRepo,
         attributedPartnerName: pr.attributedPartnerId ? (orgNameById.get(pr.attributedPartnerId) ?? null) : null,
         attributedViaOpportunity: Boolean(pr.attributedOpportunityEventId),
         githubCreatedAt: pr.githubCreatedAt,
@@ -239,7 +242,7 @@ export async function getUserImpactBadges(userIds: string[]): Promise<Map<string
       .select({
         userId: githubPullRequests.userId,
         total: sql<number>`count(*)::int`,
-        qualifying: sql<number>`count(*) filter (where ${githubPullRequests.merged} and not ${githubPullRequests.isOwnRepo})::int`,
+        qualifying: sql<number>`count(*) filter (where ${githubPullRequests.merged} and not ${githubPullRequests.isOwnRepo} and not ${githubPullRequests.isPracticeRepo})::int`,
       })
       .from(githubPullRequests)
       .where(inArray(githubPullRequests.userId, userIds))

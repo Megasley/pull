@@ -9,6 +9,7 @@ import {
   Hammer,
   Link2,
   Map,
+  Rocket,
   Send,
   ShieldCheck,
   Target,
@@ -38,4 +39,5 @@ export const ACHIEVEMENT_ICONS: Record<
   "git-merge": GitMerge,
   send: Send,
   "shield-check": ShieldCheck,
+  rocket: Rocket,
 };

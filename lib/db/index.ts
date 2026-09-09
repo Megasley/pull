@@ -11,12 +11,15 @@ const globalForDb = globalThis as unknown as {
 
 function createPostgresClient() {
   const databaseUrl = getDatabaseUrl();
-  // Supabase's transaction pooler (pgbouncer) multiplexes many client
-  // connections onto few backend ones, so it can support a larger
-  // client-side pool. A direct/local connection (e.g. 127.0.0.1:54322 in
-  // Docker) has no such multiplexing and idle sockets can be silently
-  // dropped by Docker/OS, so keep that path's pool small.
-  const isPooled = /pooler\.supabase\.com:6543\b/.test(databaseUrl);
+  // Supabase's Supavisor pooler (session mode on :5432, transaction mode on
+  // :6543) multiplexes many client connections onto few backend ones, so it
+  // can support a larger client-side pool. A direct/local connection (e.g.
+  // 127.0.0.1:54322 in Docker) has no such multiplexing and idle sockets can
+  // be silently dropped by Docker/OS, so keep that path's pool small.
+  // Previously matched only :6543 — our DATABASE_URL uses the :5432 session
+  // pooler, so that check always evaluated false in production and ran an
+  // unpooled-sized (max 3) client pool against pooled infrastructure.
+  const isPooled = /pooler\.supabase\.com(:\d+)?\b/.test(databaseUrl);
 
   return postgres(databaseUrl, {
     prepare: false,
