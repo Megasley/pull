@@ -19,6 +19,11 @@ import type { SubmissionStatus, UserRole } from "@/types/submission";
 /** Soft budget so /admin never burns a full Vercel function timeout. */
 const ADMIN_QUERY_BUDGET_MS = 4_000;
 
+/** Serialize mutations that can reduce the active-admin set. */
+const LAST_ACTIVE_ADMIN_LOCK = sql`
+  SELECT pg_advisory_xact_lock(hashtext('pull:last-active-admin'))
+`;
+
 export type AdminUserRecord = {
   id: string;
   username: string;
@@ -190,47 +195,74 @@ export async function updateUserRole(input: {
   }
 
   const db = getDb();
-  const existingRows = await db
-    .select()
-    .from(users)
-    .where(eq(users.id, input.userId))
-    .limit(1);
+  const outcome = await db.transaction(async (transaction) => {
+    await transaction.execute(LAST_ACTIVE_ADMIN_LOCK);
 
-  const existing = existingRows[0];
-  if (!existing) {
-    return { ok: false, reason: "not_found" };
-  }
+    const existingRows = await transaction
+      .select()
+      .from(users)
+      .where(eq(users.id, input.userId))
+      .limit(1);
 
-  if (
-    input.userId === input.actorUserId &&
-    existing.role === "admin" &&
-    input.role !== "admin"
-  ) {
-    return { ok: false, reason: "self_demote" };
-  }
-
-  if (existing.role === "admin" && input.role !== "admin") {
-    const admins = await countAdmins();
-    if (admins <= 1) {
-      return { ok: false, reason: "last_admin" };
+    const existing = existingRows[0];
+    if (!existing) {
+      return { ok: false as const, reason: "not_found" as const };
     }
+
+    if (
+      input.userId === input.actorUserId &&
+      existing.role === "admin" &&
+      input.role !== "admin"
+    ) {
+      return { ok: false as const, reason: "self_demote" as const };
+    }
+
+    if (
+      existing.role === "admin" &&
+      existing.accountStatus === "active" &&
+      input.role !== "admin"
+    ) {
+      const adminRows = await transaction
+        .select({ value: count() })
+        .from(users)
+        .where(and(eq(users.role, "admin"), eq(users.accountStatus, "active")));
+
+      if ((adminRows[0]?.value ?? 0) <= 1) {
+        return { ok: false as const, reason: "last_admin" as const };
+      }
+    }
+
+    if (existing.role === input.role) {
+      return { ok: true as const, user: existing, changed: false as const };
+    }
+
+    const [updated] = await transaction
+      .update(users)
+      .set({
+        role: input.role,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(users.id, input.userId))
+      .returning();
+
+    if (!updated) {
+      return { ok: false as const, reason: "not_found" as const };
+    }
+
+    return {
+      ok: true as const,
+      user: updated,
+      changed: true as const,
+      previousRole: existing.role,
+    };
+  });
+
+  if (!outcome.ok) {
+    return outcome;
   }
 
-  if (existing.role === input.role) {
-    return { ok: true, user: mapAdminUser(existing) };
-  }
-
-  const [updated] = await db
-    .update(users)
-    .set({
-      role: input.role,
-      updatedAt: new Date().toISOString(),
-    })
-    .where(eq(users.id, input.userId))
-    .returning();
-
-  if (!updated) {
-    return { ok: false, reason: "not_found" };
+  if (!outcome.changed) {
+    return { ok: true, user: mapAdminUser(outcome.user) };
   }
 
   await recordAdminAction({
@@ -238,7 +270,7 @@ export async function updateUserRole(input: {
     targetUserId: input.userId,
     action: "role_change",
     metadata: {
-      from: existing.role,
+      from: outcome.previousRole,
       to: input.role,
     },
   });
@@ -251,7 +283,7 @@ export async function updateUserRole(input: {
     });
   }
 
-  return { ok: true, user: mapAdminUser(updated) };
+  return { ok: true, user: mapAdminUser(outcome.user) };
 }
 
 export async function getReviewHealth(): Promise<ReviewHealth> {
@@ -413,16 +445,6 @@ export type ModerationResult =
         | "self_moderation";
     };
 
-async function countActiveAdmins(): Promise<number> {
-  const db = getDb();
-  const rows = await db
-    .select({ value: count() })
-    .from(users)
-    .where(and(eq(users.role, "admin"), eq(users.accountStatus, "active")));
-
-  return rows[0]?.value ?? 0;
-}
-
 async function applyModeration(input: {
   userId: string;
   actorUserId: string;
@@ -434,48 +456,57 @@ async function applyModeration(input: {
   }
 
   const db = getDb();
-  const existingRows = await db
-    .select()
-    .from(users)
-    .where(eq(users.id, input.userId))
-    .limit(1);
+  const outcome = await db.transaction(async (transaction) => {
+    await transaction.execute(LAST_ACTIVE_ADMIN_LOCK);
 
-  const existing = existingRows[0];
-  if (!existing) {
-    return { ok: false, reason: "not_found" };
-  }
+    const existingRows = await transaction
+      .select()
+      .from(users)
+      .where(eq(users.id, input.userId))
+      .limit(1);
 
-  const disablesAccount = input.action === "suspend" || input.action === "ban";
-  if (disablesAccount && existing.role === "admin") {
-    if (input.userId === input.actorUserId) {
-      return { ok: false, reason: "self_moderation" };
+    const existing = existingRows[0];
+    if (!existing) {
+      return { ok: false as const, reason: "not_found" as const };
     }
 
-    if (existing.accountStatus === "active" && (await countActiveAdmins()) <= 1) {
-      return { ok: false, reason: "last_admin" };
-    }
-  }
+    const disablesAccount = input.action === "suspend" || input.action === "ban";
+    if (disablesAccount && existing.role === "admin") {
+      if (input.userId === input.actorUserId) {
+        return { ok: false as const, reason: "self_moderation" as const };
+      }
 
-  const now = new Date().toISOString();
-  const patch =
-    input.action === "restore"
-      ? {
-          accountStatus: "active" as const,
-          moderationReason: null,
-          moderatedAt: null,
-          moderatedBy: null,
-          updatedAt: now,
+      if (existing.accountStatus === "active") {
+        const adminRows = await transaction
+          .select({ value: count() })
+          .from(users)
+          .where(and(eq(users.role, "admin"), eq(users.accountStatus, "active")));
+
+        if ((adminRows[0]?.value ?? 0) <= 1) {
+          return { ok: false as const, reason: "last_admin" as const };
         }
-      : {
-          accountStatus:
-            input.action === "ban" ? ("banned" as const) : ("suspended" as const),
-          moderationReason: input.reason?.trim() || null,
-          moderatedAt: now,
-          moderatedBy: input.actorUserId,
-          updatedAt: now,
-        };
+      }
+    }
 
-  const updated = await db.transaction(async (transaction) => {
+    const now = new Date().toISOString();
+    const patch =
+      input.action === "restore"
+        ? {
+            accountStatus: "active" as const,
+            moderationReason: null,
+            moderatedAt: null,
+            moderatedBy: null,
+            updatedAt: now,
+          }
+        : {
+            accountStatus:
+              input.action === "ban" ? ("banned" as const) : ("suspended" as const),
+            moderationReason: input.reason?.trim() || null,
+            moderatedAt: now,
+            moderatedBy: input.actorUserId,
+            updatedAt: now,
+          };
+
     const [updatedUser] = await transaction
       .update(users)
       .set(patch)
@@ -489,11 +520,19 @@ async function applyModeration(input: {
       `);
     }
 
-    return updatedUser;
+    if (!updatedUser) {
+      return { ok: false as const, reason: "not_found" as const };
+    }
+
+    return {
+      ok: true as const,
+      user: updatedUser,
+      previousStatus: existing.accountStatus,
+    };
   });
 
-  if (!updated) {
-    return { ok: false, reason: "not_found" };
+  if (!outcome.ok) {
+    return outcome;
   }
 
   await recordAdminAction({
@@ -502,11 +541,11 @@ async function applyModeration(input: {
     action: input.action,
     metadata: {
       reason: input.reason?.trim() || null,
-      previousStatus: existing.accountStatus,
+      previousStatus: outcome.previousStatus,
     },
   });
 
-  return { ok: true, user: mapAdminUser(updated) };
+  return { ok: true, user: mapAdminUser(outcome.user) };
 }
 
 export async function suspendUser(input: {
