@@ -17,7 +17,7 @@ vi.mock("@/lib/admin/audit-log", () => ({
   recordAdminAction: repositoryMocks.recordAdminAction,
 }));
 
-import { banUser, updateUserRole } from "@/lib/admin/repository";
+import { banUser, suspendUser, updateUserRole } from "@/lib/admin/repository";
 
 type TestUser = {
   id: string;
@@ -63,11 +63,12 @@ function admin(id: string): TestUser {
   };
 }
 
-function createDbHarness(targets: string[]) {
-  const state = new Map<string, TestUser>([
-    ["admin-a", admin("admin-a")],
-    ["admin-b", admin("admin-b")],
-  ]);
+function createDbHarness(
+  targets: string[],
+  options?: { users?: TestUser[]; failSessionRevocation?: boolean },
+) {
+  const initialUsers = options?.users ?? [admin("admin-a"), admin("admin-b")];
+  const state = new Map<string, TestUser>(initialUsers.map((user) => [user.id, user]));
   const revokedSessions: string[] = [];
   let nextTarget = 0;
   let lockTail = Promise.resolve();
@@ -86,6 +87,8 @@ function createDbHarness(targets: string[]) {
     transaction: vi.fn(async (operation: (transaction: object) => Promise<unknown>) => {
       const targetId = targets[nextTarget++];
       if (!targetId) throw new Error("Missing transaction target");
+      const originalTarget = state.get(targetId);
+      const targetSnapshot = originalTarget ? { ...originalTarget } : undefined;
 
       let releaseLock: (() => void) | undefined;
       let executeCalls = 0;
@@ -94,6 +97,9 @@ function createDbHarness(targets: string[]) {
           if (executeCalls++ === 0) {
             releaseLock = await acquireLock();
           } else {
+            if (options?.failSessionRevocation) {
+              throw new Error("Session revocation failed");
+            }
             revokedSessions.push(targetId);
           }
           return [];
@@ -134,6 +140,9 @@ function createDbHarness(targets: string[]) {
 
       try {
         return await operation(transaction);
+      } catch (error) {
+        if (targetSnapshot) state.set(targetId, targetSnapshot);
+        throw error;
       } finally {
         releaseLock?.();
       }
@@ -203,6 +212,96 @@ describe("admin repository last-active-admin invariant", () => {
     await expect(
       banUser({ userId: "admin-a", actorUserId: "admin-a" }),
     ).resolves.toEqual({ ok: false, reason: "self_moderation" });
+    expect(harness.revokedSessions).toEqual([]);
+    expect(repositoryMocks.recordAdminAction).not.toHaveBeenCalled();
+  });
+
+  it("rejects self-demotion without changing the role", async () => {
+    const harness = createDbHarness(["admin-a"]);
+    repositoryMocks.getDb.mockReturnValue(harness.db);
+
+    await expect(
+      updateUserRole({
+        userId: "admin-a",
+        actorUserId: "admin-a",
+        role: "builder",
+      }),
+    ).resolves.toEqual({ ok: false, reason: "self_demote" });
+    expect(harness.state.get("admin-a")?.role).toBe("admin");
+    expect(repositoryMocks.recordAdminAction).not.toHaveBeenCalled();
+  });
+
+  it("rejects blocking the last active admin without partial changes", async () => {
+    const harness = createDbHarness(["admin-a"], { users: [admin("admin-a")] });
+    repositoryMocks.getDb.mockReturnValue(harness.db);
+
+    await expect(
+      banUser({ userId: "admin-a", actorUserId: "admin-b" }),
+    ).resolves.toEqual({ ok: false, reason: "last_admin" });
+    expect(harness.state.get("admin-a")?.accountStatus).toBe("active");
+    expect(harness.revokedSessions).toEqual([]);
+    expect(repositoryMocks.recordAdminAction).not.toHaveBeenCalled();
+  });
+
+  it("rejects demoting the last active admin without changing the role", async () => {
+    const harness = createDbHarness(["admin-a"], { users: [admin("admin-a")] });
+    repositoryMocks.getDb.mockReturnValue(harness.db);
+
+    await expect(
+      updateUserRole({
+        userId: "admin-a",
+        actorUserId: "admin-b",
+        role: "builder",
+      }),
+    ).resolves.toEqual({ ok: false, reason: "last_admin" });
+    expect(harness.state.get("admin-a")?.role).toBe("admin");
+    expect(repositoryMocks.recordAdminAction).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["suspend", suspendUser, "suspended"],
+    ["ban", banUser, "banned"],
+  ] as const)("%ss a user and revokes their sessions", async (_, action, status) => {
+    const harness = createDbHarness(["admin-b"]);
+    repositoryMocks.getDb.mockReturnValue(harness.db);
+
+    const result = await action({
+      userId: "admin-b",
+      actorUserId: "admin-a",
+    });
+
+    expect(result.ok).toBe(true);
+    expect(harness.state.get("admin-b")?.accountStatus).toBe(status);
+    expect(harness.revokedSessions).toEqual(["admin-b"]);
+    expect(repositoryMocks.recordAdminAction).toHaveBeenCalledTimes(1);
+  });
+
+  it("allows demotion when another active admin remains", async () => {
+    const harness = createDbHarness(["admin-b"]);
+    repositoryMocks.getDb.mockReturnValue(harness.db);
+
+    const result = await updateUserRole({
+      userId: "admin-b",
+      actorUserId: "admin-a",
+      role: "builder",
+    });
+
+    expect(result.ok).toBe(true);
+    expect(harness.state.get("admin-b")?.role).toBe("builder");
+    expect(harness.state.get("admin-a")?.role).toBe("admin");
+    expect(repositoryMocks.recordAdminAction).toHaveBeenCalledTimes(1);
+  });
+
+  it("rolls back the account change when session revocation fails", async () => {
+    const harness = createDbHarness(["admin-b"], {
+      failSessionRevocation: true,
+    });
+    repositoryMocks.getDb.mockReturnValue(harness.db);
+
+    await expect(
+      banUser({ userId: "admin-b", actorUserId: "admin-a" }),
+    ).rejects.toThrow("Session revocation failed");
+    expect(harness.state.get("admin-b")?.accountStatus).toBe("active");
     expect(harness.revokedSessions).toEqual([]);
     expect(repositoryMocks.recordAdminAction).not.toHaveBeenCalled();
   });
