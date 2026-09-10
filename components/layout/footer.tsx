@@ -25,9 +25,28 @@ function SocialIcon({ name }: { name: SocialIconName }) {
     );
   }
 
+  if (name === "x") {
+    return (
+      <svg viewBox="0 0 24 24" className="size-3.5" fill="currentColor" aria-hidden>
+        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.727-8.835L1.254 2.25H8.08l4.253 5.622L18.244 2.25Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z" />
+      </svg>
+    );
+  }
+
   return (
-    <svg viewBox="0 0 24 24" className="size-3.5" fill="currentColor" aria-hidden>
-      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.727-8.835L1.254 2.25H8.08l4.253 5.622L18.244 2.25Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z" />
+    <svg viewBox="0 0 24 24" className="size-4" aria-hidden>
+      <mask id="buzz-logo-mask" maskUnits="userSpaceOnUse">
+        <rect x="0" y="0" width="24" height="24" fill="white" />
+        <circle cx="9.6" cy="9.8" r="1.3" fill="black" />
+        <circle cx="14.4" cy="9.8" r="1.3" fill="black" />
+        <rect x="8.3" y="12.6" width="7.4" height="1.8" rx="0.3" fill="black" />
+        <rect x="8.3" y="15.6" width="7.4" height="1.8" rx="0.3" fill="black" />
+      </mask>
+      <g mask="url(#buzz-logo-mask)" fill="currentColor">
+        <circle cx="5.1" cy="12" r="4.3" />
+        <circle cx="18.9" cy="12" r="4.3" />
+        <rect x="7.4" y="4.4" width="9.2" height="15.2" rx="3" />
+      </g>
     </svg>
   );
 }

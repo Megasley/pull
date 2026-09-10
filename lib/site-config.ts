@@ -39,10 +39,15 @@ export const socialLinks = [
     href: "https://x.com/pullosdev",
     icon: "x",
   },
+  {
+    title: "Buzz Community",
+    href: "https://pull.communities.buzz.xyz/invite/v2.2UvyWPcITanGWkmizYh9YBOWEzW4gtQ20HFsyV7erpo",
+    icon: "buzz",
+  },
 ] as const satisfies readonly {
   title: string;
   href: string;
-  icon: "github" | "x";
+  icon: "github" | "x" | "buzz";
 }[];
 
 export type SocialLink = (typeof socialLinks)[number];
