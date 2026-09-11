@@ -1,6 +1,6 @@
 import { PULL_STORAGE_PREFIX } from "@/lib/storage/brand-keys";
 
-export type ChapterQuizStatus = "passed" | "skipped";
+export type ChapterQuizStatus = "passed";
 
 const CHAPTER_QUIZ_PREFIX = `${PULL_STORAGE_PREFIX}chapter-quiz:`;
 
@@ -18,7 +18,7 @@ export function readStoredChapterQuizStatus(
   }
 
   const raw = window.localStorage.getItem(storageKey(userId, roadmapSlug, quizId));
-  return raw === "passed" || raw === "skipped" ? raw : null;
+  return raw === "passed" ? raw : null;
 }
 
 export function writeStoredChapterQuizStatus(
@@ -32,4 +32,16 @@ export function writeStoredChapterQuizStatus(
   }
 
   window.localStorage.setItem(storageKey(userId, roadmapSlug, quizId), status);
+}
+
+export function clearStoredChapterQuizStatus(
+  userId: string,
+  roadmapSlug: string,
+  quizId: string,
+) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.removeItem(storageKey(userId, roadmapSlug, quizId));
 }

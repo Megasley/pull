@@ -9,7 +9,20 @@ import type { AchievementEvalContext } from "@/types/achievement";
 function roadmapProgressPercent(roadmapSlug: string, completedIds: string[]) {
   const roadmap = getRoadmap(roadmapSlug);
   if (!roadmap || roadmap.nodes.length === 0) return 0;
-  return Math.round((completedIds.length / roadmap.nodes.length) * 100);
+  const completed = new Set(completedIds);
+  const canonicalCompleted = roadmap.nodes.filter((node) =>
+    completed.has(node.id),
+  ).length;
+  return Math.round((canonicalCompleted / roadmap.nodes.length) * 100);
+}
+
+function canonicalCompletedLessonCount(progressByRoadmap: Record<string, string[]>) {
+  return getRoadmapSlugs().reduce((total, roadmapSlug) => {
+    const roadmap = getRoadmap(roadmapSlug);
+    if (!roadmap) return total;
+    const completed = new Set(progressByRoadmap[roadmapSlug] ?? []);
+    return total + roadmap.nodes.filter((node) => completed.has(node.id)).length;
+  }, 0);
 }
 
 function isRoadmapFullyComplete(roadmapSlug: string, completedIds: Set<string>) {
@@ -44,7 +57,7 @@ export function isAchievementEarned(
 
   switch (criteria.type) {
     case "lessons_completed": {
-      const total = Object.values(progressByRoadmap).flat().length;
+      const total = canonicalCompletedLessonCount(progressByRoadmap);
       return total >= criteria.min;
     }
     case "roadmap_progress": {

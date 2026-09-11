@@ -9,7 +9,7 @@ import { ThemeProvider } from "@/components/theme/theme-provider";
 import { DEV_CHUNK_RECOVERY_SCRIPT } from "@/lib/dev/chunk-error-recovery";
 import { siteConfig } from "@/lib/site-config";
 
-import "@/styles/index.css";
+import "@/app/globals.css";
 
 const spaceGrotesk = localFont({
   src: "./fonts/SpaceGrotesk-Variable.woff2",

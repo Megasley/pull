@@ -11,21 +11,17 @@ export function useLessonCompletion(
   lessonSlug: string,
   roadmap: RoadmapJson,
 ) {
-  const { completedIds, setCompletedIds } = useRoadmapProgress(roadmapSlug, roadmap);
+  const { completedIds, setNodeCompleted } = useRoadmapProgress(roadmapSlug, roadmap);
   const isComplete = completedIds.has(lessonSlug);
   const roadmapProgress = calculateRoadmapProgress(roadmap.nodes, completedIds);
 
   const markComplete = useCallback(() => {
-    setCompletedIds((current) => new Set([...current, lessonSlug]));
-  }, [lessonSlug, setCompletedIds]);
+    setNodeCompleted(lessonSlug, true);
+  }, [lessonSlug, setNodeCompleted]);
 
   const markIncomplete = useCallback(() => {
-    setCompletedIds((current) => {
-      const next = new Set(current);
-      next.delete(lessonSlug);
-      return next;
-    });
-  }, [lessonSlug, setCompletedIds]);
+    setNodeCompleted(lessonSlug, false);
+  }, [lessonSlug, setNodeCompleted]);
 
   const toggleComplete = useCallback(() => {
     if (isComplete) {

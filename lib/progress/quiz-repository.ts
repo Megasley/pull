@@ -1,12 +1,34 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray, or, sql, type SQL } from "drizzle-orm";
 
 import { getDb, isDbConnectionError, withDbRetry } from "@/lib/db";
 import { userChapterQuizzes } from "@/lib/db/schema";
 import { isDatabaseConfigured } from "@/lib/db/env";
+import {
+  isCanonicalQuizReference,
+  resolveChapterQuiz,
+} from "@/lib/progress/validation";
+import { getChapterQuizzesForRoadmap } from "@/lib/quizzes/load";
+import { getRoadmapSlugs } from "@/lib/roadmap/load-roadmap";
 import { awardXp } from "@/lib/xp/repository";
 import { chapterQuizXpKey } from "@/lib/xp/config";
 
-export type ChapterQuizRecordStatus = "passed" | "skipped";
+export type ChapterQuizRecordStatus = "passed";
+
+export function canonicalChapterQuizFilter(): SQL {
+  const filters = getRoadmapSlugs().flatMap((roadmapSlug) => {
+    const quizIds = getChapterQuizzesForRoadmap(roadmapSlug).map((quiz) => quiz.id);
+    return quizIds.length > 0
+      ? [
+          and(
+            eq(userChapterQuizzes.roadmapSlug, roadmapSlug),
+            inArray(userChapterQuizzes.quizId, quizIds),
+          ),
+        ]
+      : [];
+  });
+
+  return or(...filters) ?? sql`false`;
+}
 
 function nowIso(): string {
   return new Date().toISOString();
@@ -17,6 +39,9 @@ export async function getChapterQuizStatus(
   roadmapSlug: string,
   quizId: string,
 ): Promise<ChapterQuizRecordStatus | null> {
+  if (!isCanonicalQuizReference(roadmapSlug, quizId)) {
+    return null;
+  }
   if (!isDatabaseConfigured()) {
     return null;
   }
@@ -37,7 +62,7 @@ export async function getChapterQuizStatus(
         .limit(1);
 
       const status = rows[0]?.status;
-      return status === "passed" || status === "skipped" ? status : null;
+      return status === "passed" ? status : null;
     });
   } catch (error) {
     if (isDbConnectionError(error)) {
@@ -56,6 +81,11 @@ export async function getChapterQuizStatuses(
     return {};
   }
 
+  const quizIds = getChapterQuizzesForRoadmap(roadmapSlug).map((quiz) => quiz.id);
+  if (quizIds.length === 0) {
+    return {};
+  }
+
   try {
     return await withDbRetry(async () => {
       const db = getDb();
@@ -69,12 +99,13 @@ export async function getChapterQuizStatuses(
           and(
             eq(userChapterQuizzes.userId, userId),
             eq(userChapterQuizzes.roadmapSlug, roadmapSlug),
+            inArray(userChapterQuizzes.quizId, quizIds),
           ),
         );
 
       const result: Record<string, ChapterQuizRecordStatus> = {};
       for (const row of rows) {
-        if (row.status === "passed" || row.status === "skipped") {
+        if (row.status === "passed") {
           result[row.quizId] = row.status;
         }
       }
@@ -131,6 +162,15 @@ export async function recordChapterQuizPassed(input: {
   quizId: string;
   score: number;
 }) {
+  const resolved = resolveChapterQuiz(input.roadmapSlug, input.quizId);
+  if (
+    !resolved.ok ||
+    !Number.isInteger(input.score) ||
+    input.score < resolved.value.quiz.passingScore ||
+    input.score > resolved.value.quiz.questions.length
+  ) {
+    throw new Error("Cannot record an invalid chapter quiz pass.");
+  }
   if (!isDatabaseConfigured()) {
     return;
   }
@@ -148,26 +188,6 @@ export async function recordChapterQuizPassed(input: {
       userId: input.userId,
       sourceType: "chapter_quiz_passed",
       sourceKey: chapterQuizXpKey(input.roadmapSlug, input.quizId),
-    });
-  });
-}
-
-export async function recordChapterQuizSkipped(input: {
-  userId: string;
-  roadmapSlug: string;
-  quizId: string;
-}) {
-  if (!isDatabaseConfigured()) {
-    return;
-  }
-
-  await withDbRetry(async () => {
-    await upsertChapterQuizStatus({
-      userId: input.userId,
-      roadmapSlug: input.roadmapSlug,
-      quizId: input.quizId,
-      status: "skipped",
-      score: null,
     });
   });
 }

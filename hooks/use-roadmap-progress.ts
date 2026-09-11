@@ -4,8 +4,7 @@ import { useCallback, useEffect, useSyncExternalStore } from "react";
 
 import {
   fetchRoadmapProgressAction,
-  mergeRoadmapProgressAction,
-  replaceRoadmapProgressAction,
+  toggleLessonProgressAction,
 } from "@/app/actions/progress";
 import { useAuthSession } from "@/hooks/use-auth-session";
 import {
@@ -67,25 +66,14 @@ export function useRoadmapProgress(slug: string, data: RoadmapJson) {
     let cancelled = false;
 
     async function hydrateFromServer() {
-      const localIds = readStoredCompletedIds(slug, userId) ?? [];
       const result = await fetchRoadmapProgressAction(slug);
 
       if (cancelled || !result.authenticated) {
         return;
       }
 
-      const merged = [...new Set([...localIds, ...result.completedNodeSlugs])].sort();
-
-      writeStoredCompletedIds(slug, new Set(merged), userId);
+      writeStoredCompletedIds(slug, new Set(result.completedNodeSlugs), userId);
       dispatchProgressChange(slug);
-
-      const localHasExtra = localIds.some(
-        (nodeId) => !result.completedNodeSlugs.includes(nodeId),
-      );
-
-      if (localHasExtra || merged.length !== result.completedNodeSlugs.length) {
-        await mergeRoadmapProgressAction(slug, merged);
-      }
     }
 
     void hydrateFromServer();
@@ -95,8 +83,8 @@ export function useRoadmapProgress(slug: string, data: RoadmapJson) {
     };
   }, [authReady, slug, userId]);
 
-  const setCompletedIds = useCallback(
-    (updater: Set<string> | ((current: Set<string>) => Set<string>)) => {
+  const setNodeCompleted = useCallback(
+    (nodeSlug: string, completed: boolean) => {
       if (!userId) {
         return;
       }
@@ -104,16 +92,37 @@ export function useRoadmapProgress(slug: string, data: RoadmapJson) {
       const current = new Set(
         JSON.parse(getCompletedSnapshot(slug, userId)) as string[],
       );
-      const next = typeof updater === "function" ? updater(current) : updater;
+      const next = new Set(current);
+      if (completed) {
+        next.add(nodeSlug);
+      } else {
+        next.delete(nodeSlug);
+      }
 
       writeStoredCompletedIds(slug, next, userId);
       dispatchProgressChange(slug);
-      void replaceRoadmapProgressAction(slug, [...next]);
+
+      void toggleLessonProgressAction(slug, nodeSlug, completed)
+        .then(async (result) => {
+          if (result.ok) {
+            return;
+          }
+
+          const server = await fetchRoadmapProgressAction(slug);
+          if (server.authenticated) {
+            writeStoredCompletedIds(slug, new Set(server.completedNodeSlugs), userId);
+            dispatchProgressChange(slug);
+          }
+        })
+        .catch(() => {
+          writeStoredCompletedIds(slug, current, userId);
+          dispatchProgressChange(slug);
+        });
     },
     [slug, userId],
   );
 
-  return { completedIds, setCompletedIds };
+  return { completedIds, setNodeCompleted };
 }
 
 export function useRoadmapUnlocked(data: RoadmapJson): boolean {

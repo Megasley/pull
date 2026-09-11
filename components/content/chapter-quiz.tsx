@@ -16,12 +16,17 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { XP_REWARDS } from "@/lib/xp/config";
 import { cn } from "@/lib/utils";
-import type { LessonChapterQuiz } from "@/types/content";
+import type {
+  ChapterQuizAnswer,
+  ChapterQuizSubmissionResult,
+  LessonChapterQuiz,
+} from "@/types/content";
 
 type ChapterQuizProps = {
   quiz: LessonChapterQuiz;
-  onPassed: (score: number) => void;
-  onSkip?: () => void;
+  onSubmit: (
+    answers: ChapterQuizAnswer[],
+  ) => Promise<ChapterQuizSubmissionResult | null>;
   disabled?: boolean;
   /** When false, answers are scored locally only (guest practice mode). */
   persistResults?: boolean;
@@ -40,25 +45,27 @@ function optionBadgeClass(selected: boolean, submitted: boolean) {
 
 export function ChapterQuiz({
   quiz,
-  onPassed,
-  onSkip,
+  onSubmit,
   disabled = false,
   persistResults = true,
   signInHref,
 }: ChapterQuizProps) {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
-  const [showSkipConfirm, setShowSkipConfirm] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submissionResult, setSubmissionResult] =
+    useState<ChapterQuizSubmissionResult | null>(null);
 
   const answeredCount = Object.keys(answers).length;
   const totalQuestions = quiz.questions.length;
   const progressPercent = Math.round((answeredCount / totalQuestions) * 100);
 
-  const score = quiz.questions.reduce((total, question) => {
+  const localScore = quiz.questions.reduce((total, question) => {
     return answers[question.id] === question.correctOptionId ? total + 1 : total;
   }, 0);
 
-  const passed = score >= quiz.passingScore;
+  const score = submissionResult?.score ?? localScore;
+  const passed = submissionResult?.passed ?? localScore >= quiz.passingScore;
   const xpReward = XP_REWARDS.chapter_quiz_passed;
 
   const progressLabel = useMemo(() => {
@@ -71,18 +78,32 @@ export function ChapterQuiz({
     return `${answeredCount} of ${totalQuestions} locked in`;
   }, [answeredCount, passed, submitted, totalQuestions]);
 
-  function handleSubmit() {
+  async function handleSubmit() {
     if (answeredCount < totalQuestions) {
       return;
     }
 
-    setSubmitted(true);
-    if (passed && persistResults) {
-      onPassed(score);
+    if (!persistResults) {
+      setSubmitted(true);
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const result = await onSubmit(
+        quiz.questions.map((question) => ({
+          questionId: question.id,
+          optionId: answers[question.id],
+        })),
+      );
+      if (result) {
+        setSubmissionResult(result);
+        setSubmitted(true);
+      }
+    } finally {
+      setSubmitting(false);
     }
   }
-
-  const canSkip = persistResults && Boolean(onSkip);
 
   return (
     <section className="relative overflow-hidden rounded-none border border-ink bg-card shadow-[var(--shadow-off)]">
@@ -130,7 +151,7 @@ export function ChapterQuiz({
           {persistResults ? (
             <>
               Score <span className="font-semibold text-ink">{quiz.passingScore}</span>{" "}
-              of {totalQuestions} to unlock mark-complete — or skip with a warning.
+              of {totalQuestions} to unlock mark-complete.
             </>
           ) : (
             <>
@@ -361,7 +382,7 @@ export function ChapterQuiz({
               {!passed ? (
                 <p className="mt-2 text-sm text-muted-foreground">
                   {persistResults
-                    ? "Review the hints and retry, or skip to mark complete anyway."
+                    ? "Review the hints and retry until you pass."
                     : "Review the hints and try again."}
                 </p>
               ) : !persistResults && signInHref ? (
@@ -385,9 +406,12 @@ export function ChapterQuiz({
         {!submitted || !passed ? (
           <Button
             type="button"
-            onClick={handleSubmit}
+            onClick={() => void handleSubmit()}
             disabled={
-              disabled || answeredCount < totalQuestions || (submitted && passed)
+              disabled ||
+              submitting ||
+              answeredCount < totalQuestions ||
+              (submitted && passed)
             }
             className="shadow-[var(--shadow-off-sm)]"
           >
@@ -402,40 +426,12 @@ export function ChapterQuiz({
             onClick={() => {
               setAnswers({});
               setSubmitted(false);
+              setSubmissionResult(null);
             }}
             className="border-ink/25"
           >
             ./retry
           </Button>
-        ) : null}
-        {canSkip ? (
-          !showSkipConfirm ? (
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => setShowSkipConfirm(true)}
-              disabled={disabled}
-            >
-              skip check
-            </Button>
-          ) : (
-            <div className="flex w-full flex-wrap items-center gap-2 border border-ink/20 bg-signal/15 px-3 py-2">
-              <p className="font-mono text-[11px] text-muted-foreground">
-                Skip the check? You can still mark complete, but passing is recommended.
-              </p>
-              <Button type="button" size="sm" variant="outline" onClick={onSkip}>
-                confirm skip
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant="ghost"
-                onClick={() => setShowSkipConfirm(false)}
-              >
-                cancel
-              </Button>
-            </div>
-          )
         ) : null}
         {!persistResults && signInHref && !submitted ? (
           <Button asChild variant="outline" className="border-ink/25">

@@ -82,8 +82,12 @@ export function LessonExperience({
   // do not also feed them into LessonBuildChallenge.
   const recommendedProjects = lesson.recommendedProjects ?? [];
   const chapterProjects = chapterQuiz?.recommendedProjects ?? [];
-  const { canMarkComplete, status, hydrated, handlePassed, handleSkip } =
-    useChapterQuizGate(lesson.roadmap, chapterQuiz, userId, isAuthenticated);
+  const { canMarkComplete, status, hydrated, handleSubmit } = useChapterQuizGate(
+    lesson.roadmap,
+    chapterQuiz,
+    userId,
+    isAuthenticated,
+  );
   const signInHref = `/sign-in?next=${encodeURIComponent(
     `/roadmaps/${lesson.roadmap}/lessons/${lesson.slug}`,
   )}`;
@@ -263,8 +267,7 @@ export function LessonExperience({
                 onToggleComplete={toggleComplete}
                 isAuthenticated={isAuthenticated}
                 signInHref={signInHref}
-                onPassed={(score) => void handlePassed(score)}
-                onSkip={() => void handleSkip()}
+                onSubmit={handleSubmit}
               />
             ) : (
               <LessonCompletionButton

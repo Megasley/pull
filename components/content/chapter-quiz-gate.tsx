@@ -1,12 +1,16 @@
 "use client";
 
-import { CheckCircle2, SkipForward } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 
 import { ChapterQuiz } from "@/components/content/chapter-quiz";
 import { LessonCompletionButton } from "@/components/content/lesson-completion-button";
 import { Badge } from "@/components/ui/badge";
 import type { ChapterQuizStatus } from "@/lib/quizzes/storage";
-import type { LessonChapterQuiz } from "@/types/content";
+import type {
+  ChapterQuizAnswer,
+  ChapterQuizSubmissionResult,
+  LessonChapterQuiz,
+} from "@/types/content";
 
 type ChapterQuizGateProps = {
   quiz: LessonChapterQuiz;
@@ -17,8 +21,9 @@ type ChapterQuizGateProps = {
   onToggleComplete: () => void;
   isAuthenticated: boolean;
   signInHref: string;
-  onPassed: (score: number) => void;
-  onSkip: () => void;
+  onSubmit: (
+    answers: ChapterQuizAnswer[],
+  ) => Promise<ChapterQuizSubmissionResult | null>;
 };
 
 export function ChapterQuizGate({
@@ -30,14 +35,13 @@ export function ChapterQuizGate({
   onToggleComplete,
   isAuthenticated,
   signInHref,
-  onPassed,
-  onSkip,
+  onSubmit,
 }: ChapterQuizGateProps) {
   if (!hydrated) {
     return null;
   }
 
-  const quizComplete = isAuthenticated && (status === "passed" || status === "skipped");
+  const quizComplete = isAuthenticated && status === "passed";
   const showQuiz = !quizComplete;
 
   return (
@@ -45,8 +49,7 @@ export function ChapterQuizGate({
       {showQuiz ? (
         <ChapterQuiz
           quiz={quiz}
-          onPassed={onPassed}
-          onSkip={isAuthenticated ? onSkip : undefined}
+          onSubmit={onSubmit}
           persistResults={isAuthenticated}
           signInHref={signInHref}
         />
@@ -54,21 +57,15 @@ export function ChapterQuizGate({
 
       {quizComplete ? (
         <div className="flex flex-wrap items-center gap-2 border border-ink/20 bg-signal/15 px-4 py-3 shadow-[var(--shadow-off-sm)]">
-          {status === "passed" ? (
-            <CheckCircle2 className="size-4 text-ink" aria-hidden />
-          ) : (
-            <SkipForward className="size-4 text-muted-foreground" aria-hidden />
-          )}
+          <CheckCircle2 className="size-4 text-ink" aria-hidden />
           <Badge
             variant="outline"
             className="rounded-none border-ink/25 bg-background font-mono text-[10px] uppercase"
           >
-            chapter check // {status === "passed" ? "cleared" : "skipped"}
+            chapter check // cleared
           </Badge>
           <p className="font-mono text-[11px] text-muted-foreground">
-            {status === "passed"
-              ? "Nice — mark-complete is unlocked."
-              : "Skipped — you can still finish the lesson."}
+            Nice — mark-complete is unlocked.
           </p>
         </div>
       ) : null}
@@ -81,7 +78,7 @@ export function ChapterQuizGate({
         disabled={!canMarkComplete}
         disabledReason={
           !canMarkComplete
-            ? "Pass the chapter check or confirm skip to mark this lesson complete."
+            ? "Pass the chapter check to mark this lesson complete."
             : undefined
         }
       />

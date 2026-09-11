@@ -22,14 +22,8 @@ CREATE POLICY "Users are publicly readable"
   ON public.users FOR SELECT USING (true);
 
 DROP POLICY IF EXISTS "Users can create their own profile" ON public.users;
-CREATE POLICY "Users can create their own profile"
-  ON public.users FOR INSERT WITH CHECK (auth.uid() = id);
-
 DROP POLICY IF EXISTS "Users can update their own profile" ON public.users;
-CREATE POLICY "Users can update their own profile"
-  ON public.users FOR UPDATE
-  USING (auth.uid() = id)
-  WITH CHECK (auth.uid() = id);
+REVOKE INSERT, UPDATE, DELETE ON public.users FROM anon, authenticated;
 
 -- ============================================================
 -- user_roadmap_progress
@@ -41,17 +35,9 @@ CREATE POLICY "Users can read their own roadmap progress"
   ON public.user_roadmap_progress FOR SELECT USING (auth.uid() = user_id);
 
 DROP POLICY IF EXISTS "Users can insert their own roadmap progress" ON public.user_roadmap_progress;
-CREATE POLICY "Users can insert their own roadmap progress"
-  ON public.user_roadmap_progress FOR INSERT WITH CHECK (auth.uid() = user_id);
-
 DROP POLICY IF EXISTS "Users can update their own roadmap progress" ON public.user_roadmap_progress;
-CREATE POLICY "Users can update their own roadmap progress"
-  ON public.user_roadmap_progress FOR UPDATE
-  USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
-
 DROP POLICY IF EXISTS "Users can delete their own roadmap progress" ON public.user_roadmap_progress;
-CREATE POLICY "Users can delete their own roadmap progress"
-  ON public.user_roadmap_progress FOR DELETE USING (auth.uid() = user_id);
+REVOKE INSERT, UPDATE, DELETE ON public.user_roadmap_progress FROM anon, authenticated;
 
 -- ============================================================
 -- projects
@@ -169,33 +155,6 @@ CREATE POLICY "Organizations are publicly readable"
   ON public.organizations FOR SELECT USING (true);
 
 -- ============================================================
--- cohorts / partner tables
--- ============================================================
-ALTER TABLE public.cohorts ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.cohort_memberships ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.cohort_opportunities ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.cohort_skills ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.partner_participants ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.partner_invitations ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.invitation_verification_codes ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "Authenticated users can read cohorts" ON public.cohorts;
-CREATE POLICY "Authenticated users can read cohorts"
-  ON public.cohorts FOR SELECT TO authenticated USING (true);
-
-DROP POLICY IF EXISTS "Authenticated users can read cohort memberships" ON public.cohort_memberships;
-CREATE POLICY "Authenticated users can read cohort memberships"
-  ON public.cohort_memberships FOR SELECT TO authenticated USING (auth.uid() = user_id);
-
-DROP POLICY IF EXISTS "Authenticated users can read cohort opportunities" ON public.cohort_opportunities;
-CREATE POLICY "Authenticated users can read cohort opportunities"
-  ON public.cohort_opportunities FOR SELECT TO authenticated USING (true);
-
-DROP POLICY IF EXISTS "Authenticated users can read cohort skills" ON public.cohort_skills;
-CREATE POLICY "Authenticated users can read cohort skills"
-  ON public.cohort_skills FOR SELECT TO authenticated USING (true);
-
--- ============================================================
 -- user_weekly_goals
 -- ============================================================
 ALTER TABLE public.user_weekly_goals ENABLE ROW LEVEL SECURITY;
@@ -210,8 +169,10 @@ CREATE POLICY "Users can manage their own weekly goals"
 ALTER TABLE public.user_chapter_quizzes ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Users can manage their own chapter quizzes" ON public.user_chapter_quizzes;
-CREATE POLICY "Users can manage their own chapter quizzes"
-  ON public.user_chapter_quizzes FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can read their own chapter quizzes" ON public.user_chapter_quizzes;
+CREATE POLICY "Users can read their own chapter quizzes"
+  ON public.user_chapter_quizzes FOR SELECT USING (auth.uid() = user_id);
+REVOKE INSERT, UPDATE, DELETE ON public.user_chapter_quizzes FROM anon, authenticated;
 
 -- ============================================================
 -- admin tables: RLS on, no client policies (server-side only)

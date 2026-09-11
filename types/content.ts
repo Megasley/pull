@@ -41,6 +41,16 @@ export type LessonChapterQuiz = {
   questions: LessonQuizQuestion[];
 };
 
+export type ChapterQuizAnswer = {
+  questionId: string;
+  optionId: string;
+};
+
+export type ChapterQuizSubmissionResult = {
+  passed: boolean;
+  score: number;
+};
+
 export type LessonFrontmatter = {
   title: string;
   description: string;

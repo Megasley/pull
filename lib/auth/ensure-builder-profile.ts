@@ -2,16 +2,14 @@ import type { User } from "@supabase/supabase-js";
 
 import { eq } from "drizzle-orm";
 
+import type { AcquisitionSignal } from "@/lib/auth/acquisition";
 import { resolveUserRole } from "@/lib/auth/roles";
-import { getDb } from "@/lib/db";
+import { getDb, withDbRetry } from "@/lib/db";
 import { isDatabaseConfigured } from "@/lib/db/env";
 import { users } from "@/lib/db/schema";
 import { notifyWelcomeAsync } from "@/lib/notifications/dispatch";
-import { createClient } from "@/lib/supabase/server";
-import { mapBuilderProfile, type BuilderProfile } from "@/types/user";
-
-import { normalizeAccountStatus, type UserAccountStatus } from "./account-status";
-import type { AcquisitionSignal } from "./acquisition";
+import { mapDrizzleUser } from "@/lib/profile/repository";
+import type { BuilderProfile } from "@/types/user";
 
 /** Throttle DB writes — enough for MAU, light on write load. */
 const ACTIVITY_TOUCH_MS = 60 * 60 * 1000;
@@ -32,23 +30,18 @@ function sanitizeUsername(value: string): string {
   return sanitized || "builder";
 }
 
-async function generateUniqueUsername(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  baseUsername: string,
-): Promise<string> {
+async function generateUniqueUsername(baseUsername: string): Promise<string> {
+  const db = getDb();
   let candidate = sanitizeUsername(baseUsername);
 
   for (let attempt = 0; attempt < 10; attempt += 1) {
-    const { data } = await supabase
-      .from("users")
-      .select("id")
-      .eq("username", candidate)
-      .maybeSingle();
+    const rows = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.username, candidate))
+      .limit(1);
 
-    if (!data) {
-      return candidate;
-    }
-
+    if (!rows[0]) return candidate;
     candidate = `${sanitizeUsername(baseUsername)}-${attempt + 1}`;
   }
 
@@ -74,177 +67,110 @@ function getGithubIdentity(user: User) {
   return { githubUsername, displayName, avatar, email };
 }
 
-/**
- * PostgREST schema cache can lag behind migrations. Read launch columns via
- * Drizzle so onboarding / moderation state stays accurate.
- */
-async function enrichProfileFromDrizzle(
-  profile: BuilderProfile,
-): Promise<BuilderProfile> {
-  if (!isDatabaseConfigured()) {
-    return profile;
-  }
-
-  try {
-    const db = getDb();
-    const rows = await db
-      .select({
-        accountStatus: users.accountStatus,
-        moderationReason: users.moderationReason,
-        onboardingCompletedAt: users.onboardingCompletedAt,
-        preferredRoadmapSlug: users.preferredRoadmapSlug,
-      })
-      .from(users)
-      .where(eq(users.id, profile.id))
-      .limit(1);
-
-    const row = rows[0];
-    if (!row) {
-      return profile;
-    }
-
-    return {
-      ...profile,
-      accountStatus: normalizeAccountStatus(row.accountStatus as UserAccountStatus),
-      moderationReason: row.moderationReason,
-      onboardingCompletedAt: row.onboardingCompletedAt,
-      preferredRoadmapSlug: row.preferredRoadmapSlug,
-    };
-  } catch (error) {
-    console.warn("[auth] enrichProfileFromDrizzle failed", error);
-    return profile;
-  }
+function isUniqueViolation(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    error.code === "23505"
+  );
 }
 
 export async function ensureBuilderProfile(
   user: User,
   options: { acquisition?: AcquisitionSignal } = {},
 ): Promise<BuilderProfile | null> {
-  const supabase = await createClient();
+  if (!isDatabaseConfigured()) return null;
 
-  const { data: existing, error: existingError } = await supabase
-    .from("users")
-    .select("*")
-    .eq("id", user.id)
-    .maybeSingle();
+  return withDbRetry(async () => {
+    const db = getDb();
+    const existingRows = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, user.id))
+      .limit(1);
+    const existing = existingRows[0];
+    const { githubUsername, displayName, avatar, email } = getGithubIdentity(user);
 
-  if (existingError) {
-    throw existingError;
-  }
+    if (existing) {
+      const nextRole = resolveUserRole(
+        existing.githubUsername ?? githubUsername,
+        existing.role,
+      );
+      const shouldUpdateRole = nextRole !== existing.role;
+      const shouldSyncEmail = Boolean(email) && email !== existing.email;
+      const shouldTouch = shouldTouchActivity(existing.lastActiveAt);
 
-  const { githubUsername, displayName, avatar, email } = getGithubIdentity(user);
+      if (shouldUpdateRole || shouldSyncEmail || shouldTouch) {
+        const now = new Date().toISOString();
+        const [updated] = await db
+          .update(users)
+          .set({
+            ...(shouldUpdateRole ? { role: nextRole, updatedAt: now } : {}),
+            ...(shouldSyncEmail && email ? { email, updatedAt: now } : {}),
+            ...(shouldTouch ? { lastActiveAt: now } : {}),
+          })
+          .where(eq(users.id, user.id))
+          .returning();
 
-  if (existing) {
-    const nextRole = resolveUserRole(
-      existing.github_username ?? githubUsername,
-      existing.role,
-    );
-
-    const existingEmail = typeof existing.email === "string" ? existing.email : null;
-    const shouldUpdateRole = nextRole !== (existing.role ?? "builder");
-    const shouldSyncEmail = Boolean(email) && email !== existingEmail;
-    const lastActiveRaw =
-      typeof existing.last_active_at === "string" ? existing.last_active_at : null;
-    const shouldTouch = shouldTouchActivity(lastActiveRaw);
-
-    if (shouldUpdateRole || shouldSyncEmail || shouldTouch) {
-      const now = new Date().toISOString();
-      const patch: Record<string, string> = {};
-      if (shouldUpdateRole) {
-        patch.role = nextRole;
-        patch.updated_at = now;
-      }
-      if (shouldSyncEmail && email) {
-        patch.email = email;
-        patch.updated_at = now;
-      }
-      if (shouldTouch) {
-        patch.last_active_at = now;
+        return updated ? mapDrizzleUser(updated) : null;
       }
 
-      const { data: updated, error: updateError } = await supabase
-        .from("users")
-        .update(patch)
-        .eq("id", user.id)
-        .select("*")
-        .single();
-
-      if (updateError) {
-        throw updateError;
-      }
-
-      return enrichProfileFromDrizzle(mapBuilderProfile(updated));
+      return mapDrizzleUser(existing);
     }
 
-    return enrichProfileFromDrizzle(mapBuilderProfile(existing));
-  }
+    const username = await generateUniqueUsername(githubUsername);
+    const timestamp = new Date().toISOString();
+    const acquisition = options.acquisition;
 
-  const username = await generateUniqueUsername(supabase, githubUsername);
-  const timestamp = new Date().toISOString();
-  const role = resolveUserRole(githubUsername);
-  const acquisition = options.acquisition;
+    try {
+      const [created] = await db
+        .insert(users)
+        .values({
+          id: user.id,
+          username,
+          displayName,
+          avatar,
+          bio: "",
+          githubUsername,
+          email,
+          role: resolveUserRole(githubUsername),
+          xp: 0,
+          level: 1,
+          // First-touch only — never written again after this insert.
+          acquisitionSource: acquisition?.source ?? "direct",
+          acquisitionDetail: acquisition?.detail ?? {},
+          createdAt: timestamp,
+          updatedAt: timestamp,
+          lastActiveAt: timestamp,
+        })
+        .returning();
 
-  const { data: created, error: createError } = await supabase
-    .from("users")
-    .insert({
-      id: user.id,
-      username,
-      display_name: displayName,
-      avatar,
-      bio: "",
-      github_username: githubUsername,
-      email,
-      role,
-      xp: 0,
-      level: 1,
-      // First-touch only — never written again after this insert.
-      acquisition_source: acquisition?.source ?? "direct",
-      acquisition_detail: acquisition?.detail ?? {},
-      created_at: timestamp,
-      updated_at: timestamp,
-      last_active_at: timestamp,
-    })
-    .select("*")
-    .single();
+      if (!created) return null;
+      const profile = mapDrizzleUser(created);
+      notifyWelcomeAsync({
+        userId: profile.id,
+        displayName: profile.displayName,
+        email: profile.email ?? email,
+      });
+      return profile;
+    } catch (error) {
+      if (!isUniqueViolation(error)) throw error;
 
-  if (createError) {
-    if (createError.code === "23505") {
-      const { data: profile } = await supabase
-        .from("users")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-
-      return profile ? enrichProfileFromDrizzle(mapBuilderProfile(profile)) : null;
+      const rows = await db.select().from(users).where(eq(users.id, user.id)).limit(1);
+      return rows[0] ? mapDrizzleUser(rows[0]) : null;
     }
-
-    throw createError;
-  }
-
-  const profile = await enrichProfileFromDrizzle(mapBuilderProfile(created));
-  notifyWelcomeAsync({
-    userId: profile.id,
-    displayName: profile.displayName,
-    email: profile.email ?? email,
   });
-
-  return profile;
 }
 
 export async function getBuilderProfile(
   userId: string,
 ): Promise<BuilderProfile | null> {
-  const supabase = await createClient();
+  if (!isDatabaseConfigured()) return null;
 
-  const { data, error } = await supabase
-    .from("users")
-    .select("*")
-    .eq("id", userId)
-    .maybeSingle();
-
-  if (error) {
-    throw error;
-  }
-
-  return data ? enrichProfileFromDrizzle(mapBuilderProfile(data)) : null;
+  return withDbRetry(async () => {
+    const db = getDb();
+    const rows = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+    return rows[0] ? mapDrizzleUser(rows[0]) : null;
+  });
 }

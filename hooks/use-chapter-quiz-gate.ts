@@ -4,15 +4,19 @@ import { useCallback, useEffect, useState } from "react";
 
 import {
   fetchChapterQuizStatusAction,
-  skipChapterQuizAction,
   submitChapterQuizAction,
 } from "@/app/actions/progress";
 import {
+  clearStoredChapterQuizStatus,
   readStoredChapterQuizStatus,
   writeStoredChapterQuizStatus,
   type ChapterQuizStatus,
 } from "@/lib/quizzes/storage";
-import type { LessonChapterQuiz } from "@/types/content";
+import type {
+  ChapterQuizAnswer,
+  ChapterQuizSubmissionResult,
+  LessonChapterQuiz,
+} from "@/types/content";
 
 export function useChapterQuizGate(
   roadmapSlug: string,
@@ -43,9 +47,18 @@ export function useChapterQuizGate(
       }
 
       const result = await fetchChapterQuizStatusAction(roadmapSlug, activeQuiz.id);
-      if (!cancelled && result.authenticated && result.status) {
+      if (!cancelled && result.authenticated) {
         setStatus(result.status);
-        writeStoredChapterQuizStatus(userId, roadmapSlug, activeQuiz.id, result.status);
+        if (result.status) {
+          writeStoredChapterQuizStatus(
+            userId,
+            roadmapSlug,
+            activeQuiz.id,
+            result.status,
+          );
+        } else {
+          clearStoredChapterQuizStatus(userId, roadmapSlug, activeQuiz.id);
+        }
       }
 
       if (!cancelled) {
@@ -60,41 +73,40 @@ export function useChapterQuizGate(
     };
   }, [isAuthenticated, quiz, roadmapSlug, userId]);
 
-  const canMarkComplete =
-    !quiz || !isAuthenticated || status === "passed" || status === "skipped";
+  const canMarkComplete = !quiz || !isAuthenticated || status === "passed";
 
-  const handlePassed = useCallback(
-    async (score: number) => {
+  const handleSubmit = useCallback(
+    async (
+      answers: ChapterQuizAnswer[],
+    ): Promise<ChapterQuizSubmissionResult | null> => {
       if (!quiz || !userId) {
-        return;
+        return null;
       }
 
-      setStatus("passed");
-      writeStoredChapterQuizStatus(userId, roadmapSlug, quiz.id, "passed");
-      await submitChapterQuizAction({
+      const result = await submitChapterQuizAction({
         roadmapSlug,
         quizId: quiz.id,
-        score,
+        answers,
       });
+
+      if (!result.ok) {
+        return null;
+      }
+
+      if (result.passed) {
+        setStatus("passed");
+        writeStoredChapterQuizStatus(userId, roadmapSlug, quiz.id, "passed");
+      }
+
+      return { passed: result.passed, score: result.score };
     },
     [quiz, roadmapSlug, userId],
   );
-
-  const handleSkip = useCallback(async () => {
-    if (!quiz || !userId) {
-      return;
-    }
-
-    setStatus("skipped");
-    writeStoredChapterQuizStatus(userId, roadmapSlug, quiz.id, "skipped");
-    await skipChapterQuizAction({ roadmapSlug, quizId: quiz.id });
-  }, [quiz, roadmapSlug, userId]);
 
   return {
     status,
     hydrated,
     canMarkComplete,
-    handlePassed,
-    handleSkip,
+    handleSubmit,
   };
 }
