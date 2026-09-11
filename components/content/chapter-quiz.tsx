@@ -258,7 +258,7 @@ export function ChapterQuiz({
                         "group flex w-full items-start gap-3 border px-3 py-2.5 text-left text-sm transition-all",
                         "disabled:cursor-default",
                         !submitted &&
-                          "hover:-translate-y-px hover:border-ink/40 hover:shadow-[var(--shadow-off-sm)]",
+                          "hover:-translate-y-px hover:border-ink/40 hover:shadow-[var(--shadow-off-sm)] active:translate-y-px active:shadow-none",
                         active &&
                           !submitted &&
                           "border-ink bg-signal/20 text-foreground",

@@ -15,6 +15,7 @@ const buttonVariants = cva(
     "shadow-[var(--shadow-off-sm)] outline-none select-none",
     "transition-[transform,box-shadow,background-color,color] duration-100",
     "hover:-translate-x-px hover:-translate-y-px",
+    "active:translate-x-[3px] active:translate-y-[3px] active:shadow-none",
     "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal",
     "disabled:pointer-events-none disabled:translate-0 disabled:opacity-50 disabled:shadow-none",
     "data-[loading=true]:pointer-events-none data-[loading=true]:translate-0 data-[loading=true]:opacity-100",
@@ -33,7 +34,7 @@ const buttonVariants = cva(
           "border-ink/30 bg-transparent text-foreground shadow-none hover:border-ink hover:bg-background hover:shadow-[var(--shadow-off-sm)]",
         destructive:
           "border-destructive/50 bg-destructive/10 text-destructive shadow-[3px_3px_0_color-mix(in_oklab,var(--destructive)_55%,var(--ink))] hover:bg-destructive/20 focus-visible:outline-destructive/40",
-        link: "h-auto border-0 bg-transparent p-0 font-medium text-primary shadow-none hover:translate-0 hover:underline hover:underline-offset-4 focus-visible:outline-signal",
+        link: "h-auto border-0 bg-transparent p-0 font-medium text-primary shadow-none hover:translate-0 hover:underline hover:underline-offset-4 active:translate-0 focus-visible:outline-signal",
       },
       size: {
         default:

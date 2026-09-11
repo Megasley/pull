@@ -275,7 +275,7 @@ export function MobileNav({
         aria-modal="true"
         aria-labelledby="mobile-navigation-title"
         className={cn(
-          "fixed inset-x-0 top-14 z-50 flex max-h-[calc(100dvh-3.5rem)] flex-col overscroll-contain border-b border-border bg-background transition-all duration-200",
+          "fixed inset-x-0 top-14 z-50 flex max-h-[calc(100dvh-3.5rem)] flex-col overscroll-contain border-b border-border bg-background transition-[transform,opacity] duration-200",
           open
             ? "pointer-events-auto translate-y-0 opacity-100"
             : "pointer-events-none -translate-y-2 opacity-0",
