@@ -62,6 +62,7 @@ export const xpSourceTypeEnum = pgEnum("xp_source_type", [
   "roadmap_complete",
   "achievement",
   "qa_answer_accepted",
+  "pr_review_completed",
 ]);
 
 export const resourceTypeEnum = pgEnum("resource_type", [
@@ -192,5 +193,24 @@ export const commentStatusEnum = pgEnum("comment_status", [
   "visible",
   "hidden",
   "deleted",
+]);
+
+/** Who put a PR into the review-discovery queue: an admin curating a repo
+ *  that needs eyes, or the PR's own author asking peers to review it.
+ *  See lib/db/schema/pr-review-requests.ts — this drives queue ordering
+ *  (peer_submitted ranks above admin_curated). */
+export const prReviewSourceTypeEnum = pgEnum("pr_review_source_type", [
+  "admin_curated",
+  "peer_submitted",
+]);
+
+/** "reviewed" is set only by the credit-detection hook in lib/github/sync.ts
+ *  cross-referencing a builder's own GitHub review-sync data — never by
+ *  self-report, since a manual "I reviewed this" button would be gameable. */
+export const prReviewStatusEnum = pgEnum("pr_review_status", [
+  "needs_review",
+  "reviewed",
+  "closed",
+  "hidden",
 ]);
 

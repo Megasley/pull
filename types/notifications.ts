@@ -4,6 +4,7 @@ export type EmailNotificationPrefs = {
   achievements: boolean;
   product: boolean;
   qaActivity: boolean;
+  prReviewActivity: boolean;
 };
 
 export const DEFAULT_EMAIL_NOTIFICATION_PREFS: EmailNotificationPrefs = {
@@ -12,6 +13,7 @@ export const DEFAULT_EMAIL_NOTIFICATION_PREFS: EmailNotificationPrefs = {
   achievements: true,
   product: false,
   qaActivity: false,
+  prReviewActivity: false,
 };
 
 export type EmailNotificationPrefKey = keyof EmailNotificationPrefs;
@@ -45,5 +47,9 @@ export function normalizeEmailNotificationPrefs(
       typeof raw.qaActivity === "boolean"
         ? raw.qaActivity
         : DEFAULT_EMAIL_NOTIFICATION_PREFS.qaActivity,
+    prReviewActivity:
+      typeof raw.prReviewActivity === "boolean"
+        ? raw.prReviewActivity
+        : DEFAULT_EMAIL_NOTIFICATION_PREFS.prReviewActivity,
   };
 }

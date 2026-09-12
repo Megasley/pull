@@ -7,6 +7,7 @@ export * from "./goals";
 export * from "./milestones";
 export * from "./opportunities";
 export * from "./partners";
+export * from "./pr-review-requests";
 export * from "./relations";
 export * from "./roadmaps";
 export * from "./support";

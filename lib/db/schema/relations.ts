@@ -13,6 +13,7 @@ import {
 } from "./github";
 import { adminNotifications, milestoneEvents } from "./milestones";
 import { opportunityEvents } from "./opportunities";
+import { prReviewRequests } from "./pr-review-requests";
 import {
   orgInviteLinks,
   orgMemberships,
@@ -59,6 +60,25 @@ export const usersRelations = relations(users, ({ many, one }) => ({
   orgMemberships: many(orgMemberships),
   opportunityEvents: many(opportunityEvents),
   comments: many(comments),
+  submittedPrReviewRequests: many(prReviewRequests, {
+    relationName: "pr_review_request_submitter",
+  }),
+  reviewedPrReviewRequests: many(prReviewRequests, {
+    relationName: "pr_review_request_reviewer",
+  }),
+}));
+
+export const prReviewRequestsRelations = relations(prReviewRequests, ({ one }) => ({
+  submittedBy: one(users, {
+    fields: [prReviewRequests.submittedByUserId],
+    references: [users.id],
+    relationName: "pr_review_request_submitter",
+  }),
+  reviewedBy: one(users, {
+    fields: [prReviewRequests.reviewedByUserId],
+    references: [users.id],
+    relationName: "pr_review_request_reviewer",
+  }),
 }));
 
 export const githubReviewedPullRequestsRelations = relations(

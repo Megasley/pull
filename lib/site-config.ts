@@ -1,7 +1,6 @@
 import {
   Activity,
   Bell,
-  ClipboardCheck,
   FolderGit2,
   GitPullRequest,
   LayoutDashboard,
@@ -116,6 +115,7 @@ export const primaryNav = [
     items: [
       { title: "Open Source Projects", href: "/discover" },
       { title: "Issues", href: "/issues" },
+      { title: "Reviews", href: "/pr-reviews" },
       { title: "First Contribution", href: "/first-contribution" },
       { title: "Bounties", comingSoon: true },
     ],
@@ -161,7 +161,6 @@ export const accountNavSections = [
       { title: "Activity", href: "/activity", icon: Activity },
       { title: "PR portfolio", href: "/portfolio", icon: GitPullRequest },
       { title: "Reputation", href: "/reputation", icon: Trophy },
-      { title: "Review", href: "/review", icon: ClipboardCheck },
       { title: "Admin", href: "/admin", icon: ShieldCheck, adminOnly: true },
     ],
   },

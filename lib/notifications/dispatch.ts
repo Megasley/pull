@@ -3,6 +3,7 @@ import { sendEmail, type SendEmailInput, type SendEmailResult } from "@/lib/emai
 import { AchievementEmail } from "@/lib/email/templates/achievement";
 import { AnswerAcceptedEmail } from "@/lib/email/templates/answer-accepted";
 import { CommentReplyEmail } from "@/lib/email/templates/comment-reply";
+import { PrReviewCompletedEmail } from "@/lib/email/templates/pr-review-completed";
 import { ReviewOutcomeEmail } from "@/lib/email/templates/review-outcome";
 import { ReviewQueueEmail } from "@/lib/email/templates/review-queue";
 import { RoleGrantedEmail } from "@/lib/email/templates/role-granted";
@@ -340,4 +341,35 @@ export function notifyAnswerAcceptedAsync(
   input: Parameters<typeof notifyAnswerAccepted>[0],
 ) {
   fireAndForget(notifyAnswerAccepted(input), "answer-accepted");
+}
+
+export async function notifyPrReviewCompleted(input: {
+  submitterUserId: string;
+  repoFullName: string;
+  prNumber: number;
+  prTitle: string;
+  prUrl: string;
+}) {
+  const recipient = await getNotificationRecipient(input.submitterUserId);
+  if (!recipient || !recipientAllows(recipient, "prReviewActivity")) {
+    return;
+  }
+
+  await sendEmailWithRetry({
+    to: recipient.email,
+    subject: `Reviewed: ${input.repoFullName} #${input.prNumber}`,
+    react: PrReviewCompletedEmail({
+      displayName: recipient.displayName,
+      repoFullName: input.repoFullName,
+      prNumber: input.prNumber,
+      prTitle: input.prTitle,
+      href: input.prUrl,
+    }),
+  });
+}
+
+export function notifyPrReviewCompletedAsync(
+  input: Parameters<typeof notifyPrReviewCompleted>[0],
+) {
+  fireAndForget(notifyPrReviewCompleted(input), "pr-review-completed");
 }

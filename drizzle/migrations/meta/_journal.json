@@ -225,6 +225,20 @@
       "when": 1789195957024,
       "tag": "0031_qa_activity_notification_pref",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1789213217928,
+      "tag": "0032_pr_review_requests",
+      "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1789219798401,
+      "tag": "0033_pr_review_activity_notification_pref",
+      "breakpoints": true
     }
   ]
 }
