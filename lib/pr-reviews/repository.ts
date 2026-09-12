@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, ne, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gte, ne, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 import { getDb } from "@/lib/db";
@@ -42,6 +42,12 @@ const FLAG_REPUTATION_THRESHOLD = 20;
 
 const RATE_LIMIT_WINDOW_SECONDS = 30;
 const RATE_LIMIT_MAX_SUBMISSIONS = 3;
+
+/** Requests older than this drop out of the public queue — a stale ask
+ *  nobody picked up in three months is more likely abandoned than worth
+ *  surfacing. Doesn't change `status` or affect the admin/"my submissions"
+ *  views, purely a display-age cutoff on what gets suggested. */
+const MAX_SUGGESTED_AGE_MONTHS = 3;
 
 /** Only applied to peer submissions — the public-facing, anyone-can-hit
  *  form is the actual abuse vector. Admin curation is role-gated already
@@ -178,7 +184,13 @@ export async function listReviewRequestsForViewer(
   }
 
   const db = getDb();
-  const conditions = [eq(prReviewRequests.status, "needs_review")];
+  const conditions = [
+    eq(prReviewRequests.status, "needs_review"),
+    gte(
+      prReviewRequests.createdAt,
+      sql`now() - (${MAX_SUGGESTED_AGE_MONTHS} || ' months')::interval`,
+    ),
+  ];
   if (viewerGithubUsername) {
     conditions.push(ne(prReviewRequests.authorLogin, viewerGithubUsername));
   }
