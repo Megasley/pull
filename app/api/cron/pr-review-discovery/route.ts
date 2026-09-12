@@ -5,7 +5,7 @@ import { discoverEcosystemReviewRequests } from "@/lib/pr-reviews/discovery";
 import { refreshStaleRequests } from "@/lib/pr-reviews/repository";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 const STALE_REFRESH_BUDGET = 30;
 
