@@ -1,11 +1,31 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, inArray, or, sql, type SQL } from "drizzle-orm";
 
 import { getDb, isDbConnectionError, withDbRetry } from "@/lib/db";
 import { userRoadmapProgress } from "@/lib/db/schema";
 import { isDatabaseConfigured } from "@/lib/db/env";
+import { getRoadmap, getRoadmapSlugs } from "@/lib/roadmap/load-roadmap";
 
 function nowIso(): string {
   return new Date().toISOString();
+}
+
+export function canonicalRoadmapProgressFilter(): SQL {
+  const filters = getRoadmapSlugs().flatMap((roadmapSlug) => {
+    const roadmap = getRoadmap(roadmapSlug);
+    return roadmap
+      ? [
+          and(
+            eq(userRoadmapProgress.roadmapSlug, roadmapSlug),
+            inArray(
+              userRoadmapProgress.nodeSlug,
+              roadmap.nodes.map((node) => node.id),
+            ),
+          ),
+        ]
+      : [];
+  });
+
+  return or(...filters) ?? sql`false`;
 }
 
 export async function getCompletedNodeSlugs(
@@ -13,6 +33,11 @@ export async function getCompletedNodeSlugs(
   roadmapSlug: string,
 ): Promise<string[]> {
   if (!isDatabaseConfigured()) {
+    return [];
+  }
+
+  const roadmap = getRoadmap(roadmapSlug);
+  if (!roadmap) {
     return [];
   }
 
@@ -26,6 +51,10 @@ export async function getCompletedNodeSlugs(
           and(
             eq(userRoadmapProgress.userId, userId),
             eq(userRoadmapProgress.roadmapSlug, roadmapSlug),
+            inArray(
+              userRoadmapProgress.nodeSlug,
+              roadmap.nodes.map((node) => node.id),
+            ),
             eq(userRoadmapProgress.status, "completed"),
           ),
         );
@@ -61,6 +90,7 @@ export async function getAllCompletedNodeSlugs(
           and(
             eq(userRoadmapProgress.userId, userId),
             eq(userRoadmapProgress.status, "completed"),
+            canonicalRoadmapProgressFilter(),
           ),
         );
 
@@ -110,6 +140,7 @@ export async function getRecentCompletedLessons(
           and(
             eq(userRoadmapProgress.userId, userId),
             eq(userRoadmapProgress.status, "completed"),
+            canonicalRoadmapProgressFilter(),
           ),
         )
         .orderBy(desc(userRoadmapProgress.completedAt))
@@ -182,48 +213,4 @@ export async function setNodeCompletion(
     const { onLessonCompleted } = await import("@/lib/xp/achievements");
     await onLessonCompleted(userId, roadmapSlug, nodeSlug);
   });
-}
-
-export async function mergeRoadmapProgress(
-  userId: string,
-  roadmapSlug: string,
-  completedNodeSlugs: string[],
-): Promise<string[]> {
-  if (!isDatabaseConfigured()) {
-    return completedNodeSlugs;
-  }
-
-  const existing = new Set(await getCompletedNodeSlugs(userId, roadmapSlug));
-  const merged = new Set([...existing, ...completedNodeSlugs]);
-
-  for (const nodeSlug of merged) {
-    await setNodeCompletion(userId, roadmapSlug, nodeSlug, true);
-  }
-
-  return [...merged];
-}
-
-export async function replaceRoadmapProgress(
-  userId: string,
-  roadmapSlug: string,
-  completedNodeSlugs: string[],
-): Promise<string[]> {
-  if (!isDatabaseConfigured()) {
-    return completedNodeSlugs;
-  }
-
-  const existing = await getCompletedNodeSlugs(userId, roadmapSlug);
-  const incoming = new Set(completedNodeSlugs);
-
-  for (const nodeSlug of existing) {
-    if (!incoming.has(nodeSlug)) {
-      await setNodeCompletion(userId, roadmapSlug, nodeSlug, false);
-    }
-  }
-
-  for (const nodeSlug of incoming) {
-    await setNodeCompletion(userId, roadmapSlug, nodeSlug, true);
-  }
-
-  return [...incoming];
 }

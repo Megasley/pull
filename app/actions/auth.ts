@@ -45,6 +45,49 @@ export async function signInWithGitHub(nextPath?: string) {
   redirect("/sign-in?error=oauth");
 }
 
+export async function isLocalTestSignInEnabled(): Promise<boolean> {
+  if (process.env.NODE_ENV !== "development") {
+    return false;
+  }
+
+  try {
+    const hostname = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL ?? "").hostname;
+    return hostname === "127.0.0.1" || hostname === "localhost";
+  } catch {
+    return false;
+  }
+}
+
+export async function signInWithLocalTestAccount(
+  formData: FormData,
+  nextPath?: string,
+) {
+  if (!(await isLocalTestSignInEnabled())) {
+    redirect("/sign-in?error=configuration");
+  }
+
+  const email = formData.get("email");
+  const password = formData.get("password");
+
+  if (typeof email !== "string" || typeof password !== "string") {
+    redirect("/sign-in?error=Invalid%20test%20login");
+  }
+
+  const supabase = await createClientIfConfigured();
+
+  if (!supabase) {
+    redirect("/sign-in?error=configuration");
+  }
+
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+  if (error) {
+    redirect(`/sign-in?error=${encodeURIComponent(error.message)}`);
+  }
+
+  redirect(sanitizeRedirectPath(nextPath ?? "/dashboard"));
+}
+
 export async function signOut() {
   if (!isSupabaseConfigured()) {
     redirect("/");

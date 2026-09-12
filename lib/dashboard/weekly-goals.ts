@@ -7,6 +7,7 @@ import {
   userRoadmapProgress,
   userWeeklyGoals,
 } from "@/lib/db/schema";
+import { canonicalRoadmapProgressFilter } from "@/lib/progress/repository";
 import type { WeeklyGoalItem } from "@/types/dashboard";
 
 function isoWeekStart(date = new Date()): string {
@@ -99,6 +100,7 @@ async function computeAutoProgress(
         and(
           eq(userRoadmapProgress.userId, userId),
           eq(userRoadmapProgress.status, "completed"),
+          canonicalRoadmapProgressFilter(),
           gte(userRoadmapProgress.completedAt, weekStartIso),
         ),
       );

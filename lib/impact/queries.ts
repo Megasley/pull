@@ -13,6 +13,7 @@ import {
   users,
 } from "@/lib/db/schema";
 import { AFRICAN_COUNTRY_CODES, getCountryCodesForRegion } from "@/lib/geo/countries";
+import { canonicalRoadmapProgressFilter } from "@/lib/progress/repository";
 
 import { ACTIVE_CONTRIBUTOR_WINDOW_DAYS, monthBucket } from "./definitions";
 import { summarizeCounts, summarizeDurations, type DurationSummary } from "./stats";
@@ -601,7 +602,13 @@ export async function educationToContributionConversion(): Promise<ConversionRes
     const completions = await db
       .select({ userId: userRoadmapProgress.userId, completedAt: sql<string>`min(${userRoadmapProgress.completedAt})` })
       .from(userRoadmapProgress)
-      .where(and(eq(userRoadmapProgress.status, "completed"), isNotNull(userRoadmapProgress.completedAt)))
+      .where(
+        and(
+          eq(userRoadmapProgress.status, "completed"),
+          canonicalRoadmapProgressFilter(),
+          isNotNull(userRoadmapProgress.completedAt),
+        ),
+      )
       .groupBy(userRoadmapProgress.userId);
 
     if (completions.length === 0) return { eligible: 0, converted: 0, rate: null };
@@ -625,7 +632,6 @@ export async function educationToContributionConversion(): Promise<ConversionRes
     return { eligible: completions.length, converted, rate: converted / completions.length };
   });
 }
-
 /** Users with a tracked "clicked through to GitHub" opportunity event whose
  *  click is attributed to an actual merged PR (see lib/github/attribution.ts). */
 export async function opportunityToContributionConversion(): Promise<ConversionResult> {

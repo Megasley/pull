@@ -6,7 +6,7 @@ import { projectSubmissions, projects, users } from "@/lib/db/schema";
 import type { BuilderProfile } from "@/types/user";
 import { mapBuilderProfile, type BuilderProfileRow } from "@/types/user";
 
-function mapDrizzleUser(row: typeof users.$inferSelect): BuilderProfile {
+export function mapDrizzleUser(row: typeof users.$inferSelect): BuilderProfile {
   return mapBuilderProfile({
     id: row.id,
     username: row.username,

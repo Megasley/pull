@@ -17,6 +17,7 @@ import {
   countSubmittedGithubPullRequests,
   countVerifiedMergedPullRequests,
 } from "@/lib/github/store";
+import { canonicalRoadmapProgressFilter } from "@/lib/progress/repository";
 import { getRoadmap } from "@/lib/roadmap/load-roadmap";
 import {
   achievementXpKey,
@@ -45,6 +46,7 @@ async function getProgressByRoadmap(userId: string): Promise<Record<string, stri
       and(
         eq(userRoadmapProgress.userId, userId),
         eq(userRoadmapProgress.status, "completed"),
+        canonicalRoadmapProgressFilter(),
       ),
     );
 
@@ -85,12 +87,13 @@ async function getGithubPrCounts(userId: string): Promise<{
     return { total: 0, merged: 0, readyForReview: 0, verifiedMerged: 0 };
   }
 
-  const [{ pullRequests: total }, merged, readyForReview, verifiedMerged] = await Promise.all([
-    countGithubSyncedEntities(userId),
-    countMergedGithubPullRequests(userId),
-    countSubmittedGithubPullRequests(userId),
-    countVerifiedMergedPullRequests(userId),
-  ]);
+  const [{ pullRequests: total }, merged, readyForReview, verifiedMerged] =
+    await Promise.all([
+      countGithubSyncedEntities(userId),
+      countMergedGithubPullRequests(userId),
+      countSubmittedGithubPullRequests(userId),
+      countVerifiedMergedPullRequests(userId),
+    ]);
   return { total, merged, readyForReview, verifiedMerged };
 }
 
@@ -268,6 +271,11 @@ export async function onLessonCompleted(
   roadmapSlug: string,
   nodeSlug: string,
 ) {
+  const roadmap = getRoadmap(roadmapSlug);
+  if (!roadmap?.nodes.some((node) => node.id === nodeSlug)) {
+    return;
+  }
+
   await awardXp({
     userId,
     sourceType: "lesson_complete",
@@ -275,20 +283,17 @@ export async function onLessonCompleted(
     metadata: { roadmapSlug, nodeSlug },
   });
 
-  const roadmap = getRoadmap(roadmapSlug);
-  if (roadmap) {
-    const progress = await getProgressByRoadmap(userId);
-    const completed = new Set(progress[roadmapSlug] ?? []);
-    const allDone = roadmap.nodes.every((node) => completed.has(node.id));
+  const progress = await getProgressByRoadmap(userId);
+  const completed = new Set(progress[roadmapSlug] ?? []);
+  const allDone = roadmap.nodes.every((node) => completed.has(node.id));
 
-    if (allDone) {
-      await awardXp({
-        userId,
-        sourceType: "roadmap_complete",
-        sourceKey: roadmapXpKey(roadmapSlug),
-        metadata: { roadmapSlug },
-      });
-    }
+  if (allDone) {
+    await awardXp({
+      userId,
+      sourceType: "roadmap_complete",
+      sourceKey: roadmapXpKey(roadmapSlug),
+      metadata: { roadmapSlug },
+    });
   }
 
   await syncAchievementsForUser(userId);
@@ -299,24 +304,26 @@ export async function onLessonUncompleted(
   roadmapSlug: string,
   nodeSlug: string,
 ) {
+  const roadmap = getRoadmap(roadmapSlug);
+  if (!roadmap?.nodes.some((node) => node.id === nodeSlug)) {
+    return;
+  }
+
   await revokeXp({
     userId,
     sourceType: "lesson_complete",
     sourceKey: lessonXpKey(roadmapSlug, nodeSlug),
   });
 
-  const roadmap = getRoadmap(roadmapSlug);
-  if (roadmap) {
-    const progress = await getProgressByRoadmap(userId);
-    const completed = new Set(progress[roadmapSlug] ?? []);
-    const allDone = roadmap.nodes.every((node) => completed.has(node.id));
-    if (!allDone) {
-      await revokeXp({
-        userId,
-        sourceType: "roadmap_complete",
-        sourceKey: roadmapXpKey(roadmapSlug),
-      });
-    }
+  const progress = await getProgressByRoadmap(userId);
+  const completed = new Set(progress[roadmapSlug] ?? []);
+  const allDone = roadmap.nodes.every((node) => completed.has(node.id));
+  if (!allDone) {
+    await revokeXp({
+      userId,
+      sourceType: "roadmap_complete",
+      sourceKey: roadmapXpKey(roadmapSlug),
+    });
   }
 }
 

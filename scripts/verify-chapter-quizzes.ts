@@ -33,16 +33,38 @@ const catalogs: QuizCatalog[] = [
 const errors: string[] = [];
 
 for (const { slug, roadmap, quizzes, minQuestions, maxQuestions } of catalogs) {
+  const sectionIds = new Set<string>();
+  const quizzesBySection = new Map<string, LessonChapterQuiz[]>();
+  const checkpointsBySection = new Map<string, RoadmapJson["nodes"]>();
+  const seenQuizIds = new Set<string>();
+  const seenCheckpointIds = new Set<string>();
+
   for (const section of roadmap.sections) {
-    const quiz = quizzes.find((item) => item.sectionId === section.id);
-    if (!quiz) {
-      errors.push(`[${slug}] Missing quiz for section: ${section.id}`);
-      continue;
+    if (sectionIds.has(section.id)) {
+      errors.push(`[${slug}] Duplicate section id: ${section.id}`);
+    }
+    sectionIds.add(section.id);
+  }
+
+  for (const quiz of quizzes) {
+    if (seenQuizIds.has(quiz.id)) {
+      errors.push(`[${slug}] Duplicate quiz id: ${quiz.id}`);
+    }
+    seenQuizIds.add(quiz.id);
+
+    const sectionQuizzes = quizzesBySection.get(quiz.sectionId) ?? [];
+    sectionQuizzes.push(quiz);
+    quizzesBySection.set(quiz.sectionId, sectionQuizzes);
+
+    if (!sectionIds.has(quiz.sectionId)) {
+      errors.push(
+        `[${slug}] Quiz ${quiz.id} references unknown section: ${quiz.sectionId}`,
+      );
     }
 
-    if (quiz.id !== `${slug}:${section.id}`) {
+    if (quiz.id !== `${slug}:${quiz.sectionId}`) {
       errors.push(
-        `[${slug}] Quiz id mismatch for ${section.id}: expected ${slug}:${section.id}`,
+        `[${slug}] Quiz id mismatch for ${quiz.sectionId}: expected ${slug}:${quiz.sectionId}`,
       );
     }
 
@@ -64,14 +86,54 @@ for (const { slug, roadmap, quizzes, minQuestions, maxQuestions } of catalogs) {
         );
       }
     }
+  }
 
-    const checkpoint = roadmap.nodes.find(
-      (node) => node.sectionId === section.id && node.chapterCheckpoint === true,
-    );
+  for (const checkpoint of roadmap.nodes.filter(
+    (node) => node.chapterCheckpoint === true,
+  )) {
+    if (seenCheckpointIds.has(checkpoint.id)) {
+      errors.push(`[${slug}] Duplicate checkpoint id: ${checkpoint.id}`);
+    }
+    seenCheckpointIds.add(checkpoint.id);
 
-    if (!checkpoint) {
+    const sectionCheckpoints = checkpointsBySection.get(checkpoint.sectionId) ?? [];
+    sectionCheckpoints.push(checkpoint);
+    checkpointsBySection.set(checkpoint.sectionId, sectionCheckpoints);
+
+    if (!sectionIds.has(checkpoint.sectionId)) {
       errors.push(
-        `[${slug}] Missing chapterCheckpoint node for section: ${section.id}`,
+        `[${slug}] Checkpoint ${checkpoint.id} references unknown section: ${checkpoint.sectionId}`,
+      );
+    }
+  }
+
+  const mappedSectionIds = new Set([
+    ...sectionIds,
+    ...quizzesBySection.keys(),
+    ...checkpointsBySection.keys(),
+  ]);
+
+  for (const sectionId of mappedSectionIds) {
+    const sectionQuizzes = quizzesBySection.get(sectionId) ?? [];
+    const sectionCheckpoints = checkpointsBySection.get(sectionId) ?? [];
+
+    if (sectionQuizzes.length === 0) {
+      errors.push(`[${slug}] Missing quiz for section: ${sectionId}`);
+    } else if (sectionQuizzes.length > 1) {
+      errors.push(
+        `[${slug}] Multiple quizzes for section ${sectionId}: ${sectionQuizzes
+          .map((quiz) => quiz.id)
+          .join(", ")}`,
+      );
+    }
+
+    if (sectionCheckpoints.length === 0) {
+      errors.push(`[${slug}] Missing chapterCheckpoint node for section: ${sectionId}`);
+    } else if (sectionCheckpoints.length > 1) {
+      errors.push(
+        `[${slug}] Multiple chapterCheckpoint nodes for section ${sectionId}: ${sectionCheckpoints
+          .map((checkpoint) => checkpoint.id)
+          .join(", ")}`,
       );
     }
   }
@@ -84,7 +146,7 @@ if (errors.length > 0) {
 }
 
 const totalSections = catalogs.reduce(
-  (sum, catalog) => sum + catalog.quizzes.length,
+  (sum, catalog) => sum + catalog.roadmap.sections.length,
   0,
 );
 console.log(

@@ -35,5 +35,8 @@ jobs:
       - name: Validate content
         run: npm run validate:content
 
+      - name: Verify chapter quizzes
+        run: npm run verify:quizzes
+
       - name: Build application
         run: npm run build

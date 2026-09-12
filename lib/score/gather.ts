@@ -8,6 +8,7 @@ import {
   userRoadmapProgress,
   xpEvents,
 } from "@/lib/db/schema";
+import { canonicalRoadmapProgressFilter } from "@/lib/progress/repository";
 import type { BuilderScoreInputs } from "@/types/score";
 
 import { CONSISTENCY_WINDOW_WEEKS } from "./weights";
@@ -123,6 +124,7 @@ export async function gatherBuilderScoreInputs(
         and(
           eq(userRoadmapProgress.userId, userId),
           eq(userRoadmapProgress.status, "completed"),
+          canonicalRoadmapProgressFilter(),
           gte(userRoadmapProgress.completedAt, windowIso),
         ),
       ),

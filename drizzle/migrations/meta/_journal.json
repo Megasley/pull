@@ -239,6 +239,13 @@
       "when": 1789219798401,
       "tag": "0033_pr_review_activity_notification_pref",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1789134080364,
+      "tag": "0034_server_owned_learning_progress",
+      "breakpoints": true
     }
   ]
 }
