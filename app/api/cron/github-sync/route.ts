@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { syncDueGithubConnections } from "@/lib/github";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 /**
  * Background GitHub sync cron.
