@@ -245,6 +245,11 @@ export class GithubClient {
           }
         }
 
+        // Without this, a rate-limited run just sits there for up to 60s per
+        // attempt with no output at all — indistinguishable from a hang.
+        console.warn(
+          `[github-client] retrying after ${error.message} — waiting ${Math.round(waitMs / 1000)}s (attempt ${attempt + 1}/${attempts})`,
+        );
         await sleep(waitMs);
       }
     }
