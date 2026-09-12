@@ -34,6 +34,7 @@ import {
   toggleLessonProgressAction,
 } from "@/app/actions/progress";
 import { evaluateEarnedAchievementSlugs } from "@/lib/achievements/evaluate";
+import { resolveChapterQuizRelationship } from "@/lib/progress/validation";
 import { getChapterQuizzesForRoadmap } from "@/lib/quizzes/load";
 import { getRoadmap } from "@/lib/roadmap/load-roadmap";
 
@@ -127,6 +128,9 @@ describe("progress action security", () => {
   it("requires a recorded pass before completing a checkpoint", async () => {
     const roadmap = getRoadmap("bitcoin")!;
     const checkpoint = roadmap.nodes.find((node) => node.chapterCheckpoint)!;
+    const quiz = getChapterQuizzesForRoadmap("bitcoin").find(
+      (item) => item.sectionId === checkpoint.sectionId,
+    )!;
     mocks.getCompletedNodeSlugs.mockResolvedValue(checkpoint.lockedUntil ?? []);
 
     await expect(
@@ -144,6 +148,11 @@ describe("progress action security", () => {
     await expect(
       toggleLessonProgressAction("bitcoin", checkpoint.id, true),
     ).resolves.toEqual({ ok: true });
+    expect(mocks.getChapterQuizStatus).toHaveBeenLastCalledWith(
+      activeProfile.id,
+      "bitcoin",
+      quiz.id,
+    );
   });
 });
 
@@ -237,6 +246,42 @@ describe("chapter quiz security", () => {
 
   it("does not expose a chapter quiz skip action", () => {
     expect("skipChapterQuizAction" in progressActions).toBe(false);
+  });
+
+  it("resolves quiz submissions and checkpoints through one canonical relationship", () => {
+    const roadmap = getRoadmap("bitcoin")!;
+    const quiz = getChapterQuizzesForRoadmap("bitcoin")[0];
+    const checkpoint = roadmap.nodes.find(
+      (node) => node.sectionId === quiz.sectionId && node.chapterCheckpoint,
+    )!;
+    const otherCheckpoint = roadmap.nodes.find(
+      (node) => node.sectionId !== quiz.sectionId && node.chapterCheckpoint === true,
+    )!;
+
+    const byQuiz = resolveChapterQuizRelationship({
+      roadmapSlug: "bitcoin",
+      quizId: quiz.id,
+    });
+    const byCheckpoint = resolveChapterQuizRelationship({
+      roadmapSlug: "bitcoin",
+      checkpointNodeSlug: checkpoint.id,
+    });
+
+    expect(byQuiz).toMatchObject({
+      ok: true,
+      value: { quizId: quiz.id, checkpointNodeSlug: checkpoint.id },
+    });
+    expect(byCheckpoint).toMatchObject({
+      ok: true,
+      value: { quizId: quiz.id, checkpointNodeSlug: checkpoint.id },
+    });
+    expect(
+      resolveChapterQuizRelationship({
+        roadmapSlug: "bitcoin",
+        quizId: quiz.id,
+        checkpointNodeSlug: otherCheckpoint.id,
+      }),
+    ).toEqual({ ok: false, reason: "invalid_quiz" });
   });
 });
 

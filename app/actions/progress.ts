@@ -19,6 +19,7 @@ import {
 } from "@/lib/progress/quiz-repository";
 import {
   gradeChapterQuizAnswers,
+  resolveCheckpointChapterQuiz,
   resolveChapterQuiz,
   resolveRoadmap,
   resolveRoadmapNode,
@@ -26,7 +27,6 @@ import {
   type ProgressValidationReason,
 } from "@/lib/progress/validation";
 import { buildAllRoadmapProgressSummaries } from "@/lib/progress/summary";
-import { getChapterQuizBySection } from "@/lib/quizzes/load";
 import type { ChapterQuizAnswer } from "@/types/content";
 import type { RoadmapProgressSummary } from "@/types/progress";
 
@@ -62,14 +62,15 @@ async function validateCompletionEligibility(
   }
 
   if (canonical.node.chapterCheckpoint) {
-    const quiz = getChapterQuizBySection(
-      canonical.roadmapSlug,
-      canonical.node.sectionId,
-    );
-    if (!quiz) {
-      return "invalid_quiz";
+    const relationship = resolveCheckpointChapterQuiz(canonical);
+    if (!relationship.ok) {
+      return relationship.reason;
     }
-    const status = await getChapterQuizStatus(userId, canonical.roadmapSlug, quiz.id);
+    const status = await getChapterQuizStatus(
+      userId,
+      relationship.value.roadmapSlug,
+      relationship.value.quizId,
+    );
     if (status !== "passed") {
       return "chapter_quiz_required";
     }
@@ -182,7 +183,11 @@ export async function fetchChapterQuizStatusAction(
     return { authenticated: true as const, status: null, error: quiz.reason };
   }
 
-  const status = await getChapterQuizStatus(user.id, roadmapSlug, quizId);
+  const status = await getChapterQuizStatus(
+    user.id,
+    quiz.value.roadmapSlug,
+    quiz.value.quizId,
+  );
 
   return { authenticated: true as const, status };
 }

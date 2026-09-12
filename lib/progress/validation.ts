@@ -35,8 +35,17 @@ export type CanonicalNode = {
 export type CanonicalQuiz = {
   roadmap: RoadmapJson;
   roadmapSlug: string;
+  checkpoint: RoadmapJsonNode;
+  checkpointNodeSlug: string;
   quiz: LessonChapterQuiz;
   quizId: string;
+  sectionId: string;
+};
+
+type ChapterQuizRelationshipInput = {
+  roadmapSlug: unknown;
+  quizId?: string;
+  checkpointNodeSlug?: string;
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -86,25 +95,76 @@ export function resolveChapterQuiz(
   roadmapSlug: unknown,
   quizId: unknown,
 ): ValidationResult<CanonicalQuiz> {
-  const roadmapResult = resolveRoadmap(roadmapSlug);
-  if (!roadmapResult.ok) {
-    return roadmapResult;
-  }
   if (typeof quizId !== "string") {
     return { ok: false, reason: "invalid_input" };
   }
 
-  const quiz = getChapterQuizzesForRoadmap(roadmapSlug as string).find(
-    (item) => item.id === quizId,
-  );
-  if (!quiz) {
+  return resolveChapterQuizRelationship({ roadmapSlug, quizId });
+}
+
+export function resolveCheckpointChapterQuiz(
+  canonical: CanonicalNode,
+): ValidationResult<CanonicalQuiz> {
+  return resolveChapterQuizRelationship({
+    roadmapSlug: canonical.roadmapSlug,
+    checkpointNodeSlug: canonical.nodeSlug,
+  });
+}
+
+export function resolveChapterQuizRelationship(
+  input: ChapterQuizRelationshipInput,
+): ValidationResult<CanonicalQuiz> {
+  const roadmapResult = resolveRoadmap(input.roadmapSlug);
+  if (!roadmapResult.ok) {
+    return roadmapResult;
+  }
+
+  const roadmapSlug = input.roadmapSlug as string;
+  const quizzes = getChapterQuizzesForRoadmap(roadmapSlug);
+  const requestedQuiz = input.quizId
+    ? quizzes.find((quiz) => quiz.id === input.quizId)
+    : null;
+  const requestedCheckpoint = input.checkpointNodeSlug
+    ? roadmapResult.value.nodes.find(
+        (node) =>
+          node.id === input.checkpointNodeSlug && node.chapterCheckpoint === true,
+      )
+    : null;
+
+  if (
+    (!input.quizId && !input.checkpointNodeSlug) ||
+    (input.quizId && !requestedQuiz) ||
+    (input.checkpointNodeSlug && !requestedCheckpoint)
+  ) {
     return { ok: false, reason: "invalid_quiz" };
   }
 
-  const hasCheckpoint = roadmapResult.value.nodes.some(
-    (node) => node.sectionId === quiz.sectionId && node.chapterCheckpoint === true,
+  const sectionId = requestedQuiz?.sectionId ?? requestedCheckpoint?.sectionId;
+  if (
+    !sectionId ||
+    (requestedQuiz &&
+      requestedCheckpoint &&
+      requestedQuiz.sectionId !== requestedCheckpoint.sectionId)
+  ) {
+    return { ok: false, reason: "invalid_quiz" };
+  }
+
+  const sectionQuizzes = quizzes.filter((quiz) => quiz.sectionId === sectionId);
+  const sectionCheckpoints = roadmapResult.value.nodes.filter(
+    (node) => node.sectionId === sectionId && node.chapterCheckpoint === true,
   );
-  if (!hasCheckpoint) {
+
+  if (sectionQuizzes.length !== 1 || sectionCheckpoints.length !== 1) {
+    return { ok: false, reason: "invalid_quiz" };
+  }
+
+  const [quiz] = sectionQuizzes;
+  const [checkpoint] = sectionCheckpoints;
+  if (
+    quiz.id !== `${roadmapSlug}:${sectionId}` ||
+    (input.quizId && quiz.id !== input.quizId) ||
+    (input.checkpointNodeSlug && checkpoint.id !== input.checkpointNodeSlug)
+  ) {
     return { ok: false, reason: "invalid_quiz" };
   }
 
@@ -112,9 +172,12 @@ export function resolveChapterQuiz(
     ok: true,
     value: {
       roadmap: roadmapResult.value,
-      roadmapSlug: roadmapSlug as string,
+      roadmapSlug,
+      checkpoint,
+      checkpointNodeSlug: checkpoint.id,
       quiz,
-      quizId,
+      quizId: quiz.id,
+      sectionId,
     },
   };
 }

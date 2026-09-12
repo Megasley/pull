@@ -14,6 +14,12 @@ import {
   writeStoredCompletedIds,
 } from "@/lib/roadmap/prerequisites";
 import {
+  applyNodeCompletionSnapshot,
+  progressMutationCoordinator,
+  reconcileProgressSnapshot,
+  type ProgressScope,
+} from "@/lib/progress/pending-mutations";
+import {
   dispatchRoadmapProgressEvent,
   subscribeRoadmapProgressEvent,
 } from "@/lib/storage/brand-keys";
@@ -46,6 +52,32 @@ function dispatchProgressChange(slug: string) {
   dispatchRoadmapProgressEvent({ slug });
 }
 
+function writeProgressSnapshot(
+  scope: ProgressScope,
+  completedNodeSlugs: Iterable<string>,
+) {
+  writeStoredCompletedIds(scope.roadmapSlug, new Set(completedNodeSlugs), scope.userId);
+  dispatchProgressChange(scope.roadmapSlug);
+}
+
+async function reconcileFromServer(scope: ProgressScope): Promise<boolean> {
+  const completedNodeSlugs = await reconcileProgressSnapshot(
+    progressMutationCoordinator,
+    scope,
+    async () => {
+      const result = await fetchRoadmapProgressAction(scope.roadmapSlug);
+      return result.authenticated ? result.completedNodeSlugs : null;
+    },
+  );
+
+  if (!completedNodeSlugs) {
+    return false;
+  }
+
+  writeProgressSnapshot(scope, completedNodeSlugs);
+  return true;
+}
+
 export function useRoadmapProgress(slug: string, data: RoadmapJson) {
   void data;
   const { userId, ready: authReady } = useAuthSession();
@@ -63,24 +95,7 @@ export function useRoadmapProgress(slug: string, data: RoadmapJson) {
       return;
     }
 
-    let cancelled = false;
-
-    async function hydrateFromServer() {
-      const result = await fetchRoadmapProgressAction(slug);
-
-      if (cancelled || !result.authenticated) {
-        return;
-      }
-
-      writeStoredCompletedIds(slug, new Set(result.completedNodeSlugs), userId);
-      dispatchProgressChange(slug);
-    }
-
-    void hydrateFromServer();
-
-    return () => {
-      cancelled = true;
-    };
+    void reconcileFromServer({ userId, roadmapSlug: slug }).catch(() => undefined);
   }, [authReady, slug, userId]);
 
   const setNodeCompleted = useCallback(
@@ -92,32 +107,54 @@ export function useRoadmapProgress(slug: string, data: RoadmapJson) {
       const current = new Set(
         JSON.parse(getCompletedSnapshot(slug, userId)) as string[],
       );
-      const next = new Set(current);
-      if (completed) {
-        next.add(nodeSlug);
-      } else {
-        next.delete(nodeSlug);
-      }
+      const scope = { userId, roadmapSlug: slug };
+      const mutation = progressMutationCoordinator.begin(
+        scope,
+        nodeSlug,
+        completed,
+        current.has(nodeSlug),
+      );
+      const next = applyNodeCompletionSnapshot(current, nodeSlug, completed);
 
-      writeStoredCompletedIds(slug, next, userId);
-      dispatchProgressChange(slug);
+      writeProgressSnapshot(scope, next);
 
-      void toggleLessonProgressAction(slug, nodeSlug, completed)
-        .then(async (result) => {
-          if (result.ok) {
-            return;
-          }
+      void (async () => {
+        let accepted = false;
+        try {
+          const result = await toggleLessonProgressAction(slug, nodeSlug, completed);
+          accepted = result.ok;
+        } catch {
+          accepted = false;
+        }
 
-          const server = await fetchRoadmapProgressAction(slug);
-          if (server.authenticated) {
-            writeStoredCompletedIds(slug, new Set(server.completedNodeSlugs), userId);
-            dispatchProgressChange(slug);
-          }
-        })
-        .catch(() => {
-          writeStoredCompletedIds(slug, current, userId);
-          dispatchProgressChange(slug);
-        });
+        const settled = progressMutationCoordinator.settle(
+          scope,
+          nodeSlug,
+          mutation.token,
+        );
+
+        let reconciled = false;
+        try {
+          reconciled = await reconcileFromServer(scope);
+        } catch {
+          reconciled = false;
+        }
+
+        if (!accepted && settled && !reconciled) {
+          const cached = new Set(
+            JSON.parse(getCompletedSnapshot(slug, userId)) as string[],
+          );
+          const rolledBack = applyNodeCompletionSnapshot(
+            cached,
+            nodeSlug,
+            settled.previousCompleted,
+          );
+          writeProgressSnapshot(
+            scope,
+            progressMutationCoordinator.overlay(scope, rolledBack),
+          );
+        }
+      })();
     },
     [slug, userId],
   );
