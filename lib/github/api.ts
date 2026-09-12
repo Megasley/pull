@@ -332,6 +332,7 @@ type ArbitraryPullRequestDetail = {
   state: string;
   merged: boolean;
   user: { login: string } | null;
+  created_at: string;
 };
 
 export type FetchedPullRequest = {
@@ -341,6 +342,7 @@ export type FetchedPullRequest = {
   state: string;
   merged: boolean;
   authorLogin: string;
+  githubCreatedAt: string;
 };
 
 /**
@@ -366,6 +368,7 @@ export async function fetchPullRequestByUrl(
     state: detail.state,
     merged: detail.merged,
     authorLogin: detail.user?.login ?? "",
+    githubCreatedAt: detail.created_at,
   };
 }
 

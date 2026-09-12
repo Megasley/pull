@@ -1,0 +1,1 @@
+ALTER TABLE "pr_review_requests" ADD COLUMN "pr_created_at" timestamp with time zone;
