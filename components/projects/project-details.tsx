@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Clock } from "lucide-react";
 
+import { CommentThread } from "@/components/comments/comment-thread";
 import { Muted } from "@/components/design-system";
 import { SiteContainer } from "@/components/layout/site-container";
 import { ProjectBookmarkButton } from "@/components/projects/project-bookmark-button";
@@ -48,6 +49,7 @@ const TOC_SECTIONS = [
   { id: "resources", title: "Recommended resources" },
   { id: "examples", title: "Example repositories" },
   { id: "submission", title: "Submission instructions" },
+  { id: "discussion", title: "Discussion" },
 ] as const;
 
 type ProjectDetailsProps = {
@@ -200,6 +202,12 @@ export async function ProjectDetails({ project }: ProjectDetailsProps) {
 
               <ProjectSection id="submission" title="Submission instructions">
                 <ProjectBulletList items={project.submission} />
+              </ProjectSection>
+
+              <ProjectSection id="discussion" title="Discussion">
+                <CommentThread
+                  entity={{ entityType: "project", projectSlug: project.slug }}
+                />
               </ProjectSection>
             </div>
           </div>

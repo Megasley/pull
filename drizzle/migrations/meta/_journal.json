@@ -211,6 +211,20 @@
       "when": 1788941010915,
       "tag": "0029_wise_tiger_shark",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1789168506888,
+      "tag": "0030_native_qa_comments",
+      "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1789195957024,
+      "tag": "0031_qa_activity_notification_pref",
+      "breakpoints": true
     }
   ]
 }

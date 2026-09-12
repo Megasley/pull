@@ -12,6 +12,7 @@ export const TIMELINE_EVENT_TYPES: TimelineEventType[] = [
   "merged",
   "project_submission",
   "roadmap_completion",
+  "qa_answer_accepted",
 ];
 
 export const TIMELINE_TYPE_LABEL: Record<TimelineEventType, string> = {
@@ -22,6 +23,7 @@ export const TIMELINE_TYPE_LABEL: Record<TimelineEventType, string> = {
   merged: "Merged",
   project_submission: "Submissions",
   roadmap_completion: "Roadmaps",
+  qa_answer_accepted: "Q&A",
 };
 
 export const TIMELINE_TYPE_SINGULAR: Record<TimelineEventType, string> = {
@@ -32,6 +34,7 @@ export const TIMELINE_TYPE_SINGULAR: Record<TimelineEventType, string> = {
   merged: "Merged",
   project_submission: "Submission",
   roadmap_completion: "Roadmap",
+  qa_answer_accepted: "Accepted answer",
 };
 
 export const TIMELINE_DATE_RANGES: Array<{
