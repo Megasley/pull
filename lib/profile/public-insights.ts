@@ -74,6 +74,8 @@ const ACTIVITY_TYPE_LABELS: Record<TimelineEventType, string> = {
   merged: "Merged PRs",
   project_submission: "Project submissions",
   roadmap_completion: "Roadmap milestones",
+  qa_answer_accepted: "Accepted Q&A answers",
+  pr_review_completed: "PR reviews completed",
 };
 
 const PR_TYPE_ORDER: ContributionType[] = [

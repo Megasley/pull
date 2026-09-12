@@ -1,6 +1,9 @@
 import { ACHIEVEMENT_DEFINITIONS } from "@/lib/achievements/definitions";
 import { sendEmail, type SendEmailInput, type SendEmailResult } from "@/lib/email/send";
 import { AchievementEmail } from "@/lib/email/templates/achievement";
+import { AnswerAcceptedEmail } from "@/lib/email/templates/answer-accepted";
+import { CommentReplyEmail } from "@/lib/email/templates/comment-reply";
+import { PrReviewCompletedEmail } from "@/lib/email/templates/pr-review-completed";
 import { ReviewOutcomeEmail } from "@/lib/email/templates/review-outcome";
 import { ReviewQueueEmail } from "@/lib/email/templates/review-queue";
 import { RoleGrantedEmail } from "@/lib/email/templates/role-granted";
@@ -284,4 +287,89 @@ export async function notifyRoleGranted(input: {
 
 export function notifyRoleGrantedAsync(input: Parameters<typeof notifyRoleGranted>[0]) {
   fireAndForget(notifyRoleGranted(input), "role-granted");
+}
+
+export async function notifyNewReply(input: {
+  questionAuthorUserId: string;
+  replyAuthorUsername: string;
+  entityTitle: string;
+  href: string;
+}) {
+  const recipient = await getNotificationRecipient(input.questionAuthorUserId);
+  if (!recipient || !recipientAllows(recipient, "qaActivity")) {
+    return;
+  }
+
+  await sendEmailWithRetry({
+    to: recipient.email,
+    subject: `New reply on your question`,
+    react: CommentReplyEmail({
+      displayName: recipient.displayName,
+      replyAuthorUsername: input.replyAuthorUsername,
+      entityTitle: input.entityTitle,
+      href: appUrl(input.href),
+    }),
+  });
+}
+
+export function notifyNewReplyAsync(input: Parameters<typeof notifyNewReply>[0]) {
+  fireAndForget(notifyNewReply(input), "comment-reply");
+}
+
+export async function notifyAnswerAccepted(input: {
+  answerAuthorUserId: string;
+  entityTitle: string;
+  href: string;
+}) {
+  const recipient = await getNotificationRecipient(input.answerAuthorUserId);
+  if (!recipient || !recipientAllows(recipient, "qaActivity")) {
+    return;
+  }
+
+  await sendEmailWithRetry({
+    to: recipient.email,
+    subject: "Your answer was accepted",
+    react: AnswerAcceptedEmail({
+      displayName: recipient.displayName,
+      entityTitle: input.entityTitle,
+      href: appUrl(input.href),
+    }),
+  });
+}
+
+export function notifyAnswerAcceptedAsync(
+  input: Parameters<typeof notifyAnswerAccepted>[0],
+) {
+  fireAndForget(notifyAnswerAccepted(input), "answer-accepted");
+}
+
+export async function notifyPrReviewCompleted(input: {
+  submitterUserId: string;
+  repoFullName: string;
+  prNumber: number;
+  prTitle: string;
+  prUrl: string;
+}) {
+  const recipient = await getNotificationRecipient(input.submitterUserId);
+  if (!recipient || !recipientAllows(recipient, "prReviewActivity")) {
+    return;
+  }
+
+  await sendEmailWithRetry({
+    to: recipient.email,
+    subject: `Reviewed: ${input.repoFullName} #${input.prNumber}`,
+    react: PrReviewCompletedEmail({
+      displayName: recipient.displayName,
+      repoFullName: input.repoFullName,
+      prNumber: input.prNumber,
+      prTitle: input.prTitle,
+      href: input.prUrl,
+    }),
+  });
+}
+
+export function notifyPrReviewCompletedAsync(
+  input: Parameters<typeof notifyPrReviewCompleted>[0],
+) {
+  fireAndForget(notifyPrReviewCompleted(input), "pr-review-completed");
 }

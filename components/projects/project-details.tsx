@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Clock } from "lucide-react";
+import { ArrowLeft, Clock } from "lucide-react";
 
+import { CommentThread } from "@/components/comments/comment-thread";
 import { Muted } from "@/components/design-system";
 import { SiteContainer } from "@/components/layout/site-container";
 import { ProjectBookmarkButton } from "@/components/projects/project-bookmark-button";
@@ -17,10 +18,7 @@ import { Button } from "@/components/ui/button";
 import { bootstrapCurrentUserProfile } from "@/lib/auth/session";
 import { isDatabaseConfigured } from "@/lib/db/env";
 import { compileProjectMdx } from "@/lib/projects/compile-spec";
-import {
-  getActiveSubmission,
-  listUserSubmissionStatusByProjectSlug,
-} from "@/lib/submissions/repository";
+import { listUserSubmissionStatusByProjectSlug } from "@/lib/submissions/repository";
 import type { ProjectSpec } from "@/types/project";
 import type { RoadmapDifficulty } from "@/types";
 
@@ -48,6 +46,7 @@ const TOC_SECTIONS = [
   { id: "resources", title: "Recommended resources" },
   { id: "examples", title: "Example repositories" },
   { id: "submission", title: "Submission instructions" },
+  { id: "discussion", title: "Discussion" },
 ] as const;
 
 type ProjectDetailsProps = {
@@ -65,10 +64,6 @@ export async function ProjectDetails({ project }: ProjectDetailsProps) {
       ? await listUserSubmissionStatusByProjectSlug(profile.id)
       : {};
   const submissionStatus = submissionStatusBySlug[project.slug] ?? null;
-  const activeSubmission =
-    profile && isDatabaseConfigured()
-      ? await getActiveSubmission(profile.id, project.slug)
-      : null;
 
   return (
     <div>
@@ -113,18 +108,6 @@ export async function ProjectDetails({ project }: ProjectDetailsProps) {
 
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild className="w-full sm:w-auto">
-                <Link href={`/projects/${project.slug}/submit`}>
-                  {activeSubmission?.status === "draft"
-                    ? "./continue-draft"
-                    : activeSubmission?.status === "needs_changes"
-                      ? "./revise"
-                      : activeSubmission
-                        ? "./view-submission"
-                        : "./submit"}
-                  <ArrowRight aria-hidden />
-                </Link>
-              </Button>
-              <Button asChild variant="outline" className="w-full sm:w-auto">
                 <Link href={lessonHref}>./open-lesson</Link>
               </Button>
               <Button asChild variant="outline" className="w-full sm:w-auto">
@@ -200,6 +183,12 @@ export async function ProjectDetails({ project }: ProjectDetailsProps) {
 
               <ProjectSection id="submission" title="Submission instructions">
                 <ProjectBulletList items={project.submission} />
+              </ProjectSection>
+
+              <ProjectSection id="discussion" title="Discussion">
+                <CommentThread
+                  entity={{ entityType: "project", projectSlug: project.slug }}
+                />
               </ProjectSection>
             </div>
           </div>

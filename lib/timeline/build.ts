@@ -3,11 +3,14 @@ import { and, desc, eq, ne } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { isDatabaseConfigured } from "@/lib/db/env";
 import {
+  comments,
+  prReviewRequests,
   projectSubmissions,
   projects,
   submissionReviewEvents,
   xpEvents,
 } from "@/lib/db/schema";
+import { getDeveloperToolBySlug } from "@/lib/developer-tools";
 import { getRoadmap } from "@/lib/roadmap/load-roadmap";
 import {
   listGithubCommits,
@@ -99,6 +102,102 @@ async function listRoadmapCompletions(userId: string): Promise<TimelineEvent[]> 
   });
 }
 
+async function listAcceptedAnswersForUser(userId: string): Promise<TimelineEvent[]> {
+  if (!isDatabaseConfigured()) return [];
+
+  const db = getDb();
+  const rows = await db
+    .select({
+      id: comments.id,
+      entityType: comments.entityType,
+      projectSlug: projects.slug,
+      projectTitle: projects.title,
+      roadmapSlug: comments.roadmapSlug,
+      roadmapNodeSlug: comments.roadmapNodeSlug,
+      developerToolSlug: comments.developerToolSlug,
+      acceptedAt: comments.acceptedAt,
+    })
+    .from(comments)
+    .leftJoin(projects, eq(comments.projectId, projects.id))
+    .where(and(eq(comments.authorId, userId), eq(comments.isAcceptedAnswer, true)))
+    .orderBy(desc(comments.acceptedAt))
+    .limit(50);
+
+  return rows
+    .filter((row): row is typeof row & { acceptedAt: string } => row.acceptedAt !== null)
+    .map((row) => {
+      if (row.entityType === "project" && row.projectSlug) {
+        return {
+          id: `qa:${row.id}`,
+          type: "qa_answer_accepted" as const,
+          title: `Answer accepted on ${row.projectTitle ?? row.projectSlug}`,
+          description: "Your reply was marked as the accepted answer.",
+          occurredAt: row.acceptedAt,
+          href: `/projects/${row.projectSlug}#discussion`,
+          meta: row.projectSlug,
+        };
+      }
+
+      if (row.entityType === "roadmap_step" && row.roadmapSlug && row.roadmapNodeSlug) {
+        const roadmap = getRoadmap(row.roadmapSlug);
+        const node = roadmap?.nodes.find((n) => n.id === row.roadmapNodeSlug);
+        return {
+          id: `qa:${row.id}`,
+          type: "qa_answer_accepted" as const,
+          title: `Answer accepted on ${node?.title ?? row.roadmapNodeSlug}`,
+          description: "Your reply was marked as the accepted answer.",
+          occurredAt: row.acceptedAt,
+          href: `/roadmaps/${row.roadmapSlug}/lessons/${row.roadmapNodeSlug}#lesson-discussion-heading`,
+          meta: row.roadmapSlug,
+        };
+      }
+
+      const tool = row.developerToolSlug ? getDeveloperToolBySlug(row.developerToolSlug) : null;
+      return {
+        id: `qa:${row.id}`,
+        type: "qa_answer_accepted" as const,
+        title: `Answer accepted on ${tool?.name ?? row.developerToolSlug ?? "a developer tool"}`,
+        description: "Your reply was marked as the accepted answer.",
+        occurredAt: row.acceptedAt,
+        href: row.developerToolSlug ? `/developer-tools/${row.developerToolSlug}` : null,
+        meta: row.developerToolSlug,
+      };
+    });
+}
+
+async function listCompletedPrReviewsForUser(userId: string): Promise<TimelineEvent[]> {
+  if (!isDatabaseConfigured()) return [];
+
+  const db = getDb();
+  const rows = await db
+    .select({
+      id: prReviewRequests.id,
+      prUrl: prReviewRequests.prUrl,
+      repoFullName: prReviewRequests.repoFullName,
+      number: prReviewRequests.number,
+      title: prReviewRequests.title,
+      reviewedAt: prReviewRequests.reviewedAt,
+    })
+    .from(prReviewRequests)
+    .where(
+      and(eq(prReviewRequests.reviewedByUserId, userId), eq(prReviewRequests.status, "reviewed")),
+    )
+    .orderBy(desc(prReviewRequests.reviewedAt))
+    .limit(50);
+
+  return rows
+    .filter((row): row is typeof row & { reviewedAt: string } => row.reviewedAt !== null)
+    .map((row) => ({
+      id: `pr-review:${row.id}`,
+      type: "pr_review_completed" as const,
+      title: row.title,
+      description: `Reviewed PR #${row.number} in ${row.repoFullName}`,
+      occurredAt: row.reviewedAt,
+      href: row.prUrl,
+      meta: `#${row.number}`,
+    }));
+}
+
 export async function loadContributionTimeline(
   userId: string,
   preload?: {
@@ -107,19 +206,27 @@ export async function loadContributionTimeline(
     issues?: Awaited<ReturnType<typeof listGithubIssues>>;
   },
 ): Promise<ContributionTimelineData> {
-  const [commits, pullRequests, issues, reviews, submissions, roadmaps] =
-    await Promise.all([
-      preload?.commits
-        ? Promise.resolve(preload.commits)
-        : listGithubCommits(userId, 100),
-      preload?.pullRequests
-        ? Promise.resolve(preload.pullRequests)
-        : listGithubPullRequests(userId, 100),
-      preload?.issues ? Promise.resolve(preload.issues) : listGithubIssues(userId, 100),
-      listReviewEventsForUser(userId),
-      listRecentUserSubmissions(userId, 50),
-      listRoadmapCompletions(userId),
-    ]);
+  const [
+    commits,
+    pullRequests,
+    issues,
+    reviews,
+    submissions,
+    roadmaps,
+    acceptedAnswers,
+    completedPrReviews,
+  ] = await Promise.all([
+    preload?.commits ? Promise.resolve(preload.commits) : listGithubCommits(userId, 100),
+    preload?.pullRequests
+      ? Promise.resolve(preload.pullRequests)
+      : listGithubPullRequests(userId, 100),
+    preload?.issues ? Promise.resolve(preload.issues) : listGithubIssues(userId, 100),
+    listReviewEventsForUser(userId),
+    listRecentUserSubmissions(userId, 50),
+    listRoadmapCompletions(userId),
+    listAcceptedAnswersForUser(userId),
+    listCompletedPrReviewsForUser(userId),
+  ]);
 
   const events: TimelineEvent[] = [];
 
@@ -195,6 +302,8 @@ export async function loadContributionTimeline(
   }
 
   events.push(...roadmaps);
+  events.push(...acceptedAnswers);
+  events.push(...completedPrReviews);
 
   const sorted = sortTimelineEvents(events);
 

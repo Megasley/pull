@@ -1,0 +1,1 @@
+ALTER TABLE "users" ALTER COLUMN "email_notifications" SET DEFAULT '{"reviewOutcomes":false,"reviewQueue":false,"achievements":true,"product":false,"qaActivity":false,"prReviewActivity":false}'::jsonb;

@@ -307,6 +307,9 @@ export default async function AdminOverviewPage({
             <Button asChild variant="outline">
               <Link href="/admin/partners">./partners</Link>
             </Button>
+            <Button asChild variant="outline">
+              <Link href="/admin/pr-reviews">./pr-reviews</Link>
+            </Button>
             <Button asChild>
               <Link href="/review">./review</Link>
             </Button>

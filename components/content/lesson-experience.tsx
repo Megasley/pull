@@ -51,6 +51,10 @@ type LessonExperienceProps = {
   navigation: LessonNavigation;
   roadmap: RoadmapJson;
   children: React.ReactNode;
+  /** Server-rendered <CommentThread> — passed down from LessonRenderer since
+   *  this component is a client component and can't render an async server
+   *  component directly. */
+  discussion: React.ReactNode;
 };
 
 export function LessonExperience({
@@ -58,10 +62,15 @@ export function LessonExperience({
   navigation,
   roadmap,
   children,
+  discussion,
 }: LessonExperienceProps) {
   const [helpOpen, setHelpOpen] = useState(false);
   const readingProgress = useReadingProgress();
-  const headingIds = lesson.toc.map((item) => item.id);
+  const tocItems = [
+    ...lesson.toc,
+    { id: "lesson-discussion-heading", title: "Discussion", depth: 2 as const },
+  ];
+  const headingIds = tocItems.map((item) => item.id);
   const { activeId, scrollToHeading } = useActiveHeading("lesson-content", headingIds);
   const { isAuthenticated, userId } = useAuthSession();
   const { isComplete, toggleComplete, roadmapProgress } = useLessonCompletion(
@@ -197,10 +206,10 @@ export function LessonExperience({
 
         <div className="grid gap-12 xl:grid-cols-[minmax(0,1fr)_260px]">
           <div className="min-w-0 space-y-10">
-            {lesson.toc.length > 0 ? (
+            {tocItems.length > 0 ? (
               <div className="border border-border bg-card p-4 xl:hidden">
                 <StickyTableOfContents
-                  items={lesson.toc}
+                  items={tocItems}
                   activeId={activeId}
                   onNavigate={scrollToHeading}
                 />
@@ -277,13 +286,24 @@ export function LessonExperience({
                 signInHref={signInHref}
               />
             )}
+            <section aria-labelledby="lesson-discussion-heading" className="space-y-4">
+              <p className="tech-eyebrow">discussion</p>
+              <h2
+                id="lesson-discussion-heading"
+                className="text-2xl font-bold tracking-[-0.03em]"
+              >
+                Discussion
+              </h2>
+              {discussion}
+            </section>
+
             <LessonNavigationBar roadmapSlug={lesson.roadmap} navigation={navigation} />
           </div>
 
           <aside className="hidden xl:block">
             <div className="sticky top-24 space-y-8">
               <StickyTableOfContents
-                items={lesson.toc}
+                items={tocItems}
                 activeId={activeId}
                 onNavigate={scrollToHeading}
               />

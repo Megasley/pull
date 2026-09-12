@@ -28,6 +28,8 @@ export async function updateEmailNotificationPrefsAction(formData: FormData) {
     reviewQueue: formData.get("reviewQueue") === "on",
     achievements: formData.get("achievements") === "on",
     product: formData.get("product") === "on",
+    qaActivity: formData.get("qaActivity") === "on",
+    prReviewActivity: formData.get("prReviewActivity") === "on",
   } satisfies EmailNotificationPrefs);
 
   const updated = await updateEmailNotificationPrefs(gate.profile.id, prefs);

@@ -10,6 +10,8 @@ export const XP_REWARDS: Record<XpSourceType, number> = {
   merged_pr: 100,
   roadmap_complete: 200,
   achievement: 0, // amount comes from achievement.xpReward
+  qa_answer_accepted: 20,
+  pr_review_completed: 30,
 };
 
 export function lessonXpKey(roadmapSlug: string, nodeSlug: string) {
@@ -30,4 +32,12 @@ export function submissionXpKey(submissionId: string) {
 
 export function achievementXpKey(slug: string) {
   return slug;
+}
+
+export function qaAnswerXpKey(replyCommentId: string) {
+  return replyCommentId;
+}
+
+export function prReviewXpKey(reviewRequestId: string) {
+  return reviewRequestId;
 }

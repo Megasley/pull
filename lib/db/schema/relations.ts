@@ -1,5 +1,6 @@
 import { relations } from "drizzle-orm";
 
+import { comments } from "./comments";
 import {
   githubCommits,
   githubConnections,
@@ -12,6 +13,7 @@ import {
 } from "./github";
 import { adminNotifications, milestoneEvents } from "./milestones";
 import { opportunityEvents } from "./opportunities";
+import { prReviewRequests } from "./pr-review-requests";
 import {
   orgInviteLinks,
   orgMemberships,
@@ -57,6 +59,26 @@ export const usersRelations = relations(users, ({ many, one }) => ({
   githubContributionDays: many(githubContributionDays),
   orgMemberships: many(orgMemberships),
   opportunityEvents: many(opportunityEvents),
+  comments: many(comments),
+  submittedPrReviewRequests: many(prReviewRequests, {
+    relationName: "pr_review_request_submitter",
+  }),
+  reviewedPrReviewRequests: many(prReviewRequests, {
+    relationName: "pr_review_request_reviewer",
+  }),
+}));
+
+export const prReviewRequestsRelations = relations(prReviewRequests, ({ one }) => ({
+  submittedBy: one(users, {
+    fields: [prReviewRequests.submittedByUserId],
+    references: [users.id],
+    relationName: "pr_review_request_submitter",
+  }),
+  reviewedBy: one(users, {
+    fields: [prReviewRequests.reviewedByUserId],
+    references: [users.id],
+    relationName: "pr_review_request_reviewer",
+  }),
 }));
 
 export const githubReviewedPullRequestsRelations = relations(
@@ -179,6 +201,7 @@ export const projectsRelations = relations(projects, ({ one, many }) => ({
   }),
   nodes: many(roadmapNodes),
   submissions: many(projectSubmissions),
+  comments: many(comments),
 }));
 
 export const roadmapNodesRelations = relations(roadmapNodes, ({ one, many }) => ({
@@ -267,6 +290,26 @@ export const submissionReviewEventsRelations = relations(
     }),
   }),
 );
+
+export const commentsRelations = relations(comments, ({ one, many }) => ({
+  project: one(projects, {
+    fields: [comments.projectId],
+    references: [projects.id],
+  }),
+  author: one(users, {
+    fields: [comments.authorId],
+    references: [users.id],
+  }),
+  // Self-referential: a reply's `thread` points at its root question row;
+  // a root question's `replies` are every row whose threadId points back at
+  // it. Always exactly 2 levels deep — see lib/comments/repository.ts.
+  thread: one(comments, {
+    fields: [comments.threadId],
+    references: [comments.id],
+    relationName: "thread_replies",
+  }),
+  replies: many(comments, { relationName: "thread_replies" }),
+}));
 
 export const achievementsRelations = relations(achievements, ({ many }) => ({
   userAchievements: many(userAchievements),

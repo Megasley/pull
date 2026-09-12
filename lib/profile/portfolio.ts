@@ -99,6 +99,7 @@ const PUBLIC_TIMELINE_TYPES = new Set([
   "review",
   "project_submission",
   "roadmap_completion",
+  "qa_answer_accepted",
 ]);
 
 /** Make the timeline safe and relevant for anonymous public viewers. */

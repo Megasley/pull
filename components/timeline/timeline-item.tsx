@@ -26,6 +26,8 @@ const TYPE_ICON: Record<
   merged: GitMergeIcon,
   project_submission: FileCodeIcon,
   roadmap_completion: MapIcon,
+  qa_answer_accepted: CheckCircleIcon,
+  pr_review_completed: GitPullRequestIcon,
 };
 
 const TYPE_TONE: Record<TimelineEventType, string> = {
@@ -36,6 +38,8 @@ const TYPE_TONE: Record<TimelineEventType, string> = {
   merged: "bg-signal/40 text-ink",
   project_submission: "bg-foreground/10 text-foreground",
   roadmap_completion: "bg-signal/25 text-ink",
+  qa_answer_accepted: "bg-signal/40 text-ink",
+  pr_review_completed: "bg-ink/10 text-ink",
 };
 
 type TimelineItemProps = {

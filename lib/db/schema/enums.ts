@@ -61,6 +61,8 @@ export const xpSourceTypeEnum = pgEnum("xp_source_type", [
   "merged_pr",
   "roadmap_complete",
   "achievement",
+  "qa_answer_accepted",
+  "pr_review_completed",
 ]);
 
 export const resourceTypeEnum = pgEnum("resource_type", [
@@ -175,5 +177,40 @@ export const orgQualificationStatusEnum = pgEnum("org_qualification_status", [
   "qualified",
   "completed",
   "graduated",
+]);
+
+/** A comment/reply row's entity attachment — see lib/db/schema/comments.ts for
+ *  why this is a discriminator + nullable typed columns rather than a
+ *  polymorphic entity_id (two of the three referenced entity types have no
+ *  backing DB row at all: roadmap steps and developer tools are static content). */
+export const commentEntityTypeEnum = pgEnum("comment_entity_type", [
+  "roadmap_step",
+  "project",
+  "developer_tool",
+]);
+
+export const commentStatusEnum = pgEnum("comment_status", [
+  "visible",
+  "hidden",
+  "deleted",
+]);
+
+/** Who put a PR into the review-discovery queue: an admin curating a repo
+ *  that needs eyes, or the PR's own author asking peers to review it.
+ *  See lib/db/schema/pr-review-requests.ts — this drives queue ordering
+ *  (peer_submitted ranks above admin_curated). */
+export const prReviewSourceTypeEnum = pgEnum("pr_review_source_type", [
+  "admin_curated",
+  "peer_submitted",
+]);
+
+/** "reviewed" is set only by the credit-detection hook in lib/github/sync.ts
+ *  cross-referencing a builder's own GitHub review-sync data — never by
+ *  self-report, since a manual "I reviewed this" button would be gameable. */
+export const prReviewStatusEnum = pgEnum("pr_review_status", [
+  "needs_review",
+  "reviewed",
+  "closed",
+  "hidden",
 ]);
 

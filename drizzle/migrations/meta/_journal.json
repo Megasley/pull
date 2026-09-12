@@ -215,8 +215,36 @@
     {
       "idx": 30,
       "version": "7",
+      "when": 1789168506888,
+      "tag": "0030_native_qa_comments",
+      "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1789195957024,
+      "tag": "0031_qa_activity_notification_pref",
+      "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1789213217928,
+      "tag": "0032_pr_review_requests",
+      "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1789219798401,
+      "tag": "0033_pr_review_activity_notification_pref",
+      "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
       "when": 1789134080364,
-      "tag": "0030_server_owned_learning_progress",
+      "tag": "0034_server_owned_learning_progress",
       "breakpoints": true
     }
   ]

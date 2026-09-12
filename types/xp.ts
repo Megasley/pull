@@ -5,7 +5,9 @@ export type XpSourceType =
   | "project_approved"
   | "merged_pr"
   | "roadmap_complete"
-  | "achievement";
+  | "achievement"
+  | "qa_answer_accepted"
+  | "pr_review_completed";
 
 export type XpAwardResult = {
   awarded: boolean;
