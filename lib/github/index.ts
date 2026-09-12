@@ -17,6 +17,9 @@ export {
   listGithubContributionDays,
 } from "./service";
 
+export { fetchPullRequestByUrl, fetchRepoPullRequestsNeedingReview } from "./api";
+export type { FetchedPullRequest, DiscoveredPullRequest } from "./api";
+
 export {
   REPO_PAGE_SIZE,
   filterAndSortRepositories,

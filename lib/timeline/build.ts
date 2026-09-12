@@ -4,6 +4,7 @@ import { getDb } from "@/lib/db";
 import { isDatabaseConfigured } from "@/lib/db/env";
 import {
   comments,
+  prReviewRequests,
   projectSubmissions,
   projects,
   submissionReviewEvents,
@@ -164,6 +165,39 @@ async function listAcceptedAnswersForUser(userId: string): Promise<TimelineEvent
     });
 }
 
+async function listCompletedPrReviewsForUser(userId: string): Promise<TimelineEvent[]> {
+  if (!isDatabaseConfigured()) return [];
+
+  const db = getDb();
+  const rows = await db
+    .select({
+      id: prReviewRequests.id,
+      prUrl: prReviewRequests.prUrl,
+      repoFullName: prReviewRequests.repoFullName,
+      number: prReviewRequests.number,
+      title: prReviewRequests.title,
+      reviewedAt: prReviewRequests.reviewedAt,
+    })
+    .from(prReviewRequests)
+    .where(
+      and(eq(prReviewRequests.reviewedByUserId, userId), eq(prReviewRequests.status, "reviewed")),
+    )
+    .orderBy(desc(prReviewRequests.reviewedAt))
+    .limit(50);
+
+  return rows
+    .filter((row): row is typeof row & { reviewedAt: string } => row.reviewedAt !== null)
+    .map((row) => ({
+      id: `pr-review:${row.id}`,
+      type: "pr_review_completed" as const,
+      title: row.title,
+      description: `Reviewed PR #${row.number} in ${row.repoFullName}`,
+      occurredAt: row.reviewedAt,
+      href: row.prUrl,
+      meta: `#${row.number}`,
+    }));
+}
+
 export async function loadContributionTimeline(
   userId: string,
   preload?: {
@@ -172,20 +206,27 @@ export async function loadContributionTimeline(
     issues?: Awaited<ReturnType<typeof listGithubIssues>>;
   },
 ): Promise<ContributionTimelineData> {
-  const [commits, pullRequests, issues, reviews, submissions, roadmaps, acceptedAnswers] =
-    await Promise.all([
-      preload?.commits
-        ? Promise.resolve(preload.commits)
-        : listGithubCommits(userId, 100),
-      preload?.pullRequests
-        ? Promise.resolve(preload.pullRequests)
-        : listGithubPullRequests(userId, 100),
-      preload?.issues ? Promise.resolve(preload.issues) : listGithubIssues(userId, 100),
-      listReviewEventsForUser(userId),
-      listRecentUserSubmissions(userId, 50),
-      listRoadmapCompletions(userId),
-      listAcceptedAnswersForUser(userId),
-    ]);
+  const [
+    commits,
+    pullRequests,
+    issues,
+    reviews,
+    submissions,
+    roadmaps,
+    acceptedAnswers,
+    completedPrReviews,
+  ] = await Promise.all([
+    preload?.commits ? Promise.resolve(preload.commits) : listGithubCommits(userId, 100),
+    preload?.pullRequests
+      ? Promise.resolve(preload.pullRequests)
+      : listGithubPullRequests(userId, 100),
+    preload?.issues ? Promise.resolve(preload.issues) : listGithubIssues(userId, 100),
+    listReviewEventsForUser(userId),
+    listRecentUserSubmissions(userId, 50),
+    listRoadmapCompletions(userId),
+    listAcceptedAnswersForUser(userId),
+    listCompletedPrReviewsForUser(userId),
+  ]);
 
   const events: TimelineEvent[] = [];
 
@@ -262,6 +303,7 @@ export async function loadContributionTimeline(
 
   events.push(...roadmaps);
   events.push(...acceptedAnswers);
+  events.push(...completedPrReviews);
 
   const sorted = sortTimelineEvents(events);
 
