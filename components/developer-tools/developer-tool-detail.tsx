@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft, ExternalLink, GitBranch } from "lucide-react";
 
+import { CommentThread } from "@/components/comments/comment-thread";
 import {
   DeveloperToolDifficultyBadge,
   DeveloperToolOpenSourceBadge,
@@ -181,6 +182,16 @@ export function DeveloperToolDetail({ tool }: DeveloperToolDetailProps) {
             />
           ))}
         </ul>
+      </section>
+
+      <section aria-labelledby="discussion-heading" className="space-y-4">
+        <p className="tech-eyebrow">discussion</p>
+        <h2 id="discussion-heading" className="text-2xl font-bold tracking-[-0.03em]">
+          Discussion
+        </h2>
+        <CommentThread
+          entity={{ entityType: "developer_tool", developerToolSlug: tool.slug }}
+        />
       </section>
     </div>
   );

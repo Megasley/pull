@@ -61,6 +61,7 @@ export const xpSourceTypeEnum = pgEnum("xp_source_type", [
   "merged_pr",
   "roadmap_complete",
   "achievement",
+  "qa_answer_accepted",
 ]);
 
 export const resourceTypeEnum = pgEnum("resource_type", [
@@ -175,5 +176,21 @@ export const orgQualificationStatusEnum = pgEnum("org_qualification_status", [
   "qualified",
   "completed",
   "graduated",
+]);
+
+/** A comment/reply row's entity attachment — see lib/db/schema/comments.ts for
+ *  why this is a discriminator + nullable typed columns rather than a
+ *  polymorphic entity_id (two of the three referenced entity types have no
+ *  backing DB row at all: roadmap steps and developer tools are static content). */
+export const commentEntityTypeEnum = pgEnum("comment_entity_type", [
+  "roadmap_step",
+  "project",
+  "developer_tool",
+]);
+
+export const commentStatusEnum = pgEnum("comment_status", [
+  "visible",
+  "hidden",
+  "deleted",
 ]);
 

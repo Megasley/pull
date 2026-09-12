@@ -32,6 +32,11 @@ const TOGGLES: {
     description: "When you unlock one or more achievements.",
   },
   {
+    key: "qaActivity",
+    label: "Q&A activity",
+    description: "Replies to your questions, and when your answer is accepted.",
+  },
+  {
     key: "product",
     label: "Product updates",
     description: "Welcome email and role grants (reviewer / admin).",

@@ -1,5 +1,6 @@
 export * from "./admin-audit-log";
 export * from "./admin-metrics-snapshots";
+export * from "./comments";
 export * from "./enums";
 export * from "./github";
 export * from "./goals";

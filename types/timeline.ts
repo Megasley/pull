@@ -5,7 +5,8 @@ export type TimelineEventType =
   | "review"
   | "merged"
   | "project_submission"
-  | "roadmap_completion";
+  | "roadmap_completion"
+  | "qa_answer_accepted";
 
 export type TimelineDateRange = "7d" | "30d" | "90d" | "365d" | "all";
 
