@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gte, ne, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ne, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 import { getDb } from "@/lib/db";
@@ -43,11 +43,14 @@ const FLAG_REPUTATION_THRESHOLD = 20;
 const RATE_LIMIT_WINDOW_SECONDS = 30;
 const RATE_LIMIT_MAX_SUBMISSIONS = 3;
 
-/** Requests older than this drop out of the public queue — a stale ask
- *  nobody picked up in three months is more likely abandoned than worth
- *  surfacing. Doesn't change `status` or affect the admin/"my submissions"
- *  views, purely a display-age cutoff on what gets suggested. */
-const MAX_SUGGESTED_AGE_MONTHS = 3;
+/** PRs open on GitHub longer than this drop out of the public queue — an
+ *  old, unreviewed PR is more likely abandoned/stale than worth suggesting.
+ *  Measured from when the PR was actually opened on GitHub (`prCreatedAt`),
+ *  not when Pull found or was told about it — falls back to `createdAt` for
+ *  rows inserted before that was tracked. Doesn't change `status` or affect
+ *  the admin/"my submissions" views, purely a display-age cutoff on what
+ *  gets suggested. */
+const MAX_SUGGESTED_PR_AGE_MONTHS = 4;
 
 /** Only applied to peer submissions — the public-facing, anyone-can-hit
  *  form is the actual abuse vector. Admin curation is role-gated already
@@ -121,6 +124,7 @@ export async function createReviewRequest(input: {
       number: parsed.number,
       title: pr.title,
       authorLogin: pr.authorLogin,
+      prCreatedAt: pr.githubCreatedAt,
       sourceType: input.sourceType,
       submittedByUserId: input.submittedByUserId,
       flaggedForReview,
@@ -144,6 +148,9 @@ export type PrReviewRequestRecord = {
   hiddenReason: string | null;
   submittedByUsername: string | null;
   createdAt: string;
+  /** When the PR was actually opened on GitHub — null for rows inserted
+   *  before this was tracked. */
+  prCreatedAt: string | null;
   flaggedForReview: boolean;
   tracks: DiscoveryTrack[];
   language: string | null;
@@ -165,6 +172,7 @@ function mapRequestRow(row: {
     hiddenReason: row.request.hiddenReason,
     submittedByUsername: row.submittedByUsername,
     createdAt: row.request.createdAt,
+    prCreatedAt: row.request.prCreatedAt,
     flaggedForReview: row.request.flaggedForReview,
     ...lookupCatalogMeta(row.request.repoFullName),
   };
@@ -186,10 +194,15 @@ export async function listReviewRequestsForViewer(
   const db = getDb();
   const conditions = [
     eq(prReviewRequests.status, "needs_review"),
-    gte(
-      prReviewRequests.createdAt,
-      sql`now() - (${MAX_SUGGESTED_AGE_MONTHS} || ' months')::interval`,
-    ),
+    // Peer submissions are exempt — a builder asking for a review on their
+    // own PR should never be hidden just because the PR itself is old; the
+    // age cutoff only exists to keep stale, nobody-asked-for-it ecosystem/
+    // admin-curated entries from cluttering the queue.
+    sql`(
+      ${prReviewRequests.sourceType} = 'peer_submitted'
+      or coalesce(${prReviewRequests.prCreatedAt}, ${prReviewRequests.createdAt})
+         >= now() - (${MAX_SUGGESTED_PR_AGE_MONTHS} || ' months')::interval
+    )`,
   ];
   if (viewerGithubUsername) {
     conditions.push(ne(prReviewRequests.authorLogin, viewerGithubUsername));
@@ -522,6 +535,7 @@ export async function insertDiscoveredReviewRequest(input: {
   number: number;
   title: string;
   authorLogin: string;
+  prCreatedAt: string;
 }): Promise<void> {
   const db = getDb();
   await db.insert(prReviewRequests).values({
@@ -530,6 +544,7 @@ export async function insertDiscoveredReviewRequest(input: {
     number: input.number,
     title: input.title,
     authorLogin: input.authorLogin,
+    prCreatedAt: input.prCreatedAt,
     sourceType: "admin_curated",
     submittedByUserId: null,
     flaggedForReview: false,

@@ -53,6 +53,7 @@ export async function discoverEcosystemReviewRequests(): Promise<{
         number: pr.number,
         title: pr.title,
         authorLogin: pr.authorLogin,
+        prCreatedAt: pr.githubCreatedAt,
       });
       added += 1;
     }

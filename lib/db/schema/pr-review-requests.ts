@@ -30,6 +30,11 @@ export const prReviewRequests = pgTable(
 
     title: text("title").notNull(),
     authorLogin: text("author_login").notNull(),
+    /** When the PR was actually opened on GitHub — not when Pull found or
+     *  was told about it. Nullable because rows inserted before this column
+     *  existed have no way to backfill it retroactively; the suggestion-age
+     *  filter falls back to `createdAt` for those. */
+    prCreatedAt: timestamp("pr_created_at", { withTimezone: true, mode: "string" }),
 
     sourceType: prReviewSourceTypeEnum("source_type").notNull(),
     submittedByUserId: uuid("submitted_by_user_id").references(() => users.id, {
