@@ -281,7 +281,15 @@ export async function syncGithubForUser(
           ? error.message
           : "GitHub sync failed";
 
-    await setGithubSyncStatus(userId, "error", message);
-    return { ok: false, error: message };
+    // For a Drizzle query failure, `message` is just "Failed query: <sql>" —
+    // the actual Postgres reason (e.g. a real constraint/type error) lives
+    // on `cause`, which was previously discarded, making the admin panel's
+    // sync-error display uninformative for exactly the errors worth seeing.
+    const cause =
+      error instanceof Error && error.cause instanceof Error ? error.cause.message : null;
+    const storedMessage = cause ? `${message} | cause: ${cause}` : message;
+
+    await setGithubSyncStatus(userId, "error", storedMessage);
+    return { ok: false, error: storedMessage };
   }
 }
