@@ -2,7 +2,6 @@
 
 import { revalidatePath } from "next/cache";
 
-import { refreshAdminMetricsSnapshot } from "@/lib/admin/metrics-snapshot";
 import {
   banUser,
   deleteUser,
@@ -232,30 +231,5 @@ export async function deleteUserAction(userId: string, confirmUsername: string) 
     ok: true as const,
     authDeleted: result.authDeleted,
     authDeleteError: result.authDeleteError,
-  };
-}
-
-/** Manually recompute launch/funnel metrics snapshot (same work as the cron). */
-export async function refreshAdminMetricsAction() {
-  const gate = await requireAdmin();
-  if (!gate.ok) {
-    return { ok: false as const, reason: gate.reason };
-  }
-
-  const result = await refreshAdminMetricsSnapshot();
-  revalidatePath("/admin");
-
-  if (!result.ok) {
-    return {
-      ok: false as const,
-      reason: "refresh_failed" as const,
-      error: result.error ?? "Could not refresh metrics.",
-      computedAt: result.computedAt,
-    };
-  }
-
-  return {
-    ok: true as const,
-    computedAt: result.computedAt,
   };
 }

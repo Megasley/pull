@@ -206,7 +206,16 @@ export async function fetchCronSyncHealth() {
       recentErrors: errorRows
         .map((row) => row.syncError)
         .filter((value): value is string => Boolean(value))
-        .map((value) => value.slice(0, 180)),
+        .map((value) => {
+          // "<message> | cause: <cause>" (see lib/github/sync.ts) — the cause
+          // is the actually-useful part for a Drizzle query failure, where
+          // <message> alone is just the SQL text. Truncate the message
+          // instead of the whole string so a long query never crowds out
+          // the reason it failed.
+          const [message, cause] = value.split(" | cause: ");
+          if (!cause) return value.slice(0, 180);
+          return `${message.slice(0, 80)}… | cause: ${cause.slice(0, 180)}`;
+        }),
     };
   });
 }

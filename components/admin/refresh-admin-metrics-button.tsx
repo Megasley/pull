@@ -3,9 +3,16 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
-import { refreshAdminMetricsAction } from "@/app/actions/admin";
 import { Button } from "@/components/ui/button";
 
+/**
+ * Hits a dedicated route (not a Server Action) so this can run far longer
+ * than the /admin page's own maxDuration=30 allows — a Server Action is
+ * bound to its page's maxDuration with no per-action override in Next.js,
+ * and computing the full metrics snapshot can exceed that, which used to
+ * surface as a raw "Connection closed" error when Vercel killed the
+ * function mid-request. See app/api/admin/refresh-metrics/route.ts.
+ */
 export function RefreshAdminMetricsButton() {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -21,14 +28,19 @@ export function RefreshAdminMetricsButton() {
         onClick={() => {
           setError(null);
           startTransition(async () => {
-            const result = await refreshAdminMetricsAction();
-            if (!result.ok) {
-              setError(
-                "error" in result && result.error ? result.error : "Refresh failed",
-              );
-              return;
+            try {
+              const response = await fetch("/api/admin/refresh-metrics", {
+                method: "POST",
+              });
+              const result = await response.json();
+              if (!result.ok) {
+                setError(result.error ?? "Refresh failed");
+                return;
+              }
+              router.refresh();
+            } catch {
+              setError("Refresh failed — check your connection and try again.");
             }
-            router.refresh();
           });
         }}
       >
