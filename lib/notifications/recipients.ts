@@ -74,6 +74,23 @@ export async function listReviewQueueRecipients(
     .filter((item) => item.prefs.reviewQueue);
 }
 
+/** Any builder can opt in (unlike listReviewQueueRecipients, which is
+ *  scoped to reviewer/admin — a review-request digest is relevant to
+ *  everyone, not just designated reviewers). */
+export async function listPrReviewDigestRecipients(): Promise<NotificationRecipient[]> {
+  if (!isDatabaseConfigured()) {
+    return [];
+  }
+
+  const db = getDb();
+  const rows = await db.select().from(users).where(isNotNull(users.email));
+
+  return rows
+    .map(mapRecipient)
+    .filter((item): item is NotificationRecipient => item !== null)
+    .filter((item) => item.prefs.prReviewDigest);
+}
+
 export function recipientAllows(
   recipient: NotificationRecipient,
   key: EmailNotificationPrefKey,

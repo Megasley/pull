@@ -4,12 +4,14 @@ import { AchievementEmail } from "@/lib/email/templates/achievement";
 import { AnswerAcceptedEmail } from "@/lib/email/templates/answer-accepted";
 import { CommentReplyEmail } from "@/lib/email/templates/comment-reply";
 import { PrReviewCompletedEmail } from "@/lib/email/templates/pr-review-completed";
+import { PrReviewDigestEmail } from "@/lib/email/templates/pr-review-digest";
 import { ReviewOutcomeEmail } from "@/lib/email/templates/review-outcome";
 import { ReviewQueueEmail } from "@/lib/email/templates/review-queue";
 import { RoleGrantedEmail } from "@/lib/email/templates/role-granted";
 import { WelcomeEmail } from "@/lib/email/templates/welcome";
 import {
   getNotificationRecipient,
+  listPrReviewDigestRecipients,
   listReviewQueueRecipients,
   recipientAllows,
 } from "@/lib/notifications/recipients";
@@ -372,4 +374,50 @@ export function notifyPrReviewCompletedAsync(
   input: Parameters<typeof notifyPrReviewCompleted>[0],
 ) {
   fireAndForget(notifyPrReviewCompleted(input), "pr-review-completed");
+}
+
+/**
+ * Weekly nudge to everyone opted into `prReviewDigest` — driven by
+ * app/api/cron/pr-review-digest/route.ts, not a per-event trigger like the
+ * rest of this file, so it's a batch send to all opted-in recipients rather
+ * than one lookup by userId. `items` is the same handful of PRs for every
+ * recipient (oldest-waiting from the public queue), not personalized.
+ */
+export async function notifyPrReviewDigest(
+  items: Array<{ repoFullName: string; number: number; title: string; prUrl: string }>,
+) {
+  if (items.length === 0) {
+    return { sent: 0, failed: 0, failures: [] };
+  }
+
+  const recipients = await listPrReviewDigestRecipients();
+  const href = appUrl("/pr-reviews");
+
+  const payloads: SendEmailInput[] = recipients.map((recipient) => ({
+    to: recipient.email,
+    subject: `${items.length} PR${items.length === 1 ? "" : "s"} waiting for a reviewer`,
+    react: PrReviewDigestEmail({
+      displayName: recipient.displayName,
+      items: items.map((item) => ({
+        repoFullName: item.repoFullName,
+        number: item.number,
+        title: item.title,
+        href: item.prUrl,
+      })),
+      href,
+    }),
+  }));
+
+  const stats = await sendEmailInBatches(payloads);
+
+  if (stats.failed > 0) {
+    console.warn("[notifications] pr-review-digest partial failures", {
+      total: payloads.length,
+      sent: stats.sent,
+      failed: stats.failed,
+      failures: stats.failures,
+    });
+  }
+
+  return stats;
 }

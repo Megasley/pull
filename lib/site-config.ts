@@ -194,6 +194,7 @@ export const footerNav = [
     links: [
       { title: "Open Source Projects", href: "/discover" },
       { title: "Issues", href: "/issues" },
+      { title: "Reviews", href: "/pr-reviews" },
       { title: "First Contribution", href: "/first-contribution" },
       { title: "Support", href: "/support" },
       { title: "Feedback", href: siteConfig.feedbackUrl },

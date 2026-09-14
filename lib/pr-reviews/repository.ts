@@ -9,7 +9,7 @@ import { getAllDiscoveryRepositories } from "@/lib/discovery/catalog";
 // barrel: the barrel re-exports lib/github/service.ts, which imports
 // lib/github/sync.ts, which imports THIS file (for the credit-detection
 // hook) — going through the barrel here would be a circular import.
-import { fetchPullRequestByUrl } from "@/lib/github/api";
+import { fetchPullRequestByUrl, hasReviewedPullRequest } from "@/lib/github/api";
 import { GithubClient } from "@/lib/github/client";
 import { getGithubConnection } from "@/lib/github/store";
 import { parsePrUrl } from "@/lib/pr-reviews/validate";
@@ -76,7 +76,12 @@ export type CreateReviewRequestResult =
   | { ok: true; id: string }
   | {
       ok: false;
-      reason: "invalid_url" | "github_not_connected" | "pr_not_found" | "rate_limited";
+      reason:
+        | "invalid_url"
+        | "github_not_connected"
+        | "pr_not_found"
+        | "rate_limited"
+        | "already_submitted";
     };
 
 export async function createReviewRequest(input: {
@@ -102,11 +107,17 @@ export async function createReviewRequest(input: {
     return { ok: false, reason: "github_not_connected" };
   }
 
+  const existing = await findActiveReviewRequestFor(parsed.repoFullName, parsed.number);
+  if (existing) {
+    return { ok: false, reason: "already_submitted" };
+  }
+
   const client = new GithubClient(accessToken);
   let pr;
   try {
     pr = await fetchPullRequestByUrl(client, parsed.owner, parsed.repo, parsed.number);
-  } catch {
+  } catch (error) {
+    console.error("[pr-reviews] createReviewRequest fetch failed", error);
     return { ok: false, reason: "pr_not_found" };
   }
 
@@ -125,6 +136,9 @@ export async function createReviewRequest(input: {
       title: pr.title,
       authorLogin: pr.authorLogin,
       prCreatedAt: pr.githubCreatedAt,
+      additions: pr.additions,
+      deletions: pr.deletions,
+      filesChanged: pr.filesChanged,
       sourceType: input.sourceType,
       submittedByUserId: input.submittedByUserId,
       flaggedForReview,
@@ -132,6 +146,75 @@ export async function createReviewRequest(input: {
     .returning({ id: prReviewRequests.id });
 
   return { ok: true, id: row.id };
+}
+
+export type PreviewPullRequestResult =
+  | {
+      ok: true;
+      preview: {
+        repoFullName: string;
+        number: number;
+        title: string;
+        authorLogin: string;
+        prCreatedAt: string;
+        language: string | null;
+        /** Set when this PR is already tracked (needs_review/reviewed/
+         *  closed) — lets the UI warn before the builder confirms, instead
+         *  of only finding out after submitting. A withdrawn or
+         *  admin-hidden entry doesn't count, so resubmitting after
+         *  withdrawing stays possible. */
+        existingStatus: PrReviewRequestRecord["status"] | null;
+        additions: number;
+        deletions: number;
+      };
+    }
+  | { ok: false; reason: "invalid_url" | "github_not_connected" | "pr_not_found" };
+
+/**
+ * Fetches a pasted PR URL's real metadata so a builder can confirm it's the
+ * right one before actually adding it to the queue — same lookup
+ * `createReviewRequest` does, minus the insert. Doesn't count against the
+ * submission rate limit (isRateLimited), since nothing is submitted yet.
+ */
+export async function previewPullRequestForReview(input: {
+  prUrl: string;
+  userId: string;
+}): Promise<PreviewPullRequestResult> {
+  const parsed = parsePrUrl(input.prUrl);
+  if (!parsed) {
+    return { ok: false, reason: "invalid_url" };
+  }
+
+  const connection = await getGithubConnection(input.userId);
+  const accessToken = connection?.accessToken ?? null;
+  if (!accessToken) {
+    return { ok: false, reason: "github_not_connected" };
+  }
+
+  const client = new GithubClient(accessToken);
+  try {
+    const [pr, existing] = await Promise.all([
+      fetchPullRequestByUrl(client, parsed.owner, parsed.repo, parsed.number),
+      findActiveReviewRequestFor(parsed.repoFullName, parsed.number),
+    ]);
+    return {
+      ok: true,
+      preview: {
+        repoFullName: parsed.repoFullName,
+        number: parsed.number,
+        title: pr.title,
+        authorLogin: pr.authorLogin,
+        prCreatedAt: pr.githubCreatedAt,
+        language: lookupCatalogMeta(parsed.repoFullName).language,
+        existingStatus: existing?.status ?? null,
+        additions: pr.additions,
+        deletions: pr.deletions,
+      },
+    };
+  } catch (error) {
+    console.error("[pr-reviews] previewPullRequestForReview failed", error);
+    return { ok: false, reason: "pr_not_found" };
+  }
 }
 
 export type PrReviewRequestRecord = {
@@ -151,9 +234,15 @@ export type PrReviewRequestRecord = {
   /** When the PR was actually opened on GitHub — null for rows inserted
    *  before this was tracked. */
   prCreatedAt: string | null;
+  reviewedAt: string | null;
   flaggedForReview: boolean;
   tracks: DiscoveryTrack[];
   language: string | null;
+  /** Diff size — null for auto-discovered rows (search API doesn't return
+   *  diff stats); see lib/db/schema/pr-review-requests.ts. */
+  additions: number | null;
+  deletions: number | null;
+  filesChanged: number | null;
 };
 
 function mapRequestRow(row: {
@@ -173,7 +262,11 @@ function mapRequestRow(row: {
     submittedByUsername: row.submittedByUsername,
     createdAt: row.request.createdAt,
     prCreatedAt: row.request.prCreatedAt,
+    reviewedAt: row.request.reviewedAt,
     flaggedForReview: row.request.flaggedForReview,
+    additions: row.request.additions,
+    deletions: row.request.deletions,
+    filesChanged: row.request.filesChanged,
     ...lookupCatalogMeta(row.request.repoFullName),
   };
 }
@@ -347,6 +440,36 @@ export async function listMySubmissions(userId: string): Promise<MyReviewRequest
   }));
 }
 
+/** PRs this user has actually reviewed — the credited flip side of
+ *  listMySubmissions. Always `status: "reviewed"` by construction (that's
+ *  the only way reviewedByUserId gets set), but reuses the same record
+ *  shape as the rest of this module rather than a narrower type. */
+export async function listMyReviewedRequests(userId: string): Promise<MyReviewRequestRecord[]> {
+  if (!isDatabaseConfigured()) {
+    return [];
+  }
+
+  const db = getDb();
+  const submitter = alias(users, "submitter");
+  const reviewer = alias(users, "reviewer");
+  const rows = await db
+    .select({
+      request: prReviewRequests,
+      submittedByUsername: submitter.username,
+      reviewedByUsername: reviewer.username,
+    })
+    .from(prReviewRequests)
+    .leftJoin(submitter, eq(prReviewRequests.submittedByUserId, submitter.id))
+    .leftJoin(reviewer, eq(prReviewRequests.reviewedByUserId, reviewer.id))
+    .where(eq(prReviewRequests.reviewedByUserId, userId))
+    .orderBy(desc(prReviewRequests.reviewedAt));
+
+  return rows.map((row) => ({
+    ...mapRequestRow(row),
+    reviewedByUsername: row.reviewedByUsername,
+  }));
+}
+
 export type WithdrawReviewRequestResult =
   | { ok: true }
   | { ok: false; reason: "not_found" | "not_owner" };
@@ -496,6 +619,83 @@ export async function markReviewedByMatch(
   }
 }
 
+export type ReportOwnReviewResult =
+  | { ok: true }
+  | {
+      ok: false;
+      reason:
+        | "not_found"
+        | "already_resolved"
+        | "github_not_connected"
+        | "is_own_pr"
+        | "no_review_found"
+        | "check_failed";
+    };
+
+/**
+ * Manual fallback for the passive credit-detection in lib/github/sync.ts,
+ * which only fires on the reviewer's own next sync and can miss a review
+ * entirely (see that file's docs). Lets a signed-in builder say "I reviewed
+ * this" right after doing it — re-checks GitHub directly rather than
+ * trusting the click, then reuses markReviewedByMatch for the actual credit
+ * so both paths stay in sync (XP, notification, status change all shared).
+ */
+export async function reportOwnReview(input: {
+  id: string;
+  userId: string;
+}): Promise<ReportOwnReviewResult> {
+  const db = getDb();
+  const [request] = await db
+    .select({
+      repoFullName: prReviewRequests.repoFullName,
+      number: prReviewRequests.number,
+      authorLogin: prReviewRequests.authorLogin,
+      status: prReviewRequests.status,
+    })
+    .from(prReviewRequests)
+    .where(eq(prReviewRequests.id, input.id))
+    .limit(1);
+
+  if (!request) {
+    return { ok: false, reason: "not_found" };
+  }
+  if (request.status !== "needs_review") {
+    return { ok: false, reason: "already_resolved" };
+  }
+
+  const connection = await getGithubConnection(input.userId);
+  const accessToken = connection?.accessToken ?? null;
+  if (!accessToken || !connection?.login) {
+    return { ok: false, reason: "github_not_connected" };
+  }
+  if (connection.login.toLowerCase() === request.authorLogin.toLowerCase()) {
+    return { ok: false, reason: "is_own_pr" };
+  }
+
+  const [owner, repo] = request.repoFullName.split("/");
+  const client = new GithubClient(accessToken);
+  let reviewed: boolean;
+  try {
+    reviewed = await hasReviewedPullRequest(
+      client,
+      owner,
+      repo,
+      request.number,
+      connection.login,
+    );
+  } catch (error) {
+    console.error("[pr-reviews] reportOwnReview check failed", error);
+    return { ok: false, reason: "check_failed" };
+  }
+
+  if (!reviewed) {
+    return { ok: false, reason: "no_review_found" };
+  }
+
+  await markReviewedByMatch(request.repoFullName, request.number, input.userId);
+  return { ok: true };
+}
+
 /** Whether a non-hidden row already exists for this PR — used by the
  *  ecosystem discovery job to avoid re-adding a PR it already found (or one
  *  a peer/admin already added) on a prior run. */
@@ -521,6 +721,34 @@ export async function existsOpenRequestFor(
     .limit(1);
 
   return rows.length > 0;
+}
+
+/** Same "already tracked" rule as existsOpenRequestFor (excludes hidden —
+ *  a withdrawn or admin-hidden entry doesn't block resubmitting), but
+ *  returns the status too so the UI can tell a builder *why* — already
+ *  waiting for review, already reviewed, or already closed elsewhere. */
+export async function findActiveReviewRequestFor(
+  repoFullName: string,
+  number: number,
+): Promise<{ status: PrReviewRequestRecord["status"] } | null> {
+  if (!isDatabaseConfigured()) {
+    return null;
+  }
+
+  const db = getDb();
+  const [row] = await db
+    .select({ status: prReviewRequests.status })
+    .from(prReviewRequests)
+    .where(
+      and(
+        eq(prReviewRequests.repoFullName, repoFullName),
+        eq(prReviewRequests.number, number),
+        ne(prReviewRequests.status, "hidden"),
+      ),
+    )
+    .limit(1);
+
+  return row ?? null;
 }
 
 /**

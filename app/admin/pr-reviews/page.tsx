@@ -8,7 +8,14 @@ import { UnhideReviewRequestButton } from "@/components/pr-reviews/unhide-review
 import { Badge } from "@/components/ui/badge";
 import { isAdminRole } from "@/lib/auth/roles";
 import { bootstrapCurrentUserProfile } from "@/lib/auth/session";
-import { formatSubmittedByLabel, REVIEW_STATUS_CLASS, REVIEW_STATUS_LABEL } from "@/lib/pr-reviews/format";
+import {
+  daysSince,
+  formatRelativeTime,
+  formatSubmittedByLabel,
+  REVIEW_STATUS_CLASS,
+  REVIEW_STATUS_LABEL,
+  STALE_AFTER_DAYS,
+} from "@/lib/pr-reviews/format";
 import { cn } from "@/lib/utils";
 
 export const metadata = { title: "Admin · PR Reviews" };
@@ -30,14 +37,17 @@ export default async function AdminPrReviewsPage() {
   const flaggedCount = requests.filter(
     (request) => request.flaggedForReview && request.status === "needs_review",
   ).length;
+  const staleCount = requests.filter(
+    (request) => request.status === "needs_review" && daysSince(request.createdAt) >= STALE_AFTER_DAYS,
+  ).length;
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 pt-12 pb-20 sm:px-6 lg:px-8">
       <PageHeader
         eyebrow="admin // pr reviews"
         title="PR review queue"
-        description="Add a PR directly, or manage every request regardless of status — hide anything that shouldn't be in the public queue, or unhide something that was hidden by mistake. Flagged entries (newer/lower-reputation peer submitters) sort first for a quick look; nothing is gated, this is spot-checking after the fact."
-        meta={`${openCount} open${flaggedCount > 0 ? ` · ${flaggedCount} flagged` : ""} · ${requests.length} total`}
+        description="Add a PR directly, or manage every request regardless of status. Hide anything that shouldn't be in the public queue, or unhide something that was hidden by mistake. Flagged entries (newer/lower-reputation peer submitters) sort first for a quick look; nothing is gated, this is spot-checking after the fact."
+        meta={`${openCount} open${flaggedCount > 0 ? ` · ${flaggedCount} flagged` : ""}${staleCount > 0 ? ` · ${staleCount} stale (${STALE_AFTER_DAYS}d+)` : ""} · ${requests.length} total`}
       />
 
       <div className="mt-8">
@@ -54,6 +64,8 @@ export default async function AdminPrReviewsPage() {
           <ol className="space-y-3">
             {requests.map((request) => {
               const submittedByLabel = formatSubmittedByLabel(request);
+              const isStale =
+                request.status === "needs_review" && daysSince(request.createdAt) >= STALE_AFTER_DAYS;
               return (
                 <li
                   key={request.id}
@@ -82,8 +94,16 @@ export default async function AdminPrReviewsPage() {
                           Flagged
                         </Badge>
                       ) : null}
+                      {isStale ? (
+                        <Badge variant="destructive" className="text-[10px]">
+                          Stale
+                        </Badge>
+                      ) : null}
                       <span className="font-mono text-[11px] text-muted-foreground">
                         {request.repoFullName} #{request.number}
+                      </span>
+                      <span className="text-[11px] text-muted-foreground">
+                        submitted {formatRelativeTime(request.createdAt)}
                       </span>
                     </div>
                     <p className="truncate text-sm font-medium text-foreground">{request.title}</p>

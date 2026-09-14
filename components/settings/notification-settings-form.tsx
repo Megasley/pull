@@ -42,6 +42,11 @@ const TOGGLES: {
     description: "When a PR you submitted for review gets reviewed.",
   },
   {
+    key: "prReviewDigest",
+    label: "PR review digest",
+    description: "A weekly nudge with a few real PRs still waiting for a reviewer.",
+  },
+  {
     key: "product",
     label: "Product updates",
     description: "Welcome email and role grants (reviewer / admin).",

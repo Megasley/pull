@@ -26,6 +26,65 @@ export function formatSubmittedByLabel(
     : `submitted by @${record.submittedByUsername}`;
 }
 
+// Muted, desaturated hues (not raw language-brand colors) so a row of
+// language dots stays calm next to this site's restrained "flat paper, warm
+// ink, electric signal lime" palette instead of turning into a rainbow.
+// Shown as a small dot next to the language name, not a colored badge
+// background — color stays a quiet accent, not the dominant signal.
+const LANGUAGE_DOT_COLOR: Record<string, string> = {
+  JavaScript: "#c9a227",
+  TypeScript: "#3b6ea5",
+  Python: "#4a7a8c",
+  Rust: "#b5651d",
+  Go: "#4a9b8e",
+  C: "#6b6f8c",
+  "C++": "#a15c7a",
+  "C#": "#7a5ca1",
+  Scala: "#a13d3d",
+};
+const LANGUAGE_DOT_FALLBACK = "#8a8680";
+
+export function languageDotColor(language: string): string {
+  return LANGUAGE_DOT_COLOR[language] ?? LANGUAGE_DOT_FALLBACK;
+}
+
+/** Rough "how big a bite is this" signal — lets a first-time reviewer
+ *  self-select something approachable instead of gambling on a title
+ *  alone. Buckets match the common convention used by PR-size-label bots
+ *  (roughly: XS<10, S<30, M<100, L<500, XL 500+ changed lines). */
+export type PrSizeLabel = "XS" | "S" | "M" | "L" | "XL";
+
+export function prSizeLabel(additions: number, deletions: number): PrSizeLabel {
+  const total = additions + deletions;
+  if (total < 10) return "XS";
+  if (total < 30) return "S";
+  if (total < 100) return "M";
+  if (total < 500) return "L";
+  return "XL";
+}
+
+export function formatRelativeTime(iso: string): string {
+  const diffMs = Date.now() - Date.parse(iso);
+  if (!Number.isFinite(diffMs)) return "";
+  const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  if (days <= 0) return "today";
+  if (days === 1) return "1 day ago";
+  if (days < 30) return `${days} days ago`;
+  const months = Math.floor(days / 30);
+  return months === 1 ? "1 month ago" : `${months} months ago`;
+}
+
+/** A needs_review row this old is more likely stale/abandoned than
+ *  genuinely still being worked toward — used to flag it for an admin
+ *  rather than let it silently accumulate. */
+export const STALE_AFTER_DAYS = 30;
+
+export function daysSince(iso: string): number {
+  const diffMs = Date.now() - Date.parse(iso);
+  if (!Number.isFinite(diffMs)) return 0;
+  return Math.floor(diffMs / (1000 * 60 * 60 * 24));
+}
+
 export const REVIEW_STATUS_LABEL: Record<PrReviewRequestRecord["status"], string> = {
   needs_review: "Needs review",
   reviewed: "Reviewed",

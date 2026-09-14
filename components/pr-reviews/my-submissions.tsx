@@ -39,7 +39,7 @@ export async function MySubmissions() {
   if (submissions.length === 0) {
     return (
       <p className="text-sm text-muted-foreground">
-        You haven&apos;t submitted any PRs for review yet — do that from the Browse tab.
+        You haven&apos;t submitted any PRs for review yet. Do that from the Browse tab.
       </p>
     );
   }

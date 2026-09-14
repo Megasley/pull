@@ -8,8 +8,11 @@ import {
   createReviewRequest,
   hideReviewRequest,
   listAllReviewRequests,
+  listMyReviewedRequests,
   listMySubmissions,
   listReviewRequestsForViewer,
+  previewPullRequestForReview,
+  reportOwnReview,
   restoreOwnReviewRequest,
   unhideReviewRequest,
   withdrawOwnReviewRequest,
@@ -30,11 +33,21 @@ function prReviewErrorMessage(reason: string) {
     case "github_not_connected":
       return "Connect your GitHub account before submitting a PR for review.";
     case "pr_not_found":
-      return "Could not find that pull request on GitHub — check the URL and that it's public.";
+      return "Could not find that pull request on GitHub. Check the URL and that it's public.";
     case "not_found":
       return "This review request no longer exists.";
     case "rate_limited":
-      return "You're submitting too fast — try again in a moment.";
+      return "You're submitting too fast. Try again in a moment.";
+    case "already_submitted":
+      return "This PR is already in the review queue.";
+    case "already_resolved":
+      return "This request has already moved on. Refresh the page to see its current status.";
+    case "is_own_pr":
+      return "You can't review your own PR.";
+    case "no_review_found":
+      return "We couldn't find a review from you on that PR yet. Leave one on GitHub first, then try again.";
+    case "check_failed":
+      return "Couldn't check GitHub right now. Try again in a moment.";
     case "not_owner":
       return "You can only withdraw your own submission.";
     case "not_withdrawn":
@@ -58,7 +71,29 @@ export async function listReviewRequestsAction() {
   const profile = await requireActiveAccount();
   const viewerGithubUsername = profile.ok ? profile.profile.githubUsername : null;
   const requests = await listReviewRequestsForViewer(viewerGithubUsername);
-  return { ok: true as const, requests };
+  return { ok: true as const, requests, viewerSignedIn: profile.ok };
+}
+
+export async function previewPrForReviewAction(prUrl: string) {
+  const gate = await requirePrReviewActor();
+  if (!gate.ok) {
+    return {
+      ok: false as const,
+      reason: gate.reason,
+      error: prReviewErrorMessage(gate.reason),
+    };
+  }
+
+  const result = await previewPullRequestForReview({ prUrl, userId: gate.profile.id });
+  if (!result.ok) {
+    return {
+      ok: false as const,
+      reason: result.reason,
+      error: prReviewErrorMessage(result.reason),
+    };
+  }
+
+  return { ok: true as const, preview: result.preview };
 }
 
 export async function submitPrForReviewAction(prUrl: string) {
@@ -219,6 +254,16 @@ export async function listMySubmissionsAction() {
   return { ok: true as const, requests };
 }
 
+export async function listMyReviewsAction() {
+  const gate = await requirePrReviewActor();
+  if (!gate.ok) {
+    return { ok: false as const, requests: [] };
+  }
+
+  const requests = await listMyReviewedRequests(gate.profile.id);
+  return { ok: true as const, requests };
+}
+
 export async function withdrawReviewRequestAction(id: string) {
   const gate = await requirePrReviewActor();
   if (!gate.ok) {
@@ -230,6 +275,29 @@ export async function withdrawReviewRequestAction(id: string) {
   }
 
   const result = await withdrawOwnReviewRequest({ id, userId: gate.profile.id });
+  if (!result.ok) {
+    return {
+      ok: false as const,
+      reason: result.reason,
+      error: prReviewErrorMessage(result.reason),
+    };
+  }
+
+  revalidatePrReviewPaths();
+  return { ok: true as const };
+}
+
+export async function reportOwnReviewAction(id: string) {
+  const gate = await requirePrReviewActor();
+  if (!gate.ok) {
+    return {
+      ok: false as const,
+      reason: gate.reason,
+      error: prReviewErrorMessage(gate.reason),
+    };
+  }
+
+  const result = await reportOwnReview({ id, userId: gate.profile.id });
   if (!result.ok) {
     return {
       ok: false as const,

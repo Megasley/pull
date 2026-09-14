@@ -15,9 +15,12 @@ import { users } from "./users";
  * A real GitHub PR listed for peer review — the "PR review discovery
  * dashboard" (issue: builder suggestion to surface PRs needing review).
  * Pull never hosts the review itself; this table is purely a discovery
- * queue. `status` moves to "reviewed" only via the credit-detection hook in
- * lib/github/sync.ts, which cross-references a builder's own GitHub review
- * sync data against open rows here — never via self-report.
+ * queue. `status` moves to "reviewed" via the credit-detection hook in
+ * lib/github/sync.ts (cross-referencing a builder's own GitHub review sync
+ * against open rows here), or via the "I reviewed this" self-report button
+ * (lib/pr-reviews/repository.ts:reportOwnReview) — both re-verify against
+ * GitHub and funnel through the same markReviewedByMatch, so credit is
+ * always earned, never just claimed.
  */
 export const prReviewRequests = pgTable(
   "pr_review_requests",
@@ -35,6 +38,15 @@ export const prReviewRequests = pgTable(
      *  existed have no way to backfill it retroactively; the suggestion-age
      *  filter falls back to `createdAt` for those. */
     prCreatedAt: timestamp("pr_created_at", { withTimezone: true, mode: "string" }),
+
+    /** Diff size, for the "how big a bite is this" signal on the card.
+     *  Only available for PRs fetched via the single-PR detail endpoint
+     *  (peer submissions, admin single-URL adds) — the ecosystem-discovery
+     *  job uses GitHub's lighter search API, which doesn't return diff
+     *  stats, so these stay null for auto-discovered rows. */
+    additions: integer("additions"),
+    deletions: integer("deletions"),
+    filesChanged: integer("files_changed"),
 
     sourceType: prReviewSourceTypeEnum("source_type").notNull(),
     submittedByUserId: uuid("submitted_by_user_id").references(() => users.id, {

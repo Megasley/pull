@@ -291,14 +291,12 @@ export function MobileNav({
           className="flex-1 overflow-y-auto overscroll-contain"
         >
           <div className="flex flex-col gap-3 py-4 pb-28">
-            {!isAuthenticated ? (
-              <div className="flex items-center justify-between border border-border px-4 py-3">
-                <p className="font-mono text-[11px] font-bold tracking-[0.22em] text-foreground uppercase">
-                  Theme
-                </p>
-                <ThemeToggle />
-              </div>
-            ) : null}
+            <div className="flex items-center justify-between border border-border px-4 py-3">
+              <p className="font-mono text-[11px] font-bold tracking-[0.22em] text-foreground uppercase">
+                Theme
+              </p>
+              <ThemeToggle />
+            </div>
 
             {isAuthenticated ? (
               <div className="flex items-center gap-3 border border-border bg-card px-3.5 py-3">
