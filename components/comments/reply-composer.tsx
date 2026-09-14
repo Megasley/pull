@@ -4,7 +4,9 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import { postReplyAction } from "@/app/actions/comments";
+import { MarkdownEditor } from "@/components/comments/markdown-editor";
 import { Button } from "@/components/ui/button";
+import { draftKeySuffix, useCommentDraft } from "@/hooks/use-comment-draft";
 
 type ReplyComposerProps = {
   threadId: string;
@@ -13,9 +15,22 @@ type ReplyComposerProps = {
 export function ReplyComposer({ threadId }: ReplyComposerProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [body, setBody] = useState("");
-  const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+  const { value: body, setValue: setBody, clearDraft } = useCommentDraft(
+    draftKeySuffix({ kind: "reply", threadId }),
+  );
+
+  // Auto-open the composer once when a saved draft is present (e.g. after
+  // a page refresh), so the user sees their unfinished reply instead of a
+  // collapsed "Reply" button. Uses render-phase setState — the React-
+  // blessed pattern for adjusting state based on external store values,
+  // which does not trigger the set-state-in-effect lint rule.
+  const [autoOpened, setAutoOpened] = useState(false);
+  if (!autoOpened && body.trim().length > 0 && !open) {
+    setAutoOpened(true);
+    setOpen(true);
+  }
 
   function submit() {
     setError(null);
@@ -31,7 +46,7 @@ export function ReplyComposer({ threadId }: ReplyComposerProps) {
         return;
       }
 
-      setBody("");
+      clearDraft();
       setOpen(false);
       router.refresh();
     });
@@ -47,14 +62,13 @@ export function ReplyComposer({ threadId }: ReplyComposerProps) {
 
   return (
     <div className="space-y-2">
-      <textarea
-        rows={2}
+      <MarkdownEditor
         value={body}
-        onChange={(event) => setBody(event.target.value)}
+        onChange={setBody}
         placeholder="Write a reply…"
+        rows={2}
         disabled={pending}
         autoFocus
-        className="w-full rounded-none border border-border bg-transparent px-3 py-2 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
       />
       {error ? (
         <p
@@ -62,6 +76,11 @@ export function ReplyComposer({ threadId }: ReplyComposerProps) {
           role="alert"
         >
           {error}
+        </p>
+      ) : null}
+      {body.trim() ? (
+        <p className="text-[11px] text-muted-foreground">
+          Draft saved automatically — it will be here if you refresh the page.
         </p>
       ) : null}
       <div className="flex justify-end gap-2">
@@ -73,7 +92,7 @@ export function ReplyComposer({ threadId }: ReplyComposerProps) {
           onClick={() => {
             setOpen(false);
             setBody("");
-            setError(null);
+            clearDraft();
           }}
         >
           Cancel

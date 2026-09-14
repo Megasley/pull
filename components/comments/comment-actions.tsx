@@ -4,7 +4,9 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import { deleteCommentAction, editCommentAction } from "@/app/actions/comments";
+import { MarkdownEditor } from "@/components/comments/markdown-editor";
 import { Button } from "@/components/ui/button";
+import { draftKeySuffix, useCommentDraft } from "@/hooks/use-comment-draft";
 
 type CommentActionsProps = {
   commentId: string;
@@ -12,13 +14,20 @@ type CommentActionsProps = {
 };
 
 /** Edit/delete controls for a comment the viewer owns. Edit replaces this
- *  component with an inline textarea (the surrounding body text stays as-is
- *  until the page refreshes with the saved copy); delete asks for
- *  confirmation inline rather than a native browser dialog. */
+ *  component with an inline MarkdownEditor (the surrounding body text stays
+ *  as-is until the page refreshes with the saved copy); delete asks for
+ *  confirmation inline rather than a native browser dialog.
+ *
+ *  Unsaved edit drafts persist to localStorage so a page refresh mid-edit
+ *  doesn't lose work. The draft is cleared on save or cancel. When no draft
+ *  exists, the hook falls back to `initialBody` automatically. */
 export function CommentActions({ commentId, initialBody }: CommentActionsProps) {
   const router = useRouter();
   const [mode, setMode] = useState<"idle" | "editing" | "confirm-delete">("idle");
-  const [draft, setDraft] = useState(initialBody);
+  const { value: draft, setValue: setDraft, clearDraft } = useCommentDraft(
+    draftKeySuffix({ kind: "edit", commentId }),
+    initialBody,
+  );
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -30,6 +39,7 @@ export function CommentActions({ commentId, initialBody }: CommentActionsProps) 
         setError(result.error);
         return;
       }
+      clearDraft();
       setMode("idle");
       router.refresh();
     });
@@ -50,14 +60,18 @@ export function CommentActions({ commentId, initialBody }: CommentActionsProps) 
   if (mode === "editing") {
     return (
       <div className="space-y-2">
-        <textarea
-          rows={2}
+        <MarkdownEditor
           value={draft}
-          onChange={(event) => setDraft(event.target.value)}
+          onChange={setDraft}
+          rows={2}
           disabled={pending}
           autoFocus
-          className="w-full rounded-none border border-border bg-transparent px-3 py-2 text-sm outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
         />
+        {draft.trim() ? (
+          <p className="text-[11px] text-muted-foreground">
+            Draft saved automatically — it will be here if you refresh the page.
+          </p>
+        ) : null}
         {error ? (
           <p className="text-xs text-destructive" role="alert">
             {error}
@@ -70,8 +84,9 @@ export function CommentActions({ commentId, initialBody }: CommentActionsProps) 
             size="sm"
             disabled={pending}
             onClick={() => {
-              setMode("idle");
+              clearDraft();
               setDraft(initialBody);
+              setMode("idle");
               setError(null);
             }}
           >
@@ -129,7 +144,6 @@ export function CommentActions({ commentId, initialBody }: CommentActionsProps) 
         variant="ghost"
         size="xs"
         onClick={() => {
-          setDraft(initialBody);
           setMode("editing");
         }}
       >

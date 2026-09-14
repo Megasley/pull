@@ -1,0 +1,82 @@
+/**
+ * highlight.js theme for comment code blocks — matches the lesson MDX code
+ * block colors (#0d1117 background, #e6edf3 foreground). Scoped to
+ * .comment-markdown so it never collides with rehype-pretty-code (shiki)
+ * styles used in lesson MDX content.
+ */
+
+.comment-markdown .hljs {
+  color: #e6edf3;
+  background: transparent;
+}
+
+.comment-markdown .hljs-comment,
+.comment-markdown .hljs-quote {
+  color: #8b949e;
+  font-style: italic;
+}
+
+.comment-markdown .hljs-keyword,
+.comment-markdown .hljs-selector-tag,
+.comment-markdown .hljs-literal,
+.comment-markdown .hljs-type,
+.comment-markdown .hljs-addition {
+  color: #ff7b72;
+}
+
+.comment-markdown .hljs-string,
+.comment-markdown .hljs-meta .hljs-string,
+.comment-markdown .hljs-doctag,
+.comment-markdown .hljs-regexp {
+  color: #a5d6ff;
+}
+
+.comment-markdown .hljs-number,
+.comment-markdown .hljs-symbol,
+.comment-markdown .hljs-bullet,
+.comment-markdown .hljs-template-variable,
+.comment-markdown .hljs-attr {
+  color: #79c0ff;
+}
+
+.comment-markdown .hljs-title,
+.comment-markdown .hljs-section,
+.comment-markdown .hljs-name,
+.comment-markdown .hljs-selector-id,
+.comment-markdown .hljs-selector-class {
+  color: #d2a8ff;
+}
+
+.comment-markdown .hljs-built_in,
+.comment-markdown .hljs-class .hljs-title,
+.comment-markdown .hljs-title.class_,
+.comment-markdown .hljs-variable {
+  color: #ffa657;
+}
+
+.comment-markdown .hljs-attribute,
+.comment-markdown .hljs-function .hljs-title,
+.comment-markdown .hljs-params {
+  color: #e6edf3;
+}
+
+.comment-markdown .hljs-meta,
+.comment-markdown .hljs-tag {
+  color: #8b949e;
+}
+
+.comment-markdown .hljs-deletion {
+  color: #ffa198;
+}
+
+.comment-markdown .hljs-emphasis {
+  font-style: italic;
+}
+
+.comment-markdown .hljs-strong {
+  font-weight: 700;
+}
+
+.comment-markdown .hljs-link {
+  text-decoration: underline;
+}

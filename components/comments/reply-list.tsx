@@ -1,7 +1,7 @@
 import { AcceptAnswerButton } from "@/components/comments/accept-answer-button";
 import { CommentActions } from "@/components/comments/comment-actions";
+import { MarkdownPreview } from "@/components/comments/markdown-preview";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { linkifyText } from "@/lib/comments/linkify";
 import type { CommentReplyRecord } from "@/types/comments";
 
 function formatDate(value: string) {
@@ -68,9 +68,13 @@ export function ReplyList({ replies, canAcceptAnswer, viewerId }: ReplyListProps
                   </span>
                 ) : null}
               </div>
-              <p className="text-sm leading-relaxed text-muted-foreground">
-                {reply.status === "deleted" ? "[deleted]" : linkifyText(reply.body)}
-              </p>
+              <div className="text-sm leading-relaxed text-muted-foreground">
+                {reply.status === "deleted" ? (
+                  "[deleted]"
+                ) : (
+                  <MarkdownPreview content={reply.body} />
+                )}
+              </div>
               {canAcceptAnswer && reply.status === "visible" ? (
                 <AcceptAnswerButton replyId={reply.id} />
               ) : null}
