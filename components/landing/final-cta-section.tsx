@@ -50,6 +50,12 @@ export function FinalCtaSection() {
             >
               or make your first PR today →
             </Link>
+            <Link
+              href="/pr-reviews"
+              className="font-mono text-sm text-ink/70 underline underline-offset-4 hover:text-ink"
+            >
+              or review someone else&apos;s PR →
+            </Link>
           </div>
         </Reveal>
       </SiteContainer>

@@ -3,6 +3,7 @@ import { Suspense } from "react";
 
 import { PageHeader } from "@/components/design-system";
 import { SiteContainer } from "@/components/layout/site-container";
+import { MyReviews } from "@/components/pr-reviews/my-reviews";
 import { MySubmissions } from "@/components/pr-reviews/my-submissions";
 import { PrReviewList } from "@/components/pr-reviews/pr-review-list";
 import { SubmitPrForm } from "@/components/pr-reviews/submit-pr-form";
@@ -13,7 +14,7 @@ import { bootstrapCurrentUserProfile } from "@/lib/auth/session";
 export const metadata = {
   title: "PR Reviews",
   description:
-    "Real GitHub pull requests looking for a reviewer across Bitcoin, Lightning, Nostr, and the wider open source ecosystem — it needs more reviewers than contributors.",
+    "Real GitHub pull requests looking for a reviewer across Bitcoin, Lightning, Nostr, and the wider open source ecosystem, which needs more reviewers than contributors.",
 };
 
 export default async function PrReviewsPage() {
@@ -24,13 +25,14 @@ export default async function PrReviewsPage() {
       <PageHeader
         eyebrow="contribute // reviews"
         title="Review a pull request"
-        description="Browse real, open PRs across Bitcoin, Lightning, Nostr, and other open source ecosystems that need a second pair of eyes. Click through and leave an actual review on GitHub with your own account — Pull just helps you find it and credits you once it's done."
+        description="Browse real, open PRs across Bitcoin, Lightning, Nostr, and other open source ecosystems that need a second pair of eyes. Click through and leave an actual review on GitHub with your own account. Pull just helps you find it and credits you once it's done."
       />
 
       <Tabs defaultValue="browse" className="mt-8">
         <TabsList variant="line">
           <TabsTrigger value="browse">Browse</TabsTrigger>
           {profile ? <TabsTrigger value="mine">My submissions</TabsTrigger> : null}
+          {profile ? <TabsTrigger value="reviews">My reviews</TabsTrigger> : null}
         </TabsList>
 
         <TabsContent value="browse" className="mt-6 space-y-8">
@@ -55,6 +57,14 @@ export default async function PrReviewsPage() {
           <TabsContent value="mine" className="mt-6">
             <Suspense fallback={<p className="text-sm text-muted-foreground">Loading…</p>}>
               <MySubmissions />
+            </Suspense>
+          </TabsContent>
+        ) : null}
+
+        {profile ? (
+          <TabsContent value="reviews" className="mt-6">
+            <Suspense fallback={<p className="text-sm text-muted-foreground">Loading…</p>}>
+              <MyReviews />
             </Suspense>
           </TabsContent>
         ) : null}

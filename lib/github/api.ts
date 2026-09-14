@@ -333,6 +333,9 @@ type ArbitraryPullRequestDetail = {
   merged: boolean;
   user: { login: string } | null;
   created_at: string;
+  additions: number;
+  deletions: number;
+  changed_files: number;
 };
 
 export type FetchedPullRequest = {
@@ -343,6 +346,9 @@ export type FetchedPullRequest = {
   merged: boolean;
   authorLogin: string;
   githubCreatedAt: string;
+  additions: number;
+  deletions: number;
+  filesChanged: number;
 };
 
 /**
@@ -369,7 +375,37 @@ export async function fetchPullRequestByUrl(
     merged: detail.merged,
     authorLogin: detail.user?.login ?? "",
     githubCreatedAt: detail.created_at,
+    additions: detail.additions,
+    deletions: detail.deletions,
+    filesChanged: detail.changed_files,
   };
+}
+
+type PullRequestReview = {
+  user: { login: string } | null;
+  state: string;
+};
+
+/**
+ * Whether `login` has left an actual review (any state — approved, changes
+ * requested, or just a formal "commented" review counts) on this PR. Used
+ * by the "I reviewed this" self-report button: a manual fallback for when
+ * the passive credit-detection in lib/github/sync.ts hasn't (yet, or ever)
+ * picked up the review on its own — see that file's docs on why it can miss
+ * one. Re-checks GitHub directly rather than trusting the click.
+ */
+export async function hasReviewedPullRequest(
+  client: GithubClient,
+  owner: string,
+  repo: string,
+  number: number,
+  login: string,
+): Promise<boolean> {
+  const reviews = await client.request<PullRequestReview[]>(
+    `/repos/${owner}/${repo}/pulls/${number}/reviews?per_page=100`,
+  );
+  const target = login.toLowerCase();
+  return reviews.some((review) => review.user?.login?.toLowerCase() === target);
 }
 
 export async function fetchAuthoredIssues(client: GithubClient, login: string) {

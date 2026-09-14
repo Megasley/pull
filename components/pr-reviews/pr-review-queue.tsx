@@ -3,10 +3,16 @@
 import { useMemo, useState } from "react";
 import { ExternalLink } from "lucide-react";
 
+import { ReportReviewedButton } from "@/components/pr-reviews/report-reviewed-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { formatSubmittedByLabel } from "@/lib/pr-reviews/format";
+import {
+  formatRelativeTime,
+  formatSubmittedByLabel,
+  languageDotColor,
+  prSizeLabel,
+} from "@/lib/pr-reviews/format";
 import type { PrReviewRequestRecord } from "@/lib/pr-reviews/repository";
 import type { DiscoveryTrack } from "@/types/discovery";
 
@@ -15,7 +21,8 @@ const TRACK_LABEL: Record<DiscoveryTrack, string> = {
   lightning: "Lightning",
 };
 
-type SortOrder = "oldest" | "newest";
+type SortField = "submitted" | "opened";
+type SortDirection = "oldest" | "newest";
 
 const PAGE_SIZE = 10;
 
@@ -57,21 +64,17 @@ function FilterChip({
   );
 }
 
-function formatRelativeTime(iso: string): string {
-  const diffMs = Date.now() - Date.parse(iso);
-  if (!Number.isFinite(diffMs)) return "";
-  const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  if (days <= 0) return "today";
-  if (days === 1) return "1 day ago";
-  if (days < 30) return `${days} days ago`;
-  const months = Math.floor(days / 30);
-  return months === 1 ? "1 month ago" : `${months} months ago`;
-}
-
-export function PrReviewQueue({ requests }: { requests: PrReviewRequestRecord[] }) {
+export function PrReviewQueue({
+  requests,
+  viewerSignedIn,
+}: {
+  requests: PrReviewRequestRecord[];
+  viewerSignedIn: boolean;
+}) {
   const [track, setTrack] = useState<DiscoveryTrack | "all">("all");
   const [language, setLanguage] = useState<string | "all">("all");
-  const [sort, setSort] = useState<SortOrder>("oldest");
+  const [sortField, setSortField] = useState<SortField>("submitted");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("oldest");
   const [page, setPage] = useState(1);
 
   function selectTrack(value: DiscoveryTrack | "all") {
@@ -84,8 +87,13 @@ export function PrReviewQueue({ requests }: { requests: PrReviewRequestRecord[] 
     setPage(1);
   }
 
-  function selectSort(value: SortOrder) {
-    setSort(value);
+  function selectSortField(value: SortField) {
+    setSortField(value);
+    setPage(1);
+  }
+
+  function selectSortDirection(value: SortDirection) {
+    setSortDirection(value);
     setPage(1);
   }
 
@@ -118,18 +126,24 @@ export function PrReviewQueue({ requests }: { requests: PrReviewRequestRecord[] 
     });
 
     // Peer-submitted requests always rank above ecosystem/admin-curated ones
-    // (confirmed design decision); the sort toggle only controls the
+    // (confirmed design decision); the sort controls only affect the
     // secondary tie-break by time within each group.
     return [...matches].sort((a, b) => {
       const groupA = a.sourceType === "peer_submitted" ? 0 : 1;
       const groupB = b.sourceType === "peer_submitted" ? 0 : 1;
       if (groupA !== groupB) return groupA - groupB;
 
-      const timeA = Date.parse(a.createdAt);
-      const timeB = Date.parse(b.createdAt);
-      return sort === "oldest" ? timeA - timeB : timeB - timeA;
+      const timeOf = (request: PrReviewRequestRecord) =>
+        Date.parse(
+          sortField === "opened"
+            ? (request.prCreatedAt ?? request.createdAt)
+            : request.createdAt,
+        );
+      const timeA = timeOf(a);
+      const timeB = timeOf(b);
+      return sortDirection === "oldest" ? timeA - timeB : timeB - timeA;
     });
-  }, [requests, track, language, sort]);
+  }, [requests, track, language, sortField, sortDirection]);
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(page, pageCount);
@@ -138,7 +152,7 @@ export function PrReviewQueue({ requests }: { requests: PrReviewRequestRecord[] 
   if (requests.length === 0) {
     return (
       <p className="text-sm text-muted-foreground">
-        Nothing waiting for review right now — check back soon.
+        Nothing waiting for review right now. Check back soon.
       </p>
     );
   }
@@ -181,11 +195,29 @@ export function PrReviewQueue({ requests }: { requests: PrReviewRequestRecord[] 
           </FilterRow>
         ) : null}
 
-        <FilterRow label="Submitted">
-          <FilterChip active={sort === "oldest"} onClick={() => selectSort("oldest")}>
+        <FilterRow label="Sort by">
+          <FilterChip
+            active={sortField === "submitted"}
+            onClick={() => selectSortField("submitted")}
+          >
+            Submitted to Pull
+          </FilterChip>
+          <FilterChip active={sortField === "opened"} onClick={() => selectSortField("opened")}>
+            PR opened
+          </FilterChip>
+        </FilterRow>
+
+        <FilterRow label="Order">
+          <FilterChip
+            active={sortDirection === "oldest"}
+            onClick={() => selectSortDirection("oldest")}
+          >
             Oldest first
           </FilterChip>
-          <FilterChip active={sort === "newest"} onClick={() => selectSort("newest")}>
+          <FilterChip
+            active={sortDirection === "newest"}
+            onClick={() => selectSortDirection("newest")}
+          >
             Newest first
           </FilterChip>
         </FilterRow>
@@ -217,25 +249,50 @@ export function PrReviewQueue({ requests }: { requests: PrReviewRequestRecord[] 
                     >
                       {request.sourceType === "peer_submitted" ? "Peer submitted" : "Ecosystem"}
                     </Badge>
+                    {request.language ? (
+                      <span className="inline-flex items-center gap-1.5 border border-border px-1.5 py-0.5 text-[11px] text-muted-foreground">
+                        <span
+                          className="size-2 shrink-0 rounded-full"
+                          style={{ backgroundColor: languageDotColor(request.language) }}
+                          aria-hidden
+                        />
+                        {request.language}
+                      </span>
+                    ) : null}
+                    {request.additions !== null && request.deletions !== null ? (
+                      <span
+                        className="border border-border px-1.5 py-0.5 text-[11px] text-muted-foreground"
+                        title={`+${request.additions} -${request.deletions}${request.filesChanged !== null ? ` · ${request.filesChanged} file${request.filesChanged === 1 ? "" : "s"}` : ""}`}
+                      >
+                        {prSizeLabel(request.additions, request.deletions)}
+                      </span>
+                    ) : null}
                     <span className="font-mono text-[11px] text-muted-foreground">
                       {request.repoFullName} #{request.number}
                     </span>
-                    <span className="text-[11px] text-muted-foreground">
-                      {formatRelativeTime(request.createdAt)}
-                    </span>
+                    {request.prCreatedAt ? (
+                      <span className="text-[11px] text-muted-foreground">
+                        opened {formatRelativeTime(request.prCreatedAt)}
+                      </span>
+                    ) : null}
                   </div>
                   <p className="truncate text-sm font-medium text-foreground">{request.title}</p>
                   <p className="text-xs text-muted-foreground">
-                    by @{request.authorLogin}
-                    {submittedByLabel ? ` · ${submittedByLabel}` : ""}
+                    by @{request.authorLogin} ·{" "}
+                    {submittedByLabel
+                      ? `${submittedByLabel} ${formatRelativeTime(request.createdAt)}`
+                      : `added to Pull ${formatRelativeTime(request.createdAt)}`}
                   </p>
                 </div>
-                <Button asChild size="sm" className="shrink-0">
-                  <a href={request.prUrl} target="_blank" rel="noreferrer">
-                    Review on GitHub
-                    <ExternalLink className="size-3.5" aria-hidden />
-                  </a>
-                </Button>
+                <div className="flex shrink-0 flex-col items-end gap-2">
+                  <Button asChild size="sm">
+                    <a href={request.prUrl} target="_blank" rel="noreferrer">
+                      Review on GitHub
+                      <ExternalLink className="size-3.5" aria-hidden />
+                    </a>
+                  </Button>
+                  {viewerSignedIn ? <ReportReviewedButton id={request.id} /> : null}
+                </div>
               </li>
             );
           })}

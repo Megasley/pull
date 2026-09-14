@@ -37,7 +37,7 @@ export function AdminAddPrForm() {
           Add a PR to the queue
         </label>
         <p className="mt-1 text-xs text-muted-foreground">
-          Paste any GitHub pull request URL — adds it as an admin-curated entry, same tier as
+          Paste any GitHub pull request URL. Adds it as an admin-curated entry, same tier as
           the ecosystem auto-discovery job.
         </p>
       </div>

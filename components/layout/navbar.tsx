@@ -54,7 +54,7 @@ export async function Navbar({ className }: NavbarProps) {
           >
             Feedback
           </a>
-          {!user ? <ThemeToggle className="hidden sm:inline-flex" /> : null}
+          <ThemeToggle className="hidden sm:inline-flex" />
           <AuthControls className="hidden md:flex" />
           <MobileNav
             isAuthenticated={Boolean(user)}

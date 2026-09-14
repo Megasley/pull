@@ -253,6 +253,13 @@
       "when": 1789248567031,
       "tag": "0035_pr_review_pr_created_at",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1789375398391,
+      "tag": "0036_pr_review_diff_size",
+      "breakpoints": true
     }
   ]
 }
