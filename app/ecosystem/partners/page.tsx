@@ -77,11 +77,12 @@ const WHY_PARTNER_BENEFITS = [
 function PartnerLogo({
   partner,
   boxClassName,
-  imgClassName,
+  imgHeightRem,
 }: {
   partner: EcosystemPartner;
   boxClassName: string;
-  imgClassName: string;
+  /** Base display height in rem, before the partner's own logoScale is applied. */
+  imgHeightRem: number;
 }) {
   return (
     <div
@@ -96,11 +97,8 @@ function PartnerLogo({
         <img
           src={partner.logoSrc}
           alt={partner.name}
-          className={cn(
-            "w-auto max-w-full",
-            imgClassName,
-            partner.logoLight && "invert",
-          )}
+          style={{ height: `${imgHeightRem * (partner.logoScale ?? 1)}rem` }}
+          className={cn("w-auto max-w-full", partner.logoLight && "invert")}
         />
       ) : (
         <span className="font-mono text-xs font-bold">{partner.logoInitials}</span>
@@ -117,7 +115,7 @@ function PartnerCard({ partner }: { partner: EcosystemPartner }) {
         className="group flex h-full flex-col gap-5 border border-border bg-background p-6 transition-colors hover:bg-muted/20 sm:p-7"
       >
         <div className="flex items-start gap-4">
-          <PartnerLogo partner={partner} boxClassName="h-14 w-24 p-2" imgClassName="h-7" />
+          <PartnerLogo partner={partner} boxClassName="h-14 w-24 p-2" imgHeightRem={1.75} />
           <div className="min-w-0 flex-1">
             <span
               className={cn(
@@ -204,11 +202,7 @@ export default function EcosystemPartnersPage() {
                   href={`/ecosystem/partners/${partner.slug}`}
                   className="group grid gap-6 border border-ink bg-signal/10 p-6 transition-colors hover:bg-signal/15 sm:p-8 lg:grid-cols-[auto_1fr_auto] lg:items-center lg:gap-10"
                 >
-                  <PartnerLogo
-                    partner={partner}
-                    boxClassName="h-20 w-40 p-4"
-                    imgClassName="h-9"
-                  />
+                  <PartnerLogo partner={partner} boxClassName="h-20 w-40 p-4" imgHeightRem={2.25} />
                   <div className="min-w-0">
                     <span className="inline-block border border-ink bg-ink px-2.5 py-1 font-mono text-[10px] uppercase tracking-widest text-[var(--background)]">
                       {partner.recognitionLabel ?? PARTNER_TYPE_LABELS[partner.partnerType]}

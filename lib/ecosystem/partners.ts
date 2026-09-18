@@ -39,6 +39,10 @@ export type EcosystemPartner = {
   logoSrc?: string;
   /** Set when logoSrc is a light/white-ink mark, so it needs the opposite invert direction of a dark-ink logo. */
   logoLight?: boolean;
+  /** Multiplier applied to the base logo display height, for marks whose own
+   *  padding/aspect ratio makes them read smaller than others at the same
+   *  height class. Defaults to 1. */
+  logoScale?: number;
   partnerType: PartnerType;
   /** Human-readable recognition label, e.g. "Founding Sponsor". */
   recognitionLabel?: string;
@@ -142,6 +146,41 @@ const partners: EcosystemPartner[] = [
         summary:
           "A contribution journey for qualified Thebuidl participants. Learn practical Rust and Bitcoin development skills with Thebuidl. Continue by applying those skills to real open source projects on Pull.",
         skills: ["Rust", "Bitcoin", "Open Source"],
+      },
+    ],
+  },
+  {
+    slug: "dada-devs",
+    name: "Dada Devs",
+    tagline: "Home of Africa's first generation of female Bitcoin developers.",
+    description:
+      "Dada Devs creates pathways for African female engineers to transition into Bitcoin and open-source development. Through code-first onboarding, mentorship, and ecosystem collaborations, participants build practical skills running nodes and building on the Lightning Network. Graduates join Pull to continue their open source contribution journey.",
+    website: "https://dadadevs.com",
+    logoInitials: "DD",
+    logoSrc: "/dada-devs-logo.png",
+    logoScale: 1.4,
+    partnerType: "learning_partner",
+    journeySteps: [
+      "Learn with Dada Devs",
+      "Find real contribution opportunities on Pull",
+      "Build a public record of your work",
+    ],
+    journeys: [
+      {
+        slug: "mastering-bitcoin",
+        name: "Mastering Bitcoin",
+        status: "active",
+        summary:
+          "A contribution journey for qualified Dada Devs participants. Learn practical Bitcoin protocol development and node operations with Dada Devs. Continue by applying those skills to real open source projects on Pull.",
+        skills: ["Bitcoin", "Node Operations", "Open Source"],
+      },
+      {
+        slug: "mastering-lightning",
+        name: "Mastering Lightning",
+        status: "active",
+        summary:
+          "A contribution journey for qualified Dada Devs participants. Learn practical Lightning Network development with Dada Devs. Continue by applying those skills to real open source projects on Pull.",
+        skills: ["Lightning", "Bitcoin", "Open Source"],
       },
     ],
   },

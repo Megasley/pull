@@ -10,8 +10,6 @@ type PartnerInviteCtaProps = {
   orgName: string;
   /** Current page path, preserved as the sign-in redirect target. */
   pagePath: string;
-  /** "journey" for the compact in-section CTA, "final" for the closing page CTA. */
-  variant?: "journey" | "final";
 };
 
 /**
@@ -19,13 +17,7 @@ type PartnerInviteCtaProps = {
  * visitor toward their contribution experience without bypassing cohort
  * access control — the org invite link is never re-derivable from here.
  */
-export function PartnerInviteCta({
-  state,
-  orgSlug,
-  orgName,
-  pagePath,
-  variant = "journey",
-}: PartnerInviteCtaProps) {
+export function PartnerInviteCta({ state, orgSlug, orgName, pagePath }: PartnerInviteCtaProps) {
   if (state === "member") {
     return (
       <div className="flex flex-col gap-3">
@@ -41,10 +33,7 @@ export function PartnerInviteCta({
     );
   }
 
-  const explainer =
-    variant === "final"
-      ? `Available to qualified ${orgName} participants. Already part of ${orgName}? Use the invitation link from your program to join Pull.`
-      : `Available to qualified participants. Already a participant? Use your invitation to continue your journey on Pull.`;
+  const explainer = `Available to qualified ${orgName} participants. Already part of ${orgName}? Use the invitation link from your program to join Pull.`;
 
   if (state === "signed_in_non_member") {
     return (

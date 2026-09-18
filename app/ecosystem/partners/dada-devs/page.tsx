@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 
 import { PartnerCurrentJourney } from "@/components/ecosystem/partner-current-journey";
@@ -14,12 +15,13 @@ import { getPartnerBySlug } from "@/lib/ecosystem/partners";
 import { getUserOrgMembershipBySlug } from "@/lib/partners/memberships";
 import { getPartnerOrgBySlug, listOrgSkills } from "@/lib/partners/orgs";
 
-const PAGE_PATH = "/ecosystem/partners/thebuidl";
+const PAGE_PATH = "/ecosystem/partners/dada-devs";
+const GITHUB_URL = "https://github.com/DadaDevelopers";
 
 export const metadata: Metadata = {
-  title: "Thebuidl × Pull | From Learning to Open Source",
+  title: "Dada Devs × Pull | From Learning to Open Source",
   description:
-    "Thebuidl and Pull help developers move from structured learning into meaningful open source contribution.",
+    "Dada Devs and Pull help African female engineers move from structured Bitcoin and Lightning training into meaningful open source contribution.",
   alternates: { canonical: PAGE_PATH },
 };
 
@@ -27,7 +29,7 @@ const HOW_IT_WORKS_STEPS = [
   {
     step: "01",
     label: "Complete your pathway",
-    body: "Build practical skills with Thebuidl.",
+    body: "Build practical Bitcoin and Lightning skills with Dada Devs.",
   },
   {
     step: "02",
@@ -59,8 +61,8 @@ const WHAT_YOU_GET = [
   "A growing public record of your work",
 ] as const;
 
-export default async function TheBuidlPartnerPage() {
-  const partner = getPartnerBySlug("thebuidl");
+export default async function DadaDevsPartnerPage() {
+  const partner = getPartnerBySlug("dada-devs");
   if (!partner) return null;
 
   const profile = await bootstrapCurrentUserProfile();
@@ -74,12 +76,11 @@ export default async function TheBuidlPartnerPage() {
       ? "signed_in_non_member"
       : "signed_out";
 
-  const journey = partner.journeys?.[0];
+  const journeys = partner.journeys ?? [];
 
-  // Admin-configured org skills are the source of truth; the static journey's
+  // Admin-configured org skills are the source of truth; each pathway's own
   // skills are only a fallback for when the DB is unreachable.
   const dbSkills = dbOrg ? await listOrgSkills(dbOrg.id) : [];
-  const skills = dbSkills.length > 0 ? dbSkills : (journey?.skills ?? []);
 
   return (
     <>
@@ -96,7 +97,7 @@ export default async function TheBuidlPartnerPage() {
                   ← Partners
                 </Link>
                 <span className="text-muted-foreground/40">/</span>
-                <p className="tech-eyebrow text-[var(--signal)]">Thebuidl × Pull</p>
+                <p className="tech-eyebrow text-[var(--signal)]">Dada Devs × Pull</p>
               </div>
 
               {partner.logoSrc ? (
@@ -112,13 +113,8 @@ export default async function TheBuidlPartnerPage() {
               ) : null}
 
               <h1 className="mt-6 text-balance text-[clamp(1.75rem,4vw,3rem)] font-bold leading-[1.1] tracking-[-0.04em]">
-                From learning to open source.
+                {partner.tagline}
               </h1>
-
-              <p className="mt-5 max-w-xl font-mono text-sm leading-relaxed text-muted-foreground lg:mx-0">
-                Thebuidl helps developers build practical skills. Pull helps them take the next
-                step by contributing to real open source projects.
-              </p>
 
               <div className="mt-8 flex flex-wrap justify-center gap-3 lg:justify-start">
                 <Button
@@ -126,7 +122,12 @@ export default async function TheBuidlPartnerPage() {
                   className="bg-signal border-[var(--signal)] hover:bg-[var(--signal)]/90"
                 >
                   <a href={partner.website} target="_blank" rel="noreferrer">
-                    Explore Thebuidl ↗
+                    Explore Dada Devs ↗
+                  </a>
+                </Button>
+                <Button asChild variant="outline">
+                  <a href={GITHUB_URL} target="_blank" rel="noreferrer">
+                    GitHub ↗
                   </a>
                 </Button>
               </div>
@@ -145,6 +146,36 @@ export default async function TheBuidlPartnerPage() {
         </SiteContainer>
       </section>
 
+      {/* ── About Dada Devs & DadaHub ─────────────────────────────────── */}
+      <section className="border-b border-border py-16 md:py-20">
+        <SiteContainer>
+          <div className="grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-14">
+            <div>
+              <SectionHeader eyebrow="about" title={`About ${partner.name}`} />
+              <p className="mt-6 font-mono text-sm leading-relaxed text-muted-foreground">
+                {partner.description}
+              </p>
+            </div>
+
+            <figure className="border border-border">
+              <div className="relative aspect-[3/2] overflow-hidden">
+                <Image
+                  src="/dadahub-nairobi.jpg"
+                  alt="DadaHub, Dada Devs' co-working space in Nairobi"
+                  fill
+                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  className="object-cover"
+                />
+              </div>
+              <figcaption className="border-t border-border px-4 py-3 font-mono text-xs leading-relaxed text-muted-foreground">
+                DadaHub, Nairobi — a physical co-working space dedicated to female developers and
+                designers building in Bitcoin and open source.
+              </figcaption>
+            </figure>
+          </div>
+        </SiteContainer>
+      </section>
+
       {/* ── Learn there. Continue here. ─────────────────────────────── */}
       <section className="border-b border-border py-16 md:py-20">
         <SiteContainer>
@@ -152,8 +183,9 @@ export default async function TheBuidlPartnerPage() {
             <SectionHeader eyebrow="the relationship" title="Learn there. Continue here." />
             <div className="mt-8 space-y-5 font-mono text-sm leading-[1.8] text-muted-foreground">
               <p>
-                {partner.name} helps developers build practical skills through structured learning
-                experiences.
+                {partner.name} creates pathways for African female engineers to build practical
+                skills through code-first onboarding, mentorship, and ecosystem collaborations in
+                Bitcoin and Lightning Network development.
               </p>
               <p>
                 After completing a pathway, qualified participants can continue their journey on
@@ -164,21 +196,30 @@ export default async function TheBuidlPartnerPage() {
         </SiteContainer>
       </section>
 
-      {/* ── Current Journey ──────────────────────────────────────────── */}
-      {journey ? (
+      {/* ── Pathways ──────────────────────────────────────────────────── */}
+      {journeys.length > 0 ? (
         <section className="border-b border-border py-16 md:py-20">
           <SiteContainer>
-            <SectionHeader eyebrow="current journey" title={journey.name} />
-            <div className="mt-8">
-              <PartnerCurrentJourney journey={journey} skills={skills} />
+            <SectionHeader
+              eyebrow="current journey"
+              title={journeys.map((journey) => journey.name).join(" & ")}
+            />
+            <div className="mt-8 grid gap-6 sm:grid-cols-2">
+              {journeys.map((journey) => (
+                <PartnerCurrentJourney
+                  key={journey.slug}
+                  journey={journey}
+                  skills={dbSkills.length > 0 ? dbSkills : journey.skills}
+                />
+              ))}
             </div>
             <p className="mt-8 max-w-2xl font-mono text-sm leading-relaxed text-muted-foreground">
-              Ready to get started? Apply for this pathway directly with Thebuidl.
+              Ready to get started? Apply for a pathway directly with Dada Devs.
             </p>
             <div className="mt-5">
               <Button asChild size="sm" className="bg-signal border-[var(--signal)] hover:bg-[var(--signal)]/90">
-                <a href="https://www.thebuidl.xyz/rust-for-bitcoin" target="_blank" rel="noreferrer">
-                  Apply on Thebuidl ↗
+                <a href="https://dadadevs.com/pathways/" target="_blank" rel="noreferrer">
+                  Apply on Dada Devs ↗
                 </a>
               </Button>
             </div>
@@ -213,25 +254,6 @@ export default async function TheBuidlPartnerPage() {
               </li>
             ))}
           </ul>
-        </SiteContainer>
-      </section>
-
-      {/* ── About The Buidl ──────────────────────────────────────────── */}
-      <section className="border-b border-border py-16 md:py-20">
-        <SiteContainer>
-          <div className="max-w-2xl">
-            <SectionHeader eyebrow="about" title={`About ${partner.name}`} />
-            <p className="mt-6 font-mono text-sm leading-relaxed text-muted-foreground">
-              {partner.description}
-            </p>
-            <div className="mt-6">
-              <Button asChild variant="outline" size="sm">
-                <a href={partner.website} target="_blank" rel="noreferrer">
-                  Visit {partner.name} ↗
-                </a>
-              </Button>
-            </div>
-          </div>
         </SiteContainer>
       </section>
 
