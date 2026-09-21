@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 
 import { PartnerCurrentJourney } from "@/components/ecosystem/partner-current-journey";
 import { PartnerHeroJourney } from "@/components/ecosystem/partner-hero-journey";
@@ -13,7 +14,7 @@ import { bootstrapCurrentUserProfile } from "@/lib/auth/session";
 import { isDatabaseConfigured } from "@/lib/db/env";
 import { getPartnerBySlug } from "@/lib/ecosystem/partners";
 import { getUserOrgMembershipBySlug } from "@/lib/partners/memberships";
-import { getPartnerOrgBySlug, listOrgSkills } from "@/lib/partners/orgs";
+import { getPartnerOrgBySlug } from "@/lib/partners/orgs";
 
 const PAGE_PATH = "/ecosystem/partners/dada-devs";
 const GITHUB_URL = "https://github.com/DadaDevelopers";
@@ -63,7 +64,9 @@ const WHAT_YOU_GET = [
 
 export default async function DadaDevsPartnerPage() {
   const partner = getPartnerBySlug("dada-devs");
-  if (!partner) return null;
+  if (!partner || partner.hidden) {
+    notFound();
+  }
 
   const profile = await bootstrapCurrentUserProfile();
   const dbOrg = isDatabaseConfigured() ? await getPartnerOrgBySlug(partner.slug) : null;
@@ -77,10 +80,6 @@ export default async function DadaDevsPartnerPage() {
       : "signed_out";
 
   const journeys = partner.journeys ?? [];
-
-  // Admin-configured org skills are the source of truth; each pathway's own
-  // skills are only a fallback for when the DB is unreachable.
-  const dbSkills = dbOrg ? await listOrgSkills(dbOrg.id) : [];
 
   return (
     <>
@@ -206,11 +205,7 @@ export default async function DadaDevsPartnerPage() {
             />
             <div className="mt-8 grid gap-6 sm:grid-cols-2">
               {journeys.map((journey) => (
-                <PartnerCurrentJourney
-                  key={journey.slug}
-                  journey={journey}
-                  skills={dbSkills.length > 0 ? dbSkills : journey.skills}
-                />
+                <PartnerCurrentJourney key={journey.slug} journey={journey} skills={journey.skills} />
               ))}
             </div>
             <p className="mt-8 max-w-2xl font-mono text-sm leading-relaxed text-muted-foreground">

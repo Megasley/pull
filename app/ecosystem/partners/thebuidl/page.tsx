@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 
 import { PartnerCurrentJourney } from "@/components/ecosystem/partner-current-journey";
 import { PartnerHeroJourney } from "@/components/ecosystem/partner-hero-journey";
@@ -61,7 +62,9 @@ const WHAT_YOU_GET = [
 
 export default async function TheBuidlPartnerPage() {
   const partner = getPartnerBySlug("thebuidl");
-  if (!partner) return null;
+  if (!partner || partner.hidden) {
+    notFound();
+  }
 
   const profile = await bootstrapCurrentUserProfile();
   const dbOrg = isDatabaseConfigured() ? await getPartnerOrgBySlug(partner.slug) : null;
