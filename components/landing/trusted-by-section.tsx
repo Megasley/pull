@@ -21,6 +21,12 @@ const PARTNERS = [
     height: "h-5",
     href: "https://academy.trezor.io/",
   },
+  {
+    name: "Dada Devs",
+    logo: "/dada-devs-logo.png",
+    height: "h-10",
+    href: "https://dadadevs.com",
+  },
 ];
 
 export function TrustedBySection() {

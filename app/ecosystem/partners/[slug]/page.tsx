@@ -10,7 +10,7 @@ import { siteConfig } from "@/lib/site-config";
 
 type Props = { params: Promise<{ slug: string }> };
 
-const STATIC_PARTNER_PAGES = new Set(["trezor-academy", "thebuidl"]);
+const STATIC_PARTNER_PAGES = new Set(["trezor-academy", "thebuidl", "dada-devs"]);
 
 export function generateStaticParams() {
   return listPartnerSlugs()

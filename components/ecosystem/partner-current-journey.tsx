@@ -1,5 +1,4 @@
 import { Badge } from "@/components/ui/badge";
-import { PartnerInviteCta, type PartnerCtaState } from "@/components/ecosystem/partner-invite-cta";
 import {
   PARTNER_JOURNEY_STATUS_LABELS,
   type PartnerJourney,
@@ -15,20 +14,9 @@ type PartnerCurrentJourneyProps = {
   journey: PartnerJourney;
   /** Admin-configured org skills (falls back to the static journey.skills if the org has none yet). */
   skills: string[];
-  orgSlug: string;
-  orgName: string;
-  ctaState: PartnerCtaState;
-  pagePath: string;
 };
 
-export function PartnerCurrentJourney({
-  journey,
-  skills,
-  orgSlug,
-  orgName,
-  ctaState,
-  pagePath,
-}: PartnerCurrentJourneyProps) {
+export function PartnerCurrentJourney({ journey, skills }: PartnerCurrentJourneyProps) {
   return (
     <div className="border border-border p-6 sm:p-8">
       <div className="flex flex-wrap items-center gap-3">
@@ -54,16 +42,6 @@ export function PartnerCurrentJourney({
           ))}
         </div>
       )}
-
-      <div className="mt-6 border-t border-border pt-6">
-        <PartnerInviteCta
-          state={ctaState}
-          orgSlug={orgSlug}
-          orgName={orgName}
-          pagePath={pagePath}
-          variant="journey"
-        />
-      </div>
     </div>
   );
 }

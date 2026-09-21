@@ -41,7 +41,10 @@ export function PartnerHeroJourney({ nodes, className }: PartnerHeroJourneyProps
                 ) : null}
               </div>
               {!isLast ? (
-                <span className="py-1.5 font-mono text-sm text-[var(--signal)]" aria-hidden>
+                <span
+                  className="py-1.5 font-mono text-sm text-muted-foreground dark:text-[var(--signal)]"
+                  aria-hidden
+                >
                   ↓
                 </span>
               ) : null}
