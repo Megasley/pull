@@ -4,7 +4,6 @@ import { AchievementCard } from "@/components/achievements/achievement-card";
 import { ExternalLinkIcon } from "@/components/icons/outline-icons";
 import {
   ContributionStatsGrid,
-  FeaturedProjectsSection,
   FeaturedRepositoriesSection,
   MergedPrHighlightsSection,
   PortfolioSection,
@@ -77,7 +76,6 @@ export function PublicBuilderProfile({ data }: PublicBuilderProfileProps) {
     skills,
     technologies,
     featuredRepositories,
-    featuredProjects,
     mergedPrHighlights,
     timeline,
     achievements,
@@ -345,7 +343,6 @@ export function PublicBuilderProfile({ data }: PublicBuilderProfileProps) {
           )}
         </PortfolioSection>
 
-        <FeaturedProjectsSection projects={featuredProjects} profile />
       </SiteContainer>
     </div>
   );
