@@ -1,4 +1,6 @@
 import { SegmentBar } from "@/components/profile/segment-bar";
+import { REPUTATION_EXPLAINER } from "@/lib/reputation/public-summary";
+import { strengthFromNormalized } from "@/lib/scoring/normalize";
 import { cn } from "@/lib/utils";
 import type {
   ReputationFactor,
@@ -35,6 +37,9 @@ export function ReputationPanel({
   const orderedFactors = isProfile
     ? [...reputation.factors].sort((a, b) => b.strengthPercent - a.strengthPercent)
     : reputation.factors;
+  // Same 0-100 scale as every factor's strengthPercent, so the overall tier
+  // reads on the same emerging/building/strong/exceptional ladder.
+  const tier = strengthFromNormalized(reputation.score / 100);
 
   return (
     <div
@@ -45,28 +50,28 @@ export function ReputationPanel({
         className,
       )}
     >
-      <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+      <div
+        className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between"
+        title={isProfile ? REPUTATION_EXPLAINER : undefined}
+      >
         <div className="flex items-center gap-5">
           <ScoreRing value={reputation.score} variant={variant} />
           <div className="min-w-0">
-            <p
-              className={cn(
-                isProfile
-                  ? "text-[15px] font-bold text-foreground"
-                  : "text-sm text-muted-foreground",
-              )}
-            >
-              {isProfile ? (
-                <>Open Source Reputation — {reputation.score}/100</>
-              ) : (
-                <>
-                  Open Source Reputation
-                  <span className="ml-2 font-mono text-[10px] uppercase tracking-wide text-muted-foreground/80">
-                    {reputation.version}
-                  </span>
-                </>
-              )}
-            </p>
+            {isProfile ? (
+              <p className="text-[15px] font-bold text-foreground">
+                {STRENGTH_LABEL[tier]}
+                <span className="ml-1.5 font-mono text-[11px] font-normal text-muted-foreground">
+                  OSS Reputation · {reputation.score}/100
+                </span>
+              </p>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Open Source Reputation
+                <span className="ml-2 font-mono text-[10px] uppercase tracking-wide text-muted-foreground/80">
+                  {reputation.version}
+                </span>
+              </p>
+            )}
             {!isProfile ? (
               <p className="text-3xl font-semibold tracking-tight sm:text-4xl">
                 {reputation.score}
@@ -90,16 +95,24 @@ export function ReputationPanel({
         </div>
       </div>
 
-      <div
-        className={cn(
-          "mt-6 grid gap-3",
-          compact || isProfile ? "sm:grid-cols-2" : "md:grid-cols-2",
-        )}
-      >
-        {orderedFactors.map((factor) => (
-          <FactorRow key={factor.id} factor={factor} variant={variant} />
-        ))}
-      </div>
+      {isProfile ? (
+        <details className="profile-score-breakdown mt-5">
+          <summary className="profile-score-breakdown-summary">
+            Full breakdown
+          </summary>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {orderedFactors.map((factor) => (
+              <FactorRow key={factor.id} factor={factor} variant={variant} />
+            ))}
+          </div>
+        </details>
+      ) : (
+        <div className={cn("mt-6 grid gap-3", compact ? "sm:grid-cols-2" : "md:grid-cols-2")}>
+          {orderedFactors.map((factor) => (
+            <FactorRow key={factor.id} factor={factor} variant={variant} />
+          ))}
+        </div>
+      )}
 
       {!compact && !isProfile ? (
         <>

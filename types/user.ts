@@ -8,6 +8,7 @@ import {
   type UserAccountStatus,
 } from "@/lib/auth/account-status";
 import { normalizeLookingFor, type LookingForId } from "@/lib/builders/looking-for";
+import { isOpenToStatus, type OpenToStatus } from "@/lib/profile/open-to";
 
 export type BuilderProfile = {
   id: string;
@@ -40,6 +41,12 @@ export type BuilderProfile = {
   country: string | null;
   /** Opt-in flag: show the country flag on the public profile/card. */
   showCountryPublicly: boolean;
+  /** Optional public hire/collaborate status. Null = never set. See
+   *  lib/profile/open-to.ts. */
+  openTo: OpenToStatus | null;
+  /** Up to 4 synced repo full names ("owner/repo"), builder's chosen order.
+   *  See components/profile/portfolio-sections.tsx:FeaturedRepositoriesSection. */
+  pinnedRepos: string[];
   xp: number;
   level: number;
   createdAt: string;
@@ -77,6 +84,8 @@ export function toPublicBuilderProfile(profile: BuilderProfile): PublicBuilderPr
     preferredRoadmapSlug: profile.preferredRoadmapSlug,
     // Only surfaced when the user has explicitly opted in.
     country: profile.showCountryPublicly ? profile.country : null,
+    openTo: profile.openTo,
+    pinnedRepos: profile.pinnedRepos,
     xp: profile.xp,
     level: profile.level,
     createdAt: profile.createdAt,
@@ -110,13 +119,15 @@ export type BuilderProfileRow = {
   preferred_roadmap_slug?: string | null;
   country?: string | null;
   show_country_publicly?: boolean | null;
+  open_to?: string | null;
+  pinned_repos?: string[] | null;
   xp: number;
   level: number;
   created_at: string;
   updated_at: string;
 };
 
-function normalizeSkills(value: unknown): string[] {
+function normalizeStringArray(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
   return value
     .filter((item): item is string => typeof item === "string")
@@ -136,7 +147,7 @@ export function mapBuilderProfile(row: BuilderProfileRow): BuilderProfile {
     website: row.website ?? null,
     twitterUrl: row.twitter_url ?? null,
     linkedinUrl: row.linkedin_url ?? null,
-    skills: normalizeSkills(row.skills),
+    skills: normalizeStringArray(row.skills),
     lookingFor: normalizeLookingFor(row.looking_for),
     profilePublic: row.profile_public ?? true,
     listedInDirectory: row.listed_in_directory ?? true,
@@ -151,6 +162,8 @@ export function mapBuilderProfile(row: BuilderProfileRow): BuilderProfile {
     preferredRoadmapSlug: row.preferred_roadmap_slug ?? null,
     country: row.country ?? null,
     showCountryPublicly: row.show_country_publicly ?? false,
+    openTo: row.open_to && isOpenToStatus(row.open_to) ? row.open_to : null,
+    pinnedRepos: normalizeStringArray(row.pinned_repos).slice(0, 4),
     xp: row.xp,
     level: row.level,
     createdAt: row.created_at,

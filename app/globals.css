@@ -816,6 +816,16 @@
   }
 }
 
+.profile-page .profile-open-to-cta {
+  background: var(--signal);
+  color: var(--signal-foreground);
+  border-color: var(--signal);
+}
+
+.profile-page .profile-open-to-cta:hover {
+  background: color-mix(in oklab, var(--signal) 88%, var(--ink));
+}
+
 .profile-page .profile-section {
   padding: 36px 0;
   border-top: 1px solid var(--profile-line-soft);
@@ -892,6 +902,37 @@
   border-radius: 6px;
   box-shadow: var(--profile-shadow-off);
   padding: 26px;
+}
+
+.profile-page .profile-score-breakdown-summary {
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--profile-ink-faint);
+  border-top: 1px solid var(--profile-line-soft);
+  padding-top: 14px;
+}
+
+.profile-page .profile-score-breakdown-summary::-webkit-details-marker {
+  display: none;
+}
+
+.profile-page .profile-score-breakdown-summary::before {
+  content: "▶ ";
+  display: inline-block;
+  transition: transform 0.15s ease;
+}
+
+.profile-page .profile-score-breakdown[open] .profile-score-breakdown-summary::before {
+  transform: rotate(90deg);
+}
+
+.profile-page .profile-score-breakdown-summary:hover {
+  color: var(--foreground);
 }
 
 .profile-page .profile-mini-card {
@@ -1013,8 +1054,36 @@
   font-weight: 700;
   background: var(--profile-line-soft);
   padding: 2px 7px;
-  border-radius: 20px;
   margin-left: 6px;
+  border-radius: 20px;
+}
+
+.profile-page .profile-tl-more {
+  margin-top: 4px;
+}
+
+.profile-page .profile-tl-more-summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 11px 0;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--profile-ink-faint);
+  border-bottom: 1px solid var(--profile-line-soft);
+}
+
+.profile-page .profile-tl-more-summary::-webkit-details-marker {
+  display: none;
+}
+
+.profile-page .profile-tl-more-summary:hover {
+  color: var(--foreground);
+}
+
+.profile-page .profile-tl-more[open] .profile-tl-more-summary {
+  border-bottom: none;
 }
 
 .profile-page .profile-rm-card {

@@ -7,11 +7,12 @@ import {
   getApprovedSubmissionCount,
   getUserByUsername,
   getUserLastActiveAt,
-  listApprovedSubmissionsForUser,
+  listSubmissionsForUser,
 } from "@/lib/profile/repository";
 import {
   deriveTechnologies,
   selectFeaturedRepositories,
+  selectMaintainerBadge,
   selectMergedPrHighlights,
   toPublicTimelineEvents,
 } from "@/lib/profile/portfolio";
@@ -41,7 +42,7 @@ import { toPublicBuilderProfile } from "@/types/user";
 
 function buildFeaturedProjects(
   progressByRoadmap: Record<string, string[]>,
-  approved: Awaited<ReturnType<typeof listApprovedSubmissionsForUser>>,
+  submissions: Awaited<ReturnType<typeof listSubmissionsForUser>>,
 ): PublicCompletedProject[] {
   const fromLessons: PublicCompletedProject[] = [];
 
@@ -51,20 +52,21 @@ function buildFeaturedProjects(
 
     for (const node of roadmap.nodes) {
       if (!node.project || !nodeSlugs.includes(node.id)) continue;
-      const approval = approved.find((item) => item.projectSlug === node.project);
+      const submission = submissions.find((item) => item.projectSlug === node.project);
       fromLessons.push({
         roadmapSlug,
         nodeSlug: node.id,
         projectSlug: node.project,
         title: node.title,
         completedAt: null,
-        submissionStatus: approval?.status ?? null,
-        repoUrl: approval?.repoUrl ?? null,
+        submissionStatus: submission?.status ?? null,
+        repoUrl: submission?.repoUrl ?? null,
+        liveDemoUrl: submission?.liveDemoUrl ?? null,
       });
     }
   }
 
-  const fromApprovals: PublicCompletedProject[] = approved.map((item) => ({
+  const fromSubmissions: PublicCompletedProject[] = submissions.map((item) => ({
     roadmapSlug: "",
     nodeSlug: "",
     projectSlug: item.projectSlug,
@@ -72,12 +74,13 @@ function buildFeaturedProjects(
     completedAt: item.reviewedAt ?? item.submittedAt,
     submissionStatus: item.status,
     repoUrl: item.repoUrl,
+    liveDemoUrl: item.liveDemoUrl,
   }));
 
   const seen = new Set<string>();
   const merged: PublicCompletedProject[] = [];
 
-  for (const item of [...fromApprovals, ...fromLessons]) {
+  for (const item of [...fromSubmissions, ...fromLessons]) {
     if (seen.has(item.projectSlug)) continue;
     seen.add(item.projectSlug);
     merged.push(item);
@@ -100,7 +103,7 @@ async function loadPublicBuilderProfileData(
   const [
     achievements,
     approvedCount,
-    approved,
+    submissions,
     builderScore,
     repositories,
     pullRequests,
@@ -113,7 +116,7 @@ async function loadPublicBuilderProfileData(
   ] = await Promise.all([
     listUserAchievements(profile.id, progressByRoadmap),
     getApprovedSubmissionCount(profile.id),
-    listApprovedSubmissionsForUser(profile.id),
+    listSubmissionsForUser(profile.id),
     loadBuilderScore(profile.id, progressByRoadmap),
     listGithubRepositories(profile.id, { limit: 30 }),
     listGithubPullRequests(profile.id, 80),
@@ -145,10 +148,17 @@ async function loadPublicBuilderProfileData(
   });
 
   const roadmaps = buildAllRoadmapProgressSummaries(progressByRoadmap);
-  const portfolioItems = pullRequests.map(toPortfolioItem);
+  // Repos synced with collaborator/org-member access (not just what the
+  // builder owns) — the "maintainer" signal for PR role classification.
+  // Synced data only, no extra GitHub calls: see lib/portfolio/pr-role.ts.
+  const maintainedRepoFullNames = new Set(repositories.map((repo) => repo.fullName));
+  const portfolioItems = pullRequests.map((pr) =>
+    toPortfolioItem(pr, maintainedRepoFullNames),
+  );
   const mergedPrs = portfolioItems.filter((item) => item.merged);
   const uniqueRepos = new Set(mergedPrs.map((item) => item.repoFullName));
-  const featuredProjects = buildFeaturedProjects(progressByRoadmap, approved);
+  const externalMergedPrs = mergedPrs.filter((item) => item.role === "external");
+  const featuredProjects = buildFeaturedProjects(progressByRoadmap, submissions);
   const technologies = deriveTechnologies([
     ...repositories.map((repo) => repo.language),
     ...portfolioItems.map((item) => item.language),
@@ -163,8 +173,13 @@ async function loadPublicBuilderProfileData(
     (sum, item) => sum + item.completedProjects.length,
     0,
   );
+  const maintainerBadge = selectMaintainerBadge(repositories, profile.githubUsername);
   const publicProfile = toPublicBuilderProfile(profile);
-  const timelineEvents = toPublicTimelineEvents(timelineData.events);
+  // Higher than the ~6 shown before "Show more" — the timeline is now the
+  // one chronological record (see components/profile/portfolio-sections.tsx
+  // PublicTimelineSection), while Merged PR highlights stays a small
+  // curated top-N. All synced data, no extra GitHub calls.
+  const timelineEvents = toPublicTimelineEvents(timelineData.events, 30);
   const strengthLine = buildProfileStrengthLine(builderScore, reputation);
   const activity = buildPublicProfileActivity({
     createdAt: profile.createdAt,
@@ -187,13 +202,14 @@ async function loadPublicBuilderProfileData(
       projectsApproved: approvedCount,
       achievementsUnlocked: achievements.filter((item) => item.earned).length,
       mergedPullRequests: mergedPullRequestCount,
+      externalMergedPullRequests: externalMergedPrs.length,
       repositories: repositories.length,
       uniqueContributionRepos: uniqueRepos.size,
       languagesUsed: technologies.length,
     },
     skills: profile.skills,
     technologies,
-    featuredRepositories: selectFeaturedRepositories(repositories),
+    featuredRepositories: selectFeaturedRepositories(repositories, profile.pinnedRepos),
     featuredProjects,
     mergedPrHighlights: selectMergedPrHighlights(portfolioItems),
     timeline: timelineEvents,
@@ -203,6 +219,7 @@ async function loadPublicBuilderProfileData(
     activity,
     contributionMix,
     partnerOrigin,
+    maintainerBadge,
   };
 }
 

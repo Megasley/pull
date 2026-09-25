@@ -124,6 +124,16 @@ export const prLifecycleEventTypeEnum = pgEnum("pr_lifecycle_event_type", [
   "closed",
 ]);
 
+/** Optional public-profile hire/collaborate status. Null = never set (no
+ *  header CTA); "none" is an explicit opt-out, also no CTA. See
+ *  types/profile.ts and components/profile/public-builder-profile.tsx. */
+export const openToStatusEnum = pgEnum("open_to_status", [
+  "work",
+  "collaboration",
+  "mentoring",
+  "none",
+]);
+
 /**
  * Precision of a pr_lifecycle event's `occurredAt`:
  * - "github": exact timestamp from GitHub's API (created_at / merged_at / closed_at)

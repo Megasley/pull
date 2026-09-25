@@ -1,8 +1,9 @@
-import { and, count, desc, eq, sql } from "drizzle-orm";
+import { and, count, desc, eq, inArray, sql } from "drizzle-orm";
 
 import { getDb, withDbRetry } from "@/lib/db";
 import { isDatabaseConfigured } from "@/lib/db/env";
 import { projectSubmissions, projects, users } from "@/lib/db/schema";
+import type { OpenToStatus } from "@/lib/profile/open-to";
 import type { BuilderProfile } from "@/types/user";
 import { mapBuilderProfile, type BuilderProfileRow } from "@/types/user";
 
@@ -33,6 +34,8 @@ export function mapDrizzleUser(row: typeof users.$inferSelect): BuilderProfile {
     preferred_roadmap_slug: row.preferredRoadmapSlug,
     country: row.country,
     show_country_publicly: row.showCountryPublicly,
+    open_to: row.openTo,
+    pinned_repos: Array.isArray(row.pinnedRepos) ? row.pinnedRepos : [],
     xp: row.xp,
     level: row.level,
     created_at: row.createdAt,
@@ -112,6 +115,46 @@ export async function listApprovedSubmissionsForUser(userId: string) {
   });
 }
 
+/**
+ * Submissions worth showing on the public profile — everything past
+ * "draft" (still private WIP) and short of "rejected" (a negative signal,
+ * not something to feature). Unlike listApprovedSubmissionsForUser, this
+ * includes in-progress review states so Featured projects can carry an
+ * honest status label instead of only ever showing approved work.
+ */
+export async function listSubmissionsForUser(userId: string) {
+  if (!isDatabaseConfigured()) return [];
+  return withDbRetry(async () => {
+    const db = getDb();
+    return db
+      .select({
+        id: projectSubmissions.id,
+        status: projectSubmissions.status,
+        repoUrl: projectSubmissions.repoUrl,
+        liveDemoUrl: projectSubmissions.liveDemoUrl,
+        projectSlug: projects.slug,
+        projectTitle: projects.title,
+        submittedAt: projectSubmissions.submittedAt,
+        reviewedAt: projectSubmissions.reviewedAt,
+        updatedAt: projectSubmissions.updatedAt,
+      })
+      .from(projectSubmissions)
+      .innerJoin(projects, eq(projectSubmissions.projectId, projects.id))
+      .where(
+        and(
+          eq(projectSubmissions.userId, userId),
+          inArray(projectSubmissions.status, [
+            "submitted",
+            "under_review",
+            "needs_changes",
+            "approved",
+          ]),
+        ),
+      )
+      .orderBy(desc(projectSubmissions.reviewedAt), desc(projectSubmissions.updatedAt));
+  });
+}
+
 export async function updateBuilderProfileFields(
   userId: string,
   input: {
@@ -127,6 +170,8 @@ export async function updateBuilderProfileFields(
     /** undefined = leave unchanged; null = explicitly cleared by the user. */
     country?: string | null;
     showCountryPublicly: boolean;
+    openTo: OpenToStatus | null;
+    pinnedRepos: string[];
   },
 ): Promise<BuilderProfile | null> {
   if (!isDatabaseConfigured()) return null;
@@ -148,6 +193,8 @@ export async function updateBuilderProfileFields(
         listedInDirectory,
         ...(input.country !== undefined ? { country: input.country } : {}),
         showCountryPublicly: input.showCountryPublicly,
+        openTo: input.openTo,
+        pinnedRepos: input.pinnedRepos,
         updatedAt: new Date().toISOString(),
       })
       .where(eq(users.id, userId))

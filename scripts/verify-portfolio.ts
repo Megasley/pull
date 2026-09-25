@@ -37,6 +37,7 @@ const fixtures: GithubPullRequestRecord[] = [
     deletions: 12,
     reviewComments: 3,
     contributionType: "feature",
+    isOwnRepo: false,
   },
   {
     id: "2",
@@ -56,10 +57,11 @@ const fixtures: GithubPullRequestRecord[] = [
     deletions: 0,
     reviewComments: 0,
     contributionType: "other",
+    isOwnRepo: false,
   },
 ];
 
-const items = fixtures.map(toPortfolioItem);
+const items = fixtures.map((pr) => toPortfolioItem(pr));
 assert(items[0]?.status === "merged", "merged status");
 assert(items[1]?.status === "open", "open status");
 

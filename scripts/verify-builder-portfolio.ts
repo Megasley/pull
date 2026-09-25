@@ -22,31 +22,38 @@ const emptySkills = parseSkillsInput("  ,  \n ");
 assert(emptySkills.length === 0, "empty skills");
 
 const repos = [
-  { id: "a", isPinned: false, stargazersCount: 10 },
-  { id: "b", isPinned: true, stargazersCount: 1 },
-  { id: "c", isPinned: true, stargazersCount: 2 },
-  { id: "d", isPinned: false, stargazersCount: 50 },
+  { id: "a", fullName: "me/a", isPinned: false, stargazersCount: 10 },
+  { id: "b", fullName: "me/b", isPinned: true, stargazersCount: 1 },
+  { id: "c", fullName: "me/c", isPinned: true, stargazersCount: 2 },
+  { id: "d", fullName: "me/d", isPinned: false, stargazersCount: 50 },
 ];
-const featured = selectFeaturedRepositories(repos, 6);
+const featured = selectFeaturedRepositories(repos, [], 6);
 assert(featured.length === 2 && featured[0]?.id === "b", "prefer pinned");
 
 const unpinned = selectFeaturedRepositories(
   repos.filter((r) => !r.isPinned),
+  [],
   2,
 );
 assert(unpinned[0]?.id === "d", "fallback stars");
 
+const userPinned = selectFeaturedRepositories(repos, ["me/d", "me/a"], 6);
+assert(
+  userPinned.length === 2 && userPinned[0]?.id === "d" && userPinned[1]?.id === "a",
+  "user pins take priority and keep chosen order",
+);
+
 const prs = [
-  { id: "1", title: "Feature A", merged: true, reviewComments: 1, mergedAt: "2026-01-01T00:00:00.000Z" },
-  { id: "2", title: "Feature B", merged: true, reviewComments: 5, mergedAt: "2026-02-01T00:00:00.000Z" },
-  { id: "3", title: "Not merged", merged: false, reviewComments: 9, mergedAt: null },
+  { id: "1", title: "Feature A", merged: true, reviewComments: 1, mergedAt: "2026-01-01T00:00:00.000Z", role: "external" as const },
+  { id: "2", title: "Feature B", merged: true, reviewComments: 5, mergedAt: "2026-02-01T00:00:00.000Z", role: "external" as const },
+  { id: "3", title: "Not merged", merged: false, reviewComments: 9, mergedAt: null, role: "external" as const },
 ];
 const highlights = selectMergedPrHighlights(prs, 2);
 assert(highlights.length === 2 && highlights[0]?.id === "2", "highlight ranking");
 
 const duplicateTitlePrs = [
-  { id: "4", title: "Feat/partners", merged: true, reviewComments: 3, mergedAt: "2026-03-01T00:00:00.000Z" },
-  { id: "5", title: "Feat/partners", merged: true, reviewComments: 1, mergedAt: "2026-02-15T00:00:00.000Z" },
+  { id: "4", title: "Feat/partners", merged: true, reviewComments: 3, mergedAt: "2026-03-01T00:00:00.000Z", role: "self" as const },
+  { id: "5", title: "Feat/partners", merged: true, reviewComments: 1, mergedAt: "2026-02-15T00:00:00.000Z", role: "self" as const },
 ];
 const dedupedHighlights = selectMergedPrHighlights(duplicateTitlePrs, 6);
 assert(

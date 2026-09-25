@@ -10,4 +10,5 @@ export {
 export {
   buildPublicBuilderScoreSummary,
   withPublicBuilderScoreCopy,
+  BUILDER_SCORE_EXPLAINER,
 } from "./public-summary";

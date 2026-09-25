@@ -832,6 +832,7 @@ export async function listGithubPullRequests(
     deletions: row.deletions,
     reviewComments: row.reviewComments,
     contributionType: row.contributionType,
+    isOwnRepo: row.isOwnRepo,
   }));
 }
 

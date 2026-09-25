@@ -12,7 +12,12 @@ import {
 import type { EmailNotificationPrefs } from "@/types/notifications";
 import { DEFAULT_EMAIL_NOTIFICATION_PREFS } from "@/types/notifications";
 
-import { acquisitionSourceEnum, userAccountStatusEnum, userRoleEnum } from "./enums";
+import {
+  acquisitionSourceEnum,
+  openToStatusEnum,
+  userAccountStatusEnum,
+  userRoleEnum,
+} from "./enums";
 
 export const users = pgTable(
   "users",
@@ -58,6 +63,14 @@ export const users = pgTable(
      *  promise, so existing rows must stay hidden until a user explicitly
      *  turns this on. See types/user.ts:toPublicBuilderProfile. */
     showCountryPublicly: boolean("show_country_publicly").notNull().default(false),
+    /** Optional public "hire me" status. Null = never set — no header CTA.
+     *  See lib/db/schema/enums.ts:openToStatusEnum. */
+    openTo: openToStatusEnum("open_to"),
+    /** Up to 4 synced GitHub repo full names ("owner/repo"), in the
+     *  builder's chosen display order. Validated/capped in
+     *  lib/profile/validate.ts — not a DB constraint, since the set of
+     *  valid values (their synced repos) changes with every GitHub sync. */
+    pinnedRepos: jsonb("pinned_repos").$type<string[]>().notNull().default([]),
     /** First-touch acquisition bucket. Set once at signup, immutable afterward. */
     acquisitionSource: acquisitionSourceEnum("acquisition_source"),
     acquisitionDetail: jsonb("acquisition_detail")

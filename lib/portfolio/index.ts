@@ -32,7 +32,7 @@ export async function loadPullRequestPortfolio(userId: string): Promise<{
     listGithubReviewedPullRequests(userId),
   ]);
 
-  const items = pullRequests.map(toPortfolioItem);
+  const items = pullRequests.map((pr) => toPortfolioItem(pr));
   const reviews = reviewedPullRequests.map(toReviewItem);
 
   return {

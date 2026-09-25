@@ -126,6 +126,7 @@ const prs: PullRequestPortfolioItem[] = [
     deletions: 1,
     reviewComments: 0,
     contributionType: "documentation",
+    role: "external",
   },
   {
     id: "2",
@@ -144,6 +145,7 @@ const prs: PullRequestPortfolioItem[] = [
     deletions: 2,
     reviewComments: 1,
     contributionType: "feature",
+    role: "external",
   },
 ];
 

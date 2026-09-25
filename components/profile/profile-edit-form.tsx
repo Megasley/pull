@@ -7,14 +7,19 @@ import { updatePublicProfileAction } from "@/app/actions/profile";
 import { Button } from "@/components/ui/button";
 import { LOOKING_FOR_OPTIONS, type LookingForId } from "@/lib/builders/looking-for";
 import { countryFlagEmoji, listCountriesForSelect } from "@/lib/geo/countries";
+import { OPEN_TO_OPTIONS } from "@/lib/profile/open-to";
 import { formatSkillsForInput } from "@/lib/profile/portfolio";
 import { cn } from "@/lib/utils";
+import type { GithubRepositoryRecord } from "@/types/github";
 import type { BuilderProfile } from "@/types/user";
 
 const COUNTRY_OPTIONS = listCountriesForSelect();
+const MAX_BIO_LENGTH = 280;
+const MAX_PINNED_REPOS = 4;
 
 type ProfileEditFormProps = {
   profile: BuilderProfile;
+  syncedRepositories: GithubRepositoryRecord[];
 };
 
 const fieldClassName =
@@ -52,7 +57,7 @@ function Section({
   );
 }
 
-export function ProfileEditForm({ profile }: ProfileEditFormProps) {
+export function ProfileEditForm({ profile, syncedRepositories }: ProfileEditFormProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -64,7 +69,39 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
   const [lookingFor, setLookingFor] = useState<Set<LookingForId>>(
     () => new Set(profile.lookingFor),
   );
+  const [bio, setBio] = useState(profile.bio);
+  // Order here is the display order on the public profile — the picker
+  // below lets the builder change it with up/down, not just add/remove.
+  const [pinnedRepos, setPinnedRepos] = useState<string[]>(() =>
+    profile.pinnedRepos.filter((fullName) =>
+      syncedRepositories.some((repo) => repo.fullName === fullName),
+    ),
+  );
   const flag = countryFlagEmoji(country);
+
+  const pinnableRepos = syncedRepositories.filter(
+    (repo) => !pinnedRepos.includes(repo.fullName),
+  );
+
+  function addPinnedRepo(fullName: string) {
+    if (!fullName || pinnedRepos.length >= MAX_PINNED_REPOS) return;
+    setPinnedRepos((current) => [...current, fullName]);
+  }
+
+  function removePinnedRepo(fullName: string) {
+    setPinnedRepos((current) => current.filter((name) => name !== fullName));
+  }
+
+  function movePinnedRepo(fullName: string, direction: -1 | 1) {
+    setPinnedRepos((current) => {
+      const index = current.indexOf(fullName);
+      const nextIndex = index + direction;
+      if (index < 0 || nextIndex < 0 || nextIndex >= current.length) return current;
+      const next = [...current];
+      [next[index], next[nextIndex]] = [next[nextIndex], next[index]];
+      return next;
+    });
+  }
 
   function toggleLookingFor(id: LookingForId) {
     setLookingFor((current) => {
@@ -139,11 +176,21 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
             id="bio"
             name="bio"
             rows={4}
-            defaultValue={profile.bio}
+            maxLength={MAX_BIO_LENGTH}
+            value={bio}
+            onChange={(event) => setBio(event.target.value)}
             disabled={pending}
             placeholder="What you’re building and why…"
             className={fieldClassName}
           />
+          <p
+            className={cn(
+              "mt-1.5 text-right text-xs text-muted-foreground",
+              bio.length >= MAX_BIO_LENGTH && "text-destructive",
+            )}
+          >
+            {bio.length} / {MAX_BIO_LENGTH}
+          </p>
         </div>
 
         <div>
@@ -210,6 +257,32 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
               </span>
             </span>
           </label>
+        </div>
+      </Section>
+
+      <Section
+        title="Availability"
+        tone="signal"
+        description="Optional. Shows a contact CTA in your profile header, linking to your website, LinkedIn, X, or GitHub — whichever you've set, in that order."
+      >
+        <div>
+          <label htmlFor="openTo" className="text-sm font-medium">
+            Open to
+          </label>
+          <select
+            id="openTo"
+            name="openTo"
+            defaultValue={profile.openTo ?? ""}
+            disabled={pending}
+            className={fieldClassName}
+          >
+            <option value="">Not shown</option>
+            {OPEN_TO_OPTIONS.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         </div>
       </Section>
 
@@ -298,6 +371,90 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
             className={fieldClassName}
           />
         </div>
+      </Section>
+
+      <Section
+        title="Pin repos"
+        tone="ink"
+        description={`Choose up to ${MAX_PINNED_REPOS} synced repos to feature on your public profile, in the order you want them shown. Leave empty to fall back to your GitHub-pinned repos, or top-starred.`}
+      >
+        {pinnedRepos.length > 0 ? (
+          <ul className="space-y-2">
+            {pinnedRepos.map((fullName, index) => (
+              <li
+                key={fullName}
+                className="flex items-center justify-between gap-2 border border-border bg-muted/10 px-3 py-2 text-sm"
+              >
+                <span className="min-w-0 truncate font-mono text-[12.5px]">
+                  {fullName}
+                </span>
+                <span className="flex shrink-0 items-center gap-1">
+                  <button
+                    type="button"
+                    disabled={pending || index === 0}
+                    onClick={() => movePinnedRepo(fullName, -1)}
+                    aria-label={`Move ${fullName} up`}
+                    className="rounded-none border border-border px-1.5 py-0.5 text-xs text-muted-foreground transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    ↑
+                  </button>
+                  <button
+                    type="button"
+                    disabled={pending || index === pinnedRepos.length - 1}
+                    onClick={() => movePinnedRepo(fullName, 1)}
+                    aria-label={`Move ${fullName} down`}
+                    className="rounded-none border border-border px-1.5 py-0.5 text-xs text-muted-foreground transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    ↓
+                  </button>
+                  <button
+                    type="button"
+                    disabled={pending}
+                    onClick={() => removePinnedRepo(fullName)}
+                    className="rounded-none border border-border px-2 py-0.5 text-xs text-muted-foreground transition-colors hover:border-destructive/40 hover:text-destructive disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    Remove
+                  </button>
+                </span>
+                <input type="hidden" name="pinnedRepos" value={fullName} />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-xs text-muted-foreground">No repos pinned yet.</p>
+        )}
+
+        {pinnedRepos.length < MAX_PINNED_REPOS && pinnableRepos.length > 0 ? (
+          <div>
+            <label htmlFor="addPinnedRepo" className="text-sm font-medium">
+              Add a repo
+            </label>
+            <select
+              id="addPinnedRepo"
+              value=""
+              onChange={(event) => addPinnedRepo(event.target.value)}
+              disabled={pending}
+              className={fieldClassName}
+            >
+              <option value="">Choose a synced repo…</option>
+              {pinnableRepos.map((repo) => (
+                <option key={repo.fullName} value={repo.fullName}>
+                  {repo.fullName}
+                </option>
+              ))}
+            </select>
+          </div>
+        ) : null}
+
+        {syncedRepositories.length === 0 ? (
+          <p className="text-xs text-muted-foreground">
+            No public repositories synced yet — connect GitHub sync from{" "}
+            <a href="/settings/github" className="underline">
+              GitHub settings
+            </a>{" "}
+            to choose repos here.
+          </p>
+        ) : null}
       </Section>
 
       <Section title="Location" tone="signal">

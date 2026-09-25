@@ -1,3 +1,5 @@
+import type { PullRequestContributorRole } from "@/types/portfolio";
+
 const MAX_SKILLS = 24;
 const MAX_SKILL_LENGTH = 40;
 
@@ -26,17 +28,75 @@ export function formatSkillsForInput(skills: string[]): string {
   return skills.join(", ");
 }
 
+/**
+ * Priority: the builder's own ordered pins (set in settings) > GitHub's own
+ * pinned repos > top-starred. `limit` defaults to 4 — the max a builder can
+ * pin — so the public profile always has room to show every pin they chose.
+ */
 export function selectFeaturedRepositories<
-  T extends { isPinned: boolean; stargazersCount: number },
->(repos: T[], limit = 6): T[] {
-  const pinned = repos.filter((repo) => repo.isPinned);
-  if (pinned.length > 0) {
-    return pinned.slice(0, limit);
+  T extends { fullName: string; isPinned: boolean; stargazersCount: number },
+>(repos: T[], pinnedRepoFullNames: string[] = [], limit = 4): T[] {
+  if (pinnedRepoFullNames.length > 0) {
+    const byFullName = new Map(repos.map((repo) => [repo.fullName, repo]));
+    const ordered = pinnedRepoFullNames
+      .map((fullName) => byFullName.get(fullName))
+      .filter((repo): repo is T => Boolean(repo));
+    if (ordered.length > 0) {
+      return ordered.slice(0, limit);
+    }
+  }
+
+  const githubPinned = repos.filter((repo) => repo.isPinned);
+  if (githubPinned.length > 0) {
+    return githubPinned.slice(0, limit);
   }
   return [...repos]
     .sort((a, b) => b.stargazersCount - a.stargazersCount)
     .slice(0, limit);
 }
+
+/**
+ * Which owned repo (if any) is worth a "Maintainer of X" badge — an owned
+ * repo with a real outside signal (forked or starred by people who aren't
+ * the builder), not just any personal project. Synced repo metadata only,
+ * no extra GitHub calls.
+ */
+export function selectMaintainerBadge<
+  T extends {
+    fullName: string;
+    name: string;
+    forksCount: number;
+    stargazersCount: number;
+    isFork: boolean;
+  },
+>(repos: T[], githubLogin: string): { name: string; fullName: string } | null {
+  const loginPrefix = `${githubLogin.toLowerCase()}/`;
+  const ownedWithOutsideSignal = repos.filter(
+    (repo) =>
+      !repo.isFork &&
+      repo.fullName.toLowerCase().startsWith(loginPrefix) &&
+      (repo.forksCount > 0 || repo.stargazersCount >= 3),
+  );
+
+  if (ownedWithOutsideSignal.length === 0) return null;
+
+  const [top] = [...ownedWithOutsideSignal].sort(
+    (a, b) =>
+      b.forksCount + b.stargazersCount - (a.forksCount + a.stargazersCount) ||
+      a.name.localeCompare(b.name),
+  );
+
+  return { name: top.name, fullName: top.fullName };
+}
+
+// Lower rank sorts first — external contributions are the strongest open
+// source signal, so they lead the curated highlights list regardless of
+// review-comment count.
+const ROLE_SORT_RANK: Record<PullRequestContributorRole, number> = {
+  external: 0,
+  maintainer: 1,
+  self: 2,
+};
 
 export function selectMergedPrHighlights<
   T extends {
@@ -44,13 +104,16 @@ export function selectMergedPrHighlights<
     reviewComments: number;
     mergedAt: string | null;
     title: string;
+    role: PullRequestContributorRole;
   },
->(items: T[], limit = 6): T[] {
+>(items: T[], limit = 5): T[] {
   const seenTitles = new Set<string>();
 
   return items
     .filter((item) => item.merged)
     .sort((a, b) => {
+      const roleDiff = ROLE_SORT_RANK[a.role] - ROLE_SORT_RANK[b.role];
+      if (roleDiff !== 0) return roleDiff;
       if (b.reviewComments !== a.reviewComments) {
         return b.reviewComments - a.reviewComments;
       }

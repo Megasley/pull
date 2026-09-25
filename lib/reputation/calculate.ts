@@ -23,7 +23,11 @@ const FACTOR_COPY: Record<ReputationFactorId, { label: string; description: stri
   {
     merged_pull_requests: {
       label: "Merged pull requests",
-      description: "PRs accepted into other projects.",
+      // Counts merges across all synced repos, including the builder's own
+      // — it is not limited to external contributions. See
+      // lib/portfolio/pr-role.ts and the "External" PR tag on the public
+      // profile for the external-only signal.
+      description: "Pull requests merged across your repositories.",
     },
     maintainer_reviews: {
       label: "Maintainer reviews",

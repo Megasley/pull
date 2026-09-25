@@ -25,20 +25,47 @@ import { ReputationPanel } from "@/components/reputation/reputation-panel";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { countryFlagEmoji, getCountryInfo } from "@/lib/geo/countries";
+import { openToCtaLabel, shouldShowOpenToCta } from "@/lib/profile/open-to";
 import {
   buildPublicReputationSummary,
+  REPUTATION_EXPLAINER,
   withPublicReputationCopy,
 } from "@/lib/reputation";
 import {
+  BUILDER_SCORE_EXPLAINER,
   buildPublicBuilderScoreSummary,
   withPublicBuilderScoreCopy,
 } from "@/lib/score";
+import { STRENGTH_LABEL, strengthFromNormalized } from "@/lib/scoring/normalize";
 import { siteConfig } from "@/lib/site-config";
 import type { PublicBuilderProfileData } from "@/types/profile";
 
 type PublicBuilderProfileProps = {
   data: PublicBuilderProfileData;
 };
+
+/** Header score badge: tier leading, number secondary — "Strong Builder
+ *  Score · 60/100" reads as progress to an outsider in a way "Builder score
+ *  15/100" next to "Level 8" does not. */
+function ScoreBadge({
+  label,
+  score,
+  explainer,
+}: {
+  label: string;
+  score: number;
+  explainer: string;
+}) {
+  const tier = strengthFromNormalized(score / 100);
+  return (
+    <span className="profile-badge profile-badge-accent" title={explainer}>
+      {STRENGTH_LABEL[tier]}
+      <span className="ml-1 font-normal opacity-70">
+        {label} · {score}/100
+      </span>
+    </span>
+  );
+}
 
 export function PublicBuilderProfile({ data }: PublicBuilderProfileProps) {
   const {
@@ -58,6 +85,7 @@ export function PublicBuilderProfile({ data }: PublicBuilderProfileProps) {
     activity,
     contributionMix,
     partnerOrigin,
+    maintainerBadge,
     isOwner,
   } = data;
 
@@ -72,6 +100,10 @@ export function PublicBuilderProfile({ data }: PublicBuilderProfileProps) {
   const countryName = getCountryInfo(profile.country)?.name ?? null;
   const profileUrl = `${siteConfig.url}/u/${profile.username}`;
   const githubUrl = `https://github.com/${profile.githubUsername}`;
+  // Best available way to reach out, in order — email is private and never
+  // shown here (see types/user.ts:PublicBuilderProfile).
+  const contactHref = profile.website ?? profile.linkedinUrl ?? profile.twitterUrl ?? githubUrl;
+  const openToCta = shouldShowOpenToCta(profile.openTo) ? profile.openTo : null;
   const publicBuilderScore = withPublicBuilderScoreCopy(builderScore);
   const publicReputation = withPublicReputationCopy(reputation);
   const publicBuilderSummary = buildPublicBuilderScoreSummary(publicBuilderScore);
@@ -123,6 +155,16 @@ export function PublicBuilderProfile({ data }: PublicBuilderProfileProps) {
             <ProfileActivityStrip activity={activity} />
 
             <div className="mt-4 flex flex-wrap justify-center gap-2 sm:justify-start">
+              {maintainerBadge ? (
+                <a
+                  href={`https://github.com/${maintainerBadge.fullName}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="profile-badge"
+                >
+                  Maintainer of {maintainerBadge.name}
+                </a>
+              ) : null}
               {partnerOrigin ? (
                 <Link
                   href={`/ecosystem/partners/${partnerOrigin.slug}`}
@@ -133,25 +175,33 @@ export function PublicBuilderProfile({ data }: PublicBuilderProfileProps) {
               ) : null}
               {partnerOrigin ? (
                 <>
-                  <span className="profile-badge profile-badge-accent">
-                    OSS reputation {reputation.score}
-                  </span>
+                  <ScoreBadge
+                    label="OSS Reputation"
+                    score={reputation.score}
+                    explainer={REPUTATION_EXPLAINER}
+                  />
                   {builderScore.score > 0 ? (
-                    <span className="profile-badge profile-badge-accent">
-                      Builder score {builderScore.score}
-                    </span>
+                    <ScoreBadge
+                      label="Builder Score"
+                      score={builderScore.score}
+                      explainer={BUILDER_SCORE_EXPLAINER}
+                    />
                   ) : null}
                 </>
               ) : (
                 <>
                   {builderScore.score > 0 ? (
-                    <span className="profile-badge profile-badge-accent">
-                      Builder score {builderScore.score}
-                    </span>
+                    <ScoreBadge
+                      label="Builder Score"
+                      score={builderScore.score}
+                      explainer={BUILDER_SCORE_EXPLAINER}
+                    />
                   ) : null}
-                  <span className="profile-badge profile-badge-accent">
-                    OSS reputation {reputation.score}
-                  </span>
+                  <ScoreBadge
+                    label="OSS Reputation"
+                    score={reputation.score}
+                    explainer={REPUTATION_EXPLAINER}
+                  />
                 </>
               )}
               <span className="profile-badge profile-badge-level">
@@ -187,6 +237,14 @@ export function PublicBuilderProfile({ data }: PublicBuilderProfileProps) {
           </div>
 
           <div className="profile-actions">
+            {openToCta ? (
+              <Button asChild className="profile-open-to-cta w-full sm:w-auto">
+                <a href={contactHref} target="_blank" rel="noopener noreferrer">
+                  {openToCtaLabel(openToCta)}
+                  <ExternalLinkIcon className="size-3.5" />
+                </a>
+              </Button>
+            ) : null}
             {isOwner ? (
               <Button asChild variant="outline" className="w-full sm:w-auto">
                 <Link href="/settings/profile">Edit portfolio</Link>

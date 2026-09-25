@@ -11,6 +11,11 @@ function topFactor(factors: BuilderScoreFactor[]) {
 const WHAT_IT_MEASURES =
   "Tracks learning and shipping on Pull: roadmaps, projects, approvals, and community reviews.";
 
+/** Short, standalone explainer for a hover tooltip on the score itself —
+ *  distinct from buildPublicBuilderScoreSummary, which also reacts to the
+ *  current score band. See components/score/builder-score-panel.tsx. */
+export const BUILDER_SCORE_EXPLAINER = WHAT_IT_MEASURES;
+
 const PUBLIC_FACTOR_DESCRIPTIONS: Partial<Record<BuilderScoreFactorId, string>> = {
   projects_completed: "Hands-on project work finished across roadmaps.",
 };

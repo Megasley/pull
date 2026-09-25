@@ -1,4 +1,5 @@
 import { inferContributionType } from "@/lib/github/contribution-type";
+import { classifyPullRequest } from "@/lib/portfolio/pr-role";
 import type {
   GithubPullRequestRecord,
   GithubReviewedPullRequestRecord,
@@ -63,7 +64,15 @@ export function resolvePortfolioStatus(
   return "closed";
 }
 
-export function toPortfolioItem(pr: GithubPullRequestRecord): PullRequestPortfolioItem {
+/** Empty by default so existing call sites that don't have a repo list yet
+ *  (e.g. reputation gathering) still get a valid item — everything not
+ *  known to be maintained just falls through to "external" alongside "self". */
+const NO_MAINTAINED_REPOS: ReadonlySet<string> = new Set();
+
+export function toPortfolioItem(
+  pr: GithubPullRequestRecord,
+  maintainedRepoFullNames: ReadonlySet<string> = NO_MAINTAINED_REPOS,
+): PullRequestPortfolioItem {
   const labels = pr.labels ?? [];
   const contributionType =
     (pr.contributionType as ContributionType) ||
@@ -96,6 +105,7 @@ export function toPortfolioItem(pr: GithubPullRequestRecord): PullRequestPortfol
     ].includes(contributionType)
       ? contributionType
       : inferContributionType(pr.title, labels),
+    role: classifyPullRequest(pr, { maintainedRepoFullNames }),
   };
 }
 

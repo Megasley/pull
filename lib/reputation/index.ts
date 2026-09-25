@@ -14,4 +14,5 @@ export {
 export {
   buildPublicReputationSummary,
   withPublicReputationCopy,
+  REPUTATION_EXPLAINER,
 } from "./public-summary";
