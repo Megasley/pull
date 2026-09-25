@@ -7,6 +7,7 @@ import {
   moderationBlockedMessage,
   requireActiveAccount,
 } from "@/lib/auth/require-active-account";
+import { listGithubRepositories } from "@/lib/github/store";
 import { updateBuilderProfileFields } from "@/lib/profile/repository";
 import { validateProfileEditInput } from "@/lib/profile/validate";
 import { getBuilderProfile } from "@/lib/auth/ensure-builder-profile";
@@ -34,6 +35,8 @@ export async function updatePublicProfileAction(formData: FormData) {
     listedInDirectory: formData.get("listedInDirectory"),
     country: formData.has("country") ? formData.get("country") : undefined,
     showCountryPublicly: formData.get("showCountryPublicly"),
+    openTo: formData.get("openTo"),
+    pinnedRepos: formData.getAll("pinnedRepos").map(String),
   });
 
   if (!validation.ok) {
@@ -44,7 +47,19 @@ export async function updatePublicProfileAction(formData: FormData) {
     };
   }
 
-  const updated = await updateBuilderProfileFields(gate.profile.id, validation.data);
+  // A pin can only point at a repo Pull has actually synced for this
+  // builder — the settings UI only offers those as choices, but re-check
+  // server-side since sync state can shift between page load and submit.
+  const syncedRepos = await listGithubRepositories(gate.profile.id, { limit: 30 });
+  const syncedRepoNames = new Set(syncedRepos.map((repo) => repo.fullName));
+  const pinnedRepos = validation.data.pinnedRepos.filter((fullName) =>
+    syncedRepoNames.has(fullName),
+  );
+
+  const updated = await updateBuilderProfileFields(gate.profile.id, {
+    ...validation.data,
+    pinnedRepos,
+  });
 
   if (!updated) {
     return {

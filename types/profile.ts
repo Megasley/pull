@@ -14,6 +14,9 @@ export type PublicContributionStats = {
   projectsApproved: number;
   achievementsUnlocked: number;
   mergedPullRequests: number;
+  /** Merged PRs into repos the builder doesn't own or maintain — see
+   *  lib/portfolio/pr-role.ts. The strongest open source signal. */
+  externalMergedPullRequests: number;
   repositories: number;
   uniqueContributionRepos: number;
   languagesUsed: number;
@@ -27,6 +30,7 @@ export type PublicCompletedProject = {
   completedAt: string | null;
   submissionStatus?: string | null;
   repoUrl?: string | null;
+  liveDemoUrl?: string | null;
 };
 
 export type PortfolioTechnology = {
@@ -78,5 +82,8 @@ export type PublicBuilderProfileData = {
   activity: PublicProfileActivity;
   contributionMix: PublicContributionMix;
   partnerOrigin: { slug: string; name: string } | null;
+  /** Set when the builder owns a repo with real outside signal (forks or
+   *  stars) — see lib/profile/portfolio.ts:selectMaintainerBadge. */
+  maintainerBadge: { name: string; fullName: string } | null;
   isOwner: boolean;
 };

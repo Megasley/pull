@@ -11,6 +11,11 @@ function topFactor(factors: ReputationFactor[]) {
 const WHAT_IT_MEASURES =
   "Tracks open source impact on GitHub: merged PRs, reviews, repo diversity, and active months.";
 
+/** Short, standalone explainer for a hover tooltip on the score itself —
+ *  distinct from buildPublicReputationSummary, which also reacts to the
+ *  current score band. See components/reputation/reputation-panel.tsx. */
+export const REPUTATION_EXPLAINER = WHAT_IT_MEASURES;
+
 const PUBLIC_FACTOR_DESCRIPTIONS: Partial<Record<ReputationFactorId, string>> = {
   maintainer_reviews: "Review and discussion engagement on merged pull requests.",
   repository_diversity: "Distinct repositories merged into.",

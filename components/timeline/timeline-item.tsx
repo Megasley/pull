@@ -12,6 +12,10 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { TIMELINE_TYPE_SINGULAR } from "@/lib/timeline/filter";
+import {
+  normalizePrTitleForDisplay,
+  truncateOnWordBoundary,
+} from "@/lib/portfolio/pr-title";
 import { cn } from "@/lib/utils";
 import type { TimelineEvent, TimelineEventType } from "@/types/timeline";
 
@@ -76,6 +80,13 @@ export function TimelineItem({
 }: TimelineItemProps) {
   const Icon = TYPE_ICON[event.type];
   const time = formatEventTimestamp(event.occurredAt);
+  // Only "merged" events carry a raw GitHub PR title (see
+  // lib/timeline/build.ts) — every other event type is already
+  // Pull-authored copy, so it doesn't need branch-name cleanup.
+  const displayTitle =
+    event.type === "merged"
+      ? truncateOnWordBoundary(normalizePrTitleForDisplay(event.title), 70)
+      : event.title;
 
   if (profile) {
     const content = (
@@ -91,8 +102,8 @@ export function TimelineItem({
             {event.meta ? ` · ${event.meta}` : ""}
             {time ? ` · ${time}` : ""}
           </p>
-          <p className="text-[13.5px] font-semibold">
-            {event.title}
+          <p className="text-[13.5px] font-semibold" title={event.title}>
+            {displayTitle}
             {groupCount && groupCount > 1 ? (
               <span className="profile-tl-group-count">×{groupCount}</span>
             ) : null}
@@ -149,7 +160,9 @@ export function TimelineItem({
             <CheckCircleIcon className="size-3.5 text-ink" />
           ) : null}
         </div>
-        <p className="mt-1 truncate text-sm font-medium">{event.title}</p>
+        <p className="mt-1 truncate text-sm font-medium" title={event.title}>
+          {displayTitle}
+        </p>
         <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
           {event.description}
         </p>

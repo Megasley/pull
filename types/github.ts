@@ -58,6 +58,9 @@ export type GithubPullRequestRecord = {
   deletions: number;
   reviewComments: number;
   contributionType: string;
+  /** True when the PR's repo owner is the contributor's own GitHub login.
+   *  See lib/db/schema/github.ts:githubPullRequests.isOwnRepo. */
+  isOwnRepo: boolean;
 };
 
 export type GithubReviewedPullRequestRecord = {

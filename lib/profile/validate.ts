@@ -1,6 +1,30 @@
 import { parseSkillsInput } from "@/lib/profile/portfolio";
 import { normalizeLookingFor, type LookingForId } from "@/lib/builders/looking-for";
 import { isKnownCountryCode } from "@/lib/geo/countries";
+import { isOpenToStatus, type OpenToStatus } from "@/lib/profile/open-to";
+
+const MAX_BIO_LENGTH = 280;
+const MAX_PINNED_REPOS = 4;
+
+/** Dedupe and cap at MAX_PINNED_REPOS, preserving the submitted order —
+ *  order is the builder's own display choice. Cross-checking against their
+ *  actual synced repos happens server-side, where the repo list is
+ *  available (this module stays pure / dependency-free). */
+function normalizePinnedRepos(value: string[] | string | undefined): string[] {
+  const raw = Array.isArray(value) ? value : typeof value === "string" ? [value] : [];
+  const seen = new Set<string>();
+  const result: string[] = [];
+
+  for (const entry of raw) {
+    const fullName = entry.trim();
+    if (!fullName || seen.has(fullName)) continue;
+    seen.add(fullName);
+    result.push(fullName);
+    if (result.length >= MAX_PINNED_REPOS) break;
+  }
+
+  return result;
+}
 
 function isHttpUrl(value: string): boolean {
   try {
@@ -38,6 +62,8 @@ export type ProfileEditValidation =
         /** undefined = leave unchanged; null = user cleared it. */
         country?: string | null;
         showCountryPublicly: boolean;
+        openTo: OpenToStatus | null;
+        pinnedRepos: string[];
       };
     }
   | { ok: false; error: string };
@@ -55,6 +81,8 @@ export function validateProfileEditInput(input: {
   /** Absent = field not submitted, leave unchanged. Empty string = cleared. */
   country?: FormDataEntryValue | null;
   showCountryPublicly?: FormDataEntryValue | null;
+  openTo?: FormDataEntryValue | null;
+  pinnedRepos?: string[] | string;
 }): ProfileEditValidation {
   const displayName = input.displayName?.trim() ?? "";
   const bio = input.bio?.trim() ?? "";
@@ -78,8 +106,8 @@ export function validateProfileEditInput(input: {
     return { ok: false, error: "Display name must be between 2 and 80 characters." };
   }
 
-  if (bio.length > 500) {
-    return { ok: false, error: "Bio must be 500 characters or fewer." };
+  if (bio.length > MAX_BIO_LENGTH) {
+    return { ok: false, error: `Bio must be ${MAX_BIO_LENGTH} characters or fewer.` };
   }
 
   for (const [label, value] of [
@@ -112,6 +140,17 @@ export function validateProfileEditInput(input: {
   const showCountryPublicly =
     country === null ? false : parseCheckbox(input.showCountryPublicly);
 
+  const rawOpenTo = typeof input.openTo === "string" ? input.openTo.trim() : "";
+  let openTo: OpenToStatus | null = null;
+  if (rawOpenTo) {
+    if (!isOpenToStatus(rawOpenTo)) {
+      return { ok: false, error: "Please choose a valid \"Open to\" status." };
+    }
+    openTo = rawOpenTo;
+  }
+
+  const pinnedRepos = normalizePinnedRepos(input.pinnedRepos);
+
   return {
     ok: true,
     data: {
@@ -126,6 +165,8 @@ export function validateProfileEditInput(input: {
       listedInDirectory,
       country,
       showCountryPublicly,
+      openTo,
+      pinnedRepos,
     },
   };
 }

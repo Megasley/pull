@@ -59,7 +59,7 @@ export async function gatherReputationInputs(userId: string): Promise<{
     countCodeReviews(userId),
   ]);
 
-  const portfolio = pullRequests.map(toPortfolioItem);
+  const portfolio = pullRequests.map((pr) => toPortfolioItem(pr));
   const merged = portfolio.filter((item) => item.merged);
   const uniqueRepos = new Set(merged.map((item) => item.repoFullName));
   const documentationContributions = merged.filter(

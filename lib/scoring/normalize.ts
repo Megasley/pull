@@ -12,6 +12,16 @@ export function saturate(
 
 export type ScoringStrength = "emerging" | "building" | "strong" | "exceptional";
 
+/** Shared display copy for a ScoringStrength tier — used anywhere a score
+ *  (Builder Score, OSS Reputation, or a single factor) needs a human label,
+ *  e.g. the public profile header badges. */
+export const STRENGTH_LABEL: Record<ScoringStrength, string> = {
+  emerging: "Emerging",
+  building: "Building",
+  strong: "Strong",
+  exceptional: "Exceptional",
+};
+
 export function strengthFromNormalized(normalized: number): ScoringStrength {
   if (normalized >= 0.85) return "exceptional";
   if (normalized >= 0.55) return "strong";

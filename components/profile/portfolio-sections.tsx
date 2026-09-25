@@ -12,6 +12,11 @@ import type { GithubRepositoryRecord } from "@/types/github";
 import type { PublicCompletedProject } from "@/types/profile";
 import type { PullRequestPortfolioItem } from "@/types/portfolio";
 import { CONTRIBUTION_TYPE_LABEL } from "@/lib/portfolio/filter";
+import { PR_ROLE_LABEL } from "@/lib/portfolio/pr-role";
+import {
+  normalizePrTitleForDisplay,
+  truncateOnWordBoundary,
+} from "@/lib/portfolio/pr-title";
 import { groupTimelineEvents } from "@/lib/profile/group-timeline";
 import type { GroupedTimelineEvent } from "@/lib/profile/group-timeline";
 import { TimelineItem } from "@/components/timeline/timeline-item";
@@ -159,7 +164,7 @@ export function FeaturedRepositoriesSection({
 }) {
   return (
     <PortfolioSection
-      title={profile ? "Featured repository" : "Featured repositories"}
+      title="Featured repositories"
       description={
         profile
           ? undefined
@@ -181,8 +186,8 @@ export function FeaturedRepositoriesSection({
           </p>
         )
       ) : (
-        <ul className={cn(profile ? "space-y-3" : "grid gap-3 md:grid-cols-2")}>
-          {repositories.slice(0, profile ? 1 : repositories.length).map((repo) => (
+        <ul className={cn(profile ? "grid gap-3 sm:grid-cols-2" : "grid gap-3 md:grid-cols-2")}>
+          {repositories.map((repo) => (
             <li key={repo.id}>
               <a
                 href={repo.htmlUrl}
@@ -237,11 +242,18 @@ export function FeaturedRepositoriesSection({
                       <Badge variant="secondary">Pinned</Badge>
                     )
                   ) : null}
-                  {!profile ? (
-                    <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                      <StarIcon className="size-3" />
-                      {repo.stargazersCount}
-                    </span>
+                  {repo.stargazersCount > 0 ? (
+                    profile ? (
+                      <span className="profile-tech-tag inline-flex items-center gap-1">
+                        <StarIcon className="size-3" />
+                        {repo.stargazersCount}
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                        <StarIcon className="size-3" />
+                        {repo.stargazersCount}
+                      </span>
+                    )
                   ) : null}
                 </div>
               </a>
@@ -252,6 +264,16 @@ export function FeaturedRepositoriesSection({
     </PortfolioSection>
   );
 }
+
+// Only the statuses Featured projects ever receives (see
+// lib/profile/repository.ts:listSubmissionsForUser — draft and rejected are
+// excluded before this component ever sees a project).
+const SUBMISSION_STATUS_LABEL: Record<string, string> = {
+  approved: "Approved",
+  submitted: "Submitted",
+  under_review: "In progress",
+  needs_changes: "In progress",
+};
 
 export function FeaturedProjectsSection({
   projects,
@@ -281,37 +303,80 @@ export function FeaturedProjectsSection({
         )
       ) : (
         <ul className="space-y-3">
-          {projects.map((project) => (
-            <li
-              key={project.projectSlug}
-              className={cn(
-                profile
-                  ? "profile-repo-card flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
-                  : "flex flex-col gap-3 rounded-none border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between",
-              )}
-            >
-              <div>
-                <p className="font-medium">{project.title}</p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {project.projectSlug}
-                  {project.submissionStatus ? ` · ${project.submissionStatus}` : ""}
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <Button asChild variant="outline" size="sm">
-                  <Link href={`/projects/${project.projectSlug}`}>Project</Link>
-                </Button>
-                {project.repoUrl ? (
-                  <Button asChild variant="outline" size="sm">
-                    <a href={project.repoUrl} target="_blank" rel="noopener noreferrer">
-                      Repo
-                      <ExternalLinkIcon className="size-3.5" />
-                    </a>
+          {projects.map((project) => {
+            const statusLabel = project.submissionStatus
+              ? (SUBMISSION_STATUS_LABEL[project.submissionStatus] ?? null)
+              : null;
+            // The builder's own work is the primary action when they have
+            // it — a repo over a live demo, since a demo can go stale but
+            // the repo is the durable artifact. The Pull project brief is
+            // always available as a secondary link.
+            const primaryLink = project.repoUrl
+              ? { href: project.repoUrl, label: "View repo" }
+              : project.liveDemoUrl
+                ? { href: project.liveDemoUrl, label: "Live demo" }
+                : null;
+
+            return (
+              <li
+                key={project.projectSlug}
+                className={cn(
+                  profile
+                    ? "profile-repo-card flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+                    : "flex flex-col gap-3 rounded-none border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between",
+                )}
+              >
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="font-medium">{project.title}</p>
+                    {statusLabel ? (
+                      profile ? (
+                        <span className="profile-tech-tag text-[10px]">
+                          {statusLabel}
+                        </span>
+                      ) : (
+                        <Badge variant="outline">{statusLabel}</Badge>
+                      )
+                    ) : null}
+                  </div>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {project.projectSlug}
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {primaryLink ? (
+                    <Button asChild size="sm">
+                      <a href={primaryLink.href} target="_blank" rel="noopener noreferrer">
+                        {primaryLink.label}
+                        <ExternalLinkIcon className="size-3.5" />
+                      </a>
+                    </Button>
+                  ) : null}
+                  <Button
+                    asChild
+                    variant="outline"
+                    size="sm"
+                  >
+                    <Link href={`/projects/${project.projectSlug}`}>
+                      {primaryLink ? "Brief" : "Project"}
+                    </Link>
                   </Button>
-                ) : null}
-              </div>
-            </li>
-          ))}
+                  {primaryLink?.label === "View repo" && project.liveDemoUrl ? (
+                    <Button asChild variant="outline" size="sm">
+                      <a
+                        href={project.liveDemoUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Live demo
+                        <ExternalLinkIcon className="size-3.5" />
+                      </a>
+                    </Button>
+                  ) : null}
+                </div>
+              </li>
+            );
+          })}
         </ul>
       )}
     </PortfolioSection>
@@ -385,18 +450,31 @@ export function MergedPrHighlightsSection({
                         {CONTRIBUTION_TYPE_LABEL[item.contributionType]}
                       </Badge>
                     )}
+                    {PR_ROLE_LABEL[item.role] ? (
+                      profile ? (
+                        <span className="profile-tech-tag text-[10px]">
+                          {PR_ROLE_LABEL[item.role]}
+                        </span>
+                      ) : (
+                        <Badge variant="outline">{PR_ROLE_LABEL[item.role]}</Badge>
+                      )
+                    ) : null}
                     {!profile && item.language ? (
                       <Badge variant="outline">{item.language}</Badge>
                     ) : null}
                   </div>
                   <p
+                    title={item.title}
                     className={cn(
                       profile
                         ? "text-[14.5px] font-bold group-hover:underline"
-                        : "mt-2 truncate text-sm font-medium group-hover:underline",
+                        : "mt-2 text-sm font-medium group-hover:underline",
                     )}
                   >
-                    {item.title}
+                    {truncateOnWordBoundary(
+                      normalizePrTitleForDisplay(item.title),
+                      profile ? 70 : 90,
+                    )}
                   </p>
                   <p
                     className={cn(
@@ -418,6 +496,11 @@ export function MergedPrHighlightsSection({
   );
 }
 
+// Enough to show real recent activity without the section dominating the
+// page — everything past this sits behind "Show more" (native <details>,
+// no client JS needed).
+const TIMELINE_VISIBLE_COUNT = 6;
+
 export function PublicTimelineSection({
   events,
   profile = false,
@@ -428,6 +511,10 @@ export function PublicTimelineSection({
   const displayEvents: GroupedTimelineEvent[] = profile
     ? groupTimelineEvents(events)
     : events;
+  const visibleEvents = profile
+    ? displayEvents.slice(0, TIMELINE_VISIBLE_COUNT)
+    : displayEvents;
+  const moreEvents = profile ? displayEvents.slice(TIMELINE_VISIBLE_COUNT) : [];
 
   return (
     <PortfolioSection
@@ -445,18 +532,39 @@ export function PublicTimelineSection({
           <p className="text-sm text-muted-foreground">No public activity yet.</p>
         )
       ) : (
-        <ul className={profile ? undefined : "space-y-2"}>
-          {displayEvents.map((event, index) => (
-            <li key={event.id}>
-              <TimelineItem
-                event={event}
-                index={index}
-                profile={profile}
-                groupCount={event.groupCount}
-              />
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul className={profile ? undefined : "space-y-2"}>
+            {visibleEvents.map((event, index) => (
+              <li key={event.id}>
+                <TimelineItem
+                  event={event}
+                  index={index}
+                  profile={profile}
+                  groupCount={event.groupCount}
+                />
+              </li>
+            ))}
+          </ul>
+          {moreEvents.length > 0 ? (
+            <details className="profile-tl-more">
+              <summary className="profile-tl-more-summary">
+                Show {moreEvents.length} more
+              </summary>
+              <ul>
+                {moreEvents.map((event, index) => (
+                  <li key={event.id}>
+                    <TimelineItem
+                      event={event}
+                      index={TIMELINE_VISIBLE_COUNT + index}
+                      profile={profile}
+                      groupCount={event.groupCount}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </details>
+          ) : null}
+        </>
       )}
     </PortfolioSection>
   );
@@ -468,6 +576,7 @@ export function ContributionStatsGrid({
 }: {
   stats: {
     mergedPullRequests: number;
+    externalMergedPullRequests?: number;
     repositories: number;
     languagesUsed: number;
     lessonsCompleted: number;
@@ -482,6 +591,7 @@ export function ContributionStatsGrid({
 }) {
   const profileItems = [
     { label: "Merged PRs", value: stats.mergedPullRequests },
+    { label: "External merges", value: stats.externalMergedPullRequests ?? 0 },
     { label: "Contribution repos", value: stats.uniqueContributionRepos ?? 0 },
     { label: "Roadmaps done", value: stats.roadmapsCompleted ?? 0 },
     { label: "Projects approved", value: stats.projectsApproved ?? 0 },
