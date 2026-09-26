@@ -438,5 +438,38 @@
     "tracks": ["lightning"],
     "recommendedLanguages": ["Rust"],
     "minLevel": 2
+  },
+  {
+    "id": "bitcoin-plain-talk",
+    "name": "Bitcoin Plain Talk",
+    "repository": "btc-plain-talk/bitcoin-plain-talk",
+    "description": "Open-source Bitcoin glossary in plain language, translated into African languages and turned into open training data for African-language AI.",
+    "url": "https://github.com/btc-plain-talk/bitcoin-plain-talk",
+    "issuesUrl": "https://github.com/btc-plain-talk/bitcoin-plain-talk/labels/good%20first%20issue",
+    "maintainer": "Wandia Mugo",
+    "language": "TypeScript",
+    "topics": [
+      "education",
+      "documentation",
+      "glossary",
+      "translation",
+      "africa",
+      "bitcoin",
+      "lightning",
+      "ai",
+      "nlp",
+      "datasets"
+    ],
+    "labels": ["good first issue", "help wanted", "translation", "content", "ai"],
+    "difficulty": "beginner",
+    "estimatedDifficulty": "Easy - translations need no code; dataset and model work for ML contributors",
+    "goodFirstIssues": 15,
+    "helpWanted": 8,
+    "averageReviewDays": 2,
+    "health": "good",
+    "size": "small",
+    "tracks": ["bitcoin"],
+    "recommendedLanguages": ["TypeScript", "Python"],
+    "minLevel": 1
   }
 ]
