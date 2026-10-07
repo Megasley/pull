@@ -21,11 +21,7 @@ export function ReplyComposer({ threadId }: ReplyComposerProps) {
     draftKeySuffix({ kind: "reply", threadId }),
   );
 
-  // Auto-open the composer once when a saved draft is present (e.g. after
-  // a page refresh), so the user sees their unfinished reply instead of a
-  // collapsed "Reply" button. Uses render-phase setState — the React-
-  // blessed pattern for adjusting state based on external store values,
-  // which does not trigger the set-state-in-effect lint rule.
+  // Auto-open when a saved draft exists (e.g. after refresh).
   const [autoOpened, setAutoOpened] = useState(false);
   if (!autoOpened && body.trim().length > 0 && !open) {
     setAutoOpened(true);
@@ -91,7 +87,7 @@ export function ReplyComposer({ threadId }: ReplyComposerProps) {
           disabled={pending}
           onClick={() => {
             setOpen(false);
-            setBody("");
+            setError(null);
             clearDraft();
           }}
         >

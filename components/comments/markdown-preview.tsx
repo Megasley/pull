@@ -3,6 +3,7 @@
 import { memo } from "react";
 import ReactMarkdown from "react-markdown";
 import type { Components } from "react-markdown";
+import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 
@@ -11,35 +12,32 @@ import { cn } from "@/lib/utils";
 
 import "@/styles/comment-markdown.css";
 
-/**
- * Safe URL allowlist — react-markdown's default urlTransform already blocks
- * javascript:, data:, vbscript: protocols. This narrows further to only the
- * schemes that make sense for comment content, rejecting everything else
- * (including file:, blob:, custom-scheme handlers, etc).
- */
+/** URL protocol allowlist for comment content. */
 const SAFE_PROTOCOLS = new Set(["http:", "https:", "mailto:"]);
 
 function sanitizeUrl(url: string | undefined): string | undefined {
   if (!url) return undefined;
+
+  // Relative URLs are safe without a base.
+  if (url.startsWith("/") || url.startsWith("#")) {
+    return url;
+  }
+
+  // Absolute URLs — no window access, works on server and client.
   try {
-    const parsed = new URL(url, window.location.origin);
+    const parsed = new URL(url);
     if (SAFE_PROTOCOLS.has(parsed.protocol)) {
       return parsed.href;
     }
   } catch {
-    // Relative URLs are safe; everything else is dropped
-    if (url.startsWith("/") || url.startsWith("#")) {
-      return url;
-    }
+    // Invalid URL — drop it.
   }
   return undefined;
 }
 
 const components: Components = {
-  // Code blocks: delegate to the copyable/collapsible CodeBlock wrapper.
-  // react-markdown renders fenced code as <pre><code class="language-xxx">.
+  // Unwrap <code> child to extract its className (language hint).
   pre: ({ children }) => {
-    // Unwrap the <code> child to extract its className (language hint)
     const child = Array.isArray(children) ? children[0] : children;
     if (child && typeof child === "object" && "props" in child) {
       const codeEl = child as React.ReactElement<{
@@ -75,7 +73,7 @@ const components: Components = {
   a: ({ href, children, ...props }) => {
     const safeHref = sanitizeUrl(href);
     if (!safeHref) {
-      // URL was rejected — render as plain text so the user still sees content
+      // URL rejected — render as plain text.
       return <>{children}</>;
     }
     return (
@@ -90,8 +88,7 @@ const components: Components = {
       </a>
     );
   },
-  // Disallow images entirely — comments are text-based discussions. Prevents
-  // SSRF, tracking pixels, and external-resource loading from user input.
+  // No images — prevents SSRF and tracking pixels.
   img: () => null,
   blockquote: ({ className, ...props }) => (
     <blockquote
@@ -147,19 +144,9 @@ type MarkdownPreviewProps = {
   className?: string;
 };
 
-/**
- * Renders user-supplied markdown safely:
- *
- * - react-markdown builds React elements from a markdown AST — it never uses
- *   dangerouslySetInnerHTML, so there is no XSS surface.
- * - rehype-raw is deliberately NOT included, so raw HTML in user input
- *   (<script>, <img onerror>, etc.) is silently ignored, not rendered.
- * - URL sanitization blocks all protocols except http/https/mailto plus
- *   relative paths.
- * - Images are disabled entirely.
- * - rehype-highlight adds syntax highlighting via CSS classes (operates on
- *   the HAST before React renders — no HTML string injection).
- */
+/** Safe markdown renderer: no dangerouslySetInnerHTML, no rehype-raw (raw
+ *  HTML is stripped), URL sanitization, images disabled, syntax highlighting
+ *  via CSS classes. remark-breaks preserves line breaks for legacy comments. */
 export const MarkdownPreview = memo(function MarkdownPreview({
   content,
   className,
@@ -171,7 +158,7 @@ export const MarkdownPreview = memo(function MarkdownPreview({
   return (
     <div className={cn("comment-markdown text-sm text-muted-foreground", className)}>
       <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
+        remarkPlugins={[remarkGfm, remarkBreaks]}
         rehypePlugins={[rehypeHighlight]}
         components={components}
         skipHtml

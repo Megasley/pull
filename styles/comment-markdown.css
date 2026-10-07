@@ -1,9 +1,4 @@
-/**
- * highlight.js theme for comment code blocks — matches the lesson MDX code
- * block colors (#0d1117 background, #e6edf3 foreground). Scoped to
- * .comment-markdown so it never collides with rehype-pretty-code (shiki)
- * styles used in lesson MDX content.
- */
+/* highlight.js theme for comment code blocks, scoped to .comment-markdown. */
 
 .comment-markdown .hljs {
   color: #e6edf3;

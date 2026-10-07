@@ -32,7 +32,7 @@ type MarkdownEditorProps = {
 type WrapInsert = {
   prefix: string;
   suffix: string;
-  /** Text to insert if the selection is empty (placeholder). */
+  /** Placeholder text for empty selection. */
   placeholder?: string;
 };
 
@@ -59,14 +59,15 @@ function prefixLines(
   end: number,
   opts: LineInsert,
 ): { text: string; selectionStart: number; selectionEnd: number } {
-  // Expand selection to line boundaries
+  // Expand to line boundaries.
   const lineStart = text.lastIndexOf("\n", start - 1) + 1;
-  const lineEnd = end < text.length && text[end] === "\n" ? end : end;
+  const nextBreak = text.indexOf("\n", end);
+  const lineEnd = nextBreak === -1 ? text.length : nextBreak;
 
   const block = text.slice(lineStart, lineEnd);
   const lines = block.split("\n");
   const prefixed = lines.map((line, i) => {
-    // For ordered lists, number each line
+    // Ordered lists: number each line.
     if (opts.prefix === "1. ") {
       return `${i + 1}. ${line}`;
     }
@@ -152,7 +153,7 @@ export function MarkdownEditor({
           const selected = value.slice(start, end) || "link text";
           const insert = `[${selected}](https://)`;
           const newText = value.slice(0, start) + insert + value.slice(end);
-          // Place cursor on the URL
+          // Place cursor on the URL.
           const urlStart = start + selected.length + 3;
           result = {
             text: newText,
@@ -177,7 +178,7 @@ export function MarkdownEditor({
           const selected = value.slice(start, end) || "code here";
           const insert = `\n\`\`\`ts\n${selected}\n\`\`\`\n`;
           const newText = value.slice(0, start) + insert + value.slice(end);
-          const codeStart = start + 6; // after ```ts\n
+          const codeStart = start + insert.indexOf("ts\n") + 3;
           result = {
             text: newText,
             selectionStart: codeStart,
@@ -191,7 +192,7 @@ export function MarkdownEditor({
 
       onChange(result.text);
 
-      // Restore selection after React re-renders
+      // Restore selection after re-render.
       requestAnimationFrame(() => {
         textarea.focus();
         textarea.setSelectionRange(result!.selectionStart, result!.selectionEnd);
@@ -201,22 +202,16 @@ export function MarkdownEditor({
   );
 
   function handlePaste(event: React.ClipboardEvent<HTMLTextAreaElement>) {
-    // Preserve formatting from pasted rich text: browsers put an HTML
-    // representation on the clipboard. We extract plain text which for
-    // code pastes preserves newlines/indentation — the user can then
-    // apply markdown formatting via the toolbar.
-    //
-    // If the user pastes markdown source (e.g. from another comment),
-    // it flows through as-is and renders correctly in preview.
+    // Convert rich-text clipboard HTML to markdown.
     const html = event.clipboardData.getData("text/html");
-    if (!html) return; // plain text paste — let the browser handle it
+    if (!html) return; // plain text paste — let browser handle it.
 
     event.preventDefault();
-    // Convert HTML to markdown-ish plain text: preserve line breaks
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = html;
+    // DOMParser creates an inert document — safe for hostile clipboard HTML.
+    const parsed = new DOMParser().parseFromString(html, "text/html");
+    const tempDiv = parsed.body;
 
-    // Convert <br> and block elements to newlines, <code> to backticks
+    // Convert elements to markdown.
     tempDiv.querySelectorAll("br").forEach((br) => br.replaceWith("\n"));
     tempDiv.querySelectorAll("p, div, li").forEach((el) => {
       el.append("\n");
@@ -273,7 +268,7 @@ export function MarkdownEditor({
   }
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
-    // Ctrl/Cmd+B for bold, Ctrl/Cmd+` for inline code, Ctrl/Cmd+K for link
+    // Ctrl/Cmd+B bold, +` code, +K link.
     if (!(event.ctrlKey || event.metaKey)) return;
     const key = event.key.toLowerCase();
     if (key === "b") {

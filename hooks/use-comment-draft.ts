@@ -10,16 +10,7 @@ import {
 const DRAFT_PREFIX = "comment-draft:";
 const DRAFT_EVENT = "pull:comment-draft";
 
-/**
- * Builds a stable storage key suffix unique to a comment composer location.
- *
- * - Questions: keyed by entity type + identifying slugs
- * - Replies: keyed by thread id
- * - Edits: keyed by comment id
- *
- * Two different users editing different roadmap steps, or the same user
- * editing a question vs. a reply, never collide.
- */
+/** Builds a unique storage key per composer location (question/reply/edit). */
 export function draftKeySuffix(
   location:
     | { kind: "question"; entityKey: string }
@@ -66,19 +57,8 @@ function subscribeToStorage(onStoreChange: () => void): () => void {
   };
 }
 
-/**
- * Persists a comment draft to localStorage so it survives page refreshes.
- *
- * Uses `useSyncExternalStore` to read the initial draft value — this is
- * React's built-in primitive for external stores, which handles SSR
- * hydration correctly without `setState`-in-`useEffect`.
- *
- * - On the server: returns the `initial` value (no localStorage access).
- * - On client hydration: returns the server value, then immediately
- *   re-renders with the stored draft if one exists.
- * - On every user edit: writes to localStorage immediately.
- * - `clearDraft` removes the entry — call after a successful post/reply/edit.
- */
+/** Persists a comment draft to localStorage via useSyncExternalStore.
+ *  clearDraft resets to the initial value — call after successful post. */
 export function useCommentDraft(
   keySuffix: string,
   initial: string = "",
@@ -99,12 +79,7 @@ export function useCommentDraft(
     getServerSnapshot,
   );
 
-  // Once the user starts typing, their edits take precedence over the
-  // stored value. `null` means "no manual edit yet — use stored/initial".
-  // Note: `||` (not `??`) is used between storedValue and initial because
-  // an empty string from localStorage (no draft saved) should fall through
-  // to the initial value. `editedValue` uses `??` because an empty string
-  // there means the user explicitly cleared the draft.
+  // editedValue takes precedence once the user types; null = use stored/initial.
   const [editedValue, setEditedValue] = useState<string | null>(null);
 
   const value = editedValue ?? (storedValue || initial);
@@ -118,7 +93,7 @@ export function useCommentDraft(
   );
 
   const clearDraft = useCallback(() => {
-    setEditedValue("");
+    setEditedValue(null);
     writePullLocalStorage(keySuffix, "");
     window.dispatchEvent(
       new CustomEvent(DRAFT_EVENT, {

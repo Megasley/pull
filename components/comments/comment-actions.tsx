@@ -13,14 +13,8 @@ type CommentActionsProps = {
   initialBody: string;
 };
 
-/** Edit/delete controls for a comment the viewer owns. Edit replaces this
- *  component with an inline MarkdownEditor (the surrounding body text stays
- *  as-is until the page refreshes with the saved copy); delete asks for
- *  confirmation inline rather than a native browser dialog.
- *
- *  Unsaved edit drafts persist to localStorage so a page refresh mid-edit
- *  doesn't lose work. The draft is cleared on save or cancel. When no draft
- *  exists, the hook falls back to `initialBody` automatically. */
+/** Edit/delete controls for a comment the viewer owns. Unsaved edit drafts
+ *  persist to localStorage and are cleared on save or cancel. */
 export function CommentActions({ commentId, initialBody }: CommentActionsProps) {
   const router = useRouter();
   const [mode, setMode] = useState<"idle" | "editing" | "confirm-delete">("idle");
@@ -85,7 +79,6 @@ export function CommentActions({ commentId, initialBody }: CommentActionsProps) 
             disabled={pending}
             onClick={() => {
               clearDraft();
-              setDraft(initialBody);
               setMode("idle");
               setError(null);
             }}
