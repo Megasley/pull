@@ -36,6 +36,10 @@ export async function compileLessonMdx(source: string) {
     components: mdxComponents,
     options: {
       mdxOptions,
+      // Lessons are reviewed repo content. Allow literal props such as
+      // options={["a", "b"]} for interactive blocks; dangerous JS stays blocked.
+      blockJS: false,
+      blockDangerousJS: true,
     },
   });
 }

@@ -3,8 +3,14 @@ import type { MDXComponents } from "mdx/types";
 import { cn } from "@/lib/utils";
 
 import { Callout } from "./callout";
+import { Check } from "./check";
+import { Explainer, Scene } from "./explainer";
 import { LessonImage } from "./lesson-image";
 import { Mermaid } from "./mermaid";
+import { Recap } from "./recap";
+import { Actor, Caption, Coin, Flow, Group, Pill, Stage } from "./scene-kit";
+import { Term } from "./term";
+import { TxJourney } from "./tx-journey";
 import { Video } from "./video";
 
 export const mdxComponents: MDXComponents = {
@@ -12,6 +18,20 @@ export const mdxComponents: MDXComponents = {
   Video,
   LessonImage,
   Mermaid,
+  // Interactive lesson blocks
+  Explainer,
+  Scene,
+  Stage,
+  Group,
+  Actor,
+  Flow,
+  Coin,
+  Pill,
+  Caption,
+  Check,
+  Term,
+  Recap,
+  TxJourney,
   h1: ({ className, ...props }) => (
     <h1
       className={cn(
