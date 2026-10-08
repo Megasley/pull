@@ -4,7 +4,13 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import { postQuestionAction } from "@/app/actions/comments";
+import { MarkdownEditor } from "@/components/comments/markdown-editor";
 import { Button } from "@/components/ui/button";
+import {
+  draftKeySuffix,
+  questionEntityKey,
+  useCommentDraft,
+} from "@/hooks/use-comment-draft";
 import type { CommentEntityInput } from "@/types/comments";
 
 type QuestionComposerProps = {
@@ -13,9 +19,11 @@ type QuestionComposerProps = {
 
 export function QuestionComposer({ entity }: QuestionComposerProps) {
   const router = useRouter();
-  const [body, setBody] = useState("");
-  const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+  const { value: body, setValue: setBody, clearDraft } = useCommentDraft(
+    draftKeySuffix({ kind: "question", entityKey: questionEntityKey(entity) }),
+  );
 
   function submit() {
     setError(null);
@@ -31,7 +39,7 @@ export function QuestionComposer({ entity }: QuestionComposerProps) {
         return;
       }
 
-      setBody("");
+      clearDraft();
       router.refresh();
     });
   }
@@ -41,14 +49,13 @@ export function QuestionComposer({ entity }: QuestionComposerProps) {
       <label htmlFor="qa-question-body" className="text-sm font-medium">
         Ask a question
       </label>
-      <textarea
+      <MarkdownEditor
         id="qa-question-body"
-        rows={3}
         value={body}
-        onChange={(event) => setBody(event.target.value)}
+        onChange={setBody}
         placeholder="Stuck on something here? Ask the community…"
+        rows={3}
         disabled={pending}
-        className="w-full rounded-none border border-border bg-transparent px-3 py-2 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
       />
       {error ? (
         <p
@@ -56,6 +63,11 @@ export function QuestionComposer({ entity }: QuestionComposerProps) {
           role="alert"
         >
           {error}
+        </p>
+      ) : null}
+      {body.trim() ? (
+        <p className="text-[11px] text-muted-foreground">
+          Draft saved automatically — it will be here if you refresh the page.
         </p>
       ) : null}
       <div className="flex justify-end">

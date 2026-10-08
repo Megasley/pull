@@ -1,11 +1,11 @@
 import { listThreadsForEntityAction } from "@/app/actions/comments";
 import { CommentActions } from "@/components/comments/comment-actions";
+import { MarkdownPreview } from "@/components/comments/markdown-preview";
 import { QuestionComposer } from "@/components/comments/question-composer";
 import { ReplyComposer } from "@/components/comments/reply-composer";
 import { ReplyList } from "@/components/comments/reply-list";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getCurrentUser } from "@/lib/auth/session";
-import { linkifyText } from "@/lib/comments/linkify";
 import type { CommentEntityInput } from "@/types/comments";
 
 function formatDate(value: string) {
@@ -120,11 +120,13 @@ export async function CommentThread({ entity }: CommentThreadProps) {
                         </span>
                       ) : null}
                     </div>
-                    <p className="text-sm leading-relaxed">
-                      {thread.status === "deleted"
-                        ? "[deleted]"
-                        : linkifyText(thread.body)}
-                    </p>
+                    <div className="text-sm leading-relaxed">
+                      {thread.status === "deleted" ? (
+                        "[deleted]"
+                      ) : (
+                        <MarkdownPreview content={thread.body} />
+                      )}
+                    </div>
                     {viewerId !== null &&
                     viewerId === thread.author?.id &&
                     thread.status === "visible" ? (
