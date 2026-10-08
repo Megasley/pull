@@ -1,0 +1,332 @@
+/*
+ * Interactive lesson blocks: <Explainer>, scene kit, <Check>, <TxJourney>.
+ * Motion is short and ease-out; everything stops under reduced motion.
+ */
+
+/* ── Scene kit ─────────────────────────────────────────────────────────── */
+
+.ix-stage {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem 0.5rem;
+  width: 100%;
+}
+
+.ix-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ix-actor {
+  display: flex;
+  min-width: 6.5rem;
+  max-width: 10rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid color-mix(in oklab, var(--ink) 25%, transparent);
+  background: var(--card);
+  padding: 0.75rem 0.75rem 0.6rem;
+  text-align: center;
+}
+
+.ix-actor svg {
+  width: 1.75rem;
+  height: 1.75rem;
+  color: var(--ink);
+}
+
+.ix-actor b {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--foreground);
+}
+
+.ix-actor small {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.ix-actor[data-tone="signal"] {
+  border-color: var(--ink);
+  background: color-mix(in oklab, var(--signal) 35%, var(--card));
+  box-shadow: var(--shadow-off-sm);
+}
+
+.ix-actor[data-tone="bad"] {
+  border-color: color-mix(in oklab, var(--destructive) 50%, transparent);
+  background: color-mix(in oklab, var(--destructive) 10%, var(--card));
+}
+
+.ix-actor[data-tone="bad"] svg {
+  color: var(--destructive);
+}
+
+.ix-actor[data-tone="muted"] {
+  opacity: 0.55;
+}
+
+.ix-flow {
+  display: flex;
+  min-width: 3.5rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.ix-flow-line {
+  position: relative;
+  width: 3.5rem;
+  height: 2px;
+  background-image: linear-gradient(90deg, var(--ink) 0 50%, transparent 50% 100%);
+  background-size: 8px 2px;
+  animation: ix-dash 0.6s linear infinite;
+}
+
+.ix-flow-line::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -2px;
+  width: 7px;
+  height: 7px;
+  border-top: 2px solid var(--ink);
+  border-right: 2px solid var(--ink);
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.ix-flow[data-tone="bad"] .ix-flow-line {
+  background-image: linear-gradient(
+    90deg,
+    var(--destructive) 0 50%,
+    transparent 50% 100%
+  );
+}
+
+.ix-flow[data-tone="bad"] .ix-flow-line::after {
+  border-color: var(--destructive);
+}
+
+.ix-coin {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid var(--ink);
+  background: var(--signal);
+  padding: 0.2rem 0.55rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--signal-foreground);
+  box-shadow: var(--shadow-off-sm);
+}
+
+.ix-coin[data-tone="muted"] {
+  border-style: dashed;
+  background: transparent;
+  color: var(--muted-foreground);
+  box-shadow: none;
+  text-decoration: line-through;
+}
+
+.ix-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid color-mix(in oklab, var(--ink) 20%, transparent);
+  background: var(--muted);
+  padding: 0.2rem 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--foreground);
+}
+
+.ix-pill[data-tone="signal"] {
+  border-color: var(--ink);
+  background: color-mix(in oklab, var(--signal) 45%, transparent);
+}
+
+.ix-pill[data-tone="bad"] {
+  border-color: color-mix(in oklab, var(--destructive) 50%, transparent);
+  background: color-mix(in oklab, var(--destructive) 12%, transparent);
+  color: var(--destructive);
+}
+
+.ix-pill svg {
+  width: 0.8rem;
+  height: 0.8rem;
+}
+
+.ix-caption {
+  width: 100%;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+/* Staggered entrance: delay={n} on any kit element. */
+.ix-pop {
+  animation: ix-pop 0.32s cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+.ix-d1 {
+  animation-delay: 0.35s;
+}
+.ix-d2 {
+  animation-delay: 0.7s;
+}
+.ix-d3 {
+  animation-delay: 1.05s;
+}
+.ix-d4 {
+  animation-delay: 1.4s;
+}
+
+@keyframes ix-pop {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes ix-dash {
+  to {
+    background-position: 8px 0;
+  }
+}
+
+/* ── Explainer player ──────────────────────────────────────────────────── */
+
+.ix-explainer-screen {
+  display: flex;
+  min-height: 15rem;
+  align-items: center;
+  justify-content: center;
+  padding: 1.75rem 1rem;
+  background-color: var(--background);
+  background-image: radial-gradient(
+    color-mix(in oklab, var(--ink) 12%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 16px 16px;
+}
+
+.ix-explainer-say {
+  animation: ix-fade 0.3s ease-out both;
+}
+
+@keyframes ix-fade {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.ix-progress-fill {
+  transform-origin: left center;
+  animation: ix-fill linear both;
+}
+
+@keyframes ix-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* ── TxJourney ─────────────────────────────────────────────────────────── */
+
+.ix-peer {
+  transition:
+    fill 0.25s ease-out,
+    stroke 0.25s ease-out;
+}
+
+.ix-row-enter {
+  animation: ix-pop 0.28s cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+.ix-block-enter {
+  animation: ix-block 0.45s cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+@keyframes ix-block {
+  from {
+    opacity: 0;
+    transform: translateX(-10px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.ix-pulse {
+  animation: ix-pulse 1.1s ease-in-out infinite;
+}
+
+@keyframes ix-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* ── Check ─────────────────────────────────────────────────────────────── */
+
+.ix-shake {
+  animation: ix-shake 0.32s ease-out;
+}
+
+@keyframes ix-shake {
+  25% {
+    transform: translateX(-4px);
+  }
+  50% {
+    transform: translateX(4px);
+  }
+  75% {
+    transform: translateX(-2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ix-pop,
+  .ix-flow-line,
+  .ix-explainer-say,
+  .ix-row-enter,
+  .ix-block-enter,
+  .ix-pulse,
+  .ix-shake {
+    animation: none !important;
+  }
+
+  .ix-progress-fill {
+    animation-duration: 0s !important;
+  }
+}

@@ -1,0 +1,300 @@
+---
+title: The Big Picture
+description: "Follow one Bitcoin payment from wallet to block, and see how every part of the system fits together."
+difficulty: beginner
+duration: 45 minutes
+objectives:
+  - Explain the double-spend problem and how Bitcoin solves it without a bank
+  - Follow a payment from wallet to confirmation, step by step
+  - Name the main roles (wallet, node, mempool, miner) and what each one checks
+  - Read a real transaction and its fee rate on a block explorer
+resources:
+  - title: "Mastering Bitcoin, Ch. 2: How Bitcoin Works"
+    url: "https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch02_overview.adoc"
+    kind: article
+    note: Go deeper after this lesson. The same journey, with real transaction data.
+  - title: "Bitcoin: A Peer-to-Peer Electronic Cash System"
+    url: "https://bitcoin.org/bitcoin.pdf"
+    kind: article
+    note: The original 9-page whitepaper. Sections 1–5 match this lesson.
+  - title: Mempool.space
+    url: "https://mempool.space/"
+    kind: tool
+    note: The block explorer you use in Step 5.
+reflectionPrompts:
+  - Without the word "blockchain", explain to a friend why Alice cannot spend the same coin twice.
+  - Your low-fee payment waited for several blocks. Was anything wrong with it? What would you change next time?
+  - Miners do the expensive work, so why can't they change the rules?
+lab:
+  title: Watch a real payment confirm
+  description: >-
+    Complete Step 5. Pick a pending transaction on mempool.space, predict when it
+    will confirm from its fee rate, then check your prediction.
+  evidence:
+    - The txid of the pending transaction you picked, and its fee rate in sat/vB
+    - Your prediction (next block, or later) and the reason for it
+    - The block height it confirmed in, and how many confirmations it has now
+searchQueries:
+  - double spend
+  - proof of work
+  - mempool
+---
+
+Before the details, see the whole machine. In this lesson you follow **one payment** from start to end. Every later lesson in this roadmap zooms in on one part of this picture.
+
+You do not need to install anything yet.
+
+## Step 1 — The problem: money you can copy
+
+On a computer, everything is data, and data is easy to copy. That is a big problem for money.
+
+<Explainer title="Why digital money is hard">
+  <Scene say="A digital file is easy to copy. If money were just a file, Alice could send the same coin to two people.">
+    <Stage>
+      <Actor icon="user" label="Alice" />
+      <Flow label="send" delay={1} />
+      <Coin delay={1} label="1 BTC" />
+      <Flow label="copy" delay={2} />
+      <Group delay={3}>
+        <Actor icon="user" label="Bob" />
+        <Actor icon="user" label="Carol" />
+      </Group>
+    </Stage>
+  </Scene>
+  <Scene say="Spending the same money twice is called a double spend. Any kind of digital money must stop it.">
+    <Stage>
+      <Coin label="1 BTC" />
+      <Flow tone="bad" delay={1} />
+      <Group delay={1}>
+        <Pill icon="check" label="paid to Bob" />
+        <Pill icon="x" tone="bad" label="paid to Carol too" />
+      </Group>
+      <Caption delay={2} text="double spend" />
+    </Stage>
+  </Scene>
+  <Scene say="Banks stop this with one ledger that only they control. It works, but you must trust the bank, and the bank can say no.">
+    <Stage>
+      <Actor icon="bank" label="Bank" sub="one ledger" />
+      <Group delay={1}>
+        <Pill tone="bad" label="you must trust it" />
+        <Pill tone="bad" label="it can block you" />
+      </Group>
+    </Stage>
+  </Scene>
+  <Scene say="Bitcoin's idea: thousands of computers each keep a full copy of the ledger. Each one checks every payment against the same rules.">
+    <Stage>
+      <Actor icon="node" label="Node" sub="full copy" />
+      <Actor icon="node" label="Node" sub="full copy" delay={1} />
+      <Actor icon="node" label="Node" sub="full copy" delay={2} />
+      <Caption delay={3} text="same rules, checked by everyone" />
+    </Stage>
+  </Scene>
+  <Scene say="If Alice tries to spend a coin twice, every node sees the conflict. Only one payment can win. Nobody has to trust a single company.">
+    <Stage>
+      <Actor icon="user" label="Alice" />
+      <Flow delay={1} />
+      <Group delay={1}>
+        <Pill icon="check" tone="signal" label="pay Bob: accepted" />
+        <Pill icon="x" tone="bad" label="pay Carol: rejected" />
+      </Group>
+    </Stage>
+  </Scene>
+</Explainer>
+
+A computer that keeps a copy of the ledger and checks the rules is called a <Term def="A computer that runs Bitcoin software, keeps its own copy of every block, and checks every rule for itself.">node</Term>. Anyone can run one. You will run your own in a few lessons.
+
+<Check
+  prompt="What is the main problem Bitcoin solves?"
+  options={[
+    "It makes payments faster than cards",
+    "It stops people spending the same digital money twice, without a bank in the middle",
+    "It stores files on many computers",
+    "It hides who sends each payment",
+  ]}
+  answer={1}
+  hint="Think about what goes wrong when money is just data that you can copy."
+  explain="This is the double-spend problem. Bitcoin solves it with many independent nodes that all check the same rules, instead of one trusted bank."
+/>
+
+**Done when:** you can explain a double spend in one sentence.
+
+## Step 2 — Follow one payment
+
+Alice wants to pay Bob 0.01 BTC. Play the explainer and watch each part of the system do its job.
+
+<Explainer title="A payment, start to end">
+  <Scene say="Alice's wallet holds her coins and her private key. The private key is a secret number. Only Alice knows it.">
+    <Stage>
+      <Actor icon="wallet" label="Alice's wallet" />
+      <Group delay={1}>
+        <Coin label="0.05 BTC" />
+        <Pill icon="key" label="private key" />
+      </Group>
+    </Stage>
+  </Scene>
+  <Scene say="Alice pays Bob 0.01 bitcoin. Her wallet builds a transaction. It says which coins to spend and who gets them.">
+    <Stage>
+      <Actor icon="wallet" label="Alice's wallet" />
+      <Flow label="build" delay={1} />
+      <Actor icon="file" label="Transaction" sub="0.01 BTC → Bob" delay={2} />
+    </Stage>
+  </Scene>
+  <Scene say="The wallet signs the transaction with the private key. Anyone can check the signature. Nobody can fake it without the key.">
+    <Stage>
+      <Actor icon="file" label="Transaction" />
+      <Flow label="sign" delay={1} />
+      <Actor
+        icon="sign"
+        label="Signed"
+        sub="proof it's Alice"
+        tone="signal"
+        delay={2}
+      />
+    </Stage>
+  </Scene>
+  <Scene say="The wallet sends it to a node. The node checks the rules. Is the signature valid? Do the coins exist? Are they still unspent? If yes, it passes the transaction on to other nodes.">
+    <Stage>
+      <Actor icon="node" label="Node" sub="checks rules" />
+      <Group delay={1}>
+        <Pill icon="check" tone="signal" label="signature valid" />
+        <Pill icon="check" tone="signal" label="coins exist" />
+        <Pill icon="check" tone="signal" label="not spent yet" />
+      </Group>
+      <Flow label="relay" delay={2} />
+      <Actor icon="network" label="Other nodes" delay={3} />
+    </Stage>
+  </Scene>
+  <Scene say="Each node keeps valid transactions in a waiting room called the mempool. They wait there until a miner puts them in a block.">
+    <Stage>
+      <Actor icon="node" label="Node" />
+      <Flow delay={1} />
+      <Actor icon="hourglass" label="Mempool" sub="waiting room" delay={2} />
+    </Stage>
+  </Scene>
+  <Scene say="Miners pick transactions from the mempool and pack them into a block. To add the block, a miner must do a lot of computing work. This is called proof of work. Someone finds a block about every ten minutes.">
+    <Stage>
+      <Actor icon="hourglass" label="Mempool" />
+      <Flow label="pick by fee" delay={1} />
+      <Actor icon="miner" label="Miner" sub="proof of work" delay={2} />
+      <Flow delay={3} />
+      <Actor icon="block" label="New block" tone="signal" delay={3} />
+    </Stage>
+  </Scene>
+  <Scene say="Every node checks the new block and adds it to its copy of the chain. Bob's wallet sees the payment with one confirmation. Each new block on top adds one more.">
+    <Stage>
+      <Actor icon="block" label="New block" />
+      <Flow label="check" delay={1} />
+      <Actor icon="network" label="All nodes" delay={2} />
+      <Flow delay={3} />
+      <Actor
+        icon="wallet"
+        label="Bob's wallet"
+        sub="1 confirmation"
+        tone="signal"
+        delay={3}
+      />
+    </Stage>
+  </Scene>
+</Explainer>
+
+<Check
+  type="order"
+  prompt="Put the journey of Alice's payment in order."
+  items={[
+    "Alice's wallet builds a transaction",
+    "The wallet signs it with Alice's private key",
+    "Nodes check it and pass it on",
+    "It waits in the mempool",
+    "A miner puts it in a block",
+    "Nodes check the block, and Bob sees 1 confirmation",
+  ]}
+  hint="Nobody can check a signature that does not exist yet. And a miner can only pick from what is waiting."
+  explain="Build, sign, relay, wait, mine, confirm. Every later lesson in this roadmap is a close-up of one of these steps."
+/>
+
+**Done when:** you can tell the story of the payment without looking.
+
+## Step 3 — Try it: send a payment
+
+Now you drive. Pick a fee, send the payment, and watch the network, the mempool and the chain. Then try a different fee and compare.
+
+<TxJourney />
+
+Fees are paid in <Term def="The smallest unit of bitcoin. 1 BTC is 100,000,000 satoshis (sats).">satoshis</Term>. The rates in the simulator are in sat/vB: satoshis for each virtual byte of block space.
+
+<Callout type="tip" title="Fee rate, not fee amount">
+  Miners look at the fee **rate**, not the total fee. The size of a transaction depends
+  on how many coins it spends, not on how much money it moves.
+</Callout>
+
+<Check
+  prompt="Your low-fee payment waited for several blocks. Why?"
+  options={[
+    "The network was broken for a while",
+    "Low-fee transactions are invalid until the fee goes up",
+    "Block space is limited, so miners take the highest fee rates first",
+    "Bob's wallet was offline",
+  ]}
+  answer={2}
+  hint="Look at the mempool panel. What decides which transactions go into the next block?"
+  explain="Your payment was valid the whole time. A block has limited space, and miners earn more by taking higher fee rates first. When fewer people were paying more, your payment fit."
+/>
+
+**Done when:** you have sent the payment with at least two different fees and seen the difference.
+
+## Step 4 — Who does what
+
+You met four parts of the system. Each one checks something different.
+
+| Part        | What it does                                                    | What it checks                                        | Close-up lesson                                                                                                        |
+| ----------- | --------------------------------------------------------------- | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| **Wallet**  | Keeps your keys. Builds and signs transactions.                 | That you have enough coins to spend                   | [Keys & Addresses](/roadmaps/bitcoin/lessons/basics-keys), [Wallet Architecture](/roadmaps/bitcoin/lessons/dev-wallet) |
+| **Node**    | Keeps every block. Passes transactions and blocks to its peers. | **Every** rule, for every transaction and every block | [P2P Network](/roadmaps/bitcoin/lessons/basics-network), [Bitcoin Core & RPC](/roadmaps/bitcoin/lessons/dev-core-rpc)  |
+| **Mempool** | The waiting room inside each node                               | That a transaction is valid before it can wait        | [Mempool & Fees](/roadmaps/bitcoin/lessons/basics-mempool)                                                             |
+| **Miner**   | Builds blocks and does proof of work                            | Its own block, before it spends energy on it          | [Mining & Consensus](/roadmaps/bitcoin/lessons/basics-mining)                                                          |
+
+<Callout type="warning" title="A common mistake">
+  Many people think miners make the rules. They do not. Every node checks every block.
+  If a miner breaks a rule, nodes reject the block, and the miner loses its reward and
+  the energy it spent.
+</Callout>
+
+<Check
+  prompt="A miner makes a block that pays itself 1,000 extra bitcoin. What happens?"
+  options={[
+    "Nodes accept it, because miners decide the rules",
+    "Nodes reject the block, because it breaks the rules",
+    "Only Bob's wallet notices",
+    "Nodes accept it but mark it as suspicious",
+  ]}
+  answer={1}
+  hint="Who checks every block?"
+  explain="Each node checks the block for itself. A block that breaks a rule is invalid, no matter how much work went into it."
+/>
+
+**Done when:** you can say what a node checks and why miners cannot change the rules.
+
+## Step 5 — See it on the real network (lab)
+
+Everything you just played with happens live on the real network. Look at it.
+
+1. Open [mempool.space](https://mempool.space/). The blocks on the **left** are waiting blocks: what miners will probably mine next. Each shows a range of fee rates.
+2. The blocks on the **right** are real, mined blocks. Note the latest block height.
+3. Click a waiting block, then click one transaction in it. Copy its **txid** and note its **fee rate** in sat/vB.
+4. Predict: will it go into the next block, or wait? Compare its fee rate with the range of the first waiting block.
+5. Come back later. Search for your txid. Which block is it in, and how many confirmations does it have now?
+
+**Done when:** your lab notes have the txid, your prediction with a reason, and the block it confirmed in.
+
+<Recap
+  points={[
+    "Digital money must stop double spends. Bitcoin does it with many nodes that all check the same rules.",
+    "A payment goes: build → sign → relay → mempool → mined into a block → confirmations.",
+    "Miners choose transactions by fee rate (sat/vB), because block space is limited.",
+    "Every node checks every block. Miners cannot change the rules.",
+  ]}
+/>
+
+### Next lesson
+
+**Developer Environment**: set up the tools you need to run your own node and build on Bitcoin.
