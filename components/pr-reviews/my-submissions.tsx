@@ -12,6 +12,9 @@ import { cn } from "@/lib/utils";
 // "Hidden" label from the submitter's own point of view — same underlying
 // status either way, distinguished by hiddenReason.
 function statusLabel(status: string, hiddenReason: string | null): string {
+  if (status === "closed" && hiddenReason === "deleted_on_github") {
+    return "Deleted on GitHub";
+  }
   if (status === "hidden") {
     return hiddenReason === "withdrawn" ? "Withdrawn" : "Removed by admin";
   }
@@ -64,9 +67,20 @@ export async function MySubmissions() {
               </span>
             </div>
             <p className="truncate text-sm font-medium text-foreground">{submission.title}</p>
-            {submission.status === "reviewed" && submission.reviewedByUsername ? (
+            {submission.reviewers.length > 0 ? (
               <p className="text-xs text-muted-foreground">
-                reviewed by @{submission.reviewedByUsername}
+                reviewed by{" "}
+                {submission.reviewers.map((reviewer, index) => (
+                  <span key={reviewer.username}>
+                    {index > 0 ? ", " : null}
+                    <Link
+                      href={`/u/${reviewer.username}`}
+                      className="underline-offset-4 hover:text-foreground hover:underline"
+                    >
+                      @{reviewer.username}
+                    </Link>
+                  </span>
+                ))}
               </p>
             ) : null}
           </div>

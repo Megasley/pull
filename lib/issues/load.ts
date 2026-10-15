@@ -6,6 +6,7 @@ import {
 } from "@/lib/discovery";
 import { buildAllRoadmapProgressSummaries } from "@/lib/progress/summary";
 import { getAllCompletedNodeSlugs } from "@/lib/progress/repository";
+import { getUnavailableCuratedIssueIds } from "./availability";
 import { recommendIssues } from "./engine";
 import type { IssueRecommendationContext } from "@/types/issues";
 
@@ -23,10 +24,11 @@ export const GUEST_ISSUE_CONTEXT: IssueRecommendationContext = {
 export async function loadIssueRecommendationContext(
   userId: string,
 ): Promise<IssueRecommendationContext> {
-  const [base, progressByRoadmap, activity] = await Promise.all([
+  const [base, progressByRoadmap, activity, unavailableIssueIds] = await Promise.all([
     loadDiscoveryProfileContext(userId),
     getAllCompletedNodeSlugs(userId),
     countGithubSyncedEntities(userId),
+    getUnavailableCuratedIssueIds(),
   ]);
 
   const roadmaps = buildAllRoadmapProgressSummaries(progressByRoadmap);
@@ -45,13 +47,14 @@ export async function loadIssueRecommendationContext(
     level: base.level,
     githubActivityCount: activity.commits + activity.pullRequests + activity.issues,
     recommendedRepoIds,
+    unavailableIssueIds,
   };
 }
 
 export async function loadIssueRecommendationsPageData(userId?: string | null) {
   const context = userId
     ? await loadIssueRecommendationContext(userId)
-    : GUEST_ISSUE_CONTEXT;
+    : { ...GUEST_ISSUE_CONTEXT, unavailableIssueIds: await getUnavailableCuratedIssueIds() };
   const seed = recommendIssues(context, { limit: 24, maxPerRepo: 3 });
   return { context, seed, personalized: Boolean(userId) };
 }

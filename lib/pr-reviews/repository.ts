@@ -1,16 +1,16 @@
-import { and, asc, desc, eq, ne, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, ne, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 import { getDb } from "@/lib/db";
 import { isDatabaseConfigured } from "@/lib/db/env";
-import { prReviewRequests, users } from "@/lib/db/schema";
+import { prReviewRequestReviewers, prReviewRequests, users } from "@/lib/db/schema";
 import { getAllDiscoveryRepositories } from "@/lib/discovery/catalog";
 // Import from these concrete lib/github submodules, NOT the @/lib/github
 // barrel: the barrel re-exports lib/github/service.ts, which imports
 // lib/github/sync.ts, which imports THIS file (for the credit-detection
 // hook) — going through the barrel here would be a circular import.
 import { fetchPullRequestByUrl, hasReviewedPullRequest } from "@/lib/github/api";
-import { GithubClient } from "@/lib/github/client";
+import { GithubApiError, GithubClient } from "@/lib/github/client";
 import { getGithubConnection } from "@/lib/github/store";
 import { parsePrUrl } from "@/lib/pr-reviews/validate";
 import { notifyPrReviewCompletedAsync } from "@/lib/notifications/dispatch";
@@ -409,6 +409,9 @@ export async function unhideReviewRequest(
 
 export type MyReviewRequestRecord = PrReviewRequestRecord & {
   reviewedByUsername: string | null;
+  /** Every Pull builder with a verified review on it — see
+   *  prReviewRequestReviewers. */
+  reviewers: PrReviewer[];
 };
 
 /** Every PR a user has personally submitted (any status), for their own
@@ -434,16 +437,18 @@ export async function listMySubmissions(userId: string): Promise<MyReviewRequest
     .where(eq(prReviewRequests.submittedByUserId, userId))
     .orderBy(desc(prReviewRequests.createdAt));
 
+  const reviewers = await loadReviewersFor(rows.map((row) => row.request.id));
   return rows.map((row) => ({
     ...mapRequestRow(row),
     reviewedByUsername: row.reviewedByUsername,
+    reviewers: reviewers.get(row.request.id) ?? [],
   }));
 }
 
 /** PRs this user has actually reviewed — the credited flip side of
- *  listMySubmissions. Always `status: "reviewed"` by construction (that's
- *  the only way reviewedByUserId gets set), but reuses the same record
- *  shape as the rest of this module rather than a narrower type. */
+ *  listMySubmissions. Includes ones they reviewed after someone else
+ *  already had (prReviewRequestReviewers), not just the ones where they
+ *  were first and got `reviewedByUserId`. */
 export async function listMyReviewedRequests(userId: string): Promise<MyReviewRequestRecord[]> {
   if (!isDatabaseConfigured()) {
     return [];
@@ -461,13 +466,107 @@ export async function listMyReviewedRequests(userId: string): Promise<MyReviewRe
     .from(prReviewRequests)
     .leftJoin(submitter, eq(prReviewRequests.submittedByUserId, submitter.id))
     .leftJoin(reviewer, eq(prReviewRequests.reviewedByUserId, reviewer.id))
-    .where(eq(prReviewRequests.reviewedByUserId, userId))
-    .orderBy(desc(prReviewRequests.reviewedAt));
+    .innerJoin(
+      prReviewRequestReviewers,
+      and(
+        eq(prReviewRequestReviewers.requestId, prReviewRequests.id),
+        eq(prReviewRequestReviewers.userId, userId),
+      ),
+    )
+    .orderBy(desc(prReviewRequestReviewers.reviewedAt));
 
+  const reviewers = await loadReviewersFor(rows.map((row) => row.request.id));
   return rows.map((row) => ({
     ...mapRequestRow(row),
     reviewedByUsername: row.reviewedByUsername,
+    reviewers: reviewers.get(row.request.id) ?? [],
   }));
+}
+
+export type PrReviewer = {
+  username: string;
+  displayName: string;
+  avatar: string | null;
+  reviewedAt: string;
+};
+
+/** Every recorded Pull reviewer per request, earliest first. Banned
+ *  accounts are left out — this feeds public listings. */
+async function loadReviewersFor(requestIds: string[]): Promise<Map<string, PrReviewer[]>> {
+  const byRequest = new Map<string, PrReviewer[]>();
+  if (requestIds.length === 0) {
+    return byRequest;
+  }
+
+  const db = getDb();
+  const rows = await db
+    .select({
+      requestId: prReviewRequestReviewers.requestId,
+      reviewedAt: prReviewRequestReviewers.reviewedAt,
+      username: users.username,
+      displayName: users.displayName,
+      avatar: users.avatar,
+    })
+    .from(prReviewRequestReviewers)
+    .innerJoin(users, eq(prReviewRequestReviewers.userId, users.id))
+    .where(
+      and(
+        inArray(prReviewRequestReviewers.requestId, requestIds),
+        ne(users.accountStatus, "banned"),
+      ),
+    )
+    .orderBy(asc(prReviewRequestReviewers.reviewedAt));
+
+  for (const row of rows) {
+    const list = byRequest.get(row.requestId) ?? [];
+    list.push({
+      username: row.username,
+      displayName: row.displayName,
+      avatar: row.avatar,
+      reviewedAt: row.reviewedAt,
+    });
+    byRequest.set(row.requestId, list);
+  }
+  return byRequest;
+}
+
+export type ReviewedPrRecord = PrReviewRequestRecord & {
+  reviewers: PrReviewer[];
+};
+
+const REVIEWED_LIST_LIMIT = 100;
+
+/**
+ * Public history for the "Reviewed" tab: PRs from the queue that at least
+ * one Pull builder has a GitHub-verified review on, most recent first, each
+ * with every Pull builder who reviewed it. A reviewed PR that later merges
+ * stays here; one deleted on GitHub gets closed by refreshStaleRequests and
+ * drops out.
+ */
+export async function listReviewedRequests(): Promise<ReviewedPrRecord[]> {
+  if (!isDatabaseConfigured()) {
+    return [];
+  }
+
+  const db = getDb();
+  const rows = await db
+    .select({
+      request: prReviewRequests,
+      submittedByUsername: users.username,
+    })
+    .from(prReviewRequests)
+    .leftJoin(users, eq(prReviewRequests.submittedByUserId, users.id))
+    .where(eq(prReviewRequests.status, "reviewed"))
+    .orderBy(desc(prReviewRequests.reviewedAt))
+    .limit(REVIEWED_LIST_LIMIT);
+
+  const reviewers = await loadReviewersFor(rows.map((row) => row.request.id));
+  return rows
+    .map((row) => ({
+      ...mapRequestRow(row),
+      reviewers: reviewers.get(row.request.id) ?? [],
+    }))
+    .filter((row) => row.reviewers.length > 0);
 }
 
 export type WithdrawReviewRequestResult =
@@ -552,8 +651,13 @@ export async function restoreOwnReviewRequest(input: {
 /**
  * The credit-detection loop: called from lib/github/sync.ts right after a
  * user's GitHub sync refreshes their own reviewed-PR list. Cross-references
- * those freshly-synced reviews against open review requests — this is how a
- * review gets credited, never via self-report.
+ * those freshly-synced reviews against listed review requests — this is how
+ * a review gets credited, never via self-report.
+ *
+ * The first reviewer on an open request flips it to "reviewed" (and earns
+ * the XP + pings the submitter); anyone reviewing it after that is still
+ * recorded in prReviewRequestReviewers so the public "Reviewed" tab can show
+ * every Pull builder who weighed in.
  */
 export async function markReviewedByMatch(
   repoFullName: string,
@@ -568,6 +672,7 @@ export async function markReviewedByMatch(
   const matches = await db
     .select({
       id: prReviewRequests.id,
+      status: prReviewRequests.status,
       submittedByUserId: prReviewRequests.submittedByUserId,
       title: prReviewRequests.title,
       prUrl: prReviewRequests.prUrl,
@@ -577,7 +682,7 @@ export async function markReviewedByMatch(
       and(
         eq(prReviewRequests.repoFullName, repoFullName),
         eq(prReviewRequests.number, number),
-        eq(prReviewRequests.status, "needs_review"),
+        inArray(prReviewRequests.status, ["needs_review", "reviewed"]),
       ),
     );
 
@@ -590,11 +695,21 @@ export async function markReviewedByMatch(
     }
 
     await db
+      .insert(prReviewRequestReviewers)
+      .values({ requestId: match.id, userId: reviewerUserId })
+      .onConflictDoNothing();
+
+    if (match.status !== "needs_review") {
+      continue;
+    }
+
+    await db
       .update(prReviewRequests)
       .set({
         status: "reviewed",
         reviewedByUserId: reviewerUserId,
         reviewedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       })
       .where(eq(prReviewRequests.id, match.id));
 
@@ -659,7 +774,7 @@ export async function reportOwnReview(input: {
   if (!request) {
     return { ok: false, reason: "not_found" };
   }
-  if (request.status !== "needs_review") {
+  if (request.status !== "needs_review" && request.status !== "reviewed") {
     return { ok: false, reason: "already_resolved" };
   }
 
@@ -780,17 +895,23 @@ export async function insertDiscoveredReviewRequest(input: {
 }
 
 /**
- * Re-checks open requests against GitHub and closes out ones that have been
- * merged/closed since they were listed, so the queue doesn't accumulate PRs
- * that no longer need (or can't receive) a review. Budget-limited the same
- * way lib/github/sync.ts budgets its own enrichment calls.
+ * Re-checks listed requests against GitHub so the queue doesn't hold PRs
+ * that no longer exist or can't receive a review:
+ *  - an open request whose PR was merged/closed is closed out;
+ *  - any open or reviewed request whose PR (or repo) was deleted — GitHub
+ *    answers 404/410 — is closed out too, so it also drops off the public
+ *    "Reviewed" tab.
+ * Budget-limited the same way lib/github/sync.ts budgets its own enrichment
+ * calls, and rotates through rows by least-recently-checked (`updatedAt`,
+ * bumped on every check) so a long queue gets fully covered over a few runs
+ * instead of re-checking the same oldest rows forever.
  */
 export async function refreshStaleRequests(input: {
   client: GithubClient;
   budget: number;
-}): Promise<{ checked: number; closed: number }> {
+}): Promise<{ checked: number; closed: number; deleted: number }> {
   if (!isDatabaseConfigured()) {
-    return { checked: 0, closed: 0 };
+    return { checked: 0, closed: 0, deleted: 0 };
   }
 
   const db = getDb();
@@ -799,29 +920,52 @@ export async function refreshStaleRequests(input: {
       id: prReviewRequests.id,
       repoFullName: prReviewRequests.repoFullName,
       number: prReviewRequests.number,
+      status: prReviewRequests.status,
     })
     .from(prReviewRequests)
-    .where(eq(prReviewRequests.status, "needs_review"))
-    .orderBy(asc(prReviewRequests.createdAt))
+    .where(inArray(prReviewRequests.status, ["needs_review", "reviewed"]))
+    .orderBy(asc(prReviewRequests.updatedAt))
     .limit(input.budget);
 
   let closed = 0;
+  let deleted = 0;
   for (const row of rows) {
     const [owner, repo] = row.repoFullName.split("/");
+    const now = new Date().toISOString();
     try {
       const pr = await fetchPullRequestByUrl(input.client, owner, repo, row.number);
-      if (pr.state !== "open") {
+      if (row.status === "needs_review" && pr.state !== "open") {
         await db
           .update(prReviewRequests)
-          .set({ status: "closed" })
+          .set({ status: "closed", updatedAt: now })
           .where(eq(prReviewRequests.id, row.id));
         closed += 1;
+        continue;
       }
-    } catch {
-      // Leave it as-is if GitHub is unreachable or the PR/repo is gone
-      // (e.g. deleted) — not confident enough to auto-close on a fetch error.
+    } catch (error) {
+      if (
+        error instanceof GithubApiError &&
+        (error.status === 404 || error.status === 410)
+      ) {
+        await db
+          .update(prReviewRequests)
+          .set({ status: "closed", hiddenReason: "deleted_on_github", updatedAt: now })
+          .where(eq(prReviewRequests.id, row.id));
+        deleted += 1;
+        continue;
+      }
+      // Rate limits, 5xx, network errors: not confident enough to remove
+      // anything — leave it for the next run.
+      if (error instanceof GithubApiError && (error.status === 403 || error.status === 429)) {
+        break;
+      }
     }
+
+    await db
+      .update(prReviewRequests)
+      .set({ updatedAt: now })
+      .where(eq(prReviewRequests.id, row.id));
   }
 
-  return { checked: rows.length, closed };
+  return { checked: rows.length, closed, deleted };
 }

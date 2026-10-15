@@ -6,6 +6,7 @@ import { SiteContainer } from "@/components/layout/site-container";
 import { MyReviews } from "@/components/pr-reviews/my-reviews";
 import { MySubmissions } from "@/components/pr-reviews/my-submissions";
 import { PrReviewList } from "@/components/pr-reviews/pr-review-list";
+import { ReviewedPrs } from "@/components/pr-reviews/reviewed-prs";
 import { SubmitPrForm } from "@/components/pr-reviews/submit-pr-form";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -31,6 +32,7 @@ export default async function PrReviewsPage() {
       <Tabs defaultValue="browse" className="mt-8">
         <TabsList variant="line">
           <TabsTrigger value="browse">Browse</TabsTrigger>
+          <TabsTrigger value="reviewed">Reviewed</TabsTrigger>
           {profile ? <TabsTrigger value="mine">My submissions</TabsTrigger> : null}
           {profile ? <TabsTrigger value="reviews">My reviews</TabsTrigger> : null}
         </TabsList>
@@ -50,6 +52,12 @@ export default async function PrReviewsPage() {
           )}
           <Suspense fallback={<p className="text-sm text-muted-foreground">Loading…</p>}>
             <PrReviewList />
+          </Suspense>
+        </TabsContent>
+
+        <TabsContent value="reviewed" className="mt-6">
+          <Suspense fallback={<p className="text-sm text-muted-foreground">Loading…</p>}>
+            <ReviewedPrs />
           </Suspense>
         </TabsContent>
 
