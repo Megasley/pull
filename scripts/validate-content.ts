@@ -66,10 +66,11 @@ function main() {
       }
 
       if (isConceptLesson(lessonSlug)) {
-        const hasDiagram = content.includes("<Mermaid");
+        const hasDiagram =
+          content.includes("<Mermaid") || content.includes("<Explainer");
         if (!hasDiagram) {
           warnings.push(
-            `${slug}/${lessonSlug}: concept lesson missing Mermaid diagram`,
+            `${slug}/${lessonSlug}: concept lesson missing Mermaid diagram or Explainer`,
           );
         }
       }
