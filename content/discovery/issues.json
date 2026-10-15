@@ -1,332 +1,706 @@
 [
   {
-    "id": "mempool-gfi-ui-contrast",
-    "repoId": "mempool",
-    "number": 4801,
-    "title": "Improve contrast on fee histogram labels",
-    "url": "https://github.com/mempool/mempool/issues",
-    "category": "good_first_issue",
-    "labels": ["good first issue", "ui", "frontend"],
-    "difficulty": "beginner",
-    "language": "TypeScript",
-    "tracks": ["bitcoin"],
-    "skills": ["css", "typescript", "frontend"],
-    "estimatedHours": 2,
-    "summary": "Small CSS/accessibility polish on the fee chart - ideal first frontend PR."
-  },
-  {
-    "id": "mempool-docs-api",
-    "repoId": "mempool",
-    "number": 4512,
-    "title": "Document REST endpoints for address UTXOs",
-    "url": "https://github.com/mempool/mempool/issues",
-    "category": "documentation",
-    "labels": ["documentation", "api"],
-    "difficulty": "beginner",
-    "language": "TypeScript",
-    "tracks": ["bitcoin"],
-    "skills": ["docs", "api"],
-    "estimatedHours": 3,
-    "summary": "Write clear examples for address UTXO endpoints used by wallet builders."
-  },
-  {
-    "id": "bdk-gfi-example",
-    "repoId": "bdk",
-    "number": 1620,
-    "title": "Add wallet sync example for Electrum backend",
-    "url": "https://github.com/bitcoindevkit/bdk/issues",
-    "category": "good_first_issue",
-    "labels": ["good first issue", "examples"],
-    "difficulty": "intermediate",
-    "language": "Rust",
-    "tracks": ["bitcoin"],
-    "skills": ["rust", "wallet", "electrum"],
-    "estimatedHours": 5,
-    "summary": "Extend examples so new BDK users can sync against Electrum cleanly."
-  },
-  {
-    "id": "bdk-help-descriptor",
-    "repoId": "bdk",
-    "number": 1588,
-    "title": "Clarify descriptor parsing error messages",
-    "url": "https://github.com/bitcoindevkit/bdk/issues",
-    "category": "help_wanted",
-    "labels": ["help wanted", "ux"],
-    "difficulty": "intermediate",
-    "language": "Rust",
-    "tracks": ["bitcoin"],
-    "skills": ["rust", "descriptors"],
-    "estimatedHours": 4,
-    "summary": "Make descriptor failures actionable for wallet integrators."
-  },
-  {
-    "id": "rust-bitcoin-docs-serde",
-    "repoId": "rust-bitcoin",
-    "number": 2901,
-    "title": "Document serde feature flags for Transaction",
-    "url": "https://github.com/rust-bitcoin/rust-bitcoin/issues",
-    "category": "documentation",
-    "labels": ["docs", "good first issue"],
-    "difficulty": "beginner",
-    "language": "Rust",
-    "tracks": ["bitcoin"],
-    "skills": ["rust", "docs"],
-    "estimatedHours": 2,
-    "summary": "Short docs pass explaining optional serde features."
-  },
-  {
-    "id": "rust-bitcoin-bug-psbt",
-    "repoId": "rust-bitcoin",
-    "number": 2875,
-    "title": "Fix PSBT proprietary key round-trip edge case",
-    "url": "https://github.com/rust-bitcoin/rust-bitcoin/issues",
+    "id": "bitcoin-core-build-openbsd-touch",
+    "repoId": "bitcoin-core",
+    "number": 36519,
+    "title": "depends build fails due to OpenBSD touch incompatibility with -h option",
+    "url": "https://github.com/bitcoin/bitcoin/issues",
     "category": "bug_fix",
-    "labels": ["bug", "psbt"],
-    "difficulty": "advanced",
-    "language": "Rust",
-    "tracks": ["bitcoin"],
-    "skills": ["rust", "psbt"],
-    "estimatedHours": 8,
-    "summary": "Investigate serialization edge case around proprietary PSBT keys."
-  },
-  {
-    "id": "btc-rpc-explorer-feature-theme",
-    "repoId": "btc-rpc-explorer",
-    "number": 412,
-    "title": "Add optional dark theme preference",
-    "url": "https://github.com/janoside/btc-rpc-explorer/issues",
-    "category": "feature_request",
-    "labels": ["enhancement", "ui"],
-    "difficulty": "beginner",
-    "language": "JavaScript",
-    "tracks": ["bitcoin"],
-    "skills": ["javascript", "frontend"],
-    "estimatedHours": 4,
-    "summary": "Ship a persisted dark theme toggle for self-hosted explorers."
-  },
-  {
-    "id": "bitcoin-core-docs-contrib",
-    "repoId": "bitcoin-core",
-    "number": 30102,
-    "title": "Improve CONTRIBUTING.md for first-time testers",
-    "url": "https://github.com/bitcoin/bitcoin/issues",
-    "category": "documentation",
-    "labels": ["docs", "good first issue"],
+    "labels": [
+      "Build system"
+    ],
     "difficulty": "intermediate",
     "language": "C++",
-    "tracks": ["bitcoin"],
-    "skills": ["docs", "testing"],
-    "estimatedHours": 3,
-    "summary": "Clarify how newcomers run and contribute functional tests."
+    "tracks": [
+      "bitcoin"
+    ],
+    "skills": [
+      "build-system",
+      "make",
+      "openbsd"
+    ],
+    "estimatedHours": 4,
+    "summary": "The depends build breaks on OpenBSD because its native touch doesn't support -h. Make the OpenBSD builder work without it."
   },
   {
-    "id": "bitcoin-core-help-test",
+    "id": "bitcoin-core-wallet-migration-watchonly",
     "repoId": "bitcoin-core",
-    "number": 29988,
-    "title": "Add coverage for orphan tx expiration path",
+    "number": 36483,
+    "title": "wallet: Migration fails for legacy wallet with no keys watching an address",
     "url": "https://github.com/bitcoin/bitcoin/issues",
-    "category": "help_wanted",
-    "labels": ["tests", "help wanted"],
+    "category": "bug_fix",
+    "labels": [
+      "Wallet"
+    ],
     "difficulty": "advanced",
     "language": "C++",
-    "tracks": ["bitcoin"],
-    "skills": ["c++", "testing", "mempool"],
+    "tracks": [
+      "bitcoin"
+    ],
+    "skills": [
+      "c++",
+      "wallet",
+      "functional-tests"
+    ],
     "estimatedHours": 10,
-    "summary": "Expand functional tests around orphan transaction expiry."
+    "summary": "Migrating a legacy wallet that has no keys but watches an address fails. A reproducing functional test is in the issue; find and fix the migration path."
   },
   {
-    "id": "lnd-gfi-docs-rpc",
-    "repoId": "lnd",
-    "number": 8801,
-    "title": "Document macaroon bakery examples for custom permissions",
-    "url": "https://github.com/lightningnetwork/lnd/issues",
+    "id": "bitcoin-core-flaky-p2p-eviction",
+    "repoId": "bitcoin-core",
+    "number": 36533,
+    "title": "qa: Intermittent failure in `p2p_eviction.py`",
+    "url": "https://github.com/bitcoin/bitcoin/issues",
+    "category": "bug_fix",
+    "labels": [
+      "CI failed"
+    ],
+    "difficulty": "intermediate",
+    "language": "C++",
+    "tracks": [
+      "bitcoin"
+    ],
+    "skills": [
+      "python",
+      "functional-tests",
+      "p2p"
+    ],
+    "estimatedHours": 6,
+    "summary": "p2p_eviction.py fails intermittently in CI. Reproduce the flake from the logs and make the test deterministic."
+  },
+  {
+    "id": "bdk-docs-esplora-prevouts",
+    "repoId": "bdk",
+    "number": 2343,
+    "title": "bdk_esplora: document that prevout values inserted during sync are unverified server-reported data",
+    "url": "https://github.com/bitcoindevkit/bdk/issues",
+    "category": "documentation",
+    "labels": [
+      "documentation"
+    ],
+    "difficulty": "beginner",
+    "language": "Rust",
+    "tracks": [
+      "bitcoin"
+    ],
+    "skills": [
+      "rust",
+      "docs",
+      "esplora"
+    ],
+    "estimatedHours": 2,
+    "summary": "bdk_esplora stores prevout values straight from the server during sync. Document that these are unverified server-reported data and what that means for fee calculations."
+  },
+  {
+    "id": "bdk-balance-traits",
+    "repoId": "bdk",
+    "number": 2366,
+    "title": "feat(chain): derive Copy and implement AddAssign, Sub, SubAssign, Sum for Balance",
+    "url": "https://github.com/bitcoindevkit/bdk/issues",
+    "category": "feature_request",
+    "labels": [],
+    "difficulty": "beginner",
+    "language": "Rust",
+    "tracks": [
+      "bitcoin"
+    ],
+    "skills": [
+      "rust",
+      "traits"
+    ],
+    "estimatedHours": 3,
+    "summary": "Derive Copy for bdk_chain::Balance and add AddAssign, Sub, SubAssign and Sum so balances can be combined ergonomically. Small, well-scoped Rust change."
+  },
+  {
+    "id": "bdk-filter-iter-windows",
+    "repoId": "bdk",
+    "number": 2338,
+    "title": "filter_iter example fails to compile on Windows because it depends on bdk_testenv",
+    "url": "https://github.com/bitcoindevkit/bdk/issues",
+    "category": "bug_fix",
+    "labels": [],
+    "difficulty": "intermediate",
+    "language": "Rust",
+    "tracks": [
+      "bitcoin"
+    ],
+    "skills": [
+      "rust",
+      "cargo",
+      "windows"
+    ],
+    "estimatedHours": 4,
+    "summary": "The filter_iter example doesn't compile on Windows because it depends on bdk_testenv. Restructure the dependency so new developers can run the example."
+  },
+  {
+    "id": "rust-bitcoin-hashes-lints",
+    "repoId": "rust-bitcoin",
+    "number": 6930,
+    "title": "hashes has lint warnings on master",
+    "url": "https://github.com/rust-bitcoin/rust-bitcoin/issues",
     "category": "good_first_issue",
-    "labels": ["good first issue", "docs"],
+    "labels": [],
+    "difficulty": "beginner",
+    "language": "Rust",
+    "tracks": [
+      "bitcoin"
+    ],
+    "skills": [
+      "rust",
+      "clippy"
+    ],
+    "estimatedHours": 2,
+    "summary": "The hashes crate produces lint warnings on master (e.g. deprecated max_value). Clean them up so the build is warning-free."
+  },
+  {
+    "id": "rust-bitcoin-bip434-featureid",
+    "repoId": "rust-bitcoin",
+    "number": 6964,
+    "title": "p2p: BIP434 FeatureId rejects non-ASCII identifiers",
+    "url": "https://github.com/rust-bitcoin/rust-bitcoin/issues",
+    "category": "bug_fix",
+    "labels": [],
+    "difficulty": "intermediate",
+    "language": "Rust",
+    "tracks": [
+      "bitcoin"
+    ],
+    "skills": [
+      "rust",
+      "p2p",
+      "bips"
+    ],
+    "estimatedHours": 4,
+    "summary": "BIP434 FeatureId rejects non-ASCII identifiers, but the BIP only recommends ASCII and Bitcoin Core accepts them. Align the validation with the spec."
+  },
+  {
+    "id": "lnd-update-channel-memo",
+    "repoId": "lnd",
+    "number": 11242,
+    "title": "[feature]: allow updating a channel's memo",
+    "url": "https://github.com/lightningnetwork/lnd/issues",
+    "category": "feature_request",
+    "labels": [
+      "enhancement"
+    ],
     "difficulty": "intermediate",
     "language": "Go",
-    "tracks": ["lightning"],
-    "skills": ["go", "docs", "rpc"],
-    "estimatedHours": 3,
-    "summary": "Add practical macaroon examples for app developers."
+    "tracks": [
+      "lightning"
+    ],
+    "skills": [
+      "go",
+      "grpc",
+      "lncli"
+    ],
+    "estimatedHours": 8,
+    "summary": "A channel memo can only be set when opening. Add an RPC (and lncli command) to update the memo on existing pending or open channels."
   },
   {
-    "id": "lnd-bug-htlc",
+    "id": "lnd-estimatesmartfee-missing-feerate",
     "repoId": "lnd",
-    "number": 8755,
-    "title": "Investigate intermittent HTLC interceptor timeout",
+    "number": 11284,
+    "title": "chainfee: bitcoind 32.0 estimatesmartfee can omit `feerate`, silently dropping lnd to its static fallback fee rate",
     "url": "https://github.com/lightningnetwork/lnd/issues",
     "category": "bug_fix",
-    "labels": ["bug", "htlc"],
+    "labels": [],
     "difficulty": "advanced",
     "language": "Go",
-    "tracks": ["lightning"],
-    "skills": ["go", "htlc", "lightning"],
-    "estimatedHours": 12,
-    "summary": "Reproduce and harden interceptor timeout handling."
-  },
-  {
-    "id": "ldk-help-docs",
-    "repoId": "ldk",
-    "number": 3102,
-    "title": "Improve channel monitor persistence guide",
-    "url": "https://github.com/lightningdevkit/rust-lightning/issues",
-    "category": "documentation",
-    "labels": ["docs", "help wanted"],
-    "difficulty": "intermediate",
-    "language": "Rust",
-    "tracks": ["lightning"],
-    "skills": ["rust", "docs", "persistence"],
-    "estimatedHours": 4,
-    "summary": "Expand persistence docs for mobile and embedded LN apps."
-  },
-  {
-    "id": "ldk-feature-sample",
-    "repoId": "ldk",
-    "number": 3088,
-    "title": "Sample: open channel against a Polar regtest node",
-    "url": "https://github.com/lightningdevkit/rust-lightning/issues",
-    "category": "feature_request",
-    "labels": ["examples", "help wanted"],
-    "difficulty": "intermediate",
-    "language": "Rust",
-    "tracks": ["lightning"],
-    "skills": ["rust", "regtest", "lightning"],
-    "estimatedHours": 6,
-    "summary": "Ship a guided sample pairing LDK with a local Polar network."
-  },
-  {
-    "id": "rtl-gfi-ui",
-    "repoId": "rtl",
-    "number": 1420,
-    "title": "Show channel capacity utilization sparklines",
-    "url": "https://github.com/Ride-The-Lightning/RTL/issues",
-    "category": "good_first_issue",
-    "labels": ["good first issue", "ui"],
-    "difficulty": "beginner",
-    "language": "TypeScript",
-    "tracks": ["lightning"],
-    "skills": ["typescript", "frontend", "ui"],
-    "estimatedHours": 5,
-    "summary": "Add compact capacity visuals to the channels table."
-  },
-  {
-    "id": "rtl-help-i18n",
-    "repoId": "rtl",
-    "number": 1395,
-    "title": "Add missing Spanish translations for payments view",
-    "url": "https://github.com/Ride-The-Lightning/RTL/issues",
-    "category": "help_wanted",
-    "labels": ["help wanted", "i18n"],
-    "difficulty": "beginner",
-    "language": "TypeScript",
-    "tracks": ["lightning"],
-    "skills": ["i18n", "frontend"],
-    "estimatedHours": 2,
-    "summary": "Fill translation gaps for Spanish locale strings."
-  },
-  {
-    "id": "lnbits-gfi-extension",
-    "repoId": "lnbits",
-    "number": 2650,
-    "title": "Starter extension: tip jar webhook example",
-    "url": "https://github.com/lnbits/lnbits/issues",
-    "category": "good_first_issue",
-    "labels": ["good first issue", "extension"],
-    "difficulty": "beginner",
-    "language": "Python",
-    "tracks": ["lightning", "bitcoin"],
-    "skills": ["python", "extensions", "webhooks"],
-    "estimatedHours": 4,
-    "summary": "Scaffold a tiny tip-jar extension as a teaching example."
-  },
-  {
-    "id": "lnbits-bug-auth",
-    "repoId": "lnbits",
-    "number": 2611,
-    "title": "Fix session expiry redirect loop for extension routes",
-    "url": "https://github.com/lnbits/lnbits/issues",
-    "category": "bug_fix",
-    "labels": ["bug", "auth"],
-    "difficulty": "intermediate",
-    "language": "Python",
-    "tracks": ["lightning"],
-    "skills": ["python", "auth"],
-    "estimatedHours": 5,
-    "summary": "Resolve auth redirect loop when extension sessions expire."
-  },
-  {
-    "id": "alby-feature-budget",
-    "repoId": "alby",
-    "number": 2105,
-    "title": "Allow per-site allowance budgets in extension",
-    "url": "https://github.com/getAlby/lightning-browser-extension/issues",
-    "category": "feature_request",
-    "labels": ["feature", "help wanted"],
-    "difficulty": "intermediate",
-    "language": "TypeScript",
-    "tracks": ["lightning"],
-    "skills": ["typescript", "browser", "wallet"],
+    "tracks": [
+      "lightning"
+    ],
+    "skills": [
+      "go",
+      "bitcoind",
+      "fees"
+    ],
     "estimatedHours": 8,
-    "summary": "Let users set spending budgets per website origin."
+    "summary": "Bitcoin Core 32's estimatesmartfee can omit the feerate field, and lnd silently treats that as zero and falls back to a static fee. Detect and handle the missing field."
   },
   {
-    "id": "alby-docs-webln",
-    "repoId": "alby",
-    "number": 2080,
-    "title": "Add WebLN enable() troubleshooting section",
-    "url": "https://github.com/getAlby/lightning-browser-extension/issues",
-    "category": "documentation",
-    "labels": ["docs", "good first issue"],
-    "difficulty": "beginner",
-    "language": "TypeScript",
-    "tracks": ["lightning"],
-    "skills": ["docs", "webln"],
-    "estimatedHours": 2,
-    "summary": "Document common WebLN enable failures for web apps."
-  },
-  {
-    "id": "polar-gfi-wallet-rpc",
-    "repoId": "polar",
-    "number": 1096,
-    "title": "Use default wallet for RPC commands when multiple wallets are loaded",
-    "url": "https://github.com/jamaljsr/polar/issues",
+    "id": "cln-recover-missing-comma",
+    "repoId": "core-lightning",
+    "number": 9630,
+    "title": "plugins/recover: missing comma in nodes_for_gossip concatenates two bootstrap addresses into invalid address",
+    "url": "https://github.com/ElementsProject/lightning/issues",
     "category": "good_first_issue",
-    "labels": ["good first issue", "bug", "up for grabs"],
-    "difficulty": "beginner",
-    "language": "TypeScript",
-    "tracks": ["lightning", "bitcoin"],
-    "skills": ["typescript", "electron", "rpc"],
-    "estimatedHours": 3,
-    "summary": "Fix Polar RPC calls so multi-wallet nodes use a sensible default wallet."
-  },
-  {
-    "id": "cln-help-plugin",
-    "repoId": "core-lightning",
-    "number": 7550,
-    "title": "Example plugin: invoice expiry notifier",
-    "url": "https://github.com/ElementsProject/lightning/issues",
-    "category": "help_wanted",
-    "labels": ["plugin", "help wanted"],
-    "difficulty": "intermediate",
-    "language": "Python",
-    "tracks": ["lightning"],
-    "skills": ["python", "plugins", "lightning"],
-    "estimatedHours": 6,
-    "summary": "Publish a small CLN plugin that notifies on invoice expiry."
-  },
-  {
-    "id": "cln-docs-rpc-examples",
-    "repoId": "core-lightning",
-    "number": 9294,
-    "title": "Add missing RPC examples to autogenerate-rpc-examples script",
-    "url": "https://github.com/ElementsProject/lightning/issues",
-    "category": "documentation",
-    "labels": ["documentation", "docs"],
+    "labels": [],
     "difficulty": "beginner",
     "language": "C",
-    "tracks": ["lightning"],
-    "skills": ["docs", "rpc"],
+    "tracks": [
+      "lightning"
+    ],
+    "skills": [
+      "c"
+    ],
+    "estimatedHours": 1,
+    "summary": "A missing comma in plugins/recover.c joins two bootstrap node addresses into one invalid string. A one-line fix plus a quick test - a great first CLN PR."
+  },
+  {
+    "id": "cln-json-amount-overflow",
+    "repoId": "core-lightning",
+    "number": 9617,
+    "title": "common/json_parse: json_to_bitcoin_amount fails to detect overflow and accepts negative/empty inputs",
+    "url": "https://github.com/ElementsProject/lightning/issues",
+    "category": "bug_fix",
+    "labels": [],
+    "difficulty": "intermediate",
+    "language": "C",
+    "tracks": [
+      "lightning"
+    ],
+    "skills": [
+      "c",
+      "parsing",
+      "tests"
+    ],
+    "estimatedHours": 5,
+    "summary": "json_to_bitcoin_amount has a tautological overflow check and accepts negative or empty inputs. Fix the parsing and add tests for the edge cases."
+  },
+  {
+    "id": "cln-freebsd-qsort-r",
+    "repoId": "core-lightning",
+    "number": 9616,
+    "title": "v26.06.9 not compiling on FreeBSD 15.1 (ccan/ccan/asort/asort.h with a solution)",
+    "url": "https://github.com/ElementsProject/lightning/issues",
+    "category": "bug_fix",
+    "labels": [],
+    "difficulty": "intermediate",
+    "language": "C",
+    "tracks": [
+      "lightning"
+    ],
+    "skills": [
+      "c",
+      "build-system",
+      "freebsd"
+    ],
+    "estimatedHours": 3,
+    "summary": "v26.06.9 fails to compile on FreeBSD 15.1 due to a qsort_r clash in ccan's asort.h. The issue includes a proposed solution to turn into a PR."
+  },
+  {
+    "id": "rtl-per-tab-node",
+    "repoId": "rtl",
+    "number": 1744,
+    "title": "Let each tab work on its own node instead of sharing the session's selected node",
+    "url": "https://github.com/Ride-The-Lightning/RTL/issues",
+    "category": "feature_request",
+    "labels": [
+      "enhancement",
+      "All Implementations"
+    ],
+    "difficulty": "intermediate",
+    "language": "TypeScript",
+    "tracks": [
+      "lightning"
+    ],
+    "skills": [
+      "typescript",
+      "angular",
+      "node.js"
+    ],
+    "estimatedHours": 10,
+    "summary": "The selected node is per browser session, so two tabs can't manage different nodes. Make node selection per tab."
+  },
+  {
+    "id": "lnbits-fiat-invoice-expiry",
+    "repoId": "lnbits",
+    "number": 4245,
+    "title": "[BUG] Pending sweep fails fiat invoices after the Lightning expiry (1 h) without asking the provider; a later Stripe payment is never credited",
+    "url": "https://github.com/lnbits/lnbits/issues",
+    "category": "bug_fix",
+    "labels": [
+      "bug"
+    ],
+    "difficulty": "intermediate",
+    "language": "Python",
+    "tracks": [
+      "lightning",
+      "bitcoin"
+    ],
+    "skills": [
+      "python",
+      "payments",
+      "fiat"
+    ],
+    "estimatedHours": 6,
+    "summary": "Fiat invoices (Stripe, PayPal, etc.) are expired after the 1h Lightning expiry without checking the provider, so later payments are never credited. Check with the provider before failing them."
+  },
+  {
+    "id": "alby-nwc-failed-payment",
+    "repoId": "alby",
+    "number": 3635,
+    "title": "[BUG] Failed payment shows as sent in NWC connector",
+    "url": "https://github.com/getAlby/lightning-browser-extension/issues",
+    "category": "bug_fix",
+    "labels": [],
+    "difficulty": "intermediate",
+    "language": "TypeScript",
+    "tracks": [
+      "lightning"
+    ],
+    "skills": [
+      "typescript",
+      "nwc",
+      "react"
+    ],
+    "estimatedHours": 4,
+    "summary": "Payments that failed (no preimage) show as sent in the extension's NWC connector, while Alby Hub shows them as failed. Fix the status mapping."
+  },
+  {
+    "id": "polar-custom-image-datadir",
+    "repoId": "polar",
+    "number": 1402,
+    "title": "Custom node images fail to start unless the data dir is set in the command",
+    "url": "https://github.com/jamaljsr/polar/issues",
+    "category": "help_wanted",
+    "labels": [
+      "enhancement",
+      "up for grabs"
+    ],
+    "difficulty": "intermediate",
+    "language": "TypeScript",
+    "tracks": [
+      "lightning",
+      "bitcoin"
+    ],
+    "skills": [
+      "typescript",
+      "docker"
+    ],
+    "estimatedHours": 4,
+    "summary": "Custom node images that run as root fail to start because the default commands don't pass a data dir. Pass the data dir flag explicitly so custom images work."
+  },
+  {
+    "id": "polar-explain-ports",
+    "repoId": "polar",
+    "number": 1399,
+    "title": "Feature Request: Explain host port vs. container port when connecting to nodes",
+    "url": "https://github.com/jamaljsr/polar/issues",
+    "category": "feature_request",
+    "labels": [
+      "enhancement"
+    ],
+    "difficulty": "beginner",
+    "language": "TypeScript",
+    "tracks": [
+      "lightning",
+      "bitcoin"
+    ],
+    "skills": [
+      "typescript",
+      "react",
+      "ux"
+    ],
+    "estimatedHours": 3,
+    "summary": "Users new to Docker confuse host and container ports when connecting to nodes. Add clear UI guidance explaining which port to use from where."
+  },
+  {
+    "id": "polar-deb-libasound2",
+    "repoId": "polar",
+    "number": 1400,
+    "title": "Bug: .deb package is missing the libasound2 dependency",
+    "url": "https://github.com/jamaljsr/polar/issues",
+    "category": "good_first_issue",
+    "labels": [
+      "bug"
+    ],
+    "difficulty": "beginner",
+    "language": "TypeScript",
+    "tracks": [
+      "lightning",
+      "bitcoin"
+    ],
+    "skills": [
+      "electron",
+      "packaging",
+      "linux"
+    ],
     "estimatedHours": 2,
-    "summary": "Fill gaps in generated RPC examples so new CLN builders get complete API docs."
+    "summary": "The .deb package doesn't declare libasound2, so Polar fails to start on minimal Ubuntu. Add the missing package dependency."
+  },
+  {
+    "id": "eclair-open-channel-commit-fee",
+    "repoId": "eclair",
+    "number": 3383,
+    "title": "Failure to reject `open_channel` where funder cannot pay commitment fee",
+    "url": "https://github.com/ACINQ/eclair/issues",
+    "category": "bug_fix",
+    "labels": [],
+    "difficulty": "advanced",
+    "language": "Scala",
+    "tracks": [
+      "lightning"
+    ],
+    "skills": [
+      "scala",
+      "bolts",
+      "channels"
+    ],
+    "estimatedHours": 8,
+    "summary": "BOLT 2 requires rejecting open_channel when the funder can't pay the initial commitment fee, and eclair doesn't. Add the check and a test."
+  },
+  {
+    "id": "secp256k1-ellswift-ctime-auxrnd",
+    "repoId": "libsecp256k1",
+    "number": 1962,
+    "title": "ellswift: constant-time tests don't cover `auxrnd32` in `secp256k1_ellswift_create`",
+    "url": "https://github.com/bitcoin-core/secp256k1/issues",
+    "category": "bug_fix",
+    "labels": [
+      "assurance",
+      "side-channel",
+      "tweak/refactor"
+    ],
+    "difficulty": "advanced",
+    "language": "C",
+    "tracks": [
+      "bitcoin"
+    ],
+    "skills": [
+      "c",
+      "cryptography",
+      "constant-time"
+    ],
+    "estimatedHours": 8,
+    "summary": "The constant-time tests don't cover auxrnd32 in secp256k1_ellswift_create, and the code isn't constant time in it. Extend the ctime tests and fix the gap."
+  },
+  {
+    "id": "payjoin-cli-completions",
+    "repoId": "payjoin",
+    "number": 1914,
+    "title": "Add shell completions command to payjoin-cli",
+    "url": "https://github.com/payjoin/rust-payjoin/issues",
+    "category": "feature_request",
+    "labels": [],
+    "difficulty": "beginner",
+    "language": "Rust",
+    "tracks": [
+      "bitcoin"
+    ],
+    "skills": [
+      "rust",
+      "clap",
+      "cli"
+    ],
+    "estimatedHours": 3,
+    "summary": "Add a completions subcommand to payjoin-cli that generates shell completions, following the approach already used in bdk-cli."
+  },
+  {
+    "id": "payjoin-bindings-readme-stability",
+    "repoId": "payjoin",
+    "number": 1948,
+    "title": "Make Bindings README § Stability static",
+    "url": "https://github.com/payjoin/rust-payjoin/issues",
+    "category": "documentation",
+    "labels": [],
+    "difficulty": "beginner",
+    "language": "Rust",
+    "tracks": [
+      "bitcoin"
+    ],
+    "skills": [
+      "docs",
+      "markdown"
+    ],
+    "estimatedHours": 1,
+    "summary": "The Stability section of the bindings README needs a version bump every release. Rewrite it so it's static."
+  },
+  {
+    "id": "payjoin-mailroom-tests-dry",
+    "repoId": "payjoin",
+    "number": 1944,
+    "title": "DRY up payjoin-mailroom tests",
+    "url": "https://github.com/payjoin/rust-payjoin/issues",
+    "category": "help_wanted",
+    "labels": [],
+    "difficulty": "intermediate",
+    "language": "Rust",
+    "tracks": [
+      "bitcoin"
+    ],
+    "skills": [
+      "rust",
+      "testing",
+      "refactor"
+    ],
+    "estimatedHours": 4,
+    "summary": "payjoin-mailroom tests repeat a lot of setup code. Refactor the shared code into helpers used across the existing tests."
+  },
+  {
+    "id": "fedimint-amount-from-str-panic",
+    "repoId": "fedimint",
+    "number": 9355,
+    "title": "core: Amount::from_str panics on values above 21M BTC instead of returning an error",
+    "url": "https://github.com/fedimint/fedimint/issues",
+    "category": "bug_fix",
+    "labels": [],
+    "difficulty": "beginner",
+    "language": "Rust",
+    "tracks": [
+      "bitcoin"
+    ],
+    "skills": [
+      "rust",
+      "error-handling"
+    ],
+    "estimatedHours": 3,
+    "summary": "Amount::from_str panics on values above 21M BTC instead of returning an error. Return a parse error and add a test."
+  },
+  {
+    "id": "fedimint-safeurl-join-path",
+    "repoId": "fedimint",
+    "number": 9339,
+    "title": "core: SafeUrl::join_path corrupts URL credentials and drops query/fragment",
+    "url": "https://github.com/fedimint/fedimint/issues",
+    "category": "bug_fix",
+    "labels": [],
+    "difficulty": "intermediate",
+    "language": "Rust",
+    "tracks": [
+      "bitcoin"
+    ],
+    "skills": [
+      "rust",
+      "urls",
+      "tests"
+    ],
+    "estimatedHours": 4,
+    "summary": "SafeUrl::join_path re-parses a stringified URL, which corrupts credentials and drops the query and fragment. Reimplement it on the URL type directly."
+  },
+  {
+    "id": "stratum-nominal-hash-rate-nan",
+    "repoId": "stratum-v2",
+    "number": 2376,
+    "title": "`nominal_hash_rate` is accepting NaN and others",
+    "url": "https://github.com/stratum-mining/stratum/issues",
+    "category": "bug_fix",
+    "labels": [],
+    "difficulty": "beginner",
+    "language": "Rust",
+    "tracks": [
+      "bitcoin"
+    ],
+    "skills": [
+      "rust",
+      "validation"
+    ],
+    "estimatedHours": 3,
+    "summary": "nominal_hash_rate in OpenChannel and UpdateChannel accepts NaN and other nonsensical floats. Reject invalid values and add tests."
+  },
+  {
+    "id": "stratum-docs-version-rolling",
+    "repoId": "stratum-v2",
+    "number": 2400,
+    "title": "`channels_sv2`: document that version-rolling policy is per job and that standard channels always roll (client `version_rolling` is a capability; the group-job flag is dropped for standard channels by design)",
+    "url": "https://github.com/stratum-mining/stratum/issues",
+    "category": "documentation",
+    "labels": [],
+    "difficulty": "intermediate",
+    "language": "Rust",
+    "tracks": [
+      "bitcoin"
+    ],
+    "skills": [
+      "rust",
+      "rustdoc",
+      "mining"
+    ],
+    "estimatedHours": 3,
+    "summary": "Document in channels_sv2's rustdocs that version rolling is a per-job policy and that standard channels always roll, so embedders know how the flags behave."
+  },
+  {
+    "id": "stratum-buffer-fuzz-target",
+    "repoId": "stratum-v2",
+    "number": 2405,
+    "title": "Add stateful fuzz target for buffer_sv2",
+    "url": "https://github.com/stratum-mining/stratum/issues",
+    "category": "feature_request",
+    "labels": [],
+    "difficulty": "advanced",
+    "language": "Rust",
+    "tracks": [
+      "bitcoin"
+    ],
+    "skills": [
+      "rust",
+      "fuzzing"
+    ],
+    "estimatedHours": 10,
+    "summary": "buffer_sv2 has no fuzz coverage. Build a structure-aware fuzz target driven by sequences of BufferPool operations."
+  },
+  {
+    "id": "plain-talk-dataset-validation",
+    "repoId": "bitcoin-plain-talk",
+    "number": 76,
+    "title": "Add a validation check for the training datasets",
+    "url": "https://github.com/btc-plain-talk/bitcoin-plain-talk/issues",
+    "category": "good_first_issue",
+    "labels": [
+      "good first issue",
+      "dev",
+      "ai"
+    ],
+    "difficulty": "beginner",
+    "language": "TypeScript",
+    "tracks": [
+      "bitcoin"
+    ],
+    "skills": [
+      "javascript",
+      "scripting"
+    ],
+    "estimatedHours": 3,
+    "summary": "Add a small script that validates the exported training datasets, so empty or outdated exports (like the Pidgin/Yoruba bug) get caught."
+  },
+  {
+    "id": "plain-talk-english-entries",
+    "repoId": "bitcoin-plain-talk",
+    "number": 70,
+    "title": "Add English entries for Exchange, Payment Channel, Phishing, CPFP and Smart Contract",
+    "url": "https://github.com/btc-plain-talk/bitcoin-plain-talk/issues",
+    "category": "good_first_issue",
+    "labels": [
+      "good first issue",
+      "content"
+    ],
+    "difficulty": "beginner",
+    "language": "TypeScript",
+    "tracks": [
+      "bitcoin"
+    ],
+    "skills": [
+      "writing",
+      "markdown",
+      "content"
+    ],
+    "estimatedHours": 2,
+    "summary": "Write plain-English glossary entries for Exchange, Payment Channel, Phishing, CPFP and Smart Contract - terms already linked from other entries."
+  },
+  {
+    "id": "plain-talk-fix-dataset-export",
+    "repoId": "bitcoin-plain-talk",
+    "number": 73,
+    "title": "Fix dataset export for Pidgin and Yoruba (currently exports 0 examples)",
+    "url": "https://github.com/btc-plain-talk/bitcoin-plain-talk/issues",
+    "category": "good_first_issue",
+    "labels": [
+      "good first issue",
+      "dev",
+      "lang:pidgin",
+      "lang:yoruba",
+      "ai"
+    ],
+    "difficulty": "beginner",
+    "language": "TypeScript",
+    "tracks": [
+      "bitcoin"
+    ],
+    "skills": [
+      "javascript",
+      "debugging"
+    ],
+    "estimatedHours": 3,
+    "summary": "npm run export:dataset outputs 0 examples for Pidgin and Yoruba despite 81 entries. Find out why and fix the export."
   }
 ]
