@@ -38,9 +38,9 @@ export function getAllCuratedIssues(): CuratedIssue[] {
   return issues;
 }
 
-export function getCuratedIssueSkills(): string[] {
+export function getCuratedIssueSkills(extraIssues: CuratedIssue[] = []): string[] {
   const skills = new Set<string>();
-  for (const issue of issues) {
+  for (const issue of [...issues, ...extraIssues]) {
     for (const skill of issue.skills) {
       skills.add(skill);
     }
@@ -50,6 +50,22 @@ export function getCuratedIssueSkills(): string[] {
 
 export function getCuratedIssueById(id: string): CuratedIssue | null {
   return issues.find((issue) => issue.id === id) ?? null;
+}
+
+/** Catalog repo for the issue, or — for a submitted issue on a repo outside
+ *  the Discover catalog — a minimal stand-in built from its full name. */
+function resolveIssueRepository(
+  issue: CuratedIssue,
+): { name: string; repository: string; url: string; minLevel: number } | null {
+  const repo = getDiscoveryRepositoryById(issue.repoId);
+  if (repo) return repo;
+  if (!issue.repositoryFullName) return null;
+  return {
+    name: issue.repositoryFullName.split("/")[1] ?? issue.repositoryFullName,
+    repository: issue.repositoryFullName,
+    url: `https://github.com/${issue.repositoryFullName}`,
+    minLevel: 1,
+  };
 }
 
 /**
@@ -78,7 +94,7 @@ export function recommendIssues(
 
   const scored: IssueRecommendation[] = [];
 
-  for (const issue of issues) {
+  for (const issue of [...issues, ...(context.submittedIssues ?? [])]) {
     if (dismissed.has(issue.id) || unavailable.has(issue.id)) continue;
     if (
       options.category &&
@@ -104,7 +120,7 @@ export function recommendIssues(
       continue;
     }
 
-    const repo = getDiscoveryRepositoryById(issue.repoId);
+    const repo = resolveIssueRepository(issue);
     if (!repo) continue;
 
     const reasons: string[] = [];
@@ -180,6 +196,11 @@ export function recommendIssues(
           reasons.push("Feature work pairs well with project experience");
         }
         break;
+    }
+
+    if (issue.submittedByUsername) {
+      score += 2;
+      reasons.push(`Suggested by @${issue.submittedByUsername}`);
     }
 
     if (saved.has(issue.id)) {

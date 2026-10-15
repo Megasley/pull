@@ -10,5 +10,6 @@ export * from "./partners";
 export * from "./pr-review-requests";
 export * from "./relations";
 export * from "./roadmaps";
+export * from "./submitted-issues";
 export * from "./support";
 export * from "./users";

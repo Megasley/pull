@@ -8,9 +8,9 @@ import { getAllCuratedIssues } from "./engine";
  *  well inside even the unauthenticated rate limit. */
 const ISSUE_STATE_REVALIDATE_SECONDS = 60 * 60 * 6;
 
-type IssueState = "open" | "closed" | "deleted" | "not_an_issue" | "unknown";
+export type IssueState = "open" | "closed" | "deleted" | "not_an_issue" | "unknown";
 
-async function fetchIssueState(repoFullName: string, number: number): Promise<IssueState> {
+export async function fetchIssueState(repoFullName: string, number: number): Promise<IssueState> {
   const token = process.env.GITHUB_DISCOVERY_TOKEN;
   try {
     const response = await fetch(`${GITHUB_API_BASE}/repos/${repoFullName}/issues/${number}`, {

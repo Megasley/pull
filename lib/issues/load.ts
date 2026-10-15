@@ -8,6 +8,7 @@ import { buildAllRoadmapProgressSummaries } from "@/lib/progress/summary";
 import { getAllCompletedNodeSlugs } from "@/lib/progress/repository";
 import { getUnavailableCuratedIssueIds } from "./availability";
 import { recommendIssues } from "./engine";
+import { loadApprovedSubmittedIssues } from "./submissions";
 import type { IssueRecommendationContext } from "@/types/issues";
 
 export const GUEST_ISSUE_CONTEXT: IssueRecommendationContext = {
@@ -24,12 +25,14 @@ export const GUEST_ISSUE_CONTEXT: IssueRecommendationContext = {
 export async function loadIssueRecommendationContext(
   userId: string,
 ): Promise<IssueRecommendationContext> {
-  const [base, progressByRoadmap, activity, unavailableIssueIds] = await Promise.all([
-    loadDiscoveryProfileContext(userId),
-    getAllCompletedNodeSlugs(userId),
-    countGithubSyncedEntities(userId),
-    getUnavailableCuratedIssueIds(),
-  ]);
+  const [base, progressByRoadmap, activity, unavailableIssueIds, submittedIssues] =
+    await Promise.all([
+      loadDiscoveryProfileContext(userId),
+      getAllCompletedNodeSlugs(userId),
+      countGithubSyncedEntities(userId),
+      getUnavailableCuratedIssueIds(),
+      loadApprovedSubmittedIssues(),
+    ]);
 
   const roadmaps = buildAllRoadmapProgressSummaries(progressByRoadmap);
   const completedProjectSlugs = roadmaps.flatMap((item) =>
@@ -48,13 +51,22 @@ export async function loadIssueRecommendationContext(
     githubActivityCount: activity.commits + activity.pullRequests + activity.issues,
     recommendedRepoIds,
     unavailableIssueIds,
+    submittedIssues,
   };
+}
+
+async function loadGuestIssueContext(): Promise<IssueRecommendationContext> {
+  const [unavailableIssueIds, submittedIssues] = await Promise.all([
+    getUnavailableCuratedIssueIds(),
+    loadApprovedSubmittedIssues(),
+  ]);
+  return { ...GUEST_ISSUE_CONTEXT, unavailableIssueIds, submittedIssues };
 }
 
 export async function loadIssueRecommendationsPageData(userId?: string | null) {
   const context = userId
     ? await loadIssueRecommendationContext(userId)
-    : { ...GUEST_ISSUE_CONTEXT, unavailableIssueIds: await getUnavailableCuratedIssueIds() };
+    : await loadGuestIssueContext();
   const seed = recommendIssues(context, { limit: 24, maxPerRepo: 3 });
   return { context, seed, personalized: Boolean(userId) };
 }

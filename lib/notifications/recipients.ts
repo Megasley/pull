@@ -148,3 +148,22 @@ export async function syncUserEmail(
       ),
     );
 }
+
+/** Every admin with an email on file — for moderation alerts (e.g. a new
+ *  issue submission waiting for approval). Not preference-gated: acting on
+ *  these is part of the admin role. */
+export async function listAdminRecipients(): Promise<NotificationRecipient[]> {
+  if (!isDatabaseConfigured()) {
+    return [];
+  }
+
+  const db = getDb();
+  const rows = await db
+    .select()
+    .from(users)
+    .where(and(eq(users.role, "admin"), isNotNull(users.email)));
+
+  return rows
+    .map(mapRecipient)
+    .filter((item): item is NotificationRecipient => item !== null);
+}
