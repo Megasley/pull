@@ -3,6 +3,7 @@ import { sendEmail, type SendEmailInput, type SendEmailResult } from "@/lib/emai
 import { AchievementEmail } from "@/lib/email/templates/achievement";
 import { AnswerAcceptedEmail } from "@/lib/email/templates/answer-accepted";
 import { CommentReplyEmail } from "@/lib/email/templates/comment-reply";
+import { IssueSubmittedEmail } from "@/lib/email/templates/issue-submitted";
 import { PrReviewCompletedEmail } from "@/lib/email/templates/pr-review-completed";
 import { PrReviewDigestEmail } from "@/lib/email/templates/pr-review-digest";
 import { ReviewOutcomeEmail } from "@/lib/email/templates/review-outcome";
@@ -11,6 +12,7 @@ import { RoleGrantedEmail } from "@/lib/email/templates/role-granted";
 import { WelcomeEmail } from "@/lib/email/templates/welcome";
 import {
   getNotificationRecipient,
+  listAdminRecipients,
   listPrReviewDigestRecipients,
   listReviewQueueRecipients,
   recipientAllows,
@@ -420,4 +422,33 @@ export async function notifyPrReviewDigest(
   }
 
   return stats;
+}
+
+/** Tells every admin a builder submitted an issue for the recommendations,
+ *  linking to /admin/issues where it can be approved. */
+export async function notifyIssueSubmitted(input: {
+  submitterUsername: string;
+  repoFullName: string;
+  issueNumber: number;
+  issueTitle: string;
+  issueUrl: string;
+}) {
+  const recipients = await listAdminRecipients();
+  const href = appUrl("/admin/issues");
+
+  const payloads: SendEmailInput[] = recipients.map((recipient) => ({
+    to: recipient.email,
+    subject: `Issue submitted for approval: ${input.repoFullName} #${input.issueNumber}`,
+    react: IssueSubmittedEmail({ displayName: recipient.displayName, href, ...input }),
+  }));
+
+  const stats = await sendEmailInBatches(payloads);
+  if (stats.failed > 0) {
+    console.error("[notifications] issue-submitted email failures", stats.failures);
+  }
+  return stats;
+}
+
+export function notifyIssueSubmittedAsync(input: Parameters<typeof notifyIssueSubmitted>[0]) {
+  fireAndForget(notifyIssueSubmitted(input), "issue-submitted");
 }

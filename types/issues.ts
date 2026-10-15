@@ -18,6 +18,12 @@ export type CuratedIssue = {
   skills: string[];
   estimatedHours: number;
   summary: string;
+  /** Set on builder-submitted issues (lib/issues/submissions.ts), which can
+   *  come from repos outside the Discover catalog — `repoId` then won't
+   *  resolve, and this is used for the card's repo name/link instead. */
+  repositoryFullName?: string;
+  /** Pull username of the builder who suggested it, for submitted issues. */
+  submittedByUsername?: string | null;
 };
 
 export type IssueRecommendationContext = {
@@ -32,6 +38,9 @@ export type IssueRecommendationContext = {
   dismissedIssueIds?: string[];
   /** Curated issues closed or deleted on GitHub — never recommended. */
   unavailableIssueIds?: string[];
+  /** Admin-approved, still-open builder submissions, ranked alongside the
+   *  static catalog. */
+  submittedIssues?: CuratedIssue[];
 };
 
 export type IssueRecommendation = {

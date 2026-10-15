@@ -43,6 +43,9 @@ export default async function DiscoverPage() {
         meta={metaParts.join(" · ")}
         actions={
           <>
+            <Button asChild>
+              <Link href="/issues/submit">./submit-issue</Link>
+            </Button>
             <Button asChild variant="outline">
               <Link href="/issues">ls ./issues</Link>
             </Button>

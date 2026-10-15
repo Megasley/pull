@@ -58,7 +58,10 @@ export function IssueRecommendations({ context }: IssueRecommendationsProps) {
   const difficulty =
     (searchParams.get("difficulty") as RoadmapDifficulty | "all" | null) ?? "all";
   const skill = searchParams.get("skill") ?? "all";
-  const skills = useMemo(() => getCuratedIssueSkills(), []);
+  const skills = useMemo(
+    () => getCuratedIssueSkills(context.submittedIssues),
+    [context.submittedIssues],
+  );
 
   function updateFilters(next: {
     category?: IssueCategory | "all";
@@ -296,7 +299,10 @@ export function IssueRecommendations({ context }: IssueRecommendationsProps) {
           </p>
           <ul className="mt-3 flex flex-wrap gap-2">
             {dismissedIssueIds.map((id) => {
-              const issue = getCuratedIssueById(id);
+              const issue =
+                getCuratedIssueById(id) ??
+                context.submittedIssues?.find((item) => item.id === id) ??
+                null;
               return (
                 <li key={id}>
                   <Button

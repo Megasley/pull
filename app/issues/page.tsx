@@ -47,6 +47,9 @@ export default async function IssuesPage() {
         meta={metaParts.join(" · ")}
         actions={
           <>
+            <Button asChild>
+              <Link href="/issues/submit">./submit-issue</Link>
+            </Button>
             <Button asChild variant="outline">
               <Link href="/discover">ls ./open-source</Link>
             </Button>
