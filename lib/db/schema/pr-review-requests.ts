@@ -5,6 +5,7 @@ import {
   pgTable,
   text,
   timestamp,
+  uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
 
@@ -76,5 +77,36 @@ export const prReviewRequests = pgTable(
     index("pr_review_requests_submitted_by_idx").on(table.submittedByUserId),
     index("pr_review_requests_repo_number_idx").on(table.repoFullName, table.number),
     index("pr_review_requests_flagged_idx").on(table.flaggedForReview),
+  ],
+);
+
+/**
+ * Every Pull builder with a GitHub-verified review on a listed PR — not just
+ * the first one, which is what flips `prReviewRequests.status` to
+ * "reviewed" and gets `reviewedByUserId`. Rows land via the same
+ * markReviewedByMatch path (sync or "I reviewed this"), so membership here
+ * is always verified against GitHub, never self-claimed. Powers the public
+ * "Reviewed" tab on /pr-reviews.
+ */
+export const prReviewRequestReviewers = pgTable(
+  "pr_review_request_reviewers",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    requestId: uuid("request_id")
+      .notNull()
+      .references(() => prReviewRequests.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("pr_review_request_reviewers_request_user_idx").on(
+      table.requestId,
+      table.userId,
+    ),
+    index("pr_review_request_reviewers_user_idx").on(table.userId),
   ],
 );

@@ -10,6 +10,7 @@ import {
   listAllReviewRequests,
   listMyReviewedRequests,
   listMySubmissions,
+  listReviewedRequests,
   listReviewRequestsForViewer,
   previewPullRequestForReview,
   reportOwnReview,
@@ -72,6 +73,18 @@ export async function listReviewRequestsAction() {
   const viewerGithubUsername = profile.ok ? profile.profile.githubUsername : null;
   const requests = await listReviewRequestsForViewer(viewerGithubUsername);
   return { ok: true as const, requests, viewerSignedIn: profile.ok };
+}
+
+export async function listReviewedRequestsAction() {
+  const gate = await requireActiveAccount();
+  const requests = await listReviewedRequests();
+  return {
+    ok: true as const,
+    requests,
+    viewer: gate.ok
+      ? { username: gate.profile.username, githubUsername: gate.profile.githubUsername }
+      : null,
+  };
 }
 
 export async function previewPrForReviewAction(prUrl: string) {

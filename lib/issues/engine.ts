@@ -69,6 +69,7 @@ export function recommendIssues(
   const limit = options.limit ?? 12;
   const maxPerRepo = options.maxPerRepo ?? 2;
   const dismissed = new Set(context.dismissedIssueIds ?? []);
+  const unavailable = new Set(context.unavailableIssueIds ?? []);
   const saved = new Set(context.savedIssueIds ?? []);
   const languages = new Set(context.languages.map((item) => item.toLowerCase()));
   const completedTracks = new Set(context.completedRoadmapSlugs);
@@ -78,7 +79,7 @@ export function recommendIssues(
   const scored: IssueRecommendation[] = [];
 
   for (const issue of issues) {
-    if (dismissed.has(issue.id)) continue;
+    if (dismissed.has(issue.id) || unavailable.has(issue.id)) continue;
     if (
       options.category &&
       options.category !== "all" &&

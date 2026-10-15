@@ -45,7 +45,13 @@ export function IssueRecommendations({ context }: IssueRecommendationsProps) {
   const searchParams = useSearchParams();
   const [showSavedOnly, setShowSavedOnly] = useState(false);
   const [pending, startTransition] = useTransition();
-  const { savedIssueIds, dismissedIssueIds } = useIssuePreferenceIds();
+  const { savedIssueIds, dismissedIssueIds: allDismissedIssueIds } = useIssuePreferenceIds();
+  // A dismissed issue that has since closed on GitHub can't come back, so
+  // don't offer to restore it.
+  const dismissedIssueIds = useMemo(() => {
+    const unavailable = new Set(context.unavailableIssueIds ?? []);
+    return allDismissedIssueIds.filter((id) => !unavailable.has(id));
+  }, [allDismissedIssueIds, context.unavailableIssueIds]);
 
   const category =
     (searchParams.get("category") as IssueCategory | "all" | null) ?? "all";

@@ -30,6 +30,8 @@ export type IssueRecommendationContext = {
   recommendedRepoIds: string[];
   savedIssueIds?: string[];
   dismissedIssueIds?: string[];
+  /** Curated issues closed or deleted on GitHub — never recommended. */
+  unavailableIssueIds?: string[];
 };
 
 export type IssueRecommendation = {
