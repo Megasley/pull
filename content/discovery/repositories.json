@@ -471,5 +471,36 @@
     "tracks": ["bitcoin"],
     "recommendedLanguages": ["TypeScript", "Python"],
     "minLevel": 1
+  },
+  {
+    "id": "satquests",
+    "name": "SatQuests",
+    "repository": "aizuanjeme/satquest",
+    "description": "Mobile-first PWA that teaches Bitcoin and Lightning through a Nigerian lens with match puzzles, quizzes, and scam drills, rewarding players with real sats over Lightning.",
+    "url": "https://github.com/aizuanjeme/satquest",
+    "issuesUrl": "https://github.com/aizuanjeme/satquest/labels/good%20first%20issue",
+    "maintainer": "Stephanie Ademuyiwa",
+    "language": "JavaScript",
+    "topics": [
+      "education",
+      "gamification",
+      "pwa",
+      "africa",
+      "bitcoin",
+      "lightning",
+      "translation",
+      "frontend"
+    ],
+    "labels": ["good first issue", "help wanted", "documentation"],
+    "difficulty": "beginner",
+    "estimatedDifficulty": "Easy - translations need no code; level content and UI tweaks need only React basics",
+    "goodFirstIssues": 6,
+    "helpWanted": 6,
+    "averageReviewDays": 3,
+    "health": "good",
+    "size": "small",
+    "tracks": ["bitcoin", "lightning"],
+    "recommendedLanguages": ["JavaScript", "TypeScript"],
+    "minLevel": 1
   }
 ]
