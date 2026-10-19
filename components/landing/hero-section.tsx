@@ -125,15 +125,10 @@ export function HeroSection() {
       </div>
 
       <SiteContainer className="relative flex flex-col py-20 sm:py-28">
-        <div className="flex flex-wrap items-center gap-3">
-          <p className="font-mono text-[11px] tracking-[0.14em] text-ink/70 uppercase">
-            sys.boot // open-source
-            <span className="tech-blink ml-2 inline-block h-2.5 w-2 bg-ink align-middle" />
-          </p>
-          <span className="border border-ink/35 bg-ink/5 px-2 py-1 font-mono text-[10px] tracking-[0.14em] text-ink uppercase">
-            Beta
-          </span>
-        </div>
+        <p className="font-mono text-[11px] tracking-[0.14em] text-ink/70 uppercase">
+          sys.boot // open-source
+          <span className="tech-blink ml-2 inline-block h-2.5 w-2 bg-ink align-middle" />
+        </p>
 
         <h1
           id="hero-heading"
