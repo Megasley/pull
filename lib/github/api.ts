@@ -1,4 +1,5 @@
 import type { GithubClient } from "./client";
+import { isBotAccount } from "./bots";
 import { inferContributionType } from "./contribution-type";
 import {
   GITHUB_ACTIVITY_LIMIT,
@@ -54,7 +55,7 @@ type SearchIssueItem = {
   labels?: Array<{ name: string } | string>;
   pull_request?: { merged_at?: string | null; url?: string };
   repository_url: string;
-  user?: { login: string } | null;
+  user?: { login: string; type?: string } | null;
 };
 
 type SearchResponse = {
@@ -297,13 +298,18 @@ export type DiscoveredPullRequest = {
   githubCreatedAt: string;
 };
 
+/** How many search results to pull per wanted PR, so bot PRs (dependency
+ *  bumps and the like, filtered out below) don't use up the whole page. */
+const BOT_OVERFETCH_FACTOR = 4;
+
 /**
  * Finds open, non-draft PRs with zero reviews yet in a specific repo — the
  * seed data for the PR review discovery dashboard's auto-discovery job
  * (lib/pr-reviews/discovery.ts). Unlike every other search in this file,
  * this isn't scoped to any connected Pull user — `client` may be built with
  * an empty token (unauthenticated, lower rate limit) since this runs on a
- * schedule, not on behalf of a signed-in user.
+ * schedule, not on behalf of a signed-in user. PRs opened by bots are
+ * skipped.
  */
 export async function fetchRepoPullRequestsNeedingReview(
   client: GithubClient,
@@ -311,18 +317,21 @@ export async function fetchRepoPullRequestsNeedingReview(
   limit: number,
 ): Promise<DiscoveredPullRequest[]> {
   const data = await client.request<SearchResponse>(
-    `/search/issues?q=${encodeURIComponent(`repo:${repoFullName} type:pr is:open draft:false review:none`)}&sort=created&order=asc&per_page=${limit}`,
+    `/search/issues?q=${encodeURIComponent(`repo:${repoFullName} type:pr is:open draft:false review:none`)}&sort=created&order=asc&per_page=${Math.min(100, limit * BOT_OVERFETCH_FACTOR)}`,
   );
 
-  return data.items.map((item) => ({
-    githubId: item.id,
-    number: item.number,
-    title: item.title,
-    htmlUrl: item.html_url,
-    authorLogin: item.user?.login ?? "",
-    repoFullName,
-    githubCreatedAt: item.created_at,
-  }));
+  return data.items
+    .filter((item) => !isBotAccount(item.user?.login, item.user?.type))
+    .slice(0, limit)
+    .map((item) => ({
+      githubId: item.id,
+      number: item.number,
+      title: item.title,
+      htmlUrl: item.html_url,
+      authorLogin: item.user?.login ?? "",
+      repoFullName,
+      githubCreatedAt: item.created_at,
+    }));
 }
 
 type ArbitraryPullRequestDetail = {
@@ -331,7 +340,7 @@ type ArbitraryPullRequestDetail = {
   html_url: string;
   state: string;
   merged: boolean;
-  user: { login: string } | null;
+  user: { login: string; type?: string } | null;
   created_at: string;
   additions: number;
   deletions: number;
@@ -345,6 +354,8 @@ export type FetchedPullRequest = {
   state: string;
   merged: boolean;
   authorLogin: string;
+  /** Opened by a bot account (Dependabot, Renovate, …), not a person. */
+  authorIsBot: boolean;
   githubCreatedAt: string;
   additions: number;
   deletions: number;
@@ -374,6 +385,7 @@ export async function fetchPullRequestByUrl(
     state: detail.state,
     merged: detail.merged,
     authorLogin: detail.user?.login ?? "",
+    authorIsBot: isBotAccount(detail.user?.login, detail.user?.type),
     githubCreatedAt: detail.created_at,
     additions: detail.additions,
     deletions: detail.deletions,

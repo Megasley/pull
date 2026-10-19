@@ -10,6 +10,7 @@ import { getAllDiscoveryRepositories } from "@/lib/discovery/catalog";
 // lib/github/sync.ts, which imports THIS file (for the credit-detection
 // hook) — going through the barrel here would be a circular import.
 import { fetchPullRequestByUrl, hasReviewedPullRequest } from "@/lib/github/api";
+import { KNOWN_BOT_LOGIN_LIST } from "@/lib/github/bots";
 import { GithubApiError, GithubClient } from "@/lib/github/client";
 import { getGithubConnection } from "@/lib/github/store";
 import { parsePrUrl } from "@/lib/pr-reviews/validate";
@@ -81,7 +82,8 @@ export type CreateReviewRequestResult =
         | "github_not_connected"
         | "pr_not_found"
         | "rate_limited"
-        | "already_submitted";
+        | "already_submitted"
+        | "bot_pr";
     };
 
 export async function createReviewRequest(input: {
@@ -119,6 +121,9 @@ export async function createReviewRequest(input: {
   } catch (error) {
     console.error("[pr-reviews] createReviewRequest fetch failed", error);
     return { ok: false, reason: "pr_not_found" };
+  }
+  if (pr.authorIsBot) {
+    return { ok: false, reason: "bot_pr" };
   }
 
   const flaggedForReview =
@@ -168,7 +173,7 @@ export type PreviewPullRequestResult =
         deletions: number;
       };
     }
-  | { ok: false; reason: "invalid_url" | "github_not_connected" | "pr_not_found" };
+  | { ok: false; reason: "invalid_url" | "github_not_connected" | "pr_not_found" | "bot_pr" };
 
 /**
  * Fetches a pasted PR URL's real metadata so a builder can confirm it's the
@@ -197,6 +202,9 @@ export async function previewPullRequestForReview(input: {
       fetchPullRequestByUrl(client, parsed.owner, parsed.repo, parsed.number),
       findActiveReviewRequestFor(parsed.repoFullName, parsed.number),
     ]);
+    if (pr.authorIsBot) {
+      return { ok: false, reason: "bot_pr" };
+    }
     return {
       ok: true,
       preview: {
@@ -277,6 +285,19 @@ function mapRequestRow(row: {
  * peer-submitted requests above admin-curated ones, oldest first within
  * each group so nothing silently rots at the bottom.
  */
+/** Excludes PRs opened by bots (Dependabot, Renovate, …) from public
+ *  lists — they can't be submitted any more, but older rows or an admin
+ *  unhide could still surface one. Mirrors `isBotAccount`. */
+function notBotAuthor() {
+  return sql`(
+    lower(${prReviewRequests.authorLogin}) not like '%[bot]'
+    and lower(${prReviewRequests.authorLogin}) not in (${sql.join(
+      KNOWN_BOT_LOGIN_LIST.map((login) => sql`${login}`),
+      sql`, `,
+    )})
+  )`;
+}
+
 export async function listReviewRequestsForViewer(
   viewerGithubUsername: string | null,
 ): Promise<PrReviewRequestRecord[]> {
@@ -287,6 +308,7 @@ export async function listReviewRequestsForViewer(
   const db = getDb();
   const conditions = [
     eq(prReviewRequests.status, "needs_review"),
+    notBotAuthor(),
     // Peer submissions are exempt — a builder asking for a review on their
     // own PR should never be hidden just because the PR itself is old; the
     // age cutoff only exists to keep stale, nobody-asked-for-it ecosystem/
@@ -556,7 +578,7 @@ export async function listReviewedRequests(): Promise<ReviewedPrRecord[]> {
     })
     .from(prReviewRequests)
     .leftJoin(users, eq(prReviewRequests.submittedByUserId, users.id))
-    .where(eq(prReviewRequests.status, "reviewed"))
+    .where(and(eq(prReviewRequests.status, "reviewed"), notBotAuthor()))
     .orderBy(desc(prReviewRequests.reviewedAt))
     .limit(REVIEWED_LIST_LIMIT);
 

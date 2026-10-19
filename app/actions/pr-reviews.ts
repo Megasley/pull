@@ -41,6 +41,8 @@ function prReviewErrorMessage(reason: string) {
       return "You're submitting too fast. Try again in a moment.";
     case "already_submitted":
       return "This PR is already in the review queue.";
+    case "bot_pr":
+      return "That PR was opened by a bot. Only PRs written by people can go in the review queue.";
     case "already_resolved":
       return "This request has already moved on. Refresh the page to see its current status.";
     case "is_own_pr":
