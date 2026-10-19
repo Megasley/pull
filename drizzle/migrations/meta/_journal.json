@@ -281,6 +281,13 @@
       "when": 1792028889061,
       "tag": "0039_submitted_issues",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1792420823992,
+      "tag": "0040_hide_bot_pr_review_requests",
+      "breakpoints": true
     }
   ]
 }
