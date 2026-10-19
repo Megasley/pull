@@ -1,6 +1,5 @@
 import { Logo } from "@/components/brand/logo";
 import { AuthControls } from "@/components/layout/auth-controls";
-import { BetaBadge } from "@/components/layout/beta-badge";
 import { MainNav } from "@/components/layout/main-nav";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { SiteContainer } from "@/components/layout/site-container";
@@ -38,10 +37,7 @@ export async function Navbar({ className }: NavbarProps) {
       )}
     >
       <SiteContainer className="relative flex h-14 items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <Logo />
-          <BetaBadge />
-        </div>
+        <Logo />
 
         <MainNav />
 
