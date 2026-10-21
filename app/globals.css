@@ -60,6 +60,7 @@
 
 /* Buzz-inspired: flat paper, warm ink, electric signal lime (Pull, not their yellow). */
 :root {
+  color-scheme: light;
   --ink: #231e1e;
   --signal: #c8f231;
   --signal-foreground: #231e1e;
@@ -114,6 +115,7 @@
 }
 
 .dark {
+  color-scheme: dark;
   --ink: #f4f4ef;
   --signal: #c8f231;
   --signal-foreground: #231e1e;
@@ -168,6 +170,13 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  /* Native <select> popups render outside the page on some browsers and don't
+     reliably follow color-scheme — pin option colors to the theme's palette. */
+  option,
+  optgroup {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
   }
   code,
   kbd,
