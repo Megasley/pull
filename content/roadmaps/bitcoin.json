@@ -6,10 +6,10 @@
     {
       "id": "foundations",
       "title": "Foundations",
-      "description": "Toolchain, local regtest lab, Git, crypto, and Bitcoin economics before protocol lessons.",
+      "description": "The big picture first, then your toolchain, local regtest lab, Git, crypto, and Bitcoin economics before protocol lessons.",
       "defaultExpanded": true,
       "position": { "x": 0, "y": 0 },
-      "size": { "width": 340, "height": 510 }
+      "size": { "width": 340, "height": 588 }
     },
     {
       "id": "bitcoin-basics",
@@ -54,14 +54,25 @@
   ],
   "nodes": [
     {
+      "id": "foundations-big-picture",
+      "sectionId": "foundations",
+      "title": "The Big Picture",
+      "description": "Follow one Bitcoin payment from wallet to block, and see how every part of the system fits together.",
+      "duration": "45 minutes",
+      "difficulty": "beginner",
+      "resources": ["Mastering Bitcoin Ch. 2", "Bitcoin Whitepaper", "Mempool.space"],
+      "position": { "x": 24, "y": 88 }
+    },
+    {
       "id": "foundations-intro",
       "sectionId": "foundations",
       "title": "Developer Environment",
       "description": "Set up your toolchain, package manager, and local testing stack for Bitcoin development.",
       "duration": "3 days",
       "difficulty": "beginner",
+      "lockedUntil": ["foundations-big-picture"],
       "resources": ["Pull Setup Guide", "Git Documentation", "Rust Toolchain"],
-      "position": { "x": 24, "y": 88 }
+      "position": { "x": 24, "y": 166 }
     },
     {
       "id": "dev-regtest",
@@ -72,7 +83,7 @@
       "difficulty": "beginner",
       "lockedUntil": ["foundations-intro"],
       "resources": ["Bitcoin Core Regtest", "Docker Compose", "Polar"],
-      "position": { "x": 24, "y": 166 }
+      "position": { "x": 24, "y": 244 }
     },
     {
       "id": "foundations-git",
@@ -83,7 +94,7 @@
       "difficulty": "beginner",
       "lockedUntil": ["dev-regtest"],
       "resources": ["GitHub Flow", "Conventional Commits", "Code Review Guide"],
-      "position": { "x": 24, "y": 244 }
+      "position": { "x": 24, "y": 322 }
     },
     {
       "id": "foundations-crypto",
@@ -94,7 +105,7 @@
       "difficulty": "beginner",
       "lockedUntil": ["foundations-git"],
       "resources": ["Mastering Bitcoin Ch. 4", "Mastering Bitcoin Ch. 8", "BIP-340"],
-      "position": { "x": 24, "y": 322 }
+      "position": { "x": 24, "y": 400 }
     },
     {
       "id": "foundations-economics",
@@ -109,7 +120,7 @@
         "Mastering Bitcoin Ch. 2",
         "Bitcoin Optech Fees"
       ],
-      "position": { "x": 24, "y": 400 },
+      "position": { "x": 24, "y": 478 },
       "chapterCheckpoint": true
     },
     {

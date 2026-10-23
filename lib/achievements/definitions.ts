@@ -42,6 +42,7 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
       type: "nodes_complete",
       roadmap: "bitcoin",
       nodeIds: [
+        "foundations-big-picture",
         "foundations-intro",
         "foundations-git",
         "foundations-crypto",

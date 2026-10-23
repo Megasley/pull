@@ -7,6 +7,7 @@ import { LessonExperience } from "./lesson-experience";
 
 import "@/styles/mdx.css";
 import "@/styles/lesson.css";
+import "@/styles/interactive.css";
 
 type LessonRendererProps = {
   lesson: CompiledLesson;
