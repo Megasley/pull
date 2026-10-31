@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 
+import { ProjectLogo } from "@/components/brand/project-logo";
 import {
   DeveloperToolDifficultyBadge,
   DeveloperToolOpenSourceBadge,
@@ -25,12 +26,7 @@ export function DeveloperToolCard({ tool, className }: DeveloperToolCardProps) {
       )}
     >
       <div className="flex items-start gap-3">
-        <div
-          className="flex size-12 shrink-0 items-center justify-center border border-ink bg-signal font-mono text-xs font-bold text-signal-foreground"
-          aria-hidden
-        >
-          {tool.logo}
-        </div>
+        <ProjectLogo src={tool.logoSrc} fallback={tool.logo} className="size-12" />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="truncate text-sm font-semibold tracking-tight">

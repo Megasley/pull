@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"   stop-color="#B845FF"/>
+      <stop offset="40%"  stop-color="#FF2D92"/>
+      <stop offset="80%"  stop-color="#FF9500"/>
+      <stop offset="100%" stop-color="#FFE600"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="55%">
+      <stop offset="0%"  stop-color="#FFE600" stop-opacity="0.45"/>
+      <stop offset="65%" stop-color="#FF2D92" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="14" flood-color="#000000" flood-opacity="0.28"/>
+    </filter>
+  </defs>
+
+  <!-- Rounded square background (iOS will mask further) -->
+  <rect width="512" height="512" rx="115" fill="url(#bg)"/>
+  <rect width="512" height="512" rx="115" fill="url(#glow)"/>
+
+  <!-- Bold lightning bolt with soft shadow -->
+  <polygon
+    points="302,56 138,290 244,290 200,456 376,234 272,234 330,56"
+    fill="#FFFFFF"
+    filter="url(#shadow)"/>
+</svg>
