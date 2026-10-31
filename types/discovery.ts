@@ -10,6 +10,8 @@ export type DiscoveryRepository = {
   repository: string;
   description: string;
   url: string;
+  /** Project logo under /public/logos/repos. */
+  logoSrc?: string;
   issuesUrl: string;
   maintainer: string;
   language: string;

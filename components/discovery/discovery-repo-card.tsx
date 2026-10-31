@@ -1,5 +1,6 @@
 import { Clock3, ExternalLink, HeartPulse, Tag } from "lucide-react";
 
+import { ProjectLogo } from "@/components/brand/project-logo";
 import { DiscoveryBookmarkButton } from "@/components/discovery/discovery-bookmark-button";
 import { TrackedExternalLink } from "@/components/discovery/tracked-external-link";
 import { Badge } from "@/components/ui/badge";
@@ -49,13 +50,16 @@ export function DiscoveryRepoCard({
       style={{ animationDelay: `${Math.min(index, 12) * 40}ms` }}
     >
       <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h3 className="truncate text-base font-semibold tracking-tight">
-            {repository.name}
-          </h3>
-          <p className="mt-0.5 truncate font-mono text-[11px] text-muted-foreground">
-            {repository.repository}
-          </p>
+        <div className="flex min-w-0 items-start gap-3">
+          <ProjectLogo src={repository.logoSrc} className="size-10" />
+          <div className="min-w-0">
+            <h3 className="truncate text-base font-semibold tracking-tight">
+              {repository.name}
+            </h3>
+            <p className="mt-0.5 truncate font-mono text-[11px] text-muted-foreground">
+              {repository.repository}
+            </p>
+          </div>
         </div>
         <DiscoveryBookmarkButton id={repository.id} compact />
       </div>

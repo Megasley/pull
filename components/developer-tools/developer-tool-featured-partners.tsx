@@ -1,3 +1,4 @@
+import { ProjectLogo } from "@/components/brand/project-logo";
 import { DeveloperToolSponsoredBadge } from "@/components/developer-tools/developer-tool-badge";
 import { Button } from "@/components/ui/button";
 import type { DeveloperTool } from "@/lib/developer-tools/types";
@@ -34,12 +35,11 @@ export function DeveloperToolFeaturedPartners({
           <li key={partner.id} className="min-w-0">
             <article className="flex h-full flex-col p-4 sm:p-5">
               <div className="flex items-start gap-3">
-                <div
-                  className="flex size-11 shrink-0 items-center justify-center border border-ink bg-signal font-mono text-xs font-bold text-signal-foreground"
-                  aria-hidden
-                >
-                  {partner.logo}
-                </div>
+                <ProjectLogo
+                  src={partner.logoSrc}
+                  fallback={partner.logo}
+                  className="size-11"
+                />
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <h3 className="text-sm font-semibold tracking-tight">

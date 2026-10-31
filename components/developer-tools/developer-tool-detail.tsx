@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft, ExternalLink, GitBranch } from "lucide-react";
 
+import { ProjectLogo } from "@/components/brand/project-logo";
 import { CommentThread } from "@/components/comments/comment-thread";
 import {
   DeveloperToolDifficultyBadge,
@@ -27,12 +28,12 @@ export function DeveloperToolDetail({ tool }: DeveloperToolDetailProps) {
         </Button>
 
         <header className="flex flex-col gap-6 border-b border-border pb-10 sm:flex-row sm:items-start">
-          <div
-            className="flex size-20 shrink-0 items-center justify-center border-2 border-ink bg-signal font-mono text-xl font-bold text-signal-foreground sm:size-24 sm:text-2xl"
-            aria-hidden
-          >
-            {tool.logo}
-          </div>
+          <ProjectLogo
+            src={tool.logoSrc}
+            fallback={tool.logo}
+            sizes="192px"
+            className="size-20 border-2 text-xl sm:size-24 sm:text-2xl"
+          />
           <div className="min-w-0 flex-1">
             <p className="tech-eyebrow">developer-tools // {tool.category}</p>
             <div className="mt-2 flex flex-wrap items-center gap-2">

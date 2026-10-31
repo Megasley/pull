@@ -46,6 +46,8 @@ export type DeveloperTool = {
   github?: string;
   /** Initials or short mark used when no image asset exists. */
   logo: string;
+  /** Project logo under /public/logos/tools; falls back to `logo`. */
+  logoSrc?: string;
   /** Boosted in the main directory sort. */
   featured: boolean;
   /** Subtle Sponsored badge. */
