@@ -39,14 +39,14 @@ export const socialLinks = [
     icon: "x",
   },
   {
-    title: "Buzz Community",
-    href: "https://pull.communities.buzz.xyz/invite/v2.2UvyWPcITanGWkmizYh9YBOWEzW4gtQ20HFsyV7erpo",
-    icon: "buzz",
+    title: "Discord",
+    href: "https://discord.gg/h6bVpb9uF2",
+    icon: "discord",
   },
 ] as const satisfies readonly {
   title: string;
   href: string;
-  icon: "github" | "x" | "buzz";
+  icon: "github" | "x" | "discord";
 }[];
 
 export type SocialLink = (typeof socialLinks)[number];
