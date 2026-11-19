@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Logo } from "@/components/brand/logo";
+import { NewsletterSignup } from "@/components/landing/newsletter-signup";
 import { SiteContainer } from "@/components/layout/site-container";
 import { getCurrentSessionContext } from "@/lib/auth/session";
 import {
@@ -11,6 +12,7 @@ import {
   type SocialIconName,
 } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
+import { isZohoCampaignsConfigured } from "@/lib/zoho-campaigns/env";
 
 type FooterProps = {
   className?: string;
@@ -95,6 +97,21 @@ export async function Footer({ className }: FooterProps) {
                   </Link>
                 ))}
               </nav>
+            ) : null}
+            {isZohoCampaignsConfigured() ? (
+              <section
+                aria-labelledby="footer-newsletter-heading"
+                className="max-w-sm space-y-2 pt-3"
+              >
+                <p id="footer-newsletter-heading" className="tech-eyebrow">
+                  newsletter
+                </p>
+                <p className="font-mono text-xs leading-relaxed text-muted-foreground">
+                  New roadmaps, projects, and contribution opportunities. Occasional, no
+                  spam.
+                </p>
+                <NewsletterSignup />
+              </section>
             ) : null}
           </div>
 
